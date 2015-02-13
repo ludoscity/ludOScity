@@ -6,7 +6,7 @@ package com.udem.ift2906.bixitracksexplorer.backend;
 public class TrackPoint {
     public float lat;
     public float lon;
-    public float elev;
+    public float ele;
     public String timeUTC;
 
     public float speed;
