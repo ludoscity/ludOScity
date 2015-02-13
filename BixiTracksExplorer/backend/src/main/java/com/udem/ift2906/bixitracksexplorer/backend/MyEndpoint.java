@@ -15,7 +15,7 @@ import javax.inject.Named;
 /**
  * An endpoint class we are exposing
  */
-@Api(name = "myApi", version = "v1", namespace = @ApiNamespace(ownerDomain = "backend.bixitracksexplorer.ift2906.udem.com", ownerName = "backend.bixitracksexplorer.ift2906.udem.com", packagePath = ""))
+@Api(name = "bixiTracksAPI", version = "v1", namespace = @ApiNamespace(ownerDomain = "backend.bixitracksexplorer.ift2906.udem.com", ownerName = "backend.bixitracksexplorer.ift2906.udem.com", packagePath = ""))
 public class MyEndpoint {
 
     /**
@@ -27,6 +27,23 @@ public class MyEndpoint {
         response.setData("Hi, " + name);
 
         return response;
+    }
+
+    @ApiMethod(name = "getTrack")
+    public Track getTrack()
+    {
+
+        BixiTrackXMLParser parser = new BixiTrackXMLParser();
+        return parser.readFromFile("pouet");
+
+        /*Track truc = new Track();
+
+        truc.name = "TEST";
+        truc.helmet = true;
+        truc.rating = 10;
+
+
+        return truc;*/
     }
 
 }
