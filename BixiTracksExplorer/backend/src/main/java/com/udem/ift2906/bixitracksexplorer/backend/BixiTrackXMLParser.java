@@ -40,8 +40,6 @@ public class BixiTrackXMLParser extends DefaultHandler {
     //It returns the stations uri if data have been read from input
     public Track readFromFile(String fileFullPath)
     {
-        fileFullPath="WEB-INF/Bixi__TrajetTrack201205180952.gpx";
-
 /*
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <gpx version="1.1" creator="nl.sogeti.android.gpstracker" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/gpx/1/1/gpx.xsd" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpx10="http://www.topografix.com/GPX/1/0" xmlns:ogt10="http://gpstracker.android.sogeti.nl/GPX/1/0" xmlns:f8f10="http://bixitracker.android.f8full.net/GPX/1/0">
