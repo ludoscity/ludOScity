@@ -10,14 +10,17 @@ import javax.jdo.annotations.PrimaryKey;
  * Created by F8Full on 2015-02-12.
  */
 @PersistenceCapable
+//failed attempt at children loading
+//@FetchGroup(name="pointsgeodata", members={@Persistent(name="lat"),
+//                                        @Persistent(name="lon"),})
 public class TrackPoint {
 
     @PrimaryKey
     private Key timeUTC;
 
-    @Persistent
+    @Persistent//(defaultFetchGroup = "true") failed attempt at children loading
     private float lat;
-    @Persistent
+    @Persistent//(defaultFetchGroup = "true") failed attempt at children loading
     private float lon;
     @Persistent
     private float ele;

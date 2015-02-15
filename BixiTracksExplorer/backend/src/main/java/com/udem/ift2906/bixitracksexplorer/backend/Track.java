@@ -3,7 +3,11 @@ package com.udem.ift2906.bixitracksexplorer.backend;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.jdo.annotations.Element;
@@ -24,6 +28,17 @@ public class Track {
     //TODO: try using Java DATE object to manipulate timeUTC
     @PrimaryKey
     private Key KEY_timeUTC ;
+
+    //This field is only intended as an internal way to execute queries with time filter
+    //directly supported by JDO
+    /*Simply declare the dateField as java.util.Date, then use
+
+query.setFilter("dateField < dateParam");
+query.declareParameters("java.util.Date dateParam");
+List<...> results = (List<...>) query.execute(new java.util.Date());*/
+    //http://stackoverflow.com/questions/3600779/google-app-engine-jdo-use-date-in-filter
+    @Persistent
+    private Date DATE_timeUTC;
 
     @Persistent
     private String name;
@@ -65,6 +80,15 @@ public class Track {
     public void setTimeUTC(String timeUTC) {
 
         this.KEY_timeUTC = KeyFactory.createKey(Track.class.getSimpleName(), timeUTC);
+
+        //2012-05-18T13:52:26Z
+        //public static final SimpleDateFormat ZULU_DATE_FORMATER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        try {
+            DATE_timeUTC = format.parse(timeUTC);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isHelmet() {

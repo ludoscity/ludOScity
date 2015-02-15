@@ -21,7 +21,7 @@ public class WarmupRequestListerner implements ServletContextListener {
         List<Track> allTracks = new ArrayList<>();
         //list all files in folder
 
-        final String FOLDER_PATH = "WEB-INF/";
+        final String FOLDER_PATH = "WEB-INF/";//TracksGPXFiles/";
 
         FilenameFilter filter = new FilenameFilter() {
             @Override

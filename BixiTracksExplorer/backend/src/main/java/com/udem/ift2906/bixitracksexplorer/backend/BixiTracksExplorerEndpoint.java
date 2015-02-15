@@ -9,10 +9,16 @@ package com.udem.ift2906.bixitracksexplorer.backend;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Named;
@@ -63,6 +69,74 @@ public class BixiTracksExplorerEndpoint {
             pm.close();
         }
     }
+
+    @ApiMethod(name = "Debug")
+    public Track Debug() throws ParseException {
+
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+        Date asDate = format.parse("2012-04-02T18:17:12Z");
+
+        String dateAsString = format.format(asDate);
+
+        return GetTrackFromTimeUTCKeyDate(asDate);
+
+
+    }
+
+    //Accepts Date object directly as parameter
+    //
+    @ApiMethod(name = "getTrackFromTimeUTCKeyDate")
+    public Track GetTrackFromTimeUTCKeyDate(@Named("TimeUTCDate") Date timeUTCDate) {
+
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+        String debug = format.format(timeUTCDate);
+
+        return GetTrackFromTimeUTCKeyString(format.format(timeUTCDate));
+    }
+
+    //Retrieve by timeUTC key string
+    //This function retrieves one track by key
+    //TWO OPTIONS :
+    // --Give the full points data
+    // --Give only a partial reading (points keys ??) IDEA : points lat/long
+
+    //This version retrieves all TrackPoints data
+    @ApiMethod(name = "getTrackFromTimeUTCKeyString")
+    public Track GetTrackFromTimeUTCKeyString(@Named("TimeUTCDate") String timeUTCDate) {
+        Track response = new Track();
+
+        PersistenceManager pm = PMF.get().getPersistenceManager();
+
+
+        //Build key from received data
+        Key k = KeyFactory.createKey(Track.class.getSimpleName(), timeUTCDate);//format.format(timeUTCDate));
+
+        pm.getFetchPlan().addGroup("pointskey");
+        //pm.getFetchPlan().addGroup("pointsgeodata");
+
+        //Retrieves corresponding object in the datastore
+        try
+        {
+            response = pm.getObjectById(Track.class, k);
+
+            //Touching all track points to get them loaded (UGLY) TODO: find a better way to handle this
+            for (TrackPoint point : response.getPoints())
+            {
+                float truc = point.getLat();
+            }
+        }
+        finally {
+            pm.close();
+        }
+
+
+        //
+        return response;
+    }
+
+    //
 
     //This retrieve all tracks with associated data (Bd dump)
     @SuppressWarnings("unchecked")  //return (List<Track>) q.execute();
