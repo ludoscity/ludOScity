@@ -84,6 +84,8 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
         //2012-05-18T13:52:26Z
         //public static final SimpleDateFormat ZULU_DATE_FORMATER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        //TimeZone utc = TimeZone.getTimeZone("UTC");
+        //format.setTimeZone(utc); // ZULU_DATE_FORMAT format ends with Z for UTC so make that true
         try {
             DATE_timeUTC = format.parse(timeUTC);
         } catch (ParseException e) {

@@ -60,7 +60,7 @@ public class BixiTracksExplorerEndpoint {
         q.setDatastoreReadTimeoutMillis(10000);
 
         //q.setFilter("lastName == lastNameParam");
-        q.setOrdering("KEY_timeUTC desc");
+        q.setOrdering("DATE_timeUTC asc");
         //q.declareParameters("String lastNameParam");
 
         try {
@@ -74,6 +74,8 @@ public class BixiTracksExplorerEndpoint {
     public Track Debug() throws ParseException {
 
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        //TimeZone utc = TimeZone.getTimeZone("UTC");
+        //format.setTimeZone(utc); // ZULU_DATE_FORMAT format ends with Z for UTC so make that true
 
         Date asDate = format.parse("2012-04-02T18:17:12Z");
 
@@ -84,12 +86,79 @@ public class BixiTracksExplorerEndpoint {
 
     }
 
+    @ApiMethod(name = "DebugDateRange")
+    public List<Track> DebugDateRange() throws ParseException {
+
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        //TimeZone utc = TimeZone.getTimeZone("UTC");
+        //format.setTimeZone(utc); // ZULU_DATE_FORMAT format ends with Z for UTC so make that true
+
+        Date startDate =
+                format.parse("2012-04-13T13:22:13Z");
+        Date endDate =
+                format.parse("2012-04-15T14:58:36Z");
+
+
+        return GetTracksForDateRange(startDate, endDate);
+    }
+
+    @ApiMethod(name = "getTracksForDateRange")
+    public List<Track> GetTracksForDateRange(@Named("StartDate") Date startDate, @Named("EndDate") Date endDate)
+    {
+        //TODO : check in end date is posterior to start one
+        List<Track> response = new ArrayList<>();
+
+        PersistenceManager pm = PMF.get().getPersistenceManager();
+
+        /*Simply declare the dateField as java.util.Date, then use
+
+query.setFilter("dateField < dateParam");
+query.declareParameters("java.util.Date dateParam");
+List<...> results = (List<...>) query.execute(new java.util.Date());*/
+
+        //Starting to get a grasp of fetchgroup
+        //http://db.apache.org/jdo/fetchgroups.html
+        //pm.getFetchPlan().addGroup("pointskey");
+        //pm.getFetchPlan.addGroup("pointsData");
+
+
+        Query q = pm.newQuery(Track.class);
+        q.setFilter("DATE_timeUTC >= startDate && DATE_timeUTC <= endDate");
+        q.declareParameters("java.util.Date startDate, java.util.Date endDate");
+        q.setOrdering("DATE_timeUTC asc");
+
+        q.setDatastoreReadTimeoutMillis(10000);
+
+        try
+        {
+            response = (List<Track>)q.execute(startDate, endDate);
+
+            for (Track track : response)
+            {
+                for (TrackPoint point:track.getPoints())
+                {
+                    float touch = point.getLat();
+                }
+            }
+        }
+        finally {
+            pm.close();
+        }
+
+
+        //q.setFilter("lastName == lastNameParam");
+
+        return response;
+    }
+
     //Accepts Date object directly as parameter
     //
     @ApiMethod(name = "getTrackFromTimeUTCKeyDate")
     public Track GetTrackFromTimeUTCKeyDate(@Named("TimeUTCDate") Date timeUTCDate) {
 
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        //TimeZone utc = TimeZone.getTimeZone("UTC");
+        //format.setTimeZone(utc); // ZULU_DATE_FORMAT format ends with Z for UTC so make that true
 
         String debug = format.format(timeUTCDate);
 
