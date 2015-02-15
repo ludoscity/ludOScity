@@ -1,5 +1,7 @@
 package com.udem.ift2906.bixitracksexplorer.backend;
 
+import com.google.appengine.api.datastore.Key;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -28,11 +30,11 @@ public class BixiTrackXMLParser extends DefaultHandler {
     private TrackPoint mTempTrackPoint;
 
     //The whole object from the parsing
-    private Track mToReturn; //I'm somehow disturbed to do it like that
+    private Track mTrackToReturn; //I'm somehow disturbed to do it like that
 
     public BixiTrackXMLParser()
     {
-        mToReturn = new Track();
+        mTrackToReturn = new Track();
     }
 
     //This is a one block for all stations right now, I'll probably cut it later
@@ -93,7 +95,7 @@ UN SEUL trkseg par track garanti dans ce cas là. -->
         }
 
 
-        return mToReturn;
+        return mTrackToReturn;
     }
 
     @Override
@@ -108,8 +110,8 @@ UN SEUL trkseg par track garanti dans ce cas là. -->
             mTempTrackPoint = new TrackPoint();
 
             //extract lat lon attributes
-            mTempTrackPoint.lat = Float.parseFloat(attributes.getValue("lat"));
-            mTempTrackPoint.lon = Float.parseFloat(attributes.getValue("lon"));
+            mTempTrackPoint.setLat(Float.parseFloat(attributes.getValue("lat")));
+            mTempTrackPoint.setLon(Float.parseFloat(attributes.getValue("lon")));
 
         }
     }
@@ -121,69 +123,71 @@ UN SEUL trkseg par track garanti dans ce cas là. -->
         {
             if (element.equalsIgnoreCase("ele"))
             {
-                mTempTrackPoint.ele = Float.parseFloat(mBufferedString.toString());
+                mTempTrackPoint.setEle(Float.parseFloat(mBufferedString.toString()));
 
             }
             else if (element.equalsIgnoreCase("time"))
             {
-                mTempTrackPoint.timeUTC = mBufferedString.toString();
+                Key key = mTrackToReturn.builChildKey(TrackPoint.class.getSimpleName(), mBufferedString.toString());
+                mTempTrackPoint.setTimeUTC(key);
+                //mTempTrackPoint.setTimeUTC(mBufferedString.toString());
 
             }
             else if (element.equalsIgnoreCase("gpx10:speed"))
             {
-                mTempTrackPoint.speed = Float.parseFloat(mBufferedString.toString());
+                mTempTrackPoint.setSpeed(Float.parseFloat(mBufferedString.toString()));
 
             }
             else if (element.equalsIgnoreCase("ogt10:accuracy"))
             {
-                mTempTrackPoint.accurary = Float.parseFloat(mBufferedString.toString());
+                mTempTrackPoint.setAccurary(Float.parseFloat(mBufferedString.toString()));
 
             }
             else if (element.equalsIgnoreCase("gpx10:course"))
             {
-                mTempTrackPoint.heading = Float.parseFloat(mBufferedString.toString());
+                mTempTrackPoint.setHeading(Float.parseFloat(mBufferedString.toString()));
 
             }
             else if (element.equalsIgnoreCase("trkpt"))
             {
-                mToReturn.points.add(mTempTrackPoint);
+                mTrackToReturn.getPoints().add(mTempTrackPoint);
                 mParsingTrkpt = false;
             }
 
         }
         else if (element.equalsIgnoreCase("name"))
         {
-            mToReturn.name = mBufferedString.toString();
+            mTrackToReturn.setName(mBufferedString.toString());
         }
         else if (element.equalsIgnoreCase("time"))
         {
-            mToReturn.timeUTC = mBufferedString.toString();
+           mTrackToReturn.setTimeUTC(mBufferedString.toString());
         }
         else if (element.equalsIgnoreCase("f8f10:helmet"))
         {
             String value = mBufferedString.toString();
 
-            mToReturn.helmet = !value.equalsIgnoreCase("0");
+            mTrackToReturn.setHelmet(!value.equalsIgnoreCase("0"));
         }
         else if (element.equalsIgnoreCase("f8f10:startreason"))
         {
-            mToReturn.startReason = mBufferedString.toString();
+            mTrackToReturn.setStartReason(mBufferedString.toString());
         }
         else if (element.equalsIgnoreCase("f8f10:endreason"))
         {
-            mToReturn.endReason = mBufferedString.toString();
+            mTrackToReturn.setEndReason(mBufferedString.toString());
         }
         else if (element.equalsIgnoreCase("f8f10:startstationname"))
         {
-            mToReturn.startStationName = mBufferedString.toString();
+            mTrackToReturn.setStartStationName(mBufferedString.toString());
         }
         else if (element.equalsIgnoreCase("f8f10:endStationName"))
         {
-            mToReturn.endStationName = mBufferedString.toString();
+            mTrackToReturn.setEndStationName(mBufferedString.toString());
         }
         else if (element.equalsIgnoreCase("f8f10:rating"))
         {
-            mToReturn.rating = Integer.parseInt(mBufferedString.toString());
+            mTrackToReturn.setRating(Integer.parseInt(mBufferedString.toString()));
         }
     }
 
