@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<gpx version="1.1" creator="nl.sogeti.android.gpstracker" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/gpx/1/1/gpx.xsd" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpx10="http://www.topografix.com/GPX/1/0" xmlns:ogt10="http://gpstracker.android.sogeti.nl/GPX/1/0" xmlns:f8f10="http://bixitracker.android.f8full.net/GPX/1/0">
+<metadata>
+<time>2012-05-11T20:03:07Z</time>
+</metadata>
+<trk>
+<name>Bixi__Trajet|Track 2012-05-11 16:03</name>
+<extensions>
+<f8f10:helmet>0</f8f10:helmet>
+<f8f10:startReason>Work</f8f10:startReason>
+<f8f10:endReason>Home</f8f10:endReason>
+<f8f10:startStationName>Saint-Dominique / Saint-Viateur</f8f10:startStationName>
+<f8f10:endStationName>Brébeuf / Laurier</f8f10:endStationName>
+<f8f10:rating>5</f8f10:rating>
+</extensions>
+<trkseg>
+<trkpt lat="45.53015209" lon="-73.58739128">
+<ele>0.0</ele>
+<time>2012-05-11T20:09:25Z</time>
+<extensions>
+<gpx10:speed>3.0</gpx10:speed>
+<ogt10:accuracy>40.0</ogt10:accuracy>
+<gpx10:course>25.899999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53057356" lon="-73.58692272">
+<ele>0.0</ele>
+<time>2012-05-11T20:09:39Z</time>
+<extensions>
+<gpx10:speed>3.75</gpx10:speed>
+<ogt10:accuracy>40.0</ogt10:accuracy>
+<gpx10:course>45.599998474121094</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53347694" lon="-73.58400308">
+<ele>0.0</ele>
+<time>2012-05-11T20:10:40Z</time>
+<extensions>
+<gpx10:speed>0.5</gpx10:speed>
+<ogt10:accuracy>35.7770881652832</ogt10:accuracy>
+<gpx10:course>338.20001220703125</gpx10:course></extensions>
+</trkpt>
+</trkseg>
+</trk>
+</gpx>

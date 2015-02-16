@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<gpx version="1.1" creator="nl.sogeti.android.gpstracker" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/gpx/1/1/gpx.xsd" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpx10="http://www.topografix.com/GPX/1/0" xmlns:ogt10="http://gpstracker.android.sogeti.nl/GPX/1/0" xmlns:f8f10="http://bixitracker.android.f8full.net/GPX/1/0">
+<metadata>
+<time>2012-05-09T16:39:39Z</time>
+</metadata>
+<trk>
+<name>Bixi__Trajet|Track 2012-05-09 12:39</name>
+<extensions>
+<f8f10:helmet>0</f8f10:helmet>
+<f8f10:startReason></f8f10:startReason>
+<f8f10:endReason></f8f10:endReason>
+<f8f10:startStationName></f8f10:startStationName>
+<f8f10:endStationName></f8f10:endStationName>
+<f8f10:rating>0</f8f10:rating>
+</extensions>
+<trkseg>
+<trkpt lat="45.5239359" lon="-73.60029561">
+<ele>32.900001525878906</ele>
+<time>2012-05-09T16:39:41Z</time>
+<extensions>
+<ogt10:accuracy>10.0</ogt10:accuracy></extensions>
+</trkpt>
+<trkpt lat="45.52392216" lon="-73.60040858">
+<ele>50.20000076293945</ele>
+<time>2012-05-09T16:40:27Z</time>
+<extensions>
+<gpx10:speed>0.55901700258255</gpx10:speed>
+<ogt10:accuracy>3.605551242828369</ogt10:accuracy>
+<gpx10:course>252.6999969482422</gpx10:course></extensions>
+</trkpt>
+</trkseg>
+</trk>
+</gpx>
