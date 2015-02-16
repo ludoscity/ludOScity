@@ -70,14 +70,14 @@ public class BixiTracksExplorerEndpoint {
         }
     }
 
-    @ApiMethod(name = "Debug")
-    public Track Debug() throws ParseException {
+    @ApiMethod(name = "DebugOneTrack")
+    public Track DebugOneTrack() throws ParseException {
 
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         //TimeZone utc = TimeZone.getTimeZone("UTC");
         //format.setTimeZone(utc); // ZULU_DATE_FORMAT format ends with Z for UTC so make that true
 
-        Date asDate = format.parse("2012-04-02T18:17:12Z");
+        Date asDate = format.parse("2012-04-02T18:40:46Z");
 
         String dateAsString = format.format(asDate);
 
@@ -94,9 +94,9 @@ public class BixiTracksExplorerEndpoint {
         //format.setTimeZone(utc); // ZULU_DATE_FORMAT format ends with Z for UTC so make that true
 
         Date startDate =
-                format.parse("2012-04-13T13:22:13Z");
+                format.parse("2012-04-02T20:30:58Z");
         Date endDate =
-                format.parse("2012-04-15T14:58:36Z");
+                format.parse("2012-04-04T01:02:48Z");
 
 
         return GetTracksForDateRange(startDate, endDate);
@@ -208,41 +208,77 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
     //
 
     //This retrieve all tracks with associated data (Bd dump)
-    @SuppressWarnings("unchecked")  //return (List<Track>) q.execute();
-    @ApiMethod(name = "getAllFromDatastore")
-    public List<Track> GetAllFromDatastore()
-    {
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+//    @SuppressWarnings("unchecked")  //return (List<Track>) q.execute();
+//    @ApiMethod(name = "getAllFromDatastore")
+//    public List<Track> GetAllFromDatastore()
+//    {
+//        PersistenceManager pm = PMF.get().getPersistenceManager();
+//
+//        //Starting to get a grasp of fetchgroup
+//        //http://db.apache.org/jdo/fetchgroups.html
+//        pm.getFetchPlan().addGroup("pointskey");
+//        //pm.getFetchPlan.addGroup("pointsData");
+//
+//
+//        Query q = pm.newQuery(Track.class);
+//
+//
+//        q.setDatastoreReadTimeoutMillis(10000);
+//
+//        //q.setFilter("lastName == lastNameParam");
+//        q.setOrdering("KEY_timeUTC desc");
+//        //q.declareParameters("String lastNameParam");
+//
+//        try {
+//            return (List<Track>) q.execute();
+//        }finally {
+//            pm.close();
+//        }
+//    }
 
-        //Starting to get a grasp of fetchgroup
-        //http://db.apache.org/jdo/fetchgroups.html
-        pm.getFetchPlan().addGroup("pointskey");
-        //pm.getFetchPlan.addGroup("pointsData");
+//    @ApiMethod(name = "getAllfromXML")
+//    public List<Track> getAllFromXML()
+//    {
+//        List<Track> toReturn = new ArrayList<>();
+//        //list all files in folder
+//
+//        final String FOLDER_PATH = "WEB-INF/";
+//
+//        FilenameFilter filter = new FilenameFilter() {
+//            @Override
+//            public boolean accept(File file, String s) {
+//                return s.contains(".gpx");
+//            }
+//        };
+//
+//        File folder = new File(FOLDER_PATH);
+//        File[] listOfFiles = folder.listFiles(filter);
+//
+//
+//        //for each
+//        //-invoke XML parser and put result in toReturn
+//
+//        //BixiTrackXMLParser parser = new BixiTrackXMLParser();
+//
+//        for (File file : listOfFiles) {
+//            //should I reuse the same parser or create one each time ?
+//
+//            //TEST 1 : One parser per file : 2200ms - 360 -- IMPLEMENTED
+//            //TEST 2 : One parser to parse them all : 2600 - 900
+//            BixiTrackXMLParser parser = new BixiTrackXMLParser();
+//            toReturn.add(parser.readFromFile(FOLDER_PATH + file.getName()));
+//
+//        }
+//
+//        return toReturn;
+//    }
 
-
-        Query q = pm.newQuery(Track.class);
-
-
-        q.setDatastoreReadTimeoutMillis(10000);
-
-        //q.setFilter("lastName == lastNameParam");
-        q.setOrdering("KEY_timeUTC desc");
-        //q.declareParameters("String lastNameParam");
-
-        try {
-            return (List<Track>) q.execute();
-        }finally {
-            pm.close();
-        }
-    }
-
-    @ApiMethod(name = "getAllfromXML")
-    public List<Track> getAllFromXML()
+    @ApiMethod(name = "load10TracksFromXML")
+    public List<Track> load10TracksFromXML(@Named("startIdx") int startIdx)
     {
         List<Track> toReturn = new ArrayList<>();
-        //list all files in folder
 
-        final String FOLDER_PATH = "WEB-INF/";
+        final String FOLDER_PATH = "WEB-INF/TracksGPXFiles/";
 
         FilenameFilter filter = new FilenameFilter() {
             @Override
@@ -255,20 +291,38 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
         File[] listOfFiles = folder.listFiles(filter);
 
 
-        //for each
-        //-invoke XML parser and put result in toReturn
 
-        //BixiTrackXMLParser parser = new BixiTrackXMLParser();
+       for (int i=startIdx; i<startIdx+10; ++i)
+       {
+           PersistenceManager pm = PMF.get().getPersistenceManager();
 
-        for (File file : listOfFiles) {
-            //should I reuse the same parser or create one each time ?
+           Track newTrack = new Track();
 
-            //TEST 1 : One parser per file : 2200ms - 360 -- IMPLEMENTED
-            //TEST 2 : One parser to parse them all : 2600 - 900
-            BixiTrackXMLParser parser = new BixiTrackXMLParser();
-            toReturn.add(parser.readFromFile(FOLDER_PATH + file.getName()));
+           if (i < listOfFiles.length)
+           {
+               File trackFile = listOfFiles[i];
 
-        }
+
+               BixiTrackXMLParser parser = new BixiTrackXMLParser();
+
+               newTrack = parser.readFromFile(FOLDER_PATH + trackFile.getName());
+
+
+
+               try {
+                   pm.makePersistent(newTrack);
+
+                   toReturn.add(newTrack);
+               }
+               catch (Exception e)
+               {
+                   break;
+               }
+               finally {
+                   pm.close();
+               }
+           }
+       }
 
         return toReturn;
     }
