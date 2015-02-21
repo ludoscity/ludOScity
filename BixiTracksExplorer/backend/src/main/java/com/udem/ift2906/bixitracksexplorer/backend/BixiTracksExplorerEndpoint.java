@@ -22,13 +22,14 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 /**
  * An endpoint class we are exposing
  */
-@Api(name = "bixiTracksExplorerAPI", version = "v1", namespace = @ApiNamespace(ownerDomain = "backend.bixitracksexplorer.ift2906.udem.com", ownerName = "backend.bixitracksexplorer.ift2906.udem.com", packagePath = ""))
+@Api(name = "bixiTracksExplorerAPI", version = "v2", namespace = @ApiNamespace(ownerDomain = "backend.bixitracksexplorer.ift2906.udem.com", ownerName = "backend.bixitracksexplorer.ift2906.udem.com", packagePath = ""))
 public class BixiTracksExplorerEndpoint {
 
     /**
@@ -273,8 +274,8 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
 //        return toReturn;
 //    }
 
-    @ApiMethod(name = "load10TracksFromXML")
-    public List<Track> load10TracksFromXML(@Named("startIdx") int startIdx)
+    @ApiMethod(name = "loadTracksFromXML")
+    public List<Track> loadTracksFromXML(@Named("startIdx") int startIdx, @Named("howMany") int howMany)
     {
         List<Track> toReturn = new ArrayList<>();
 
@@ -292,7 +293,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
 
 
 
-       for (int i=startIdx; i<startIdx+10; ++i)
+       for (int i=startIdx; i<startIdx+howMany; ++i)
        {
            PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -307,18 +308,25 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
 
                newTrack = parser.readFromFile(FOLDER_PATH + trackFile.getName());
 
-
-
                try {
+
+                   Key k = KeyFactory.createKey(Track.class.getSimpleName(), newTrack.getKEY_TimeUTC());
+                   pm.getObjectById(Track.class, k);
+
+                   //We get there only if the Track was already in the datastore
+                   newTrack.setTimeUTC("ALREADY IN DB, NOT ADDED");
+                   newTrack.setName("ALREADY IN DB, NOT ADDED");
+               }
+               catch (JDOObjectNotFoundException e)
+               {
+                   //Not in the datastore, let's add it
                    pm.makePersistent(newTrack);
 
-                   toReturn.add(newTrack);
-               }
-               catch (Exception e)
-               {
-                   break;
+                   continue;
                }
                finally {
+                   toReturn.add(newTrack);
+
                    pm.close();
                }
            }
