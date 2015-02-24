@@ -1,15 +1,14 @@
 package com.udem.ift2906.bixitracksexplorer;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
+import android.widget.ExpandableListView;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -53,14 +52,75 @@ public class MainActivity extends ActionBarActivity {
      */
     public static class PlaceholderFragment extends Fragment {
 
+        //final static String ARG_POSITION = "position";
+        //int mCurrentPosition = -1;
+
+        ExpandableListView mExpListView;
+        //ExpandableListAdapter mListAdapter;
+
+
+
         public PlaceholderFragment() {
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
+
+
+            //Expan
+            return inflater.inflate(R.layout.fragment_main, container, false);
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+
+//            // During startup, check if there are arguments passed to the fragment.
+//            // onStart is a good place to do this because the layout has already been
+//            // applied to the fragment at this point so we can safely call the method
+//            // below that sets the article text.
+//            Bundle args = getArguments();
+//            if (args != null) {
+//                // Set article based on argument passed in
+//                updateArticleView(args.getInt(ARG_POSITION));
+//            } else if (mCurrentPosition != -1) {
+//                // Set article based on saved instance state defined during onCreateView
+//                updateArticleView(mCurrentPosition);
+//            }
+
+            // get the listview
+            mExpListView = (ExpandableListView) getActivity().findViewById(R.id.lvExp);
+
+            //I should have a progress bar in my group / item layouts and activate them
+            //OR have a completely separated loading fragment
+            // preparing list data
+            prepareListData();
+
+
+        }
+
+        //public void updateArticleView(int position) {
+            //TextView article = (TextView) getActivity().findViewById(R.id.article);
+            //article.setText(Ipsum.Articles[position]);
+            //mCurrentPosition = position;
+        //}
+
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            super.onSaveInstanceState(outState);
+
+            // Save the current article selection in case we need to recreate the fragment
+            //outState.putInt(ARG_POSITION, mCurrentPosition);
+        }
+
+        private void prepareListData()
+        {
+
+            //start ASynchTask that retrieves data over the web
+            new RetrieveTrackListTask(getActivity()).execute(mExpListView);
         }
     }
+
+
 }
