@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<gpx version="1.1" creator="nl.sogeti.android.gpstracker" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/gpx/1/1/gpx.xsd" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpx10="http://www.topografix.com/GPX/1/0" xmlns:ogt10="http://gpstracker.android.sogeti.nl/GPX/1/0" xmlns:f8f10="http://bixitracker.android.f8full.net/GPX/1/0">
+<metadata>
+<time>2012-04-14T22:17:01Z</time>
+</metadata>
+<trk>
+<name>Bixi__Trajet|Track 2012-04-14 18:17</name>
+<extensions>
+<f8f10:helmet>0</f8f10:helmet>
+<f8f10:startReason>Else</f8f10:startReason>
+<f8f10:endReason>Home</f8f10:endReason>
+<f8f10:startStationName>Saint-André / Ontario</f8f10:startStationName>
+<f8f10:endStationName>Brébeuf / Laurier</f8f10:endStationName>
+<f8f10:rating>5</f8f10:rating>
+</extensions>
+<trkseg>
+<trkpt lat="45.5187946" lon="-73.56346441">
+<ele>11.0</ele>
+<time>2012-04-14T22:17:02Z</time>
+<extensions>
+<ogt10:accuracy>17.0880069732666</ogt10:accuracy>
+<gpx10:course>118.30000305175781</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.51989383" lon="-73.5632269">
+<ele>18.0</ele>
+<time>2012-04-14T22:18:41Z</time>
+<extensions>
+<gpx10:speed>1.0</gpx10:speed>
+<ogt10:accuracy>20.0</ogt10:accuracy>
+<gpx10:course>21.399999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5203376" lon="-73.56289633">
+<ele>7.099999904632568</ele>
+<time>2012-04-14T22:20:10Z</time>
+<extensions>
+<gpx10:speed>0.9013878107070923</gpx10:speed>
+<ogt10:accuracy>22.627416610717773</ogt10:accuracy>
+<gpx10:course>65.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52262985" lon="-73.56625932">
+<ele>49.5</ele>
+<time>2012-04-14T22:21:39Z</time>
+<extensions>
+<ogt10:accuracy>28.844409942626953</ogt10:accuracy>
+<gpx10:course>0.10000000149011612</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5234127" lon="-73.56693095">
+<ele>5.199999809265137</ele>
+<time>2012-04-14T22:22:14Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>17.8885440826416</ogt10:accuracy>
+<gpx10:course>295.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52399422" lon="-73.56773714">
+<ele>2.0999999046325684</ele>
+<time>2012-04-14T22:22:38Z</time>
+<extensions>
+<gpx10:speed>1.5</gpx10:speed>
+<ogt10:accuracy>20.0</ogt10:accuracy>
+<gpx10:course>321.6000061035156</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52624933" lon="-73.57078978">
+<ele>27.700000762939453</ele>
+<time>2012-04-14T22:24:10Z</time>
+<extensions>
+<gpx10:speed>5.0</gpx10:speed>
+<ogt10:accuracy>14.422204971313477</ogt10:accuracy>
+<gpx10:course>290.20001220703125</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5270325" lon="-73.57277733">
+<ele>21.600000381469727</ele>
+<time>2012-04-14T22:26:12Z</time>
+<extensions>
+<gpx10:speed>2.2360680103302</gpx10:speed>
+<ogt10:accuracy>25.298221588134766</ogt10:accuracy>
+<gpx10:course>305.6000061035156</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52847267" lon="-73.5756754">
+<ele>53.099998474121094</ele>
+<time>2012-04-14T22:27:42Z</time>
+<extensions>
+<gpx10:speed>3.5</gpx10:speed>
+<ogt10:accuracy>25.298221588134766</ogt10:accuracy>
+<gpx10:course>313.8999938964844</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5313857" lon="-73.58267847">
+<ele>41.20000076293945</ele>
+<time>2012-04-14T22:29:12Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>25.298221588134766</ogt10:accuracy>
+<gpx10:course>293.1000061035156</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53156002" lon="-73.58284245">
+<ele>33.20000076293945</ele>
+<time>2012-04-14T22:29:42Z</time>
+<extensions>
+<gpx10:speed>1.0</gpx10:speed>
+<ogt10:accuracy>17.0880069732666</ogt10:accuracy>
+<gpx10:course>290.29998779296875</gpx10:course></extensions>
+</trkpt>
+</trkseg>
+</trk>
+</gpx>

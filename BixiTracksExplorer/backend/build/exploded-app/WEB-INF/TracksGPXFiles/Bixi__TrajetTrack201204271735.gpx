@@ -1,0 +1,1256 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<gpx version="1.1" creator="nl.sogeti.android.gpstracker" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/gpx/1/1/gpx.xsd" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpx10="http://www.topografix.com/GPX/1/0" xmlns:ogt10="http://gpstracker.android.sogeti.nl/GPX/1/0" xmlns:f8f10="http://bixitracker.android.f8full.net/GPX/1/0">
+<metadata>
+<time>2012-04-27T21:35:18Z</time>
+</metadata>
+<trk>
+<name>Bixi__Trajet|Track 2012-04-27 17:35</name>
+<extensions>
+<f8f10:helmet>0</f8f10:helmet>
+<f8f10:startReason>Work</f8f10:startReason>
+<f8f10:endReason>Home</f8f10:endReason>
+<f8f10:startStationName>Clark / Saint-Viateur</f8f10:startStationName>
+<f8f10:endStationName>Brébeuf / Laurier</f8f10:endStationName>
+<f8f10:rating>5</f8f10:rating>
+</extensions>
+<trkseg>
+<trkpt lat="45.52507013" lon="-73.59944011">
+<ele>35.70000076293945</ele>
+<time>2012-04-27T21:35:21Z</time>
+<extensions>
+<ogt10:accuracy>17.0880069732666</ogt10:accuracy>
+<gpx10:course>6.599999904632568</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52517318" lon="-73.59935743">
+<ele>40.5</ele>
+<time>2012-04-27T21:35:35Z</time>
+<extensions>
+<ogt10:accuracy>12.649110794067383</ogt10:accuracy></extensions>
+</trkpt>
+<trkpt lat="45.525192" lon="-73.59922671">
+<ele>41.900001525878906</ele>
+<time>2012-04-27T21:35:43Z</time>
+<extensions>
+<gpx10:speed>1.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>113.69999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52516947" lon="-73.59908424">
+<ele>43.79999923706055</ele>
+<time>2012-04-27T21:35:46Z</time>
+<extensions>
+<gpx10:speed>3.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>121.5999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5251313" lon="-73.59896543">
+<ele>45.29999923706055</ele>
+<time>2012-04-27T21:35:48Z</time>
+<extensions>
+<gpx10:speed>4.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>123.9000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52506079" lon="-73.59878648">
+<ele>45.70000076293945</ele>
+<time>2012-04-27T21:35:51Z</time>
+<extensions>
+<gpx10:speed>5.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>122.0999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52503653" lon="-73.5986288">
+<ele>44.70000076293945</ele>
+<time>2012-04-27T21:35:53Z</time>
+<extensions>
+<gpx10:speed>5.25</gpx10:speed>
+<ogt10:accuracy>6.324555397033691</ogt10:accuracy>
+<gpx10:course>121.80000305175781</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52501424" lon="-73.5985694">
+<ele>44.599998474121094</ele>
+<time>2012-04-27T21:35:54Z</time>
+<extensions>
+<gpx10:speed>5.0</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>120.19999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52496973" lon="-73.59844911">
+<ele>44.29999923706055</ele>
+<time>2012-04-27T21:35:56Z</time>
+<extensions>
+<gpx10:speed>5.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>119.30000305175781</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52492871" lon="-73.59833067">
+<ele>44.70000076293945</ele>
+<time>2012-04-27T21:35:58Z</time>
+<extensions>
+<gpx10:speed>5.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>120.69999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52487967" lon="-73.59820886">
+<ele>44.900001525878906</ele>
+<time>2012-04-27T21:36:00Z</time>
+<extensions>
+<gpx10:speed>5.5</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>119.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52477921" lon="-73.59802905">
+<ele>42.79999923706055</ele>
+<time>2012-04-27T21:36:03Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>119.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52472005" lon="-73.59790544">
+<ele>43.0</ele>
+<time>2012-04-27T21:36:05Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>121.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52467585" lon="-73.59776395">
+<ele>42.5</ele>
+<time>2012-04-27T21:36:07Z</time>
+<extensions>
+<gpx10:speed>5.5</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>120.69999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52461918" lon="-73.59762982">
+<ele>42.5</ele>
+<time>2012-04-27T21:36:09Z</time>
+<extensions>
+<gpx10:speed>5.5</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>119.5999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5245549" lon="-73.5974982">
+<ele>41.70000076293945</ele>
+<time>2012-04-27T21:36:11Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>120.9000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52448876" lon="-73.59737702">
+<ele>41.5</ele>
+<time>2012-04-27T21:36:13Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>123.30000305175781</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52442904" lon="-73.59723689">
+<ele>40.5</ele>
+<time>2012-04-27T21:36:15Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>121.4000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52436454" lon="-73.59710618">
+<ele>39.70000076293945</ele>
+<time>2012-04-27T21:36:17Z</time>
+<extensions>
+<gpx10:speed>6.269968032836914</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>126.9000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52428216" lon="-73.59699153">
+<ele>38.900001525878906</ele>
+<time>2012-04-27T21:36:19Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>124.4000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52425128" lon="-73.5969165">
+<ele>38.599998474121094</ele>
+<time>2012-04-27T21:36:20Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>123.69999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5242239" lon="-73.59684825">
+<ele>38.20000076293945</ele>
+<time>2012-04-27T21:36:21Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>123.19999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52418876" lon="-73.59678027">
+<ele>38.29999923706055</ele>
+<time>2012-04-27T21:36:22Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>123.0999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52415066" lon="-73.59670635">
+<ele>38.0</ele>
+<time>2012-04-27T21:36:23Z</time>
+<extensions>
+<gpx10:speed>6.75</gpx10:speed>
+<ogt10:accuracy>6.324555397033691</ogt10:accuracy>
+<gpx10:course>124.5999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52407238" lon="-73.59657141">
+<ele>39.20000076293945</ele>
+<time>2012-04-27T21:36:25Z</time>
+<extensions>
+<gpx10:speed>6.75</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>124.9000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52404698" lon="-73.59648442">
+<ele>39.20000076293945</ele>
+<time>2012-04-27T21:36:26Z</time>
+<extensions>
+<gpx10:speed>6.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>123.19999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52401548" lon="-73.59639844">
+<ele>38.79999923706055</ele>
+<time>2012-04-27T21:36:27Z</time>
+<extensions>
+<gpx10:speed>7.0</gpx10:speed>
+<ogt10:accuracy>6.324555397033691</ogt10:accuracy>
+<gpx10:course>123.80000305175781</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52397663" lon="-73.59633167">
+<ele>36.599998474121094</ele>
+<time>2012-04-27T21:36:28Z</time>
+<extensions>
+<gpx10:speed>7.040063858032227</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>127.69999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52393989" lon="-73.59625285">
+<ele>34.900001525878906</ele>
+<time>2012-04-27T21:36:29Z</time>
+<extensions>
+<gpx10:speed>6.823671817779541</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>125.5999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52391228" lon="-73.59618746">
+<ele>34.5</ele>
+<time>2012-04-27T21:36:30Z</time>
+<extensions>
+<gpx10:speed>6.51920223236084</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>125.0999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52387673" lon="-73.59612032">
+<ele>33.900001525878906</ele>
+<time>2012-04-27T21:36:31Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>125.5999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52381065" lon="-73.59599231">
+<ele>34.400001525878906</ele>
+<time>2012-04-27T21:36:33Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>123.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52377569" lon="-73.59592045">
+<ele>34.0</ele>
+<time>2012-04-27T21:36:34Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>122.19999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52374267" lon="-73.5958445">
+<ele>33.79999923706055</ele>
+<time>2012-04-27T21:36:35Z</time>
+<extensions>
+<gpx10:speed>6.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>120.19999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5236798" lon="-73.59569892">
+<ele>33.79999923706055</ele>
+<time>2012-04-27T21:36:37Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>121.4000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52361908" lon="-73.59557246">
+<ele>34.599998474121094</ele>
+<time>2012-04-27T21:36:39Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>125.19999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52355075" lon="-73.59544686">
+<ele>34.400001525878906</ele>
+<time>2012-04-27T21:36:41Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>125.80000305175781</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52350491" lon="-73.59532079">
+<ele>32.79999923706055</ele>
+<time>2012-04-27T21:36:43Z</time>
+<extensions>
+<gpx10:speed>5.852349758148193</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>129.10000610351563</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52343889" lon="-73.5952197">
+<ele>31.100000381469727</ele>
+<time>2012-04-27T21:36:45Z</time>
+<extensions>
+<gpx10:speed>4.776243209838867</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>131.1999969482422</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5233993" lon="-73.5951527">
+<ele>31.0</ele>
+<time>2012-04-27T21:36:47Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>124.30000305175781</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52334313" lon="-73.59510788">
+<ele>32.0</ele>
+<time>2012-04-27T21:36:50Z</time>
+<extensions>
+<gpx10:speed>2.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>146.60000610351563</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52331382" lon="-73.59500742">
+<ele>32.400001525878906</ele>
+<time>2012-04-27T21:36:53Z</time>
+<extensions>
+<gpx10:speed>3.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>125.19999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52327111" lon="-73.59489418">
+<ele>32.400001525878906</ele>
+<time>2012-04-27T21:36:55Z</time>
+<extensions>
+<gpx10:speed>5.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>129.3000030517578</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52321495" lon="-73.59477568">
+<ele>32.900001525878906</ele>
+<time>2012-04-27T21:36:57Z</time>
+<extensions>
+<gpx10:speed>5.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>127.4000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52316051" lon="-73.59463328">
+<ele>33.5</ele>
+<time>2012-04-27T21:36:59Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>123.4000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52310619" lon="-73.59451212">
+<ele>34.20000076293945</ele>
+<time>2012-04-27T21:37:01Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>6.324555397033691</ogt10:accuracy>
+<gpx10:course>126.4000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5230754" lon="-73.59444931">
+<ele>34.400001525878906</ele>
+<time>2012-04-27T21:37:02Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>128.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52305705" lon="-73.59435647">
+<ele>34.5</ele>
+<time>2012-04-27T21:37:03Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>123.19999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52303289" lon="-73.594287">
+<ele>34.400001525878906</ele>
+<time>2012-04-27T21:37:04Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>4.4721360206604</ogt10:accuracy>
+<gpx10:course>122.4000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52300421" lon="-73.59421096">
+<ele>34.20000076293945</ele>
+<time>2012-04-27T21:37:05Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>6.324555397033691</ogt10:accuracy>
+<gpx10:course>124.0999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52295424" lon="-73.59406843">
+<ele>34.400001525878906</ele>
+<time>2012-04-27T21:37:07Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>119.5999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52289116" lon="-73.59391164">
+<ele>35.29999923706055</ele>
+<time>2012-04-27T21:37:09Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>8.5440034866333</ogt10:accuracy>
+<gpx10:course>121.5999984741211</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52284038" lon="-73.5937579">
+<ele>36.0</ele>
+<time>2012-04-27T21:37:11Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>120.69999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52276931" lon="-73.59366698">
+<ele>34.29999923706055</ele>
+<time>2012-04-27T21:37:13Z</time>
+<extensions>
+<gpx10:speed>4.5</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>125.19999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52272833" lon="-73.59354117">
+<ele>35.29999923706055</ele>
+<time>2012-04-27T21:37:15Z</time>
+<extensions>
+<gpx10:speed>4.5</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>115.69999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52267054" lon="-73.5934053">
+<ele>36.29999923706055</ele>
+<time>2012-04-27T21:37:18Z</time>
+<extensions>
+<gpx10:speed>3.25</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>109.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52261324" lon="-73.59330608">
+<ele>36.099998474121094</ele>
+<time>2012-04-27T21:37:21Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>120.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52264119" lon="-73.59318141">
+<ele>35.20000076293945</ele>
+<time>2012-04-27T21:37:27Z</time>
+<extensions>
+<gpx10:speed>1.820027470588684</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>48.29999923706055</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52277251" lon="-73.59308393">
+<ele>34.29999923706055</ele>
+<time>2012-04-27T21:37:32Z</time>
+<extensions>
+<gpx10:speed>2.5</gpx10:speed>
+<ogt10:accuracy>13.416407585144043</ogt10:accuracy>
+<gpx10:course>35.099998474121094</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52292487" lon="-73.593025">
+<ele>31.899999618530273</ele>
+<time>2012-04-27T21:37:38Z</time>
+<extensions>
+<gpx10:speed>1.5811388492584229</gpx10:speed>
+<ogt10:accuracy>14.422204971313477</ogt10:accuracy>
+<gpx10:course>40.70000076293945</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5230964" lon="-73.59290527">
+<ele>28.600000381469727</ele>
+<time>2012-04-27T21:38:00Z</time>
+<extensions>
+<gpx10:speed>1.25</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>55.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52319216" lon="-73.59275054">
+<ele>27.100000381469727</ele>
+<time>2012-04-27T21:38:03Z</time>
+<extensions>
+<gpx10:speed>1.25</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>24.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52325856" lon="-73.59268393">
+<ele>26.5</ele>
+<time>2012-04-27T21:38:05Z</time>
+<extensions>
+<gpx10:speed>1.5</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>26.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52332629" lon="-73.592568">
+<ele>24.700000762939453</ele>
+<time>2012-04-27T21:38:14Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>24.899999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52344704" lon="-73.59247563">
+<ele>23.700000762939453</ele>
+<time>2012-04-27T21:38:18Z</time>
+<extensions>
+<gpx10:speed>3.75</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>24.600000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52374204" lon="-73.59226188">
+<ele>31.100000381469727</ele>
+<time>2012-04-27T21:38:28Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>17.8885440826416</ogt10:accuracy>
+<gpx10:course>28.100000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52393144" lon="-73.5920844">
+<ele>31.200000762939453</ele>
+<time>2012-04-27T21:38:32Z</time>
+<extensions>
+<gpx10:speed>3.75</gpx10:speed>
+<ogt10:accuracy>20.0</ogt10:accuracy>
+<gpx10:course>33.79999923706055</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52412738" lon="-73.59174854">
+<ele>30.799999237060547</ele>
+<time>2012-04-27T21:38:43Z</time>
+<extensions>
+<gpx10:speed>1.5811388492584229</gpx10:speed>
+<ogt10:accuracy>28.844409942626953</ogt10:accuracy>
+<gpx10:course>122.4000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52444975" lon="-73.59154889">
+<ele>32.5</ele>
+<time>2012-04-27T21:38:46Z</time>
+<extensions>
+<gpx10:speed>3.783186435699463</gpx10:speed>
+<ogt10:accuracy>26.832815170288086</ogt10:accuracy>
+<gpx10:course>31.700000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52459495" lon="-73.59141329">
+<ele>34.099998474121094</ele>
+<time>2012-04-27T21:38:50Z</time>
+<extensions>
+<gpx10:speed>1.25</gpx10:speed>
+<ogt10:accuracy>14.422204971313477</ogt10:accuracy>
+<gpx10:course>34.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52470785" lon="-73.59134722">
+<ele>36.29999923706055</ele>
+<time>2012-04-27T21:39:20Z</time>
+<extensions>
+<gpx10:speed>0.75</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>37.29999923706055</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52476681" lon="-73.59127683">
+<ele>36.599998474121094</ele>
+<time>2012-04-27T21:39:21Z</time>
+<extensions>
+<gpx10:speed>1.346291184425354</gpx10:speed>
+<ogt10:accuracy>8.485280990600586</ogt10:accuracy>
+<gpx10:course>58.29999923706055</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52486694" lon="-73.59115288">
+<ele>41.5</ele>
+<time>2012-04-27T21:39:26Z</time>
+<extensions>
+<gpx10:speed>2.5</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>77.4000015258789</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52498293" lon="-73.59106306">
+<ele>42.29999923706055</ele>
+<time>2012-04-27T21:39:29Z</time>
+<extensions>
+<gpx10:speed>3.5</gpx10:speed>
+<ogt10:accuracy>8.485280990600586</ogt10:accuracy>
+<gpx10:course>50.599998474121094</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52512222" lon="-73.59093305">
+<ele>42.70000076293945</ele>
+<time>2012-04-27T21:39:30Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>41.400001525878906</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52521142" lon="-73.59082659">
+<ele>43.79999923706055</ele>
+<time>2012-04-27T21:39:32Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>46.70000076293945</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52536974" lon="-73.59067831">
+<ele>44.5</ele>
+<time>2012-04-27T21:39:34Z</time>
+<extensions>
+<gpx10:speed>7.75</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>36.400001525878906</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52549667" lon="-73.59057074">
+<ele>44.5</ele>
+<time>2012-04-27T21:39:36Z</time>
+<extensions>
+<gpx10:speed>7.25</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>31.799999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52558623" lon="-73.59053886">
+<ele>44.599998474121094</ele>
+<time>2012-04-27T21:39:37Z</time>
+<extensions>
+<gpx10:speed>7.25</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>25.299999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52571941" lon="-73.59046821">
+<ele>45.29999923706055</ele>
+<time>2012-04-27T21:39:39Z</time>
+<extensions>
+<gpx10:speed>7.0</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>27.700000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5258628" lon="-73.59033123">
+<ele>46.099998474121094</ele>
+<time>2012-04-27T21:39:42Z</time>
+<extensions>
+<gpx10:speed>5.25</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>31.399999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52603162" lon="-73.59021513">
+<ele>46.79999923706055</ele>
+<time>2012-04-27T21:39:46Z</time>
+<extensions>
+<gpx10:speed>1.5</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>41.79999923706055</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52613097" lon="-73.59013548">
+<ele>48.0</ele>
+<time>2012-04-27T21:39:47Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>37.79999923706055</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52621247" lon="-73.59001307">
+<ele>49.79999923706055</ele>
+<time>2012-04-27T21:39:49Z</time>
+<extensions>
+<gpx10:speed>3.5</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>50.400001525878906</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52636912" lon="-73.58989149">
+<ele>51.20000076293945</ele>
+<time>2012-04-27T21:39:52Z</time>
+<extensions>
+<gpx10:speed>5.024937629699707</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>34.20000076293945</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52647529" lon="-73.58981881">
+<ele>51.79999923706055</ele>
+<time>2012-04-27T21:39:54Z</time>
+<extensions>
+<gpx10:speed>5.0</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>27.299999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52662109" lon="-73.5897261">
+<ele>49.29999923706055</ele>
+<time>2012-04-27T21:39:56Z</time>
+<extensions>
+<gpx10:speed>5.5</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>28.200000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52670666" lon="-73.58967126">
+<ele>49.20000076293945</ele>
+<time>2012-04-27T21:39:57Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>29.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52679742" lon="-73.58958459">
+<ele>49.599998474121094</ele>
+<time>2012-04-27T21:39:58Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>29.899999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52691098" lon="-73.58950227">
+<ele>48.900001525878906</ele>
+<time>2012-04-27T21:40:00Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>28.100000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52702967" lon="-73.58939751">
+<ele>49.099998474121094</ele>
+<time>2012-04-27T21:40:02Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>30.399999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52713291" lon="-73.58931199">
+<ele>50.0</ele>
+<time>2012-04-27T21:40:04Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>30.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52724841" lon="-73.58920944">
+<ele>50.5</ele>
+<time>2012-04-27T21:40:06Z</time>
+<extensions>
+<gpx10:speed>6.75</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>31.100000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52734591" lon="-73.58913739">
+<ele>50.79999923706055</ele>
+<time>2012-04-27T21:40:08Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>32.900001525878906</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52745161" lon="-73.5890468">
+<ele>50.20000076293945</ele>
+<time>2012-04-27T21:40:10Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>29.899999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52754421" lon="-73.58895778">
+<ele>49.900001525878906</ele>
+<time>2012-04-27T21:40:12Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>30.600000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52766041" lon="-73.58885491">
+<ele>50.20000076293945</ele>
+<time>2012-04-27T21:40:14Z</time>
+<extensions>
+<gpx10:speed>7.0</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>32.20000076293945</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52774708" lon="-73.58872877">
+<ele>50.900001525878906</ele>
+<time>2012-04-27T21:40:16Z</time>
+<extensions>
+<gpx10:speed>7.0</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>34.20000076293945</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52786239" lon="-73.58860012">
+<ele>51.400001525878906</ele>
+<time>2012-04-27T21:40:18Z</time>
+<extensions>
+<gpx10:speed>7.0</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>34.599998474121094</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52796539" lon="-73.58850884">
+<ele>51.70000076293945</ele>
+<time>2012-04-27T21:40:20Z</time>
+<extensions>
+<gpx10:speed>6.75</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>30.100000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52802515" lon="-73.58845178">
+<ele>51.0</ele>
+<time>2012-04-27T21:40:21Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>31.700000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52815087" lon="-73.5883653">
+<ele>50.099998474121094</ele>
+<time>2012-04-27T21:40:24Z</time>
+<extensions>
+<gpx10:speed>5.25</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>28.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52824444" lon="-73.58828707">
+<ele>50.0</ele>
+<time>2012-04-27T21:40:26Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>31.299999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52830467" lon="-73.58825083">
+<ele>50.099998474121094</ele>
+<time>2012-04-27T21:40:28Z</time>
+<extensions>
+<gpx10:speed>4.25</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>27.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52841235" lon="-73.58819314">
+<ele>50.099998474121094</ele>
+<time>2012-04-27T21:40:33Z</time>
+<extensions>
+<gpx10:speed>1.0</gpx10:speed>
+<ogt10:accuracy>10.0</ogt10:accuracy>
+<gpx10:course>10.699999809265137</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52856948" lon="-73.58812987">
+<ele>52.20000076293945</ele>
+<time>2012-04-27T21:41:26Z</time>
+<extensions>
+<gpx10:speed>1.0</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>31.899999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52866222" lon="-73.58803973">
+<ele>51.5</ele>
+<time>2012-04-27T21:41:30Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>38.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52878741" lon="-73.58782392">
+<ele>45.70000076293945</ele>
+<time>2012-04-27T21:41:36Z</time>
+<extensions>
+<gpx10:speed>2.3048861026763916</gpx10:speed>
+<ogt10:accuracy>13.416407585144043</ogt10:accuracy>
+<gpx10:course>83.19999694824219</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52890642" lon="-73.58772979">
+<ele>46.599998474121094</ele>
+<time>2012-04-27T21:41:39Z</time>
+<extensions>
+<gpx10:speed>3.25</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>41.20000076293945</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5290059" lon="-73.58764609">
+<ele>47.79999923706055</ele>
+<time>2012-04-27T21:41:41Z</time>
+<extensions>
+<gpx10:speed>4.75</gpx10:speed>
+<ogt10:accuracy>8.9442720413208</ogt10:accuracy>
+<gpx10:course>41.29999923706055</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52913009" lon="-73.58754954">
+<ele>49.0</ele>
+<time>2012-04-27T21:41:43Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>34.79999923706055</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52923162" lon="-73.58746944">
+<ele>50.29999923706055</ele>
+<time>2012-04-27T21:41:45Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>30.600000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52930348" lon="-73.58742661">
+<ele>51.099998474121094</ele>
+<time>2012-04-27T21:41:46Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>26.200000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52936995" lon="-73.58735762">
+<ele>50.5</ele>
+<time>2012-04-27T21:41:47Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>29.700000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52945198" lon="-73.58729182">
+<ele>50.20000076293945</ele>
+<time>2012-04-27T21:41:49Z</time>
+<extensions>
+<gpx10:speed>5.75</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>25.899999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52951747" lon="-73.58723083">
+<ele>50.20000076293945</ele>
+<time>2012-04-27T21:41:51Z</time>
+<extensions>
+<gpx10:speed>5.5</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>33.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52960377" lon="-73.58716386">
+<ele>50.0</ele>
+<time>2012-04-27T21:41:53Z</time>
+<extensions>
+<gpx10:speed>5.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>32.599998474121094</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52964878" lon="-73.58713654">
+<ele>49.70000076293945</ele>
+<time>2012-04-27T21:41:54Z</time>
+<extensions>
+<gpx10:speed>5.0</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>34.20000076293945</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52972441" lon="-73.5870774">
+<ele>49.0</ele>
+<time>2012-04-27T21:41:56Z</time>
+<extensions>
+<gpx10:speed>4.5</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>31.799999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52979129" lon="-73.58703854">
+<ele>49.400001525878906</ele>
+<time>2012-04-27T21:41:58Z</time>
+<extensions>
+<gpx10:speed>4.25</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>29.799999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5298424" lon="-73.58698587">
+<ele>48.900001525878906</ele>
+<time>2012-04-27T21:42:00Z</time>
+<extensions>
+<gpx10:speed>3.5</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>31.899999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52989793" lon="-73.58694503">
+<ele>49.0</ele>
+<time>2012-04-27T21:42:02Z</time>
+<extensions>
+<gpx10:speed>2.5</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>32.099998474121094</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52994238" lon="-73.58689024">
+<ele>46.20000076293945</ele>
+<time>2012-04-27T21:42:05Z</time>
+<extensions>
+<gpx10:speed>1.346291184425354</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>34.79999923706055</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.52998125" lon="-73.58682182">
+<ele>43.20000076293945</ele>
+<time>2012-04-27T21:42:07Z</time>
+<extensions>
+<gpx10:speed>1.5811388492584229</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>32.29999923706055</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53002261" lon="-73.58679344">
+<ele>42.79999923706055</ele>
+<time>2012-04-27T21:42:09Z</time>
+<extensions>
+<gpx10:speed>2.5</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>20.100000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53006857" lon="-73.58676652">
+<ele>41.5</ele>
+<time>2012-04-27T21:42:11Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>27.399999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53010889" lon="-73.58673525">
+<ele>40.599998474121094</ele>
+<time>2012-04-27T21:42:12Z</time>
+<extensions>
+<gpx10:speed>3.5</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>28.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53015188" lon="-73.58669774">
+<ele>41.099998474121094</ele>
+<time>2012-04-27T21:42:13Z</time>
+<extensions>
+<gpx10:speed>4.0</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>28.200000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53022593" lon="-73.58663192">
+<ele>40.400001525878906</ele>
+<time>2012-04-27T21:42:15Z</time>
+<extensions>
+<gpx10:speed>4.5</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>32.5</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53036542" lon="-73.5865301">
+<ele>40.5</ele>
+<time>2012-04-27T21:42:18Z</time>
+<extensions>
+<gpx10:speed>5.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>24.799999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53041779" lon="-73.58648302">
+<ele>40.099998474121094</ele>
+<time>2012-04-27T21:42:19Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>27.700000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53053077" lon="-73.58639396">
+<ele>40.099998474121094</ele>
+<time>2012-04-27T21:42:21Z</time>
+<extensions>
+<gpx10:speed>6.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>31.299999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53062505" lon="-73.58631484">
+<ele>39.400001525878906</ele>
+<time>2012-04-27T21:42:23Z</time>
+<extensions>
+<gpx10:speed>6.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>27.799999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53072599" lon="-73.58624249">
+<ele>38.79999923706055</ele>
+<time>2012-04-27T21:42:25Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>27.100000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53082312" lon="-73.58616768">
+<ele>38.79999923706055</ele>
+<time>2012-04-27T21:42:27Z</time>
+<extensions>
+<gpx10:speed>5.771697998046875</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>27.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53092738" lon="-73.58608066">
+<ele>38.400001525878906</ele>
+<time>2012-04-27T21:42:29Z</time>
+<extensions>
+<gpx10:speed>6.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>31.200000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53100121" lon="-73.58599246">
+<ele>37.599998474121094</ele>
+<time>2012-04-27T21:42:31Z</time>
+<extensions>
+<gpx10:speed>4.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>38.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.5310656" lon="-73.58593208">
+<ele>37.29999923706055</ele>
+<time>2012-04-27T21:42:33Z</time>
+<extensions>
+<gpx10:speed>4.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>31.200000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53115627" lon="-73.58585248">
+<ele>37.099998474121094</ele>
+<time>2012-04-27T21:42:35Z</time>
+<extensions>
+<gpx10:speed>4.75</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>30.600000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53123697" lon="-73.58577509">
+<ele>36.0</ele>
+<time>2012-04-27T21:42:37Z</time>
+<extensions>
+<gpx10:speed>5.25</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>28.899999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53133907" lon="-73.58569962">
+<ele>35.5</ele>
+<time>2012-04-27T21:42:39Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>28.299999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53143993" lon="-73.5856197">
+<ele>35.5</ele>
+<time>2012-04-27T21:42:41Z</time>
+<extensions>
+<gpx10:speed>6.5</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>29.399999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53154198" lon="-73.58555528">
+<ele>34.79999923706055</ele>
+<time>2012-04-27T21:42:43Z</time>
+<extensions>
+<gpx10:speed>6.25</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>27.899999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53164036" lon="-73.58549439">
+<ele>36.20000076293945</ele>
+<time>2012-04-27T21:42:45Z</time>
+<extensions>
+<gpx10:speed>5.25</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>24.799999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53170244" lon="-73.58542687">
+<ele>36.5</ele>
+<time>2012-04-27T21:42:47Z</time>
+<extensions>
+<gpx10:speed>4.25</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>30.600000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53181812" lon="-73.58535478">
+<ele>33.5</ele>
+<time>2012-04-27T21:42:52Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>7.211102485656738</ogt10:accuracy>
+<gpx10:course>5.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53187903" lon="-73.58537087">
+<ele>34.400001525878906</ele>
+<time>2012-04-27T21:42:54Z</time>
+<extensions>
+<gpx10:speed>3.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>2.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53195419" lon="-73.5853501">
+<ele>33.79999923706055</ele>
+<time>2012-04-27T21:42:56Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>11.0</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53201052" lon="-73.58531066">
+<ele>34.900001525878906</ele>
+<time>2012-04-27T21:42:58Z</time>
+<extensions>
+<gpx10:speed>2.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>21.200000762939453</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53210747" lon="-73.58524204">
+<ele>35.29999923706055</ele>
+<time>2012-04-27T21:43:01Z</time>
+<extensions>
+<gpx10:speed>3.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>27.100000381469727</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53221214" lon="-73.58516834">
+<ele>35.099998474121094</ele>
+<time>2012-04-27T21:43:04Z</time>
+<extensions>
+<gpx10:speed>4.0</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>25.899999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53225911" lon="-73.58513012">
+<ele>35.29999923706055</ele>
+<time>2012-04-27T21:43:07Z</time>
+<extensions>
+<gpx10:speed>3.75</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>22.799999237060547</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53232378" lon="-73.58509801">
+<ele>34.0</ele>
+<time>2012-04-27T21:43:08Z</time>
+<extensions>
+<gpx10:speed>3.25</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>15.300000190734863</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53238338" lon="-73.58509312">
+<ele>33.79999923706055</ele>
+<time>2012-04-27T21:43:10Z</time>
+<extensions>
+<gpx10:speed>2.25</gpx10:speed>
+<ogt10:accuracy>5.0</ogt10:accuracy>
+<gpx10:course>10.399999618530273</gpx10:course></extensions>
+</trkpt>
+<trkpt lat="45.53248907" lon="-73.58510816">
+<ele>31.100000381469727</ele>
+<time>2012-04-27T21:43:14Z</time>
+<extensions>
+<gpx10:speed>1.75</gpx10:speed>
+<ogt10:accuracy>6.7082037925720215</ogt10:accuracy>
+<gpx10:course>340.79998779296875</gpx10:course></extensions>
+</trkpt>
+</trkseg>
+</trk>
+</gpx>
