@@ -1,0 +1,9 @@
+package com.udem.ift2906.bixitracksexplorer.backend;
+
+/**
+ * Created by F8Full on 2015-03-15.
+ * As BaseResult is abstract, this empty class is a way to obtain an object with just a meta field
+ */
+//This empty class is used cause Base itself is abstract but we don't want any data here
+public class TestMetaResult extends BaseResult {
+}

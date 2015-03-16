@@ -11,6 +11,7 @@ import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.udem.ift2906.bixitracksexplorer.backend.Utils.Utils;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -29,7 +30,7 @@ import javax.jdo.Query;
 /**
  * An endpoint class we are exposing
  */
-@Api(name = "bixiTracksExplorerAPI", version = "v2", namespace = @ApiNamespace(ownerDomain = "backend.bixitracksexplorer.ift2906.udem.com", ownerName = "backend.bixitracksexplorer.ift2906.udem.com", packagePath = ""))
+@Api(name = "bixiTracksExplorerAPI", version = "v3", namespace = @ApiNamespace(ownerDomain = "backend.bixitracksexplorer.ift2906.udem.com", ownerName = "backend.bixitracksexplorer.ift2906.udem.com", packagePath = ""))
 public class BixiTracksExplorerEndpoint {
 
     /**
@@ -42,11 +43,31 @@ public class BixiTracksExplorerEndpoint {
 
         return response;
     }
-    //This retrieves all tracks ommiting points
+
+    /**
+     * TEST Meta
+     */
+    @ApiMethod(name = "testMeta")
+    public TestMetaResult testMeta() {
+
+        TestMetaResult response = new TestMetaResult();
+
+        Utils.ResultMeta.addLicense(response.meta);
+
+        //For a rapid demo of the JSONObject interface
+        response.meta.put("testMetaString", "testMeta");
+        response.meta.put("testMetaBool", true);
+        response.meta.put("testMetaInt", 666);
+
+
+        return response;
+    }
+    //TODO: Types for results (ie : ListTracksResult, GetTrackFromTimeUTCKeyDateResult, ...)
+    //This retrieves all tracks omitting points
     //Use it to get to Track(s) key(s) which are timeUTC
-    @SuppressWarnings("unchecked")  //return (List<Track>) q.execute();
+    @SuppressWarnings("unchecked")  //responseList = (List<Track>) q.execute();
     @ApiMethod(name = "listTracks")
-    public List<Track> listTracks()
+    public ListTracksResult listTracks()
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -64,11 +85,20 @@ public class BixiTracksExplorerEndpoint {
         q.setOrdering("DATE_timeUTC asc");
         //q.declareParameters("String lastNameParam");
 
+        List<Track> responseList = new ArrayList<>();
+
         try {
-            return (List<Track>) q.execute();
+
+            responseList = (List<Track>) q.execute();
         }finally {
             pm.close();
         }
+
+        ListTracksResult response = new ListTracksResult(responseList);
+
+        Utils.ResultMeta.addLicense(response.meta);
+
+        return response;
     }
 
     @ApiMethod(name = "DebugOneTrack")
@@ -80,7 +110,7 @@ public class BixiTracksExplorerEndpoint {
 
         Date asDate = format.parse("2012-04-02T18:40:46Z");
 
-        String dateAsString = format.format(asDate);
+        //String dateAsString = format.format(asDate);
 
         return GetTrackFromTimeUTCKeyDate(asDate);
 
@@ -103,6 +133,8 @@ public class BixiTracksExplorerEndpoint {
         return GetTracksForDateRange(startDate, endDate);
     }
 
+    @SuppressWarnings({"unchecked",//response = (List<Track>)q.execute(startDate, endDate);
+            "unused"})  //float touch = point.getLat();
     @ApiMethod(name = "getTracksForDateRange")
     public List<Track> GetTracksForDateRange(@Named("StartDate") Date startDate, @Named("EndDate") Date endDate)
     {
@@ -138,6 +170,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
             {
                 for (TrackPoint point:track.getPoints())
                 {
+                    //So that datastore loads ALL trackPoint data fields
                     float touch = point.getLat();
                 }
             }
@@ -161,7 +194,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
         //TimeZone utc = TimeZone.getTimeZone("UTC");
         //format.setTimeZone(utc); // ZULU_DATE_FORMAT format ends with Z for UTC so make that true
 
-        String debug = format.format(timeUTCDate);
+        //String debug = format.format(timeUTCDate);
 
         return GetTrackFromTimeUTCKeyString(format.format(timeUTCDate));
     }
@@ -173,6 +206,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
     // --Give only a partial reading (points keys ??) IDEA : points lat/long
 
     //This version retrieves all TrackPoints data
+    @SuppressWarnings("unused")  //float touch = point.getLat();
     @ApiMethod(name = "getTrackFromTimeUTCKeyString")
     public Track GetTrackFromTimeUTCKeyString(@Named("TimeUTCDate") String timeUTCDate) {
         Track response = new Track();
@@ -194,7 +228,8 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
             //Touching all track points to get them loaded (UGLY) TODO: find a better way to handle this
             for (TrackPoint point : response.getPoints())
             {
-                float truc = point.getLat();
+                //So that datastore lazy loading in forced to get ALL TrackPoint data fields
+                float touch = point.getLat();
             }
         }
         finally {
@@ -297,7 +332,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
        {
            PersistenceManager pm = PMF.get().getPersistenceManager();
 
-           Track newTrack = new Track();
+           Track newTrack;
 
            if (i < listOfFiles.length)
            {
@@ -321,8 +356,6 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
                {
                    //Not in the datastore, let's add it
                    pm.makePersistent(newTrack);
-
-                   continue;
                }
                finally {
                    toReturn.add(newTrack);
