@@ -7,6 +7,7 @@ import android.widget.ExpandableListView;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.BixiTracksExplorerAPI;
+import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.ListTracksResult;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.TrackCollection;
 
@@ -17,6 +18,8 @@ import java.util.List;
 
 /**
  * Created by F8Full on 2015-02-19.
+ * This ASyncTask sets up the backend service object in PreExecute and as a simple DoInBackground
+ * code consisting in calling the listTracks endpoint method
  */
 public class RetrieveTrackListTask extends AsyncTask<ExpandableListView, Void, Void> {
 
@@ -100,19 +103,31 @@ public class RetrieveTrackListTask extends AsyncTask<ExpandableListView, Void, V
         mExpListView = expandableListViews[0];
 
         TrackCollection collection = new TrackCollection();
+        collection.setItems(new ArrayList<Track>());
+        ListTracksResult listTracksResult;
 
         try {
-            collection = mBixiTracksExplorerService.listTracks().execute();
+            listTracksResult = mBixiTracksExplorerService.listTracks().execute();
+
+            //test of good reception of meta data
+            //JSONObject responseMeta = new JSONObject(listTracksResult.getMeta());
+            //String license = responseMeta.getString("license");
+
+            if (listTracksResult.getTrackList() != null) {
+                collection.setItems(listTracksResult.getTrackList());
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        } /*catch (JSONException e) {
+            e.printStackTrace();
+        }*/
 
-        int i=0;
+        int trackIdx = 0;
 
         for (Track t : collection.getItems())
         {
-            String header = i + ". " + t.getKeyTimeUTC();
+            String header = trackIdx + ". " + t.getKeyTimeUTC();
             mListDataHeader.add(header);
 
             List<String> trackDetails = new ArrayList<>();
@@ -126,7 +141,7 @@ public class RetrieveTrackListTask extends AsyncTask<ExpandableListView, Void, V
 
             mListDataChild.put(header, trackDetails);
 
-            ++i;
+            ++trackIdx;
         }
 
         return null;
@@ -138,7 +153,16 @@ public class RetrieveTrackListTask extends AsyncTask<ExpandableListView, Void, V
 
         BixiTracksExplorerAPI.Builder builder =new BixiTracksExplorerAPI.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
                 .setRootUrl("https://udem-ift2905-backend.appspot.com/_ah/api/")
-                .setServicePath("bixiTracksExplorerAPI/v2/");
+                .setServicePath("bixiTracksExplorerAPI/v3/")
+                //.setRootUrl("http://192.168.1.XX:8080/_ah/api/") // 10.0.2.2 is localhost's IP address in Android emulator
+                //TO BE ABLE TO TARGET ON LAN, RUN THE LOCAL APPENGINE SERVER ENVIRONMENT ON 0.0.0.0 IP ADDRESS (NOT localhost)
+                /*.setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                    @Override
+                    public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+                        abstractGoogleClientRequest.setDisableGZipContent(true);
+                    }
+                })*/;
+
 
         mBixiTracksExplorerService = builder.build();
     }
