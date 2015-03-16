@@ -1,4 +1,4 @@
-package com.udem.ift2906.bixitracksexplorer.backend;
+package com.udem.ift2906.bixitracksexplorer.backend.Data;
 
 /**
  * The object model for the data we are sending through endpoints

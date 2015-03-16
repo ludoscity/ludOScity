@@ -1,4 +1,4 @@
-package com.udem.ift2906.bixitracksexplorer.backend;
+package com.udem.ift2906.bixitracksexplorer.backend.Data;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -18,7 +18,21 @@ import javax.jdo.annotations.PrimaryKey;
 
 /**
  * Created by F8Full on 2015-02-12.
+ * This file is part of BixiTracksExplorer -- Backend
+ * This is a data class describing a Track datastore entity
+ * It is annotated in that regard and will be use with JDO
+ * It describes
+ *      - one boolean property (helmet)
+ *      - one int property (rating)
+ *      - 5 String properties (name, startReason, endReason, startStation, endStation)
+ *      - 1 JDO Key constructed from a time UTC String formatted as "yyyy-MM-dd'T'HH:mm:ss'Z'"
+ *
+ *      - 1 tentative Date field for java.utils.date (future) use
+ *      - A ONE TO MANY relationship between itself and a List<TrackPoint> points property
+ *          --There might be more option here than 'dependent'
+ *
  */
+@SuppressWarnings("unused") //For getters required in JSON / JDO serialization process
 @PersistenceCapable
 @FetchGroup(name="pointskey", members={@Persistent(name="points")})
 public class Track {

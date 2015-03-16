@@ -11,6 +11,13 @@ import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.udem.ift2906.bixitracksexplorer.backend.Data.BixiTrackXMLParser;
+import com.udem.ift2906.bixitracksexplorer.backend.Data.MyBean;
+import com.udem.ift2906.bixitracksexplorer.backend.Data.PMF;
+import com.udem.ift2906.bixitracksexplorer.backend.Data.Track;
+import com.udem.ift2906.bixitracksexplorer.backend.Data.TrackPoint;
+import com.udem.ift2906.bixitracksexplorer.backend.Results.ListTracksResult;
+import com.udem.ift2906.bixitracksexplorer.backend.Results.TestMetaResult;
 import com.udem.ift2906.bixitracksexplorer.backend.Utils.Utils;
 
 import java.io.File;
@@ -312,7 +319,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
     @ApiMethod(name = "loadTracksFromXML")
     public List<Track> loadTracksFromXML(@Named("startIdx") int startIdx, @Named("howMany") int howMany)
     {
-        List<Track> toReturn = new ArrayList<>();
+        List<Track> response = new ArrayList<>();
 
         final String FOLDER_PATH = "WEB-INF/TracksGPXFiles/";
 
@@ -358,13 +365,13 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
                    pm.makePersistent(newTrack);
                }
                finally {
-                   toReturn.add(newTrack);
+                   response.add(newTrack);
 
                    pm.close();
                }
            }
        }
 
-        return toReturn;
+        return response;
     }
 }

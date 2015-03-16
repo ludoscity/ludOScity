@@ -1,4 +1,4 @@
-package com.udem.ift2906.bixitracksexplorer.backend;
+package com.udem.ift2906.bixitracksexplorer.backend.Data;
 
 import com.google.appengine.api.datastore.Key;
 

@@ -1,4 +1,4 @@
-package com.udem.ift2906.bixitracksexplorer.backend;
+package com.udem.ift2906.bixitracksexplorer.backend.Data;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -8,11 +8,19 @@ import javax.jdo.annotations.PrimaryKey;
 
 /**
  * Created by F8Full on 2015-02-12.
+ * This file is part of BixiTracksExplorer -- Backend
+ * This is a data class describing a TrackPoint datastore entity
+ * It is annotated in that regard and will be use with JDO
+ * It describes 6 float properties (lat, long, ele, speed, accuracy, heading) and a timestamp name String
+ * retrieved through a JDO Key.
+ * Though they do have Keys, TrackPoint entities don't exist by themselves in the datastore and
+ * can't be searched independently of their parent Track entity. (see Track class file)
  */
 @PersistenceCapable
 //failed attempt at children loading
 //@FetchGroup(name="pointsgeodata", members={@Persistent(name="lat"),
 //                                        @Persistent(name="lon"),})
+@SuppressWarnings("unused") //getters are indirectly used in JSON serializing process
 public class TrackPoint {
 
     @PrimaryKey

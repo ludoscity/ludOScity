@@ -1,4 +1,4 @@
-package com.udem.ift2906.bixitracksexplorer.backend;
+package com.udem.ift2906.bixitracksexplorer.backend.Results;
 
 /**
  * Created by F8Full on 2015-03-15.

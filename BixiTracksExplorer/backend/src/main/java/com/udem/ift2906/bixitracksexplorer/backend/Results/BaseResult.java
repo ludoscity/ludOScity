@@ -1,4 +1,4 @@
-package com.udem.ift2906.bixitracksexplorer.backend;
+package com.udem.ift2906.bixitracksexplorer.backend.Results;
 
 import org.json.JSONObject;
 
@@ -6,6 +6,7 @@ import org.json.JSONObject;
  * Created by F8Full on 2015-03-14.
  * abstract base classed used to encapsulate a response metadata in an org.json JSONObject
  */
+@SuppressWarnings("unused") //getMeta() Required for GAE JSON manipulation
 public abstract class BaseResult {
 
     //Let's go public
