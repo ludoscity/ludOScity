@@ -16,8 +16,9 @@ import com.udem.ift2906.bixitracksexplorer.backend.Data.MyBean;
 import com.udem.ift2906.bixitracksexplorer.backend.Data.PMF;
 import com.udem.ift2906.bixitracksexplorer.backend.Data.Track;
 import com.udem.ift2906.bixitracksexplorer.backend.Data.TrackPoint;
-import com.udem.ift2906.bixitracksexplorer.backend.Results.ListTracksResult;
-import com.udem.ift2906.bixitracksexplorer.backend.Results.TestMetaResult;
+import com.udem.ift2906.bixitracksexplorer.backend.Responses.GetTrackFromTimeUTCKeyStringResponse;
+import com.udem.ift2906.bixitracksexplorer.backend.Responses.ListTracksResponse;
+import com.udem.ift2906.bixitracksexplorer.backend.Responses.TestMetaResponse;
 import com.udem.ift2906.bixitracksexplorer.backend.Utils.Utils;
 
 import java.io.File;
@@ -55,9 +56,9 @@ public class BixiTracksExplorerEndpoint {
      * TEST Meta
      */
     @ApiMethod(name = "testMeta")
-    public TestMetaResult testMeta() {
+    public TestMetaResponse testMeta() {
 
-        TestMetaResult response = new TestMetaResult();
+        TestMetaResponse response = new TestMetaResponse();
 
         Utils.ResultMeta.addLicense(response.meta);
 
@@ -69,12 +70,12 @@ public class BixiTracksExplorerEndpoint {
 
         return response;
     }
-    //TODO: Types for results (ie : ListTracksResult, GetTrackFromTimeUTCKeyDateResult, ...)
+    //TODO: Types for results (ie : ListTracksResponse, GetTrackFromTimeUTCKeyDateResult, ...)
     //This retrieves all tracks omitting points
     //Use it to get to Track(s) key(s) which are timeUTC
     @SuppressWarnings("unchecked")  //responseList = (List<Track>) q.execute();
     @ApiMethod(name = "listTracks")
-    public ListTracksResult listTracks()
+    public ListTracksResponse listTracks()
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -101,7 +102,7 @@ public class BixiTracksExplorerEndpoint {
             pm.close();
         }
 
-        ListTracksResult response = new ListTracksResult(responseList);
+        ListTracksResponse response = new ListTracksResponse(responseList);
 
         Utils.ResultMeta.addLicense(response.meta);
 
@@ -119,7 +120,7 @@ public class BixiTracksExplorerEndpoint {
 
         //String dateAsString = format.format(asDate);
 
-        return GetTrackFromTimeUTCKeyDate(asDate);
+        return new Track();//GetTrackFromTimeUTCKeyDate(asDate);
 
 
     }
@@ -194,7 +195,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
 
     //Accepts Date object directly as parameter
     //
-    @ApiMethod(name = "getTrackFromTimeUTCKeyDate")
+    /*@ApiMethod(name = "getTrackFromTimeUTCKeyDate")
     public Track GetTrackFromTimeUTCKeyDate(@Named("TimeUTCDate") Date timeUTCDate) {
 
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -204,7 +205,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
         //String debug = format.format(timeUTCDate);
 
         return GetTrackFromTimeUTCKeyString(format.format(timeUTCDate));
-    }
+    }*/
 
     //Retrieve by timeUTC key string
     //This function retrieves one track by key
@@ -215,8 +216,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
     //This version retrieves all TrackPoints data
     @SuppressWarnings("unused")  //float touch = point.getLat();
     @ApiMethod(name = "getTrackFromTimeUTCKeyString")
-    public Track GetTrackFromTimeUTCKeyString(@Named("TimeUTCDate") String timeUTCDate) {
-        Track response = new Track();
+    public GetTrackFromTimeUTCKeyStringResponse GetTrackFromTimeUTCKeyString(@Named("TimeUTCDate") String timeUTCDate) {
 
         PersistenceManager pm = PMF.get().getPersistenceManager();
 
@@ -227,24 +227,33 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
         pm.getFetchPlan().addGroup("pointskey");
         //pm.getFetchPlan().addGroup("pointsgeodata");
 
+        Track responseTrack = new Track();
+        int touchedPoints = 0; //meta will be filled with that information
         //Retrieves corresponding object in the datastore
         try
         {
-            response = pm.getObjectById(Track.class, k);
+            responseTrack = pm.getObjectById(Track.class, k);
 
             //Touching all track points to get them loaded (UGLY) TODO: find a better way to handle this
-            for (TrackPoint point : response.getPoints())
+            //Because we have to do it, we might as well count on the way and put it in response meta object
+            //int touchedPoints = 0;
+            for (TrackPoint point : responseTrack.getPoints())
             {
                 //So that datastore lazy loading in forced to get ALL TrackPoint data fields
                 float touch = point.getLat();
+                ++touchedPoints;
             }
         }
         finally {
             pm.close();
         }
 
+        GetTrackFromTimeUTCKeyStringResponse response = new GetTrackFromTimeUTCKeyStringResponse(responseTrack);
 
-        //
+        Utils.ResultMeta.addLicense(response.meta);
+        response.meta.put("nb_touched_points",touchedPoints);
+
+
         return response;
     }
 

@@ -7,7 +7,7 @@ import android.widget.ExpandableListView;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.BixiTracksExplorerAPI;
-import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.ListTracksResult;
+import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.ListTracksResponse;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.TrackCollection;
 
@@ -104,17 +104,17 @@ public class RetrieveTrackListTask extends AsyncTask<ExpandableListView, Void, V
 
         TrackCollection collection = new TrackCollection();
         collection.setItems(new ArrayList<Track>());
-        ListTracksResult listTracksResult;
+        ListTracksResponse listTracksResponse;
 
         try {
-            listTracksResult = mBixiTracksExplorerService.listTracks().execute();
+            listTracksResponse = mBixiTracksExplorerService.listTracks().execute();
 
             //test of good reception of meta data
-            //JSONObject responseMeta = new JSONObject(listTracksResult.getMeta());
+            //JSONObject responseMeta = new JSONObject(listTracksResponse.getMeta());
             //String license = responseMeta.getString("license");
 
-            if (listTracksResult.getTrackList() != null) {
-                collection.setItems(listTracksResult.getTrackList());
+            if (listTracksResponse.getTrackList() != null) {
+                collection.setItems(listTracksResponse.getTrackList());
             }
 
         } catch (IOException e) {
