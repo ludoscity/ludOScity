@@ -67,7 +67,6 @@ public class BixiTracksExplorerEndpoint {
         response.meta.put("testMetaBool", true);
         response.meta.put("testMetaInt", 666);
 
-
         return response;
     }
     //TODO: Types for results (ie : ListTracksResponse, GetTrackFromTimeUTCKeyDateResult, ...)
