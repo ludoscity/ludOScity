@@ -74,6 +74,6 @@ public class WarmupRequestListerner implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-
+        //Not called by GAE
     }
 }

@@ -45,9 +45,9 @@ public class BixiTracksExplorerEndpoint {
      * A simple endpoint method that takes a name and says Hi back
      */
     @ApiMethod(name = "sayHi")
-    public MyBean sayHi(@Named("name") String name) {
+    public MyBean sayHi(@Named("name") String _name) {
         MyBean response = new MyBean();
-        response.setData("Hi, " + name);
+        response.setData("Hi, " + _name);
 
         return response;
     }
@@ -140,10 +140,10 @@ public class BixiTracksExplorerEndpoint {
         return GetTracksForDateRange(startDate, endDate);
     }
 
-    @SuppressWarnings({"unchecked",//response = (List<Track>)q.execute(startDate, endDate);
+    @SuppressWarnings({"unchecked",//response = (List<Track>)q.execute(_startDate, _endDate);
             "unused"})  //float touch = point.getLat();
     @ApiMethod(name = "getTracksForDateRange")
-    public List<Track> GetTracksForDateRange(@Named("StartDate") Date startDate, @Named("EndDate") Date endDate)
+    public List<Track> GetTracksForDateRange(@Named("StartDate") Date _startDate, @Named("EndDate") Date _endDate)
     {
         //TODO : check in end date is posterior to start one
         List<Track> response = new ArrayList<>();
@@ -163,15 +163,15 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
 
 
         Query q = pm.newQuery(Track.class);
-        q.setFilter("DATE_timeUTC >= startDate && DATE_timeUTC <= endDate");
-        q.declareParameters("java.util.Date startDate, java.util.Date endDate");
+        q.setFilter("DATE_timeUTC >= _startDate && DATE_timeUTC <= _endDate");
+        q.declareParameters("java.util.Date _startDate, java.util.Date _endDate");
         q.setOrdering("DATE_timeUTC asc");
 
         q.setDatastoreReadTimeoutMillis(10000);
 
         try
         {
-            response = (List<Track>)q.execute(startDate, endDate);
+            response = (List<Track>)q.execute(_startDate, _endDate);
 
             for (Track track : response)
             {
@@ -215,13 +215,13 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
     //This version retrieves all TrackPoints data
     @SuppressWarnings("unused")  //float touch = point.getLat();
     @ApiMethod(name = "getTrackFromTimeUTCKeyString")
-    public GetTrackFromTimeUTCKeyStringResponse GetTrackFromTimeUTCKeyString(@Named("TimeUTCDate") String timeUTCDate) {
+    public GetTrackFromTimeUTCKeyStringResponse GetTrackFromTimeUTCKeyString(@Named("TimeUTCDate") String _timeUTCDate) {
 
         PersistenceManager pm = PMF.get().getPersistenceManager();
 
 
         //Build key from received data
-        Key k = KeyFactory.createKey(Track.class.getSimpleName(), timeUTCDate);//format.format(timeUTCDate));
+        Key k = KeyFactory.createKey(Track.class.getSimpleName(), _timeUTCDate);//format.format(_timeUTCDate));
 
         pm.getFetchPlan().addGroup("pointskey");
         //pm.getFetchPlan().addGroup("pointsgeodata");
@@ -325,7 +325,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
 //    }
 
     @ApiMethod(name = "loadTracksFromXML")
-    public List<Track> loadTracksFromXML(@Named("startIdx") int startIdx, @Named("howMany") int howMany)
+    public List<Track> loadTracksFromXML(@Named("startIdx") int _startIdx, @Named("howMany") int _howMany)
     {
         List<Track> response = new ArrayList<>();
 
@@ -343,7 +343,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
 
 
 
-       for (int i=startIdx; i<startIdx+howMany; ++i)
+       for (int i=_startIdx; i<_startIdx+_howMany; ++i)
        {
            PersistenceManager pm = PMF.get().getPersistenceManager();
 

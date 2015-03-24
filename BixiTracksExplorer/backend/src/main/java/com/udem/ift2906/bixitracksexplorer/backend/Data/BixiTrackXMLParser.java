@@ -40,7 +40,7 @@ public class BixiTrackXMLParser extends DefaultHandler {
     //This is a one block for all stations right now, I'll probably cut it later
     //to extract the import of only a single station (which will have an associated uri)
     //It returns the stations uri if data have been read from input
-    public Track readFromFile(String fileFullPath)
+    public Track readFromFile(String _fileFullPath)
     {
 /*
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
@@ -88,7 +88,7 @@ UN SEUL trkseg par track garanti dans ce cas là. -->
             //factory.setNamespaceAware(true);
             SAXParser parser = factory.newSAXParser();
 
-            parser.parse(new File(fileFullPath),this);
+            parser.parse(new File(_fileFullPath),this);
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
@@ -99,102 +99,102 @@ UN SEUL trkseg par track garanti dans ce cas là. -->
     }
 
     @Override
-    public void startElement(String s, String s1, String elementName, Attributes attributes) throws SAXException
+    public void startElement(String _s, String _s1, String _elementName, Attributes _attributes) throws SAXException
     {
         mBufferedString = new StringBuffer();
 
-        if (elementName.equalsIgnoreCase("trkpt"))
+        if (_elementName.equalsIgnoreCase("trkpt"))
         {
             mParsingTrkpt = true;
 
             mTempTrackPoint = new TrackPoint();
 
             //extract lat lon attributes
-            mTempTrackPoint.setLat(Float.parseFloat(attributes.getValue("lat")));
-            mTempTrackPoint.setLon(Float.parseFloat(attributes.getValue("lon")));
+            mTempTrackPoint.setLat(Float.parseFloat(_attributes.getValue("lat")));
+            mTempTrackPoint.setLon(Float.parseFloat(_attributes.getValue("lon")));
 
         }
     }
 
     @Override
-    public void endElement(String s, String s1, String element) throws SAXException
+    public void endElement(String _s, String _s1, String _element) throws SAXException
     {
         if (mParsingTrkpt)
         {
-            if (element.equalsIgnoreCase("ele"))
+            if (_element.equalsIgnoreCase("ele"))
             {
                 mTempTrackPoint.setEle(Float.parseFloat(mBufferedString.toString()));
 
             }
-            else if (element.equalsIgnoreCase("time"))
+            else if (_element.equalsIgnoreCase("time"))
             {
                 Key key = mTrackToReturn.builChildKey(TrackPoint.class.getSimpleName(), mBufferedString.toString());
                 mTempTrackPoint.setTimeUTC(key);
                 //mTempTrackPoint.setTimeUTC(mBufferedString.toString());
 
             }
-            else if (element.equalsIgnoreCase("gpx10:speed"))
+            else if (_element.equalsIgnoreCase("gpx10:speed"))
             {
                 mTempTrackPoint.setSpeed(Float.parseFloat(mBufferedString.toString()));
 
             }
-            else if (element.equalsIgnoreCase("ogt10:accuracy"))
+            else if (_element.equalsIgnoreCase("ogt10:accuracy"))
             {
                 mTempTrackPoint.setAccurary(Float.parseFloat(mBufferedString.toString()));
 
             }
-            else if (element.equalsIgnoreCase("gpx10:course"))
+            else if (_element.equalsIgnoreCase("gpx10:course"))
             {
                 mTempTrackPoint.setHeading(Float.parseFloat(mBufferedString.toString()));
 
             }
-            else if (element.equalsIgnoreCase("trkpt"))
+            else if (_element.equalsIgnoreCase("trkpt"))
             {
                 mTrackToReturn.getPoints().add(mTempTrackPoint);
                 mParsingTrkpt = false;
             }
 
         }
-        else if (element.equalsIgnoreCase("name"))
+        else if (_element.equalsIgnoreCase("name"))
         {
             mTrackToReturn.setName(mBufferedString.toString());
         }
-        else if (element.equalsIgnoreCase("time"))
+        else if (_element.equalsIgnoreCase("time"))
         {
            mTrackToReturn.setTimeUTC(mBufferedString.toString());
         }
-        else if (element.equalsIgnoreCase("f8f10:helmet"))
+        else if (_element.equalsIgnoreCase("f8f10:helmet"))
         {
             String value = mBufferedString.toString();
 
             mTrackToReturn.setHelmet(!value.equalsIgnoreCase("0"));
         }
-        else if (element.equalsIgnoreCase("f8f10:startreason"))
+        else if (_element.equalsIgnoreCase("f8f10:startreason"))
         {
             mTrackToReturn.setStartReason(mBufferedString.toString());
         }
-        else if (element.equalsIgnoreCase("f8f10:endreason"))
+        else if (_element.equalsIgnoreCase("f8f10:endreason"))
         {
             mTrackToReturn.setEndReason(mBufferedString.toString());
         }
-        else if (element.equalsIgnoreCase("f8f10:startstationname"))
+        else if (_element.equalsIgnoreCase("f8f10:startstationname"))
         {
             mTrackToReturn.setStartStationName(mBufferedString.toString());
         }
-        else if (element.equalsIgnoreCase("f8f10:endStationName"))
+        else if (_element.equalsIgnoreCase("f8f10:endStationName"))
         {
             mTrackToReturn.setEndStationName(mBufferedString.toString());
         }
-        else if (element.equalsIgnoreCase("f8f10:rating"))
+        else if (_element.equalsIgnoreCase("f8f10:rating"))
         {
             mTrackToReturn.setRating(Integer.parseInt(mBufferedString.toString()));
         }
     }
 
     @Override
-    public void characters(char[] ac, int i, int j) throws SAXException {
+    public void characters(char[] _ac, int i, int j) throws SAXException {
 
-        mBufferedString.append(new String(ac, i, j));
+        mBufferedString.append(new String(_ac, i, j));
 
     }
 
