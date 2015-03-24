@@ -18,7 +18,7 @@ import android.widget.ExpandableListView;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
-    //Test 1
+    //Test test
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
