@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.udem.ift2906.bixitracksexplorer"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
