@@ -1,6 +1,7 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -45,6 +46,11 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+
+        //En attendant d'avoir un menu bien rempli, juste pour tester la class NearbyActivity
+        if (position == 3){
+            startActivity(new Intent(this, NearbyActivity.class));
+        }
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
@@ -63,6 +69,8 @@ public class MainActivity extends ActionBarActivity
             case 3:
                 mTitle = getString(R.string.title_section3);
                 break;
+            case 4:
+                mTitle = getString(R.string.title_activity_nearby);
         }
     }
 

@@ -1,0 +1,24 @@
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.udem.ift2906.bixitracksexplorer.NearbyActivity">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:id="@+id/mapNearby"
+            android:layout_width="fill_parent"
+            android:layout_height="0px"
+            android:layout_weight="3"/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="0px"
+        android:layout_weight="2"
+        android:text="TEST"
+        android:id="@+id/textView" />
+
+
+</LinearLayout>
