@@ -51,11 +51,22 @@ public class MainActivity extends ActionBarActivity
         if (position == 3){
             startActivity(new Intent(this, NearbyActivity.class));
         }
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+        else if (position == 2){
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, BudgetOverviewFragment.newInstance(position + 1))
+                    .commit();
+        }
+        else
+        {
+            // update the main content by replacing fragments
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                    .commit();
+        }
+
+
     }
 
     public void onSectionAttached(int number) {
