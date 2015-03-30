@@ -1,33 +1,37 @@
 package com.udem.ift2906.bixitracksexplorer;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiAPI;
 
 
 public class NearbyActivity extends ActionBarActivity {
     private GoogleMap nearbyMap;
-    private List<BixiStation> testListStation= new ArrayList<>();
+    private BixiAPI bixiApiInstance;
+
+    private Context mContext = this;
+    private String testText;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby);
         nearbyMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.mapNearby)).getMap();
+        textView = (TextView) findViewById(R.id.textView);
 
-        //Quelques stations de tests...
-        testListStation.add(new BixiStation("Old Orchard/Sherbrooke", new LatLng(45.471765,-73.613843)));
-        testListStation.add(new BixiStation("Bossuet/Pierre de coubertain", new LatLng(45.573906,-73.539659)));
-
-        setUpMarkers();
+        //TODO string
+        Toast.makeText(this, "Trying download...", Toast.LENGTH_SHORT).show();
+        new DownloadWebTask().execute();
     }
 
 
@@ -53,9 +57,26 @@ public class NearbyActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setUpMarkers(){
-        for (BixiStation station: testListStation){
-            nearbyMap.addMarker(station.getMarkerOptions());
+    public class DownloadWebTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            bixiApiInstance= new BixiAPI(mContext);
+            testText = bixiApiInstance.getJSonDataFromSharedPref();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            textView.setText(testText);
+            //TODO R.string
+            Toast.makeText(mContext, "Download Successful!", Toast.LENGTH_SHORT).show();
+
+            bixiApiInstance.getBixiNetwork().network.setUpMarkers();
+            bixiApiInstance.getBixiNetwork().network.addMarkersToMap(nearbyMap);
         }
     }
+
+    public Context getContext(){return mContext;}
 }
