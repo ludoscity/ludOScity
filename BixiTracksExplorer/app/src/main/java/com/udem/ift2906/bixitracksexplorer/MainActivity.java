@@ -131,6 +131,14 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // turn on the Navigation Drawer image;
+        // this is called in the LowerLevelFragments
+        mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(true);
+    }
+
+    @Override
     public void onBudgetOverviewFragmentInteraction(Uri uri) {
 
         if (uri.getPath().equalsIgnoreCase("/budget_overview_onresume"))
@@ -143,6 +151,8 @@ public class MainActivity extends ActionBarActivity
         }
         else if(uri.getPath().equalsIgnoreCase("/budget_info"))
         {
+            mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(false);
+
             String infoType = uri.getQueryParameter("info_type");
             mTitle = infoType.substring(0, infoType.length()-" :".length());
             mSubtitle = uri.getQueryParameter("selected_period");

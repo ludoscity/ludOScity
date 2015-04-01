@@ -3,8 +3,10 @@ package com.udem.ift2906.bixitracksexplorer;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -56,6 +58,21 @@ public class TrackBudgetInfoFragment extends ListFragment {
         // TODO: Change Adapter to display your content
         setListAdapter(new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS));
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Get item selected and deal with it
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //called when the up affordance/carat in actionbar is pressed
+                getActivity().onBackPressed();
+                return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -74,6 +91,8 @@ public class TrackBudgetInfoFragment extends ListFragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        // update the actionbar to show the up carat/affordance
+        ((ActionBarActivity)activity).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
