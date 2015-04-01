@@ -2,9 +2,11 @@ package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -17,7 +19,9 @@ import android.widget.ExpandableListView;
 
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+        BudgetOverviewFragment.OnFragmentInteractionListener,
+        TrackBudgetInfoFragment.OnFragmentInteractionListener{
 
     //Test test
     /**
@@ -29,6 +33,7 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private CharSequence mSubtitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,7 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
+        mSubtitle = "";
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -83,6 +89,8 @@ public class MainActivity extends ActionBarActivity
             case 4:
                 mTitle = getString(R.string.title_activity_nearby);
         }
+        mSubtitle = "";
+
     }
 
     public void restoreActionBar() {
@@ -90,6 +98,7 @@ public class MainActivity extends ActionBarActivity
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
+        actionBar.setSubtitle(mSubtitle);
     }
 
 
@@ -119,6 +128,46 @@ public class MainActivity extends ActionBarActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBudgetOverviewFragmentInteraction(Uri uri) {
+
+        if (uri.getPath().equalsIgnoreCase("/budget_overview_onresume"))
+        {
+            mTitle = getString(R.string.title_section_budget);
+            mSubtitle = "";
+
+            restoreActionBar();
+
+        }
+        else if(uri.getPath().equalsIgnoreCase("/budget_info"))
+        {
+            String infoType = uri.getQueryParameter("info_type");
+            mTitle = infoType.substring(0, infoType.length()-" :".length());
+            mSubtitle = uri.getQueryParameter("selected_period");
+
+            // Create fragment and give it required info to set itselfs up
+            TrackBudgetInfoFragment newFragment = TrackBudgetInfoFragment.newInstance(uri.getQueryParameter("info_type"), uri.getQueryParameter("selected_period"));
+
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack so the user can navigate back
+            transaction.replace(R.id.container, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
+        }
+
+
+    }
+
+    @Override
+    public void onTrackBudgetInfoFragmentInteraction(String id) {
+
     }
 
     /**
