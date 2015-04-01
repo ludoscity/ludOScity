@@ -28,6 +28,9 @@ public class TrackBudgetInfoFragment extends ListFragment {
     private String mInfoType;
     private String mTimePeriod;
 
+    private boolean mSortOrderHighToLow = true;
+    private int mSortCriteria = 0;  //0 : cost, 1: duration, 2: date
+
     private OnFragmentInteractionListener mListener;
 
     public static TrackBudgetInfoFragment newInstance(String infoType, String timePeriod) {
@@ -69,6 +72,29 @@ public class TrackBudgetInfoFragment extends ListFragment {
             case android.R.id.home:
                 //called when the up affordance/carat in actionbar is pressed
                 getActivity().onBackPressed();
+                return true;
+            case R.id.budgetInfoSortOrder:
+                if(mSortOrderHighToLow){
+                    item.setIcon(R.drawable.ic_action_sort_low_to_high);
+                }
+                else{
+                    item.setIcon(R.drawable.ic_action_sort_high_to_low);
+                }
+                mSortOrderHighToLow = !mSortOrderHighToLow;
+                return true;
+            case R.id.budgetInfoSortCriteria:
+                if (mSortCriteria == 0){
+                    item.setIcon(R.drawable.ic_action_duration);
+                    mSortCriteria = 1;
+                }
+                else if (mSortCriteria == 1){
+                    item.setIcon(R.drawable.ic_action_date);
+                    mSortCriteria = 2;
+                }
+                else if (mSortCriteria == 2){
+                    item.setIcon(R.drawable.ic_action_cost);
+                    mSortCriteria = 0;
+                }
                 return true;
         }
 
