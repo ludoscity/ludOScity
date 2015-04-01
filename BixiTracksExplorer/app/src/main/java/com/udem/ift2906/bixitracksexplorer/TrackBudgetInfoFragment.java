@@ -3,6 +3,8 @@ package com.udem.ift2906.bixitracksexplorer;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -31,7 +33,7 @@ public class TrackBudgetInfoFragment extends ListFragment {
         Bundle args = new Bundle();
         args.putString(ARG_INFOTYPE, infoType);
         args.putString(ARG_TIMEPERIOD, timePeriod);
-        fragment.setArguments(args);
+        fragment.setHasOptionsMenu(true);
         return fragment;
     }
 
@@ -54,6 +56,12 @@ public class TrackBudgetInfoFragment extends ListFragment {
         // TODO: Change Adapter to display your content
         setListAdapter(new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.menu_budget_info, menu);
+
     }
 
 

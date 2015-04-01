@@ -81,7 +81,7 @@ public class BudgetOverviewFragment extends Fragment {
         return inflatedView;
     }
 
-     @Override
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
          menuInflater.inflate(R.menu.menu_budget_overview, menu);
 
