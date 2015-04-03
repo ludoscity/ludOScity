@@ -325,8 +325,7 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
 //    }
 
     @ApiMethod(name = "loadTracksFromXML")
-    public List<Track> loadTracksFromXML(@Named("startIdx") int _startIdx, @Named("howMany") int _howMany)
-    {
+    public List<Track> loadTracksFromXML(@Named("startIdx") int _startIdx, @Named("howMany") int _howMany) throws ParseException {
         List<Track> response = new ArrayList<>();
 
         final String FOLDER_PATH = "WEB-INF/TracksGPXFiles/";
@@ -358,13 +357,22 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
 
                newTrack = parser.readFromFile(FOLDER_PATH + trackFile.getName());
 
+               DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+               //TimeZone utc = TimeZone.getTimeZone("UTC");
+               //format.setTimeZone(utc); // ZULU_DATE_FORMAT format ends with Z for UTC so make that true
+
+               Date startDate = format.parse(newTrack.getKEY_TimeUTC());
+               Date endDate = format.parse(newTrack.getPoints().get(newTrack.getPoints().size()-1).getTimeUTC());
+
+               newTrack.setDuration(endDate.getTime()-startDate.getTime());
+
                try {
 
                    Key k = KeyFactory.createKey(Track.class.getSimpleName(), newTrack.getKEY_TimeUTC());
                    pm.getObjectById(Track.class, k);
 
                    //We get there only if the Track was already in the datastore
-                   newTrack.setTimeUTC("ALREADY IN DB, NOT ADDED");
+                   //newTrack.setTimeUTC("ALREADY IN DB, NOT ADDED");
                    newTrack.setName("ALREADY IN DB, NOT ADDED");
                }
                catch (JDOObjectNotFoundException e)

@@ -69,6 +69,8 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
     private String endStationName;
     @Persistent
     private int rating;
+    @Persistent
+    private long duration;
 
     @Persistent//(defaultFetchGroup = "true") //So that children get fetch when retrieving parent
     @Element(dependent = "true")    //Children can't exist by themselves in datastore
@@ -161,5 +163,13 @@ List<...> results = (List<...>) query.execute(new java.util.Date());*/
 
     public void setPoints(List<TrackPoint> points) {
         this.points = points;
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 }
