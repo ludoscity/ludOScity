@@ -18,7 +18,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="XX,X$"
             android:id="@+id/accessCostValue"
             android:layout_gravity="center_vertical" />
 
@@ -45,7 +44,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="XX,X$"
             android:id="@+id/useCostValue"
             android:layout_gravity="center_vertical" />
 
@@ -72,13 +70,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="XX,X$"
             android:id="@+id/totalCostValue"
             android:layout_gravity="center_vertical" />
     </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal" android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_gravity="bottom"
         android:layout_weight="1">
 
