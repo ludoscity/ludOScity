@@ -17,6 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
+import com.couchbase.lite.CouchbaseLiteException;
+import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
+
+import java.io.IOException;
+
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -48,6 +53,13 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        //Initialize couchbase database
+        try {
+            DBHelper.init(this);
+        } catch (IOException | CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
