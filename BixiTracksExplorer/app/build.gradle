@@ -43,4 +43,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:7.0.0'
     compile 'com.google.code.gson:gson:+'
     compile 'com.couchbase.lite:couchbase-lite-android:1.0.4'
+    compile 'com.android.support:multidex:1.0.0'
 }
