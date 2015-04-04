@@ -1,6 +1,7 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.SphericalUtil;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
 
 /**
@@ -47,8 +48,8 @@ public class StationItem {
         return free_bikes;
     }
 
-    public double getMeterFromUserLocation(LatLng userLocation) {
-        return 100.0;
+    public double getMeterFromLatLng(LatLng userLocation) {
+        return SphericalUtil.computeDistanceBetween(userLocation, position);
     }
 
     public LatLng getPosition() {

@@ -7,6 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -21,12 +25,27 @@ public class StationListViewAdapter extends BaseAdapter {
     Context mContext;
 
     private List<StationItem> mStationList = null;
+    private LatLng mCurrentUserLatLng;
 
-    StationListViewAdapter(Context _context, List<StationItem> _stationList){
-
+    StationListViewAdapter(Context _context, List<StationItem> _stationList, LatLng _currentUserLatLng){
         mContext = _context;
         mStationList = _stationList;
         mInflater = LayoutInflater.from(_context);
+        mCurrentUserLatLng = _currentUserLatLng;
+        sortStationListByClosest();
+    }
+
+    public void setCurrentUserLatLng(LatLng mCurrentUserLatLng) {
+        this.mCurrentUserLatLng = mCurrentUserLatLng;
+    }
+
+    public void sortStationListByClosest(){
+        Collections.sort(mStationList, new Comparator<StationItem>() {
+            @Override
+            public int compare(StationItem lhs, StationItem rhs) {
+                return (int) (lhs.getMeterFromLatLng(mCurrentUserLatLng) - rhs.getMeterFromLatLng(mCurrentUserLatLng));
+            }
+        });
     }
 
     public class ViewHolder{
@@ -64,8 +83,7 @@ public class StationListViewAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        //TODO POSITION ISNT NULL...
-        holder.distance.setText(String.valueOf(mStationList.get(position).getMeterFromUserLocation(null)));
+        holder.distance.setText(String.valueOf((int)mStationList.get(position).getMeterFromLatLng(mCurrentUserLatLng)) + " m ");
         holder.name.setText(String.valueOf(mStationList.get(position).getName()));
 
         //TODO A REVOIR

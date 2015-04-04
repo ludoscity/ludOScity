@@ -2,6 +2,8 @@ package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,9 +24,12 @@ import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
 import java.util.ArrayList;
 
 
-public class NearbyFragment extends Fragment implements OnMapReadyCallback {
+public class NearbyFragment extends Fragment
+        implements OnMapReadyCallback {
     private GoogleMap nearbyMap;
     private BixiAPI bixiApiInstance;
+    private LatLng mCurrentUserLatLng;
+    private LocationManager mLocationManager;
 
     private Context mContext;
 
@@ -34,6 +39,8 @@ public class NearbyFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<StationItem> mStationDataList= new ArrayList<>();
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+
+
 
     public static NearbyFragment newInstance(int sectionNumber){
         NearbyFragment fragment = new NearbyFragment();
@@ -56,6 +63,9 @@ public class NearbyFragment extends Fragment implements OnMapReadyCallback {
                     + " must implement OnFragmentInteractionListener");
         }
 
+        //Used to get user's current location
+        setCurrentLocation();
+
         //TODO string
         Toast.makeText(mContext, "Trying download...", Toast.LENGTH_SHORT).show();
 
@@ -75,15 +85,22 @@ public class NearbyFragment extends Fragment implements OnMapReadyCallback {
         nearbyMap = googleMap;
 
         nearbyMap.setMyLocationEnabled(true);
-        nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699,-73.5539925),10));
+        nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 10));
         new DownloadWebTask().execute();
+    }
+
+    public void setCurrentLocation() {
+        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location != null){
+            mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        }
     }
 
     //Pour interaction avec mainActivity
     public interface OnFragmentInteractionListener {
         public void onNearbyFragmentInteraction();
     }
-
 
     public class DownloadWebTask extends AsyncTask<Void, Void, Void> {
 
@@ -106,10 +123,12 @@ public class NearbyFragment extends Fragment implements OnMapReadyCallback {
             bixiApiInstance.getBixiNetwork().network.setUpMarkers();
             bixiApiInstance.getBixiNetwork().network.addMarkersToMap(nearbyMap);
 
-            mStationListViewAdapter = new StationListViewAdapter(mContext, mStationDataList);
+            mStationListViewAdapter = new StationListViewAdapter(mContext, mStationDataList, mCurrentUserLatLng);
             mStationListView.setAdapter(mStationListViewAdapter);
         }
     }
 
     public Context getContext(){return mContext;}
 }
+
+
