@@ -8,7 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,6 +17,9 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiAPI;
+import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
+
+import java.util.ArrayList;
 
 
 public class NearbyFragment extends Fragment implements OnMapReadyCallback {
@@ -24,10 +27,12 @@ public class NearbyFragment extends Fragment implements OnMapReadyCallback {
     private BixiAPI bixiApiInstance;
 
     private Context mContext;
-    private OnFragmentInteractionListener mListener;
 
-    private String testText;
-    private TextView textView;
+    private OnFragmentInteractionListener mListener;
+    private StationListViewAdapter mStationListViewAdapter;
+    private ListView mStationListView;
+    private ArrayList<StationItem> mStationDataList= new ArrayList<>();
+
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public static NearbyFragment newInstance(int sectionNumber){
@@ -61,7 +66,7 @@ public class NearbyFragment extends Fragment implements OnMapReadyCallback {
         View inflatedView = layoutInflater.inflate(R.layout.fragment_nearby, viewGroup, false);
 
         ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
-        textView = (TextView) inflatedView.findViewById(R.id.textView);
+        mStationListView = (ListView) inflatedView.findViewById(R.id.stationListView);
         return inflatedView;
     }
 
@@ -85,19 +90,24 @@ public class NearbyFragment extends Fragment implements OnMapReadyCallback {
         @Override
         protected Void doInBackground(Void... params) {
             bixiApiInstance= new BixiAPI(mContext);
-            testText = bixiApiInstance.getJSonDataFromSharedPref();
+
+            for (BixiStation station: bixiApiInstance.getBixiNetwork().network.stations){
+                mStationDataList.add(new StationItem(station));
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            textView.setText(testText);
             //TODO R.string
             Toast.makeText(mContext, "Download Successful!", Toast.LENGTH_SHORT).show();
 
             bixiApiInstance.getBixiNetwork().network.setUpMarkers();
             bixiApiInstance.getBixiNetwork().network.addMarkersToMap(nearbyMap);
+
+            mStationListViewAdapter = new StationListViewAdapter(mContext, mStationDataList);
+            mStationListView.setAdapter(mStationListViewAdapter);
         }
     }
 

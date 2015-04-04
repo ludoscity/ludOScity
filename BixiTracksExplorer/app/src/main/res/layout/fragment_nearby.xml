@@ -14,12 +14,11 @@
         android:layout_height="0px"
         android:layout_weight="3"/>
 
-    <TextView
+    <ListView
         android:layout_width="fill_parent"
         android:layout_height="0px"
         android:layout_weight="2"
-        android:text="TEST"
-        android:id="@+id/textView" />
+        android:id="@+id/stationListView" />
 
 
 </LinearLayout>
