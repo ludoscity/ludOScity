@@ -1,7 +1,6 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,7 +25,8 @@ import java.io.IOException;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         BudgetOverviewFragment.OnFragmentInteractionListener,
-        TrackBudgetInfoFragment.OnFragmentInteractionListener{
+        TrackBudgetInfoFragment.OnFragmentInteractionListener,
+        NearbyFragment.OnFragmentInteractionListener {
 
     //Test test
     /**
@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState) ;
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -65,9 +65,12 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onNavigationDrawerItemSelected(int position) {
 
-        //En attendant d'avoir un menu bien rempli, juste pour tester la class NearbyActivity
+        //En attendant d'avoir un menu bien rempli, juste pour tester la class NearbyFragment
         if (position == 3){
-            startActivity(new Intent(this, NearbyActivity.class));
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, NearbyFragment.newInstance(position + 1))
+                    .commit();
         }
         else if (position == 2){
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -99,7 +102,7 @@ public class MainActivity extends ActionBarActivity
                 mTitle = getString(R.string.title_section_budget);
                 break;
             case 4:
-                mTitle = getString(R.string.title_activity_nearby);
+                mTitle = getString(R.string.title_section_nearby);
         }
         mSubtitle = "";
 
@@ -189,6 +192,11 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onTrackBudgetInfoFragmentInteraction(String id) {
+
+    }
+
+    @Override
+    public void onNearbyFragmentInteraction() {
 
     }
 

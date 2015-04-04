@@ -27,10 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".NearbyActivity"
-            android:label="@string/title_activity_nearby" >
-        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
