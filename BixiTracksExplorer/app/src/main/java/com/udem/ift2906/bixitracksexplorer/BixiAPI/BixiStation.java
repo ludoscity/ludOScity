@@ -14,6 +14,7 @@ public class BixiStation{
     public String timestamp;
 
     public MarkerOptions markerOptions;
+    public boolean favorite;
 
     public void setUpMarker(){
         //TODO Changes to markers are to be done here (for now)

@@ -56,7 +56,7 @@ public class MainActivity extends ActionBarActivity
 
         //Initialize couchbase database
         try {
-            DBHelper.init(this);
+            DBHelper.init(this, this);
         } catch (IOException | CouchbaseLiteException e) {
             e.printStackTrace();
         }

@@ -19,7 +19,9 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiAPI;
+import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiNetwork;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
+import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 
 import java.util.ArrayList;
 
@@ -69,6 +71,8 @@ public class NearbyFragment extends Fragment
         //TODO string
         Toast.makeText(mContext, "Trying download...", Toast.LENGTH_SHORT).show();
 
+        new DownloadWebTask().execute();
+
     }
 
     @Override
@@ -107,6 +111,12 @@ public class NearbyFragment extends Fragment
         @Override
         protected Void doInBackground(Void... params) {
             bixiApiInstance= new BixiAPI(mContext);
+/*
+            C'EST POUR LA BASE DE DONNÉE. JE N'ÉTAIT PAS SUR COMMENT LIMPLÉMENTER AVEC CE QUI AVAIT DÉJÀ DE FAIS
+            DBHelper.addNetwork(bixiApiInstance.downloadBixiNetwork());
+
+            return null;
+            */
 
             for (BixiStation station: bixiApiInstance.getBixiNetwork().network.stations){
                 mStationDataList.add(new StationItem(station));

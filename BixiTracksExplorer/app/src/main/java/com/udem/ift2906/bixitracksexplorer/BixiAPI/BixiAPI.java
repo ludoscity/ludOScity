@@ -47,6 +47,24 @@ public class BixiAPI{
         return bixiNetwork;
     }
 
+    public BixiNetwork downloadBixiNetwork() {
+        BixiNetwork network = null;
+        try {
+
+            //TODO Remove comments on isWifiConnected
+            //if (isWifiConnected()) {
+                String data = EntityUtils.toString(getHttp(url), HTTP.UTF_8);
+
+                Gson gson = new GsonBuilder().create();
+                network = gson.fromJson(data, BixiNetwork.class);
+            //}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return network;
+    }
+
     public String getJSonDataFromSharedPref(){
         return context.getSharedPreferences(dataName,Context.MODE_PRIVATE).getString(preferenceName,null);
     }
