@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.udem.ift2906.bixitracksexplorer.R;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -23,6 +25,25 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
     public BudgetInfoListViewAdapter(Context _context, List<BudgetInfoItem> _itemList){
         mItemList = _itemList;
         mInflater = LayoutInflater.from(_context);
+        sortTracksByCost();
+    }
+
+    private void sortTracksByCost(){
+        Collections.sort(mItemList, new Comparator<BudgetInfoItem>() {
+            //We want them in reverse order
+            @Override
+            public int compare(BudgetInfoItem lhs, BudgetInfoItem rhs) {
+                if (lhs.getCost() == rhs.getCost()){
+                    return 0;
+                }
+                else if(lhs.getCost() < rhs.getCost()){
+                    return 1;
+                }
+                else{
+                    return -1;
+                }
+            }
+        });
     }
 
     private class ViewHolder{
