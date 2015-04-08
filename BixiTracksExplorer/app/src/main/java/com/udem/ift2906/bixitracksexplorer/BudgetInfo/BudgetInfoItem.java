@@ -89,4 +89,8 @@ public class BudgetInfoItem implements Parcelable {
             return new BudgetInfoItem[size];
         }
     };
+
+    public int getDurationInMinutes() {
+        return (int)((mDuration/1000L)/60L);
+    }
 }

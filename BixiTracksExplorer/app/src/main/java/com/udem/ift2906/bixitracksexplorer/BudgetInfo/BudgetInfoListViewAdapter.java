@@ -33,13 +33,11 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
             //We want them in reverse order
             @Override
             public int compare(BudgetInfoItem lhs, BudgetInfoItem rhs) {
-                if (lhs.getCost() == rhs.getCost()){
+                if (lhs.getCost() == rhs.getCost()) {
                     return 0;
-                }
-                else if(lhs.getCost() < rhs.getCost()){
+                } else if (lhs.getCost() < rhs.getCost()) {
                     return 1;
-                }
-                else{
+                } else {
                     return -1;
                 }
             }
@@ -86,7 +84,7 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
         holder.sortCriteria.setText(String.format("%.2f", mItemList.get(position).getCost())+"$");
         holder.startStationName.setText(mItemList.get(position).getStartStationName());
         holder.endStationName.setText(mItemList.get(position).getEndStationName());
-        holder.additionalInfoLine1.setText("XX");
+        holder.additionalInfoLine1.setText(String.valueOf(mItemList.get(position).getDurationInMinutes()));
         holder.additionalInfoLine2.setText("min");
 
         return convertView;
