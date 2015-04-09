@@ -15,6 +15,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiNetwork;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
+import com.udem.ift2906.bixitracksexplorer.StationItem;
+import com.udem.ift2906.bixitracksexplorer.StationsNetwork;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
 
 import org.json.JSONException;
@@ -68,97 +70,94 @@ public class DBHelper {
         return (List<QueryRow>) allDocs.get("rows");
     }
 
-    public static BixiStation getStation(String id) {
-        BixiStation station = new BixiStation();
-
+    public static StationItem getStation(long id) {
         Cursor cursor = BixiStationDatabase.getInstance(context).getStation(id);
 
         cursor.moveToFirst();
         if (!cursor.isAfterLast()) {
-            station = createStation(cursor);
+            return createStation(cursor);
         }
 
-        return station;
+        return null;
     }
 
-    private static BixiStation createStation(Cursor cursor) {
+    private static StationItem createStation(Cursor cursor) {
         BixiStation station = new BixiStation();
 
-        station.id = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_ID));
-        station.name = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NAME));
+        station.extra.uid = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_ID));;
+        station.extra.name = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NAME));
         station.latitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LATITUDE));
         station.longitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LONGITUDE));
         station.free_bikes = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NB_BIKES_AVAILABLE));
         station.empty_slots = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NB_DOCKS_AVAILABLE));
         station.timestamp = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LAST_UPDATE));
-        station.favorite = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_FAVORITE)) > 0;
+        station.extra.locked = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_IS_LOCKED)) > 0;
+        boolean isFavorite = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_FAVORITE)) > 0;
 
-        return station;
+        return new StationItem(station, isFavorite, cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LAST_UPDATE)));
     }
 
-    public static ArrayList<BixiStation> listStations(){
-        ArrayList<BixiStation> stations = new ArrayList<>();
+    public static StationsNetwork listStations(){
+        StationsNetwork stationsNetwork = new StationsNetwork();
         Cursor cursor = BixiStationDatabase.getInstance(context).listStations();
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            stations.add(createStation(cursor));
+            stationsNetwork.stations.add(createStation(cursor));
             cursor.moveToNext();
         }
         cursor.close();
 
-        return stations;
+        return stationsNetwork;
     }
 
-    public static boolean isExist(String id) {
+    public static boolean isExist(long id) {
         return BixiStationDatabase.getInstance(context).isExist(id);
     }
 
 
 
-    public static boolean isFavorite(String id) {
+    public static boolean isFavorite(long id) {
         return BixiStationDatabase.getInstance(context).isFavorite(id);
     }
 
-    public static void addRow(BixiStation station) {
+    public static void addRow(StationItem station) {
         ContentValues cv = new ContentValues();
 
-        cv.put(BixiStationDatabase.COLUMN_ID, station.id);
-        cv.put(BixiStationDatabase.COLUMN_LATITUDE, station.latitude);
-        cv.put(BixiStationDatabase.COLUMN_LONGITUDE, station.longitude);
-        cv.put(BixiStationDatabase.COLUMN_NAME, station.name);
-        cv.put(BixiStationDatabase.COLUMN_LAST_UPDATE, station.timestamp);
-        cv.put(BixiStationDatabase.COLUMN_FAVORITE, false);
+        cv.put(BixiStationDatabase.COLUMN_ID, station.getUid());
+        cv.put(BixiStationDatabase.COLUMN_LATITUDE, station.getPosition().latitude);
+        cv.put(BixiStationDatabase.COLUMN_LONGITUDE, station.getPosition().longitude);
+        cv.put(BixiStationDatabase.COLUMN_NAME, station.getName());
+        cv.put(BixiStationDatabase.COLUMN_LAST_UPDATE, station.getTimestamp());
+        cv.put(BixiStationDatabase.COLUMN_FAVORITE, 0);
+        cv.put(BixiStationDatabase.COLUMN_IS_LOCKED, station.isLocked() ? 1 : 0);
+        cv.put(BixiStationDatabase.COLUMN_NB_BIKES_AVAILABLE, station.getFree_bikes());
+        cv.put(BixiStationDatabase.COLUMN_NB_DOCKS_AVAILABLE, station.getEmpty_slots());
 
         BixiStationDatabase.getInstance(context).addRow(cv);
     }
 
-    public static boolean updateRow(BixiStation station, String id) {
+    public static boolean updateRow(StationItem station, long id) {
         ContentValues cv = new ContentValues();
 
-        boolean isFavorite;
-
-        if (isExist(id))
-            isFavorite = isFavorite(id);
-        else
-            return false;
-
         cv.put(BixiStationDatabase.COLUMN_ID, id);
-        cv.put(BixiStationDatabase.COLUMN_LATITUDE, station.latitude);
-        cv.put(BixiStationDatabase.COLUMN_LONGITUDE, station.longitude);
-        cv.put(BixiStationDatabase.COLUMN_NAME, station.name);
-        cv.put(BixiStationDatabase.COLUMN_LAST_UPDATE, station.timestamp);
-        cv.put(BixiStationDatabase.COLUMN_FAVORITE, isFavorite);
+        cv.put(BixiStationDatabase.COLUMN_LATITUDE, station.getPosition().latitude);
+        cv.put(BixiStationDatabase.COLUMN_LONGITUDE, station.getPosition().longitude);
+        cv.put(BixiStationDatabase.COLUMN_NAME, station.getName());
+        cv.put(BixiStationDatabase.COLUMN_LAST_UPDATE, station.getTimestamp());
+        cv.put(BixiStationDatabase.COLUMN_IS_LOCKED, station.isLocked() ? 1 : 0);
+        cv.put(BixiStationDatabase.COLUMN_NB_BIKES_AVAILABLE, station.getFree_bikes());
+        cv.put(BixiStationDatabase.COLUMN_NB_DOCKS_AVAILABLE, station.getEmpty_slots());
 
         BixiStationDatabase.getInstance(context).updateRow(cv, id);
 
         return true;
     }
 
-    public static void addNetwork(BixiNetwork bixiNetwork) {
-        for (BixiStation station : bixiNetwork.network.stations) {
-            if (isExist(station.id))
-                updateRow(station, station.id);
+    public static void addNetwork(StationsNetwork stationsNetwork) {
+        for (StationItem station : stationsNetwork.stations) {
+            if (isExist(station.getUid()))
+                updateRow(station, station.getUid());
             else
                 addRow(station);
         }

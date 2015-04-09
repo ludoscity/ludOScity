@@ -10,5 +10,7 @@ package com.udem.ift2906.bixitracksexplorer.BixiAPI;
 
 public class BixiNetwork {
     public Network network;
+
+
 }
 

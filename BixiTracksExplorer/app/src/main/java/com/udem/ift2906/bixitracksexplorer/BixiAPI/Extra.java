@@ -9,5 +9,5 @@ public class Extra{
     public String removalDate;
     public Boolean temporary;
     public String terminalName;
-    public int uid;
+    public long uid;
 }

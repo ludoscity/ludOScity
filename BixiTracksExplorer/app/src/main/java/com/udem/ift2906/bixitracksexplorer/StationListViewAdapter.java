@@ -27,9 +27,9 @@ public class StationListViewAdapter extends BaseAdapter {
     private List<StationItem> mStationList = null;
     private LatLng mCurrentUserLatLng;
 
-    StationListViewAdapter(Context _context, List<StationItem> _stationList, LatLng _currentUserLatLng){
+    StationListViewAdapter(Context _context, StationsNetwork _stationsNetwork, LatLng _currentUserLatLng){
         mContext = _context;
-        mStationList = _stationList;
+        mStationList = _stationsNetwork.stations;
         mInflater = LayoutInflater.from(_context);
         mCurrentUserLatLng = _currentUserLatLng;
         sortStationListByClosest();

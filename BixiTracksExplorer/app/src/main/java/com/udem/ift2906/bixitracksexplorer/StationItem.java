@@ -1,8 +1,12 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.SphericalUtil;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Gevrai on 2015-04-03.
@@ -10,34 +14,44 @@ import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
  * Simple item holding the data necessary for each stations to be shown in listViewAdapter
  */
 public class StationItem {
-    private int uid;
+    private long uid;
     private String name;
-    private Boolean locked;
+    private boolean locked;
     private int empty_slots;
     private int free_bikes;
     private LatLng position;
+    private boolean isFavorite;
     private double meterFromUserLocation;
+    private MarkerOptions markerOptions;
+    private String timestamp;
 
-    StationItem(BixiStation _station) {
-        uid = _station.extra.uid;
-        name = _station.extra.name;
-        locked = _station.extra.locked;
-        empty_slots = _station.empty_slots;
-        free_bikes = _station.free_bikes;
-        position = new LatLng(_station.latitude, _station.longitude);
+
+    public void setUpMarker(){
+        //TODO Changes to markers are to be done here (for now)
+        markerOptions = new MarkerOptions()
+                .position(position)
+                .title(name);
+    }
+
+    public StationItem(BixiStation _station, boolean isFavorite, String date) {
+        this.uid = _station.extra.uid;
+        this.name = _station.extra.name;
+        this.locked = _station.extra.locked;
+        this.empty_slots = _station.empty_slots;
+        this.free_bikes = _station.free_bikes;
+        this.position = new LatLng(_station.latitude, _station.longitude);
+        this.isFavorite = isFavorite;
+        this.timestamp = date;
+
     }
 
 
-    public int getUid() {
+    public long getUid() {
         return uid;
     }
 
     public String getName() {
         return name;
-    }
-
-    public Boolean isLocked() {
-        return locked;
     }
 
     public int getEmpty_slots() {
@@ -54,5 +68,21 @@ public class StationItem {
 
     public LatLng getPosition() {
         return position;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public MarkerOptions getMarkerOptions() {
+        return markerOptions;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
     }
 }
