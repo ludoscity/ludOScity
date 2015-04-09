@@ -4,9 +4,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
+import com.udem.ift2906.bixitracksexplorer.StationItem;
+import com.udem.ift2906.bixitracksexplorer.StationListViewAdapter;
+import com.udem.ift2906.bixitracksexplorer.StationsNetwork;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -18,6 +24,8 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Gevrai on 15-03-26.
@@ -33,73 +41,47 @@ public class BixiAPI{
     private String url = "http://api.citybik.es/v2/networks/bixi-montreal?fields=stations";
     private String dataName = "DATA";
     private String preferenceName = "BixiStationsData";
-    private BixiNetwork bixiNetwork;
     Context context;
+    BixiNetwork bixiNetwork = null;
+    StationsNetwork stationsNetwork = null;
 
     public BixiAPI(Context _context){
         context = _context;
-        if (isWifiConnected())
-            tryDownloadingDataFromApiIntoSharedPref();
-        buildNetworkFromJSON();
     }
 
-    public BixiNetwork getBixiNetwork() {
-        return bixiNetwork;
-    }
-
-    public BixiNetwork downloadBixiNetwork() {
-        BixiNetwork network = null;
+    public StationsNetwork downloadBixiNetwork() {
         try {
-
-            //TODO Remove comments on isWifiConnected
+            //TODO Remove: comments on isWifiConnected, Emulator don't have wifi but still have internet
             //if (isWifiConnected()) {
                 String data = EntityUtils.toString(getHttp(url), HTTP.UTF_8);
 
                 Gson gson = new GsonBuilder().create();
-                network = gson.fromJson(data, BixiNetwork.class);
+                bixiNetwork = gson.fromJson(data, BixiNetwork.class);
+
+                stationsNetwork = new StationsNetwork();
+
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
+                String dateNow = simpleDateFormat.format(new Date());
+
+                for (BixiStation station : bixiNetwork.network.stations) {
+                    StationItem stationItem = new StationItem(station, DBHelper.isFavorite(station.extra.uid), dateNow);
+                    stationsNetwork.stations.add(stationItem);
+                }
             //}
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
 
-        return network;
-    }
+        new addNetworkDatabase().execute();
 
-    public String getJSonDataFromSharedPref(){
-        return context.getSharedPreferences(dataName,Context.MODE_PRIVATE).getString(preferenceName,null);
-    }
-
-    private void buildNetworkFromJSON() {
-
-        String jsonData = getJSonDataFromSharedPref();
-        Gson gson = new GsonBuilder().create();
-        bixiNetwork = gson.fromJson(jsonData, BixiNetwork.class);
+        return stationsNetwork;
     }
 
     public boolean isWifiConnected(){
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return mWifi.isConnected();
-    }
-
-    public boolean tryDownloadingDataFromApiIntoSharedPref(){
-
-        try {
-            HttpEntity page = getHttp(url);
-            String data = EntityUtils.toString(page, HTTP.UTF_8);
-            SharedPreferences preferences = context.getSharedPreferences(dataName, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(preferenceName, data);
-            editor.commit();
-            return true;
-
-        } catch (ClientProtocolException e1) {
-            e1.printStackTrace();
-            return false;
-        }  catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     public HttpEntity getHttp(String url) throws ClientProtocolException, IOException {
@@ -109,4 +91,11 @@ public class BixiAPI{
         return response.getEntity();
     }
 
+    public class addNetworkDatabase extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            DBHelper.addNetwork(stationsNetwork);
+            return null;
+        }
+    }
 }

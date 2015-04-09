@@ -15,7 +15,7 @@ import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
  */
 public class BixiStationDatabase extends SQLiteOpenHelper {
     static final String DB_NAME = "bixi.db";
-    static final int DB_VERSION = 3;
+    static final int DB_VERSION = 4;
 
     //Stations TABLE
     static final String TABLE_NAME = "Stations";
@@ -26,6 +26,7 @@ public class BixiStationDatabase extends SQLiteOpenHelper {
     static final String COLUMN_NB_BIKES_AVAILABLE = "bikes_available";
     static final String COLUMN_NB_DOCKS_AVAILABLE = "docks_available";
     static final String COLUMN_FAVORITE = "favorite";
+    static final String COLUMN_IS_LOCKED = "is_locked";
     static final String COLUMN_LAST_UPDATE = "last_update";
 
     private static BixiStationDatabase instance = null;
@@ -47,15 +48,16 @@ public class BixiStationDatabase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String sql = "CREATE TABLE " + TABLE_NAME
-                + " (" + COLUMN_ID + " TEXT PRIMARY KEY, "
+                + " (" + COLUMN_ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_NAME + " TEXT, "
                 + COLUMN_LATITUDE + " REAL, "
                 + COLUMN_LONGITUDE + " REAL, "
-                + COLUMN_NB_BIKES_AVAILABLE + " integer, "
-                + COLUMN_NB_DOCKS_AVAILABLE + " integer, "
+                + COLUMN_NB_BIKES_AVAILABLE + " INTEGER, "
+                + COLUMN_NB_DOCKS_AVAILABLE + " INTEGER, "
                 + COLUMN_FAVORITE + " NUMERIC, " //BOOLEAN
-                + COLUMN_LAST_UPDATE + " NUMERIC"
-                + ")"; //DATETIME
+                + COLUMN_IS_LOCKED + " NUMERIC, " //BOOLEAN
+                + COLUMN_LAST_UPDATE + " NUMERIC" //DATETIME
+                + ")";
 
         db.execSQL(sql);
         Log.d("DB", "database created");
@@ -73,20 +75,25 @@ public class BixiStationDatabase extends SQLiteOpenHelper {
         return c;
     }
 
-    public boolean isExist(String id) {
-        String args[] = new String[] { id };
+    public boolean isExist(long id) {
+        String args[] = new String[] { Long.toString(id) };
         Cursor c = getWritableDatabase().rawQuery("select * from "+TABLE_NAME+" where "+COLUMN_ID+" = ?", args);
 
         return c.moveToFirst();
     }
 
-    public boolean isFavorite(String id) {
-        String args[] = new String[] { id };
+    public boolean isFavorite(long id) {
+        String args[] = new String[] { Long.toString(id) };
         Cursor c = getWritableDatabase().rawQuery("select * from "+TABLE_NAME+" where "+COLUMN_ID+" = ?", args);
 
+        boolean isFavorite = false;
+
         if (c.moveToFirst())
-            return c.getInt(c.getColumnIndex(COLUMN_FAVORITE)) > 0;
-        return false;
+            isFavorite = c.getInt(c.getColumnIndex(COLUMN_FAVORITE)) > 0;
+
+        c.close();
+
+        return isFavorite;
     }
 
     public void addRow(ContentValues cv) {
@@ -96,15 +103,15 @@ public class BixiStationDatabase extends SQLiteOpenHelper {
         }
     }
 
-    public void updateRow(ContentValues cv, String id) {
+    public void updateRow(ContentValues cv, long id) {
         long k = getWritableDatabase().update(TABLE_NAME,cv,COLUMN_ID+" = '"+id + "'",null);
         if (k<0){
             Log.e(TABLE_NAME, "mise à jour impossible..");
         }
     }
 
-    public Cursor getStation(String id) {
-        String args[] = new String[] { id };
+    public Cursor getStation(long id) {
+        String args[] = new String[] { Long.toString(id) };
         Cursor c = getWritableDatabase().rawQuery("select * from "+TABLE_NAME+" where "+COLUMN_ID+" = ?", args);
 
         return c;

@@ -13,13 +13,8 @@ public class BixiStation{
     public String name;
     public String timestamp;
 
-    public MarkerOptions markerOptions;
-    public boolean favorite;
-
-    public void setUpMarker(){
-        //TODO Changes to markers are to be done here (for now)
-        markerOptions = new MarkerOptions()
-                .position(new LatLng(latitude,longitude))
-                .title(name);
+    public BixiStation() {
+        //CECI EST TRÈS IMPORTANT !!
+        extra = new Extra();
     }
 }
