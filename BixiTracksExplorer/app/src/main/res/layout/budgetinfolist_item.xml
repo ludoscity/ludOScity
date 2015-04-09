@@ -8,6 +8,7 @@
         android:id="@+id/budgetinfoitem_sort_criteria"
         android:layout_gravity="center_vertical"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_margin="10dp"
         android:orientation="vertical"
@@ -36,6 +37,7 @@
         android:id="@+id/budgetinfoitem_startend"
         android:orientation="vertical"
         android:layout_toEndOf="@id/budgetinfoitem_sort_criteria"
+        android:layout_toRightOf="@id/budgetinfoitem_sort_criteria"
         android:layout_centerVertical="true">
 
         <TextView
@@ -53,6 +55,7 @@
         android:layout_margin="10dp"
         android:orientation="vertical"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_centerVertical="true">
         <TextView
             android:layout_width="wrap_content"
