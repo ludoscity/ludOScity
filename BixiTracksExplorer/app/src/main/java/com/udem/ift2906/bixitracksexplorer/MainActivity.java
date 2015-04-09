@@ -17,15 +17,17 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
 import com.couchbase.lite.CouchbaseLiteException;
+import com.udem.ift2906.bixitracksexplorer.BudgetInfo.BudgetInfoItem;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         BudgetOverviewFragment.OnFragmentInteractionListener,
-        TrackBudgetInfoFragment.OnFragmentInteractionListener,
+        BudgetInfoFragment.OnFragmentInteractionListener,
         NearbyFragment.OnFragmentInteractionListener {
 
     //Test test
@@ -154,7 +156,7 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onBudgetOverviewFragmentInteraction(Uri uri) {
+    public void onBudgetOverviewFragmentInteraction(Uri uri, ArrayList<BudgetInfoItem> _budgetInfoItemList) {
 
         if (uri.getPath().equalsIgnoreCase("/budget_overview_onresume"))
         {
@@ -173,8 +175,7 @@ public class MainActivity extends ActionBarActivity
             mSubtitle = uri.getQueryParameter("selected_period");
 
             // Create fragment and give it required info to set itselfs up
-            TrackBudgetInfoFragment newFragment = TrackBudgetInfoFragment.newInstance(uri.getQueryParameter("info_type"), uri.getQueryParameter("selected_period"));
-
+            BudgetInfoFragment newFragment = BudgetInfoFragment.newInstance(uri.getQueryParameter("info_type"), uri.getQueryParameter("selected_period"), _budgetInfoItemList);
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -191,8 +192,15 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onTrackBudgetInfoFragmentInteraction(String id) {
+    public void onBudgetInfoFragmentInteraction(Uri _uri) {
+        if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_SORT_CHANGED)){
 
+            String [] parts = mSubtitle.toString().split(" ");
+
+            mSubtitle = parts[0] + " - " + _uri.getQueryParameter(BudgetInfoFragment.NEW_SORT_SUBTITLE);
+
+            restoreActionBar();
+        }
     }
 
     @Override
@@ -237,9 +245,6 @@ public class MainActivity extends ActionBarActivity
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-
-
-            //Expan
             return inflater.inflate(R.layout.fragment_main, container, false);
         }
 

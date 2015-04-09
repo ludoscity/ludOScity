@@ -22,6 +22,7 @@ import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.UnsavedRevision;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.udem.ift2906.bixitracksexplorer.BudgetInfo.BudgetInfoItem;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.BixiTracksExplorerAPI;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.ListTracksResponse;
@@ -62,6 +63,8 @@ public class BudgetOverviewFragment extends Fragment {
 
     private float mMonthAccessCost;
     private float mMonthUseCost;
+
+    private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -162,7 +165,7 @@ public class BudgetOverviewFragment extends Fragment {
 
             builder.appendPath("budget_overview_onresume");
 
-            mListener.onBudgetOverviewFragmentInteraction(builder.build());
+            mListener.onBudgetOverviewFragmentInteraction(builder.build(), null);
         }
     }
 
@@ -175,7 +178,7 @@ public class BudgetOverviewFragment extends Fragment {
                     .appendQueryParameter("info_type", infoType)
                     .appendQueryParameter("selected_period", mSelectedPeriod);
 
-            mListener.onBudgetOverviewFragmentInteraction(builder.build());
+            mListener.onBudgetOverviewFragmentInteraction(builder.build(), mBudgetInfoItems);
         }
     }
 
@@ -207,7 +210,7 @@ public class BudgetOverviewFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onBudgetOverviewFragmentInteraction(Uri uri);
+        public void onBudgetOverviewFragmentInteraction(Uri uri, ArrayList<BudgetInfoItem> _budgetInfoItemList);
     }
 
     public class RetrieveTrackDataAndProcessCost extends AsyncTask<Void, Void, Void> {
@@ -300,6 +303,10 @@ public class BudgetOverviewFragment extends Fragment {
 
                 final float trackCost = processCostForDuration(trackDuration, 0.f, 0);
 
+                mBudgetInfoItems.add(new BudgetInfoItem((String) properties.get("key_TimeUTC"),
+                        trackCost, (String) properties.get("startStationName"), (String) properties.get("endStationName"),
+                        trackDuration));
+
                 mSeasonUseCost += trackCost;
 
                 //store the cost in the track document for later use
@@ -343,7 +350,7 @@ public class BudgetOverviewFragment extends Fragment {
             updateCost();
 
             mUseCostInfoButton.setEnabled(true);
-            mAccessCostInfoButton.setEnabled(true);
+            //mAccessCostInfoButton.setEnabled(true);
         }
     }
 }
