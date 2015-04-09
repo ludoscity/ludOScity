@@ -97,5 +97,12 @@ public class BixiAPI{
             DBHelper.addNetwork(stationsNetwork);
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            Toast.makeText(context, "DatabaseUpdate Successful!", Toast.LENGTH_LONG).show();
+        }
     }
 }

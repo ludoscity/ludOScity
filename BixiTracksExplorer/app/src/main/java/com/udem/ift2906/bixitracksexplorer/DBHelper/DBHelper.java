@@ -13,7 +13,6 @@ import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.android.AndroidContext;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiNetwork;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
 import com.udem.ift2906.bixitracksexplorer.StationItem;
 import com.udem.ift2906.bixitracksexplorer.StationsNetwork;
@@ -22,7 +21,6 @@ import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.T
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,17 +66,6 @@ public class DBHelper {
         return (List<QueryRow>) allDocs.get("rows");
     }
 
-    public static StationItem getStation(long id) {
-        Cursor cursor = BixiStationDatabase.getInstance(context).getStation(id);
-
-        cursor.moveToFirst();
-        if (!cursor.isAfterLast()) {
-            return createStation(cursor);
-        }
-
-        return null;
-    }
-
     private static StationItem createStation(Cursor cursor) {
         BixiStation station = new BixiStation();
 
@@ -95,9 +82,9 @@ public class DBHelper {
         return new StationItem(station, isFavorite, cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LAST_UPDATE)));
     }
 
-    public static StationsNetwork listStations(){
+    public static StationsNetwork getStationsNetwork(){
         StationsNetwork stationsNetwork = new StationsNetwork();
-        Cursor cursor = BixiStationDatabase.getInstance(context).listStations();
+        Cursor cursor = BixiStationDatabase.getInstance(context).getStations();
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -107,6 +94,17 @@ public class DBHelper {
         cursor.close();
 
         return stationsNetwork;
+    }
+
+    public static StationItem getStationItem(long id) {
+        Cursor cursor = BixiStationDatabase.getInstance(context).getStation(id);
+
+        cursor.moveToFirst();
+        if (!cursor.isAfterLast()) {
+            return createStation(cursor);
+        }
+
+        return null;
     }
 
     public static boolean isExist(long id) {

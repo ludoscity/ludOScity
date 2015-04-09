@@ -113,7 +113,6 @@ public class NearbyFragment extends Fragment
             bixiApiInstance = new BixiAPI(mContext);
             stationsNetwork = bixiApiInstance.downloadBixiNetwork();
 
-
             return null;
         }
 

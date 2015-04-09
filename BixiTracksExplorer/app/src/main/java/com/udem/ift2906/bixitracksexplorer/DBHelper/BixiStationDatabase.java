@@ -68,7 +68,7 @@ public class BixiStationDatabase extends SQLiteOpenHelper {
         db.execSQL("drop table if exists "+ TABLE_NAME);
         onCreate(db);
     }
-    public Cursor listStations(){
+    public Cursor getStations(){
         String sql = "select * from " + TABLE_NAME
                 +" order by " + COLUMN_NAME + " asc";
         Cursor c = getWritableDatabase().rawQuery(sql, null);
