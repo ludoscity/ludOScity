@@ -89,6 +89,8 @@ public class BudgetInfoFragment extends ListFragment {
                 return true;
 
             case R.id.budgetInfoSortOrder:
+
+                ((BudgetInfoListViewAdapter)getListAdapter()).reverseSortOrderAndNotify();
                 if(mSortOrderHighToLow){
                     item.setIcon(R.drawable.ic_action_sort_low_to_high);
                 }
@@ -102,17 +104,17 @@ public class BudgetInfoFragment extends ListFragment {
                 if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_COST){
                     item.setIcon(R.drawable.ic_action_duration);
                     mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION;
-                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByDurationAndNotify();
+                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByDurationAndNotify(mSortOrderHighToLow);
                 }
                 else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION){
                     item.setIcon(R.drawable.ic_action_date);
                     mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DATE;
-                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByDateAndNotify();
+                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByDateAndNotify(mSortOrderHighToLow);
                 }
                 else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DATE){
                     item.setIcon(R.drawable.ic_action_cost);
                     mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;
-                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByCostAndNotify();
+                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByCostAndNotify(mSortOrderHighToLow);
                 }
 
                 notifySortCriteriaChangeToActivity();

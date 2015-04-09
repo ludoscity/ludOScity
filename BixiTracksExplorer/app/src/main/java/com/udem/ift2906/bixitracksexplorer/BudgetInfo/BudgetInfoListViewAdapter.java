@@ -32,10 +32,15 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
     public BudgetInfoListViewAdapter(Context _context, List<BudgetInfoItem> _itemList){
         mItemList = _itemList;
         mInflater = LayoutInflater.from(_context);
-        sortTracksByCostAndNotify();
+        sortTracksByCostAndNotify(true);
     }
 
-    public void sortTracksByCostAndNotify(){
+    public void reverseSortOrderAndNotify(){
+        Collections.reverse(mItemList);
+        notifyDataSetChanged();
+    }
+
+    public void sortTracksByCostAndNotify(boolean _sortHighToLow){
         Collections.sort(mItemList, new Comparator<BudgetInfoItem>() {
             //We want them in reverse order
             @Override
@@ -50,10 +55,16 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
             }
         });
         mCurrentSortCriteria = SORT_CRITERIA_COST;
-        notifyDataSetChanged();
+
+        if (!_sortHighToLow){
+            reverseSortOrderAndNotify();
+        }
+        else{
+            notifyDataSetChanged();
+        }
     }
 
-    public void sortTracksByDurationAndNotify(){
+    public void sortTracksByDurationAndNotify(boolean _sortHighToLow){
         Collections.sort(mItemList, new Comparator<BudgetInfoItem>() {
             @Override
             public int compare(BudgetInfoItem lhs, BudgetInfoItem rhs) {
@@ -67,10 +78,16 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
             }
         });
         mCurrentSortCriteria = SORT_CRITERIA_DURATION;
-        notifyDataSetChanged();
+
+        if (!_sortHighToLow){
+            reverseSortOrderAndNotify();
+        }
+        else{
+            notifyDataSetChanged();
+        }
     }
 
-    public void sortTracksByDateAndNotify(){
+    public void sortTracksByDateAndNotify(boolean _sortHighToLow){
         Collections.sort(mItemList, new Comparator<BudgetInfoItem>() {
             @Override
             public int compare(BudgetInfoItem lhs, BudgetInfoItem rhs) {
@@ -78,7 +95,13 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
             }
         });
         mCurrentSortCriteria = SORT_CRITERIA_DATE;
-        notifyDataSetChanged();
+
+        if (!_sortHighToLow){
+            reverseSortOrderAndNotify();
+        }
+        else{
+            notifyDataSetChanged();
+        }
     }
 
     private class ViewHolder{
