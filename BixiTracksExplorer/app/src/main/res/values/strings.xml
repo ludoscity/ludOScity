@@ -19,7 +19,10 @@
     <string name="timespan_season">Season</string>
     <string name="timespan_this_month">This month</string>
     <string name="access_cost_label">Access cost :</string>
-    <string name="use_cost_label">Use cost :</string>
+    <string name="use_cost_label">Usage cost :</string>
     <string name="total_cost_label">Total cost :</string>
     <string name="budget_prerecorded_data_checkbox">Prerecorded data</string>
+    <string name="budgetinfo_subtitle_by_cost">by amount</string>
+    <string name="budgetinfo_subtitle_by_duration">by duration</string>
+    <string name="budgetinfo_subtitle_by_date">by date</string>
 </resources>

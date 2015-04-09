@@ -1,6 +1,7 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
@@ -27,12 +28,15 @@ public class BudgetInfoFragment extends ListFragment {
     private static final String ARG_TIMEPERIOD = "timePeriod";
     private static final String ARG_INFOTYPE = "infoType";
     private static final String ARG_ITEMLIST = "itemList";
+    public static final String BUDGETINFOITEM_SORT_CHANGED = "budgetinfoitem_sort_changed";
+    public static final String BUDGETINFOITEM_CLICK = "budgetinfoitem_click";
+    public static final String NEW_SORT_SUBTITLE = "new_sort_subtitle";
 
     private String mInfoType;
     private String mTimePeriod;
 
     private boolean mSortOrderHighToLow = true;
-    private int mSortCriteria = 0;  //0 : cost, 1: duration, 2: date
+    private int mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;  //0 : cost, 1: duration, 2: date
 
     private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
 
@@ -83,6 +87,7 @@ public class BudgetInfoFragment extends ListFragment {
                 //called when the up affordance/carat in actionbar is pressed
                 getActivity().onBackPressed();
                 return true;
+
             case R.id.budgetInfoSortOrder:
                 if(mSortOrderHighToLow){
                     item.setIcon(R.drawable.ic_action_sort_low_to_high);
@@ -92,20 +97,27 @@ public class BudgetInfoFragment extends ListFragment {
                 }
                 mSortOrderHighToLow = !mSortOrderHighToLow;
                 return true;
+
             case R.id.budgetInfoSortCriteria:
-                if (mSortCriteria == 0){
+                if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_COST){
                     item.setIcon(R.drawable.ic_action_duration);
-                    mSortCriteria = 1;
+                    mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION;
+                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByDurationAndNotify();
                 }
-                else if (mSortCriteria == 1){
+                else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION){
                     item.setIcon(R.drawable.ic_action_date);
-                    mSortCriteria = 2;
+                    mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DATE;
+                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByDateAndNotify();
                 }
-                else if (mSortCriteria == 2){
+                else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DATE){
                     item.setIcon(R.drawable.ic_action_cost);
-                    mSortCriteria = 0;
+                    mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;
+                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByCostAndNotify();
                 }
+
+                notifySortCriteriaChangeToActivity();
                 return true;
+
         }
 
         return false;
@@ -129,6 +141,31 @@ public class BudgetInfoFragment extends ListFragment {
         }
         // update the actionbar to show the up carat/affordance
         ((ActionBarActivity)activity).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        notifySortCriteriaChangeToActivity();
+    }
+
+    private void notifySortCriteriaChangeToActivity(){
+        Uri.Builder builder = new Uri.Builder();
+        builder.appendPath(BUDGETINFOITEM_SORT_CHANGED);
+        String subtitle = "";
+
+        switch (mCurrentSortCriteria){
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_COST:
+                subtitle = getString(R.string.budgetinfo_subtitle_by_cost);
+                break;
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION:
+                subtitle = getString(R.string.budgetinfo_subtitle_by_duration);
+                break;
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_DATE:
+                subtitle = getString(R.string.budgetinfo_subtitle_by_date);
+                break;
+        }
+
+        builder.appendQueryParameter(NEW_SORT_SUBTITLE, subtitle);
+
+        if (mListener != null){
+            mListener.onBudgetInfoFragmentInteraction(builder.build());
+        }
     }
 
     @Override
@@ -142,10 +179,13 @@ public class BudgetInfoFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.onTrackBudgetInfoFragmentInteraction(mBudgetInfoItems.get(position).getID());
+        if (mListener != null){
+            Uri.Builder builder = new Uri.Builder();
+
+            builder.appendPath(BUDGETINFOITEM_CLICK)
+                    .appendQueryParameter("track_id", mBudgetInfoItems.get(position).getIDAsString());
+
+            mListener.onBudgetInfoFragmentInteraction(builder.build());
         }
     }
 
@@ -160,7 +200,7 @@ public class BudgetInfoFragment extends ListFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onTrackBudgetInfoFragmentInteraction(long id);
+        public void onBudgetInfoFragmentInteraction(Uri _uri);
     }
 
 }

@@ -177,7 +177,6 @@ public class MainActivity extends ActionBarActivity
             // Create fragment and give it required info to set itselfs up
             BudgetInfoFragment newFragment = BudgetInfoFragment.newInstance(uri.getQueryParameter("info_type"), uri.getQueryParameter("selected_period"), _budgetInfoItemList);
 
-
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
             // Replace whatever is in the fragment_container view with this fragment,
@@ -193,8 +192,15 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onTrackBudgetInfoFragmentInteraction(long id) {
+    public void onBudgetInfoFragmentInteraction(Uri _uri) {
+        if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_SORT_CHANGED)){
 
+            String [] parts = mSubtitle.toString().split(" ");
+
+            mSubtitle = parts[0] + " - " + _uri.getQueryParameter(BudgetInfoFragment.NEW_SORT_SUBTITLE);
+
+            restoreActionBar();
+        }
     }
 
     @Override

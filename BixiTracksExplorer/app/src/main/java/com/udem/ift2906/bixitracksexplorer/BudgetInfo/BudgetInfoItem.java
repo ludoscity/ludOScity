@@ -36,7 +36,7 @@ public class BudgetInfoItem implements Parcelable {
         mDuration = in.readLong();
     }
 
-    public long getID(){
+    public long getIDAsLong(){
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         //TimeZone utc = TimeZone.getTimeZone("UTC");
         //format.setTimeZone(utc); // ZULU_DATE_FORMAT format ends with Z for UTC so make that true
@@ -49,6 +49,23 @@ public class BudgetInfoItem implements Parcelable {
         }
 
         return 0;
+    }
+
+    public String getIDAsString(){
+        return mTrackID;
+    }
+
+    public Date getTimestampAsDate(){
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+        Date toReturn = null;
+
+        try {
+            toReturn = format.parse(mTrackID);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return toReturn;
     }
 
     public float getCost(){

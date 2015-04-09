@@ -2,8 +2,8 @@ package com.udem.ift2906.bixitracksexplorer.DBHelper;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
@@ -18,9 +18,6 @@ import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
 
 import org.json.JSONException;
-
-import android.content.Context;
-import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,6 +46,7 @@ public class DBHelper {
     }
 
     public static void deleteDB() throws CouchbaseLiteException {
+        //If it crashes here because getDatabase returns null, uninstall and reinstall the app
         mManager.getDatabase(mDbName).delete();
     }
 

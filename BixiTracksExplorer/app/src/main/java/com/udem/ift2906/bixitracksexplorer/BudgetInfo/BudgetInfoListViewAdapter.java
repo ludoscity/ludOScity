@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.udem.ift2906.bixitracksexplorer.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -18,6 +20,11 @@ import java.util.List;
  * Custom adapter used in BudgetInfoFragment
  */
 public class BudgetInfoListViewAdapter extends BaseAdapter{
+    public static final int SORT_CRITERIA_COST = 0;
+    public static final int SORT_CRITERIA_DURATION = 1;
+    public static final int SORT_CRITERIA_DATE = 2;
+
+    private int mCurrentSortCriteria;
     LayoutInflater mInflater;
 
     private List<BudgetInfoItem> mItemList = null;
@@ -25,10 +32,10 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
     public BudgetInfoListViewAdapter(Context _context, List<BudgetInfoItem> _itemList){
         mItemList = _itemList;
         mInflater = LayoutInflater.from(_context);
-        sortTracksByCost();
+        sortTracksByCostAndNotify();
     }
 
-    private void sortTracksByCost(){
+    public void sortTracksByCostAndNotify(){
         Collections.sort(mItemList, new Comparator<BudgetInfoItem>() {
             //We want them in reverse order
             @Override
@@ -42,10 +49,41 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
                 }
             }
         });
+        mCurrentSortCriteria = SORT_CRITERIA_COST;
+        notifyDataSetChanged();
+    }
+
+    public void sortTracksByDurationAndNotify(){
+        Collections.sort(mItemList, new Comparator<BudgetInfoItem>() {
+            @Override
+            public int compare(BudgetInfoItem lhs, BudgetInfoItem rhs) {
+                if (lhs.getDurationInMinutes() == rhs.getDurationInMinutes()) {
+                    return 0;
+                } else if (lhs.getDurationInMinutes() < rhs.getDurationInMinutes()) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
+        mCurrentSortCriteria = SORT_CRITERIA_DURATION;
+        notifyDataSetChanged();
+    }
+
+    public void sortTracksByDateAndNotify(){
+        Collections.sort(mItemList, new Comparator<BudgetInfoItem>() {
+            @Override
+            public int compare(BudgetInfoItem lhs, BudgetInfoItem rhs) {
+                return lhs.getTimestampAsDate().compareTo(rhs.getTimestampAsDate());
+            }
+        });
+        mCurrentSortCriteria = SORT_CRITERIA_DATE;
+        notifyDataSetChanged();
     }
 
     private class ViewHolder{
-        TextView sortCriteria;
+        TextView sortCriteriaLine1;
+        TextView sortCriteriaLine2;
         TextView startStationName;
         TextView endStationName;
         TextView additionalInfoLine1;
@@ -61,7 +99,7 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
     public Object getItem(int position) { return mItemList.get(position); }
 
     @Override
-    public long getItemId(int position) { return mItemList.get(position).getID(); }
+    public long getItemId(int position) { return mItemList.get(position).getIDAsLong(); }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -70,7 +108,8 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
         if (convertView == null){
             holder = new ViewHolder();
             convertView = mInflater.inflate(R.layout.budgetinfolist_item, null);
-            holder.sortCriteria = (TextView) convertView.findViewById(R.id.budgetinfoitem_sort_criteria);
+            holder.sortCriteriaLine1 = (TextView) convertView.findViewById(R.id.budgetinfoitem_sort_criteria_line1);
+            holder.sortCriteriaLine2 = (TextView) convertView.findViewById(R.id.budgetinfoitem_sort_criteria_line2);
             holder.startStationName = (TextView) convertView.findViewById(R.id.budgetinfoitem_start_station_name);
             holder.endStationName = (TextView) convertView.findViewById(R.id.budgetinfoitem_end_station_name);
             holder.additionalInfoLine1 = (TextView) convertView.findViewById(R.id.budgetinfoitem_info_line1);
@@ -80,12 +119,33 @@ public class BudgetInfoListViewAdapter extends BaseAdapter{
         else {
             holder = (ViewHolder) convertView.getTag();
         }
-
-        holder.sortCriteria.setText(String.format("%.2f", mItemList.get(position).getCost())+"$");
         holder.startStationName.setText(mItemList.get(position).getStartStationName());
         holder.endStationName.setText(mItemList.get(position).getEndStationName());
-        holder.additionalInfoLine1.setText(String.valueOf(mItemList.get(position).getDurationInMinutes()));
-        holder.additionalInfoLine2.setText("min");
+
+        if (mCurrentSortCriteria == SORT_CRITERIA_COST) {
+            holder.sortCriteriaLine1.setText(String.format("%.2f", mItemList.get(position).getCost()) + "$");
+            holder.sortCriteriaLine2.setVisibility(View.GONE);
+            holder.additionalInfoLine1.setText(String.valueOf(mItemList.get(position).getDurationInMinutes()));
+            holder.additionalInfoLine2.setVisibility(View.VISIBLE);
+            holder.additionalInfoLine2.setText("min");
+        }
+        else if (mCurrentSortCriteria == SORT_CRITERIA_DURATION){
+            holder.sortCriteriaLine1.setText(String.valueOf(mItemList.get(position).getDurationInMinutes()));
+            holder.sortCriteriaLine2.setVisibility(View.VISIBLE);
+            holder.sortCriteriaLine2.setText("min");
+            holder.additionalInfoLine1.setText(String.format("%.2f", mItemList.get(position).getCost()) + "$");
+            holder.additionalInfoLine2.setVisibility(View.GONE);
+        }
+        else{   //SORT_CRITERIA_DATE
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(mItemList.get(position).getTimestampAsDate());
+
+            holder.sortCriteriaLine1.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
+            holder.sortCriteriaLine2.setVisibility(View.VISIBLE);
+            holder.sortCriteriaLine2.setText(new SimpleDateFormat("MMM").format(cal.getTime()));
+            holder.additionalInfoLine1.setText(String.format("%.2f", mItemList.get(position).getCost()) + "$");
+            holder.additionalInfoLine2.setVisibility(View.GONE);
+        }
 
         return convertView;
     }
