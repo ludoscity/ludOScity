@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -52,6 +54,8 @@ public class BudgetOverviewFragment extends Fragment {
     private TextView mAccessCostValueTextView;
     private TextView mUseCostValueTextView;
     private TextView mTotalCostValueTextView;
+    private ProgressBar mProgressBar;
+    private LinearLayout mInterfaceLayout;
 
     private ImageButton mAccessCostInfoButton;
     private ImageButton mUseCostInfoButton;
@@ -63,6 +67,8 @@ public class BudgetOverviewFragment extends Fragment {
 
     private float mMonthAccessCost;
     private float mMonthUseCost;
+
+    private boolean mDataLoaded = false;
 
     private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
 
@@ -106,6 +112,12 @@ public class BudgetOverviewFragment extends Fragment {
             }
         });
         mUseCostInfoButton.setEnabled(false);
+
+        mProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgetoverview_progressBar);
+        mInterfaceLayout = (LinearLayout) inflatedView.findViewById(R.id.budgetoverview_interface);
+
+        mProgressBar.setVisibility(View.VISIBLE);
+        mInterfaceLayout.setVisibility(View.GONE);
 
         return inflatedView;
     }
@@ -158,6 +170,14 @@ public class BudgetOverviewFragment extends Fragment {
     public void onResume()
     {
         super.onResume();
+
+        if(mDataLoaded){
+            mProgressBar.setVisibility(View.GONE);
+            mInterfaceLayout.setVisibility(View.VISIBLE);
+            mUseCostInfoButton.setEnabled(true);
+        }
+
+
         //Happens when user presses back from TrackBudgetInfoFragment
         //let's tell our parent activity to update the action bar
         if (mListener != null){
@@ -349,7 +369,13 @@ public class BudgetOverviewFragment extends Fragment {
 
             updateCost();
 
+            mProgressBar.setVisibility(View.GONE);
+            mInterfaceLayout.setVisibility(View.VISIBLE);
+
+            mDataLoaded = true;
+
             mUseCostInfoButton.setEnabled(true);
+
             //mAccessCostInfoButton.setEnabled(true);
         }
     }
