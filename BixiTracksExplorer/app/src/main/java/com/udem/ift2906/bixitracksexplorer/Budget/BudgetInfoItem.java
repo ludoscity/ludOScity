@@ -1,4 +1,4 @@
-package com.udem.ift2906.bixitracksexplorer.BudgetInfo;
+package com.udem.ift2906.bixitracksexplorer.Budget;
 
 import android.os.Parcel;
 import android.os.Parcelable;

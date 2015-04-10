@@ -1,4 +1,4 @@
-package com.udem.ift2906.bixitracksexplorer;
+package com.udem.ift2906.bixitracksexplorer.Budget;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -11,8 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import com.udem.ift2906.bixitracksexplorer.BudgetInfo.BudgetInfoItem;
-import com.udem.ift2906.bixitracksexplorer.BudgetInfo.BudgetInfoListViewAdapter;
+import com.udem.ift2906.bixitracksexplorer.R;
 
 import java.util.ArrayList;
 
@@ -28,15 +27,16 @@ public class BudgetInfoFragment extends ListFragment {
     private static final String ARG_TIMEPERIOD = "timePeriod";
     private static final String ARG_INFOTYPE = "infoType";
     private static final String ARG_ITEMLIST = "itemList";
-    public static final String BUDGETINFOITEM_SORT_CHANGED = "budgetinfoitem_sort_changed";
-    public static final String BUDGETINFOITEM_CLICK = "budgetinfoitem_click";
-    public static final String NEW_SORT_SUBTITLE = "new_sort_subtitle";
+    public static final String BUDGETINFOITEM_SORT_CHANGED_PATH = "budgetinfoitem_sort_changed";
+    public static final String SORT_CHANGED_SUBTITLE_PARAM = "new_sort_subtitle";
+    public static final String BUDGETINFOITEM_CLICK_PATH = "budgetinfoitem_click";
+    public static final String BUDGETINFOITEM_TRACKID_PARAM = "track_id";
 
     private String mInfoType;
     private String mTimePeriod;
 
     private boolean mSortOrderHighToLow = true;
-    private int mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;  //0 : cost, 1: duration, 2: date
+    private int mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;
 
     private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
 
@@ -127,8 +127,30 @@ public class BudgetInfoFragment extends ListFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+
         menuInflater.inflate(R.menu.menu_budget_info, menu);
 
+        MenuItem tmpItem = menu.findItem(R.id.budgetInfoSortOrder);
+        if(mSortOrderHighToLow){
+            tmpItem.setIcon(R.drawable.ic_action_sort_high_to_low);
+        }
+        else {
+            tmpItem.setIcon(R.drawable.ic_action_sort_low_to_high);
+        }
+
+        tmpItem = menu.findItem(R.id.budgetInfoSortCriteria);
+
+        switch (mCurrentSortCriteria){
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_COST:
+                tmpItem.setIcon(R.drawable.ic_action_cost);
+                break;
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION:
+                tmpItem.setIcon(R.drawable.ic_action_duration);
+                break;
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_DATE:
+                tmpItem.setIcon(R.drawable.ic_action_date);
+                break;
+        }
     }
 
 
@@ -148,7 +170,7 @@ public class BudgetInfoFragment extends ListFragment {
 
     private void notifySortCriteriaChangeToActivity(){
         Uri.Builder builder = new Uri.Builder();
-        builder.appendPath(BUDGETINFOITEM_SORT_CHANGED);
+        builder.appendPath(BUDGETINFOITEM_SORT_CHANGED_PATH);
         String subtitle = "";
 
         switch (mCurrentSortCriteria){
@@ -163,7 +185,7 @@ public class BudgetInfoFragment extends ListFragment {
                 break;
         }
 
-        builder.appendQueryParameter(NEW_SORT_SUBTITLE, subtitle);
+        builder.appendQueryParameter(SORT_CHANGED_SUBTITLE_PARAM, subtitle);
 
         if (mListener != null){
             mListener.onBudgetInfoFragmentInteraction(builder.build());
@@ -184,8 +206,8 @@ public class BudgetInfoFragment extends ListFragment {
         if (mListener != null){
             Uri.Builder builder = new Uri.Builder();
 
-            builder.appendPath(BUDGETINFOITEM_CLICK)
-                    .appendQueryParameter("track_id", mBudgetInfoItems.get(position).getIDAsString());
+            builder.appendPath(BUDGETINFOITEM_CLICK_PATH)
+                    .appendQueryParameter(BUDGETINFOITEM_TRACKID_PARAM, mBudgetInfoItems.get(position).getIDAsString());
 
             mListener.onBudgetInfoFragmentInteraction(builder.build());
         }

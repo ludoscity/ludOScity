@@ -1,4 +1,4 @@
-package com.udem.ift2906.bixitracksexplorer.BudgetInfo;
+package com.udem.ift2906.bixitracksexplorer.Budget;
 
 import android.content.Context;
 import android.view.LayoutInflater;

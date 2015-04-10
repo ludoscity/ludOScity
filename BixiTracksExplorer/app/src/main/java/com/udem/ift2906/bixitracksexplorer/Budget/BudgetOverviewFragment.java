@@ -1,4 +1,4 @@
-package com.udem.ift2906.bixitracksexplorer;
+package com.udem.ift2906.bixitracksexplorer.Budget;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -24,8 +24,9 @@ import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.UnsavedRevision;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.udem.ift2906.bixitracksexplorer.BudgetInfo.BudgetInfoItem;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
+import com.udem.ift2906.bixitracksexplorer.MainActivity;
+import com.udem.ift2906.bixitracksexplorer.R;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.BixiTracksExplorerAPI;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.ListTracksResponse;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
