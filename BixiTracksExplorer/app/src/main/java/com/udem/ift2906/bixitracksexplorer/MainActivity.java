@@ -17,7 +17,10 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
 import com.couchbase.lite.CouchbaseLiteException;
-import com.udem.ift2906.bixitracksexplorer.BudgetInfo.BudgetInfoItem;
+import com.udem.ift2906.bixitracksexplorer.Budget.BudgetInfoFragment;
+import com.udem.ift2906.bixitracksexplorer.Budget.BudgetInfoItem;
+import com.udem.ift2906.bixitracksexplorer.Budget.BudgetOverviewFragment;
+import com.udem.ift2906.bixitracksexplorer.Budget.BudgetTrackDetailsFragment;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 
 import java.io.IOException;
@@ -28,7 +31,8 @@ public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         BudgetOverviewFragment.OnFragmentInteractionListener,
         BudgetInfoFragment.OnFragmentInteractionListener,
-        NearbyFragment.OnFragmentInteractionListener {
+        NearbyFragment.OnFragmentInteractionListener,
+        BudgetTrackDetailsFragment.OnBudgetTrackDetailsFragmentInteractionListener{
 
     //Test test
     /**
@@ -155,7 +159,10 @@ public class MainActivity extends ActionBarActivity
         super.onBackPressed();
         // turn on the Navigation Drawer image;
         // this is called in the LowerLevelFragments
-        mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(true);
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() == 0) {
+            mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(true);
+        }
     }
 
     @Override
@@ -199,18 +206,38 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onBudgetInfoFragmentInteraction(Uri _uri) {
-        if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_SORT_CHANGED)){
+        if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_SORT_CHANGED_PATH)){
 
             String [] parts = mSubtitle.toString().split(" ");
 
-            mSubtitle = parts[0] + " - " + _uri.getQueryParameter(BudgetInfoFragment.NEW_SORT_SUBTITLE);
+            mSubtitle = parts[0] + " - " + _uri.getQueryParameter(BudgetInfoFragment.SORT_CHANGED_SUBTITLE_PARAM);
 
             restoreActionBar();
+        }
+        else if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_CLICK_PATH)){
+
+            BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance("dummy1", "dummy2");
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack so the user can navigate back
+            transaction.replace(R.id.container, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
+
         }
     }
 
     @Override
     public void onNearbyFragmentInteraction() {
+
+    }
+
+    @Override
+    public void onBudgetTrackDetailsFragmentInteraction(Uri uri) {
 
     }
 
