@@ -167,6 +167,7 @@ public class MainActivity extends ActionBarActivity
             mSubtitle = "";
             restoreActionBar();
 
+            //Unlocking swipe gesture
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
         else if(uri.getPath().equalsIgnoreCase("/budget_info"))
