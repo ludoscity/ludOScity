@@ -36,6 +36,8 @@ public class MainActivity extends ActionBarActivity
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
+    private DrawerLayout mDrawerLayout;
+
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
@@ -51,10 +53,11 @@ public class MainActivity extends ActionBarActivity
         mTitle = getTitle();
         mSubtitle = "";
 
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+                mDrawerLayout);
 
         //Initialize couchbase database
         try {
@@ -162,13 +165,15 @@ public class MainActivity extends ActionBarActivity
         {
             mTitle = getString(R.string.title_section_budget);
             mSubtitle = "";
-
             restoreActionBar();
 
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
         else if(uri.getPath().equalsIgnoreCase("/budget_info"))
         {
             mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(false);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
 
             String infoType = uri.getQueryParameter("info_type");
             mTitle = infoType.substring(0, infoType.length()-" :".length());
