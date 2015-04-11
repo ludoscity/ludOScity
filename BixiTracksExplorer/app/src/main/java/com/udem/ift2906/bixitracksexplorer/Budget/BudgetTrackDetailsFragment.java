@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -62,6 +63,8 @@ public class BudgetTrackDetailsFragment extends Fragment
 
     private GoogleMap mMap;
 
+    private ProgressBar mDataLoadingProgressBar;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -109,6 +112,7 @@ public class BudgetTrackDetailsFragment extends Fragment
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.budgetinfotrackdetails_mapfragment)).getMapAsync(this);
 
         ((TextView)inflatedView.findViewById(R.id.budgetinfotrackdetails_cost)).setText(mTrackDataFromDB.get("cost").toString());
+        mDataLoadingProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgettrackdetails_progressBar);
         // Inflate the layout for this fragment
         return inflatedView;
     }
@@ -166,11 +170,19 @@ public class BudgetTrackDetailsFragment extends Fragment
 
         if(mTrackDataFromDB.containsKey("points"))  //Already retrived from database
         {
+            mDataLoadingProgressBar.setVisibility(View.GONE);
             //AddPolyLine
             addTrackPolylineToMap();
+            //Enable gestures
+            mMap.getUiSettings().setAllGesturesEnabled(true);
+
         }
         else
         {
+            //Disable map interactions
+            mMap.getUiSettings().setAllGesturesEnabled(false);
+            //Display progressBar
+            mDataLoadingProgressBar.setVisibility(View.VISIBLE);
             //Start retrieve task
             new RetrieveFullTrackFromBackend().execute(mTrackID);
         }
@@ -251,6 +263,10 @@ public class BudgetTrackDetailsFragment extends Fragment
 
             //addPolyline
             BudgetTrackDetailsFragment.this.addTrackPolylineToMap();
+            //remove progressBar
+            mDataLoadingProgressBar.setVisibility(View.GONE);
+            //enables map interactions
+            mMap.getUiSettings().setAllGesturesEnabled(true);
         }
 
     }
