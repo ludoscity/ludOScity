@@ -1,20 +1,34 @@
 package com.udem.ift2906.bixitracksexplorer.Budget;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.udem.ift2906.bixitracksexplorer.BixiTracksExplorerAPIHelper;
+import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 import com.udem.ift2906.bixitracksexplorer.R;
+import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.GetTrackFromTimeUTCKeyStringResponse;
+import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.TrackPoint;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,12 +42,21 @@ public class BudgetTrackDetailsFragment extends Fragment
         implements OnMapReadyCallback{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
+    //private static final String TRACK_ID = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    //Can't be of type Track because we add data in Couchbase documents that wouldn't
+    //map to API model fields
+    //Somehow this seems to go against best pratice, but I can't shake the urge of calling
+    //DBHelper as few times as possible. It allows retrieving from DB only on fragment creation
+    //and AsyncTask
+    // I should perform some tests sometimes to see if DB performance
+    //is good enough to not impact UI responsiveness.
+    private static Map<String,Object> mTrackDataFromDB;
+
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String mTrackID;
+    //private String mParam2;
 
     private OnBudgetTrackDetailsFragmentInteractionListener mListener;
 
@@ -43,16 +66,15 @@ public class BudgetTrackDetailsFragment extends Fragment
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param trackID Parameter 1.
      * @return A new instance of fragment BudgetTrackDetailsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static BudgetTrackDetailsFragment newInstance(String param1, String param2) {
+    public static BudgetTrackDetailsFragment newInstance(String trackID) {
         BudgetTrackDetailsFragment fragment = new BudgetTrackDetailsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM, trackID);
+        //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         fragment.setHasOptionsMenu(true);
         return fragment;
@@ -66,17 +88,27 @@ public class BudgetTrackDetailsFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+            mTrackID = getArguments().getString(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM);
 
+            try {
+                //Happens on UI thread
+                mTrackDataFromDB = DBHelper.retrieveTrack(mTrackID);
+            } catch (CouchbaseLiteException e) {
+                e.printStackTrace();
+            }
+
+            //mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View inflatedView = inflater.inflate(R.layout.fragment_budget_track_details, container, false);
         if (mMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.budgetinfotrackdetails_mapfragment)).getMapAsync(this);
+
+        ((TextView)inflatedView.findViewById(R.id.budgetinfotrackdetails_cost)).setText(mTrackDataFromDB.get("cost").toString());
         // Inflate the layout for this fragment
         return inflatedView;
     }
@@ -132,11 +164,52 @@ public class BudgetTrackDetailsFragment extends Fragment
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        mMap.setContentDescription("TestContentDescription");
+        if(mTrackDataFromDB.containsKey("points"))  //Already retrived from database
+        {
+            //AddPolyLine
+            addTrackPolylineToMap();
+        }
+        else
+        {
+            //Start retrieve task
+            new RetrieveFullTrackFromBackend().execute(mTrackID);
+        }
+
+        //mMap.setContentDescription("TestContentDescription");
         mMap.setMyLocationEnabled(false);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 10));
 
     }
+
+    private void addTrackPolylineToMap(){
+        List<LatLng> latLngList = new ArrayList<>();
+
+        //TODO: work out why the ValueType for "points" key is not stable
+        //I'm mystified, if anyone has any kind of explanation, I want to understand !
+        //Spent a few hours trying to understand it, to none available
+        try{
+            Iterable<TrackPoint> listTp = (Iterable<TrackPoint>)(mTrackDataFromDB.get("points"));
+            for(TrackPoint tp : listTp){
+                latLngList.add(new LatLng(tp.getLat(), tp.getLon()));
+            }
+
+        }catch (ClassCastException e){
+            Iterable<LinkedHashMap> listHm = (Iterable<LinkedHashMap>)(mTrackDataFromDB.get("points"));
+            for(LinkedHashMap hm : listHm){
+                latLngList.add(new LatLng((Double)hm.get("lat"), (Double)hm.get("lon")));
+            }
+        }
+        //End weird hack
+
+        //TODO: Add paid/free color distinction + map legend
+        //TODO: Animate camera to contain Track at appropriate zoom level
+        mMap.addPolyline(new PolylineOptions()
+                .addAll(latLngList)
+                .width(5)
+                .color(Color.BLUE));
+
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -153,4 +226,32 @@ public class BudgetTrackDetailsFragment extends Fragment
         public void onBudgetTrackDetailsFragmentInteraction(Uri uri);
     }
 
+    //Class for ASync Loading of points data from backend
+    public class RetrieveFullTrackFromBackend extends AsyncTask<String, Void, Void>{
+        @Override
+        protected Void doInBackground(String... params) {
+            final GetTrackFromTimeUTCKeyStringResponse fullTrackResponse = BixiTracksExplorerAPIHelper.retrieveFullTrack(params[0]);
+
+            if (fullTrackResponse.getTrack() != null){
+                try {
+                    DBHelper.putNewTrackPropertyAndSave(mTrackID, "points", fullTrackResponse.getTrack().getPoints());
+                    //Happens in ASyncTask
+                    mTrackDataFromDB = DBHelper.retrieveTrack(mTrackID);
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid){
+            super.onPostExecute(aVoid);
+
+            //addPolyline
+            BudgetTrackDetailsFragment.this.addTrackPolylineToMap();
+        }
+
+    }
 }

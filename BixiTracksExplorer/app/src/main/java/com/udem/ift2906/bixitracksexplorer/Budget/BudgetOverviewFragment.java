@@ -21,20 +21,16 @@ import android.widget.TextView;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.QueryRow;
-import com.couchbase.lite.UnsavedRevision;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.udem.ift2906.bixitracksexplorer.BixiTracksExplorerAPIHelper;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 import com.udem.ift2906.bixitracksexplorer.MainActivity;
 import com.udem.ift2906.bixitracksexplorer.R;
-import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.BixiTracksExplorerAPI;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.ListTracksResponse;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.TrackCollection;
 
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -236,8 +232,6 @@ public class BudgetOverviewFragment extends Fragment {
 
     public class RetrieveTrackDataAndProcessCost extends AsyncTask<Void, Void, Void> {
 
-        private BixiTracksExplorerAPI mBixiTracksExplorerService =null;
-
         private static final long m45minInms = 2700000;
         private static final long m15minInms = 900000;
         private static final float m46to60minAddedCost = 1.75f;
@@ -246,49 +240,20 @@ public class BudgetOverviewFragment extends Fragment {
         private static final float mEach30minAfter90 = 7.f;
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            BixiTracksExplorerAPI.Builder builder =new BixiTracksExplorerAPI.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
-                    .setRootUrl("https://udem-ift2905-backend.appspot.com/_ah/api/")
-                    .setServicePath("bixiTracksExplorerAPI/v3/")
-                    //.setRootUrl("http://192.168.1.XX:8080/_ah/api/") // 10.0.2.2 is localhost's IP address in Android emulator
-                    //TO BE ABLE TO TARGET ON LAN, RUN THE LOCAL APPENGINE SERVER ENVIRONMENT ON 0.0.0.0 IP ADDRESS (NOT localhost)
-                /*.setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-                    @Override
-                    public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                        abstractGoogleClientRequest.setDisableGZipContent(true);
-                    }
-                })*/;
-
-
-            mBixiTracksExplorerService = builder.build();
-        }
-
-        @Override
         protected Void doInBackground(Void... params) {
 
             TrackCollection collection = new TrackCollection();
             collection.setItems(new ArrayList<Track>());
-            ListTracksResponse listTracksResponse;
+            final ListTracksResponse listTracksResponse = BixiTracksExplorerAPIHelper.listTrack();
 
-            try {
-                listTracksResponse = mBixiTracksExplorerService.listTracks().execute();
-
-                //test of good reception of meta data
-                //JSONObject responseMeta = new JSONObject(listTracksResponse.getMeta());
-                //String license = responseMeta.getString("license");
+            //test of good reception of meta data
+            //JSONObject responseMeta = new JSONObject(listTracksResponse.getMeta());
+            //String license = responseMeta.getString("license");
 
 
-                if (listTracksResponse.getTrackList() != null) {
-                    collection.setItems(listTracksResponse.getTrackList());
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } /*catch (JSONException e) {
-            e.printStackTrace();
-        }*/
+            if (listTracksResponse.getTrackList() != null) {
+                collection.setItems(listTracksResponse.getTrackList());
+            }
 
             for (Track t : collection.getItems())
             {
@@ -331,13 +296,7 @@ public class BudgetOverviewFragment extends Fragment {
                 mSeasonUseCost += trackCost;
 
                 //store the cost in the track document for later use
-                d.update(new Document.DocumentUpdater() {
-                    @Override
-                    public boolean update(UnsavedRevision newRevision) {
-                        newRevision.getProperties().put("cost", trackCost);
-                        return true;
-                    }
-                });
+                DBHelper.putNewTrackPropertyAndSave((String)d.getProperty("key_TimeUTC"), "cost", trackCost );
             }
         }
 

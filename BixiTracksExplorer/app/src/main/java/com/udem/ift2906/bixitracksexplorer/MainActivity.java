@@ -66,6 +66,7 @@ public class MainActivity extends ActionBarActivity
         //Initialize couchbase database
         try {
             DBHelper.init(this, this);
+            BixiTracksExplorerAPIHelper.init();
         } catch (IOException | CouchbaseLiteException e) {
             e.printStackTrace();
         }
@@ -216,7 +217,8 @@ public class MainActivity extends ActionBarActivity
         }
         else if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_CLICK_PATH)){
 
-            BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance("dummy1", "dummy2");
+            BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(_uri.getQueryParameter(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM));
+            //TODO: change title / subtitle accordingly
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
