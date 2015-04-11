@@ -19,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.udem.ift2906.bixitracksexplorer.BixiTracksExplorerAPIHelper;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
@@ -62,6 +63,7 @@ public class BudgetTrackDetailsFragment extends Fragment
     private OnBudgetTrackDetailsFragmentInteractionListener mListener;
 
     private GoogleMap mMap;
+    private LatLngBounds mTrackBounds;  //Contains bounding are after call to addTrackPolylineToMap
 
     private ProgressBar mDataLoadingProgressBar;
 
@@ -168,11 +170,17 @@ public class BudgetTrackDetailsFragment extends Fragment
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        //mMap.setContentDescription("TestContentDescription");
+        mMap.setMyLocationEnabled(false);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 10));
+
         if(mTrackDataFromDB.containsKey("points"))  //Already retrived from database
         {
             mDataLoadingProgressBar.setVisibility(View.GONE);
             //AddPolyLine
             addTrackPolylineToMap();
+            //Animate camera
+            animateToTrack();
             //Enable gestures
             mMap.getUiSettings().setAllGesturesEnabled(true);
 
@@ -186,15 +194,11 @@ public class BudgetTrackDetailsFragment extends Fragment
             //Start retrieve task
             new RetrieveFullTrackFromBackend().execute(mTrackID);
         }
-
-        //mMap.setContentDescription("TestContentDescription");
-        mMap.setMyLocationEnabled(false);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 10));
-
     }
 
     private void addTrackPolylineToMap(){
         List<LatLng> latLngList = new ArrayList<>();
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
         //TODO: work out why the ValueType for "points" key is not stable
         //I'm mystified, if anyone has any kind of explanation, I want to understand !
@@ -202,16 +206,22 @@ public class BudgetTrackDetailsFragment extends Fragment
         try{
             Iterable<TrackPoint> listTp = (Iterable<TrackPoint>)(mTrackDataFromDB.get("points"));
             for(TrackPoint tp : listTp){
-                latLngList.add(new LatLng(tp.getLat(), tp.getLon()));
+                final LatLng latLng = new LatLng(tp.getLat(), tp.getLon());
+                latLngList.add(latLng);
+                boundsBuilder.include(latLng);
             }
 
         }catch (ClassCastException e){
             Iterable<LinkedHashMap> listHm = (Iterable<LinkedHashMap>)(mTrackDataFromDB.get("points"));
             for(LinkedHashMap hm : listHm){
-                latLngList.add(new LatLng((Double)hm.get("lat"), (Double)hm.get("lon")));
+                final LatLng latLng = new LatLng((Double) hm.get("lat"), (Double) hm.get("lon"));
+                latLngList.add(latLng);
+                boundsBuilder.include(latLng);
             }
         }
         //End weird hack
+
+        mTrackBounds = boundsBuilder.build();
 
         //TODO: Add paid/free color distinction + map legend
         //TODO: Animate camera to contain Track at appropriate zoom level
@@ -219,7 +229,11 @@ public class BudgetTrackDetailsFragment extends Fragment
                 .addAll(latLngList)
                 .width(5)
                 .color(Color.BLUE));
+    }
 
+    private void animateToTrack(){
+        //10 padding pixels around
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mTrackBounds, 10));
     }
 
 
@@ -265,6 +279,8 @@ public class BudgetTrackDetailsFragment extends Fragment
             BudgetTrackDetailsFragment.this.addTrackPolylineToMap();
             //remove progressBar
             mDataLoadingProgressBar.setVisibility(View.GONE);
+            //Animates camera
+            animateToTrack();
             //enables map interactions
             mMap.getUiSettings().setAllGesturesEnabled(true);
         }
