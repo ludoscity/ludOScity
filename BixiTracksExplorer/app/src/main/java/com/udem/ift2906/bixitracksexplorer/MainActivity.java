@@ -178,18 +178,16 @@ public class MainActivity extends ActionBarActivity
             //Unlocking swipe gesture
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
-        else if(uri.getPath().equalsIgnoreCase("/budget_info"))
+        else if(uri.getPath().equalsIgnoreCase("/" + BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_PATH))
         {
             mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(false);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-
-            String infoType = uri.getQueryParameter("info_type");
-            mTitle = infoType.substring(0, infoType.length()-" :".length());
-            mSubtitle = uri.getQueryParameter("selected_period");
+            mTitle = uri.getQueryParameter(BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_TYPE_PARAM);
+            mSubtitle = uri.getQueryParameter(BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_TIMEPERIOD_PARAM);
 
             // Create fragment and give it required info to set itselfs up
-            BudgetInfoFragment newFragment = BudgetInfoFragment.newInstance(uri.getQueryParameter("info_type"), uri.getQueryParameter("selected_period"), _budgetInfoItemList);
+            BudgetInfoFragment newFragment = BudgetInfoFragment.newInstance(mTitle.toString(), mSubtitle.toString(), _budgetInfoItemList);
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -209,16 +207,12 @@ public class MainActivity extends ActionBarActivity
     public void onBudgetInfoFragmentInteraction(Uri _uri) {
         if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_SORT_CHANGED_PATH)){
 
-            String [] parts = mSubtitle.toString().split(" ");
-
-            mSubtitle = parts[0] + " - " + _uri.getQueryParameter(BudgetInfoFragment.SORT_CHANGED_SUBTITLE_PARAM);
-
-            restoreActionBar();
+            mSubtitle = _uri.getQueryParameter(BudgetInfoFragment.SORT_CHANGED_SUBTITLE_PARAM);
         }
         else if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_CLICK_PATH)){
 
             BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(_uri.getQueryParameter(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM));
-            //TODO: change title / subtitle accordingly
+            mSubtitle = getString(R.string.budgettrackdetails_subtitle);
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -231,6 +225,9 @@ public class MainActivity extends ActionBarActivity
             transaction.commit();
 
         }
+
+        restoreActionBar();
+
     }
 
     @Override

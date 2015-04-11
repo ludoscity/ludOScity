@@ -45,6 +45,9 @@ public class BudgetOverviewFragment extends Fragment {
      * fragment.
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
+    public static final String BUDGETOVERVIEW_INFO_CLICK_PATH = "budget_info_click";
+    public static final String BUDGETOVERVIEW_INFO_CLICK_TYPE_PARAM = "budget_info_click_type";
+    public static final String BUDGETOVERVIEW_INFO_CLICK_TIMEPERIOD_PARAM = "budget_info_click_timeperiod";
 
     private OnFragmentInteractionListener mListener;
 
@@ -188,12 +191,14 @@ public class BudgetOverviewFragment extends Fragment {
 
     private void onInfoClick(String infoType)
     {
+        //String retrieved from strings resource must be stripped of the " :" at the end
+        infoType = infoType.substring(0, infoType.length()-" :".length());
         if (mListener != null){
             Uri.Builder builder = new Uri.Builder();
 
-            builder.appendPath("budget_info")
-                    .appendQueryParameter("info_type", infoType)
-                    .appendQueryParameter("selected_period", mSelectedPeriod);
+            builder.appendPath(BUDGETOVERVIEW_INFO_CLICK_PATH)
+                    .appendQueryParameter(BUDGETOVERVIEW_INFO_CLICK_TYPE_PARAM, infoType)
+                    .appendQueryParameter(BUDGETOVERVIEW_INFO_CLICK_TIMEPERIOD_PARAM, mSelectedPeriod);
 
             mListener.onBudgetOverviewFragmentInteraction(builder.build(), mBudgetInfoItems);
         }

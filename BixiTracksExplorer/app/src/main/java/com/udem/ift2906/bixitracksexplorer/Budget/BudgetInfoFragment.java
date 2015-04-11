@@ -151,6 +151,8 @@ public class BudgetInfoFragment extends ListFragment {
                 tmpItem.setIcon(R.drawable.ic_action_date);
                 break;
         }
+
+        notifySortCriteriaChangeToActivity();
     }
 
 
@@ -171,17 +173,17 @@ public class BudgetInfoFragment extends ListFragment {
     private void notifySortCriteriaChangeToActivity(){
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(BUDGETINFOITEM_SORT_CHANGED_PATH);
-        String subtitle = "";
+        String subtitle = mTimePeriod + " - ";
 
         switch (mCurrentSortCriteria){
             case BudgetInfoListViewAdapter.SORT_CRITERIA_COST:
-                subtitle = getString(R.string.budgetinfo_subtitle_by_cost);
+                subtitle += getString(R.string.budgetinfo_subtitle_by_cost);
                 break;
             case BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION:
-                subtitle = getString(R.string.budgetinfo_subtitle_by_duration);
+                subtitle += getString(R.string.budgetinfo_subtitle_by_duration);
                 break;
             case BudgetInfoListViewAdapter.SORT_CRITERIA_DATE:
-                subtitle = getString(R.string.budgetinfo_subtitle_by_date);
+                subtitle += getString(R.string.budgetinfo_subtitle_by_date);
                 break;
         }
 
