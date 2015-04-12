@@ -220,7 +220,7 @@ public class MainActivity extends ActionBarActivity
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-            transaction.setCustomAnimations(R.animator.slide_in_top, R.animator.fade_out);
+            transaction.setCustomAnimations(R.animator.slide_in_top, R.animator.fade_out, R.animator.fade_in, R.animator.slide_out_bottom);
 
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack so the user can navigate back
