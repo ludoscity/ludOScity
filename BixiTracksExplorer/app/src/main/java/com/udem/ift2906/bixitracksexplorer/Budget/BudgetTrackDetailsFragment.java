@@ -8,6 +8,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -138,6 +140,12 @@ public class BudgetTrackDetailsFragment extends Fragment
         mDataLoadingProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgettrackdetails_progressBar);
         // Inflate the layout for this fragment
         return inflatedView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+
+        menuInflater.inflate(R.menu.menu_budget_track_details, menu);
     }
 
     //On enter animation end we want to switch the Bitmap ImageView visibility
