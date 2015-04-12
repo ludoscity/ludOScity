@@ -3,12 +3,31 @@
     android:layout_height="match_parent"
     tools:context="com.udem.ift2906.bixitracksexplorer.Budget.BudgetTrackDetailsFragment">
 
-    <fragment
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:name="com.google.android.gms.maps.MapFragment"
-        android:id="@+id/budgetinfotrackdetails_mapfragment"
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"/>
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <fragment
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:id="@+id/budgetinfotrackdetails_mapfragment"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scaleType="matrix"
+            android:adjustViewBounds="true"
+
+            android:id="@+id/budgettrackdetails_row_imageview" />
+
+        </LinearLayout>
+
+
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -20,16 +39,6 @@
             android:layout_height="match_parent"
             android:id="@+id/budgettrackdetails_progressBar"
             android:visibility="gone" />
-
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:id="@+id/budgetinfotrackdetails_cost"
-            android:textSize="@dimen/abc_text_size_large_material"
-            android:textColor="@android:color/background_dark"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:textStyle="bold"
-            android:background="@android:color/darker_gray" />
 
         </RelativeLayout>
 

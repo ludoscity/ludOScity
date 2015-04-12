@@ -1,6 +1,7 @@
 package com.udem.ift2906.bixitracksexplorer.Budget;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -9,6 +10,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.udem.ift2906.bixitracksexplorer.R;
@@ -190,7 +196,7 @@ public class BudgetInfoFragment extends ListFragment {
         builder.appendQueryParameter(SORT_CHANGED_SUBTITLE_PARAM, subtitle);
 
         if (mListener != null){
-            mListener.onBudgetInfoFragmentInteraction(builder.build());
+            mListener.onBudgetInfoFragmentInteraction(builder.build(), null);
         }
     }
 
@@ -205,13 +211,89 @@ public class BudgetInfoFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
+
+        //Let's animate !!
+        //1- Render the View representing the clicked row in a Bitmap
+        //BitmapFactory.decodeResource(R.layout.budgetinfolist_item);
+        Bitmap viewCapture;
+
+        v.setDrawingCacheEnabled(true);
+        viewCapture = Bitmap.createBitmap(v.getDrawingCache());
+        v.setDrawingCacheEnabled(false);
+
+        //2- calculate the position of the row as well as the target animation position (at bottom of screen)
+        //matching the next fragment layout
+        // find out where the clicked view sits in relationship to the
+        // parent container
+        int rowTop = v.getTop() + getListView().getTop();
+        int rowLeft = v.getLeft() + getListView().getLeft();
+
+        int listViewBottom = getListView().getBottom();
+
+        int absoluteAnimationTargetPx = (listViewBottom - rowTop) - v.getHeight();
+
+        //View rowView = getActivity().getLayoutInflater().inflate(R.layout.budgetinfolist_item,null);
+
+        //3- Programatically create an ImageView...
+        final ImageView rowView = new ImageView(getActivity());
+        //... set Bitmap...
+        rowView.setImageBitmap(viewCapture);
+
+        //... set initial position...
+        FrameLayout.LayoutParams rlp = new FrameLayout.LayoutParams(v.getWidth(), v
+                .getHeight());
+        rlp.topMargin = rowTop;
+        rlp.leftMargin = rowLeft;
+
+        rowView.setLayoutParams(rlp);
+
+        //... retrieve fragments FrameLayout in activity_main layout...
+        final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) getActivity()
+                .findViewById(android.R.id.content)).getChildAt(0);
+
+        //... attach view to it (so that it won't be part of either fragment, hence visible
+        //at all time during the animated transitions
+        ((FrameLayout)viewGroup.findViewById(R.id.container)).addView(rowView);
+
+        //4- Create a TranslateAnimation from itnital pos to target pos
+        TranslateAnimation outAni = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0f,Animation.RELATIVE_TO_SELF,0f,
+                Animation.RELATIVE_TO_PARENT, 0f, Animation.ABSOLUTE, absoluteAnimationTargetPx );
+        outAni.setDuration(1000);
+        //Trying to fix the clitch, those didn't work
+        //outAni.setFillEnabled(true);
+        //outAni.setFillAfter(true);
+        //outAni.setZAdjustment(Animation.ZORDER_TOP);
+
+        //5- Set animationListener to remove view when animation is finished
+        outAni.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ((FrameLayout)rowView.getParent()).removeView(rowView);
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        //6- Animate !!
+        rowView.startAnimation(outAni);
+
         if (mListener != null){
             Uri.Builder builder = new Uri.Builder();
 
             builder.appendPath(BUDGETINFOITEM_CLICK_PATH)
                     .appendQueryParameter(BUDGETINFOITEM_TRACKID_PARAM, mBudgetInfoItems.get(position).getIDAsString());
 
-            mListener.onBudgetInfoFragmentInteraction(builder.build());
+            //Bitmap implements Parcelable. We pass it around to BudgetTrackDetailsFragment
+            mListener.onBudgetInfoFragmentInteraction(builder.build(), viewCapture);
         }
     }
 
@@ -226,7 +308,7 @@ public class BudgetInfoFragment extends ListFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onBudgetInfoFragmentInteraction(Uri _uri);
+        public void onBudgetInfoFragmentInteraction(Uri _uri, Bitmap _infoListRowBitmapRender);
     }
 
 }

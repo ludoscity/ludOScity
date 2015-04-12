@@ -1,6 +1,7 @@
 package com.udem.ift2906.bixitracksexplorer.Budget;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -10,8 +11,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -45,7 +49,7 @@ public class BudgetTrackDetailsFragment extends Fragment
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     //private static final String TRACK_ID = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_ROW_BITMAP_RENDER = "infolistRowBitmapRender";
 
     //Can't be of type Track because we add data in Couchbase documents that wouldn't
     //map to API model fields
@@ -67,18 +71,23 @@ public class BudgetTrackDetailsFragment extends Fragment
 
     private ProgressBar mDataLoadingProgressBar;
 
+    private Bitmap mInfoListRowBitmapRender;
+    private ImageView mInfoListRowImageView;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
      * @param trackID Parameter 1.
+     * @param _infoListRowBitmapRender
      * @return A new instance of fragment BudgetTrackDetailsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static BudgetTrackDetailsFragment newInstance(String trackID) {
+    public static BudgetTrackDetailsFragment newInstance(String trackID, Bitmap _infoListRowBitmapRender) {
         BudgetTrackDetailsFragment fragment = new BudgetTrackDetailsFragment();
         Bundle args = new Bundle();
         args.putString(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM, trackID);
+        args.putParcelable(ARG_ROW_BITMAP_RENDER, _infoListRowBitmapRender);
         //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         fragment.setHasOptionsMenu(true);
@@ -94,6 +103,7 @@ public class BudgetTrackDetailsFragment extends Fragment
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mTrackID = getArguments().getString(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM);
+            mInfoListRowBitmapRender = getArguments().getParcelable(ARG_ROW_BITMAP_RENDER);
 
             try {
                 //Happens on UI thread
@@ -113,11 +123,62 @@ public class BudgetTrackDetailsFragment extends Fragment
         if (mMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.budgetinfotrackdetails_mapfragment)).getMapAsync(this);
 
-        ((TextView)inflatedView.findViewById(R.id.budgetinfotrackdetails_cost)).setText(mTrackDataFromDB.get("cost").toString());
+        mInfoListRowImageView = ((ImageView)inflatedView.findViewById(R.id.budgettrackdetails_row_imageview));
+        mInfoListRowImageView.setVisibility(View.INVISIBLE);    //Will be made Visible after enter animation
+        mInfoListRowImageView.setImageBitmap(mInfoListRowBitmapRender);
+
+
+        //Oddly I have to adjust the ImageView height myself to twice the height of the Bitmap
+        //It took ages to find out and is out of reach of my understanding
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mInfoListRowImageView.getLayoutParams();
+        params.width = mInfoListRowBitmapRender.getWidth();
+        params.height = mInfoListRowBitmapRender.getHeight()*2;
+        mInfoListRowImageView.setLayoutParams(params);
+
         mDataLoadingProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgettrackdetails_progressBar);
         // Inflate the layout for this fragment
         return inflatedView;
     }
+
+    //On enter animation end we want to switch the Bitmap ImageView visibility
+    @Override
+    public Animation onCreateAnimation (int transit, boolean enter, int nextAnim) {
+        //Check if the superclass already created the animation
+        Animation anim = super.onCreateAnimation(transit, enter, nextAnim);
+
+        //If not, and an animation is defined, load it now
+        if (anim == null && nextAnim != 0) {
+            anim = AnimationUtils.loadAnimation(getActivity(), nextAnim);
+        }
+
+        if (anim != null) {
+
+            //Attach listener only on enter animation
+            if (enter) {
+                anim.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        mInfoListRowImageView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+
+            }
+        }
+
+        return anim;
+    }
+
+
 
     @Override
     public void onDestroyView() {
