@@ -219,7 +219,9 @@ public class BudgetInfoFragment extends ListFragment {
 
         v.setDrawingCacheEnabled(true);
         viewCapture = Bitmap.createBitmap(v.getDrawingCache());
-        v.setDrawingCacheEnabled(false);
+
+
+        v.setVisibility(View.INVISIBLE);
 
         //2- calculate the position of the row as well as the target animation position (at bottom of screen)
         //matching the next fragment layout
