@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BixiTracksExplorer</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section_favorites">Favoris</string>
+    <string name="title_section_nearby">À proximité</string>
+
+    <string name="navigation_drawer_open">Ouvrir navigation drawer</string>
+    <string name="navigation_drawer_close">Fermer navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="action_settings">Paramètres</string>
+
+
+    <string name="download_success">Données Bixi Stations téléchargé avec succès !</string>
+    <string name="noData">Connection internet requise le téléchargement des données!</string>
+    <string name="timespan_season">Saison</string>
+    <string name="timespan_this_month">Ce mois</string>
+    <string name="access_cost_label">Coût de l'accès :</string>
+    <string name="use_cost_label">Coût de la consommation :</string>
+    <string name="total_cost_label">Coût total  :</string>
+    <string name="budget_prerecorded_data_checkbox">Données enregistrées </string>
+    <string name="budgetinfo_subtitle_by_cost">par Coût </string>
+    <string name="budgetinfo_subtitle_by_duration">Par durée</string>
+    <string name="budgetinfo_subtitle_by_date">Par date</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="budgettrackdetails_subtitle">résumé du voyage</string>
+</resources>
