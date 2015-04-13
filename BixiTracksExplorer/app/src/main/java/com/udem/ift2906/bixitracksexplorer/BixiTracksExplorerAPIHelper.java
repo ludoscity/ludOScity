@@ -48,12 +48,15 @@ public class BixiTracksExplorerAPIHelper {
     }
 
     public static GetTrackFromTimeUTCKeyStringResponse retrieveFullTrack(String _key_timeUTC){
+
         GetTrackFromTimeUTCKeyStringResponse toReturn = new GetTrackFromTimeUTCKeyStringResponse();
 
-        try {
-            toReturn = mAPIService.getTrackFromTimeUTCKeyString(_key_timeUTC).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!_key_timeUTC.equalsIgnoreCase("null")) {
+            try {
+                toReturn = mAPIService.getTrackFromTimeUTCKeyString(_key_timeUTC).execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return toReturn;
     }

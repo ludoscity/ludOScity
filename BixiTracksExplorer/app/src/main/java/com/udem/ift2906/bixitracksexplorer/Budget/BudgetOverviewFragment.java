@@ -239,7 +239,7 @@ public class BudgetOverviewFragment extends Fragment {
 
         private static final long m45minInms = 2700000;
         private static final long m15minInms = 900000;
-        private static final float m46to60minAddedCost = 1.5f;
+        private static final float m46to60minAddedCost = 1.50f;
         private static final long m30minInms = 1800000;
         private static final float m61to90minCost = 3.5f;
         private static final float mEach30minAfter90 = 7.f;

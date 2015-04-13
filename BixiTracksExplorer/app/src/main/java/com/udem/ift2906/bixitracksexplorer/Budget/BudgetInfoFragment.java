@@ -5,17 +5,18 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.udem.ift2906.bixitracksexplorer.R;
 
@@ -47,6 +48,8 @@ public class BudgetInfoFragment extends ListFragment {
     private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
 
     private OnFragmentInteractionListener mListener;
+
+    private ImageView mAnimatedrowBitmapHolderImageView;
 
     public static BudgetInfoFragment newInstance(String infoType, String timePeriod, ArrayList<BudgetInfoItem> itemList) {
         BudgetInfoFragment fragment = new BudgetInfoFragment();
@@ -174,6 +177,8 @@ public class BudgetInfoFragment extends ListFragment {
         // update the actionbar to show the up carat/affordance
         ((ActionBarActivity)activity).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         notifySortCriteriaChangeToActivity();
+
+        mAnimatedrowBitmapHolderImageView = (ImageView)activity.findViewById(R.id.animatedrow_bitmap_holder_imageview);
     }
 
     private void notifySortCriteriaChangeToActivity(){
@@ -204,6 +209,7 @@ public class BudgetInfoFragment extends ListFragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mAnimatedrowBitmapHolderImageView = null;
     }
 
 
@@ -219,54 +225,39 @@ public class BudgetInfoFragment extends ListFragment {
 
         v.setDrawingCacheEnabled(true);
         viewCapture = Bitmap.createBitmap(v.getDrawingCache());
+        v.setDrawingCacheEnabled(false);
+
+        if(getActivity().findViewById(R.id.end_fragment_container) == null){
+
+            //one screen configuration, disapear row
+            v.setVisibility(View.INVISIBLE);
+        }
 
 
-        v.setVisibility(View.INVISIBLE);
+        //2- retrieve target animation position
+        Pair<Integer,Integer> targetAbsoluteXY = calculateRowAnimTarget(v);
 
-        //2- calculate the position of the row as well as the target animation position (at bottom of screen)
-        //matching the next fragment layout
-        // find out where the clicked view sits in relationship to the
-        // parent container
-        int rowTop = v.getTop() + getListView().getTop();
-        int rowLeft = v.getLeft() + getListView().getLeft();
-
-        int listViewBottom = getListView().getBottom();
-
-        int absoluteAnimationTargetPx = (listViewBottom - rowTop) - v.getHeight();
-
-        //View rowView = getActivity().getLayoutInflater().inflate(R.layout.budgetinfolist_item,null);
-
-        //3- Programatically create an ImageView...
-        final ImageView rowView = new ImageView(getActivity());
-        //... set Bitmap...
-        rowView.setImageBitmap(viewCapture);
+        //... set Bitmap on judiciously placed ImageView used as Bitmap holder...
+        mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
 
         //... set initial position...
-        FrameLayout.LayoutParams rlp = new FrameLayout.LayoutParams(v.getWidth(), v
+        RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(v.getWidth(), v
                 .getHeight());
-        rlp.topMargin = rowTop;
-        rlp.leftMargin = rowLeft;
+        rlp.topMargin = v.getTop() + getListView().getTop();//rowTop;
+        rlp.leftMargin = v.getLeft() + getListView().getLeft();//rowLeft;
 
-        rowView.setLayoutParams(rlp);
+        mAnimatedrowBitmapHolderImageView.setLayoutParams(rlp);
 
-        //... retrieve fragments FrameLayout in activity_main layout...
-        final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) getActivity()
-                .findViewById(android.R.id.content)).getChildAt(0);
-
-        //... attach view to it (so that it won't be part of either fragment, hence visible
-        //at all time during the animated transitions
-        ((FrameLayout)viewGroup.findViewById(R.id.container)).addView(rowView);
-
-        //4- Create a TranslateAnimation from itnital pos to target pos
-        TranslateAnimation outAni = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0f,Animation.RELATIVE_TO_SELF,0f,
-                Animation.RELATIVE_TO_PARENT, 0f, Animation.ABSOLUTE, absoluteAnimationTargetPx );
+        //3- Create a TranslateAnimation from initial pos to target pos
+        TranslateAnimation outAni = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0f,Animation.ABSOLUTE,targetAbsoluteXY.first,
+                Animation.RELATIVE_TO_PARENT, 0f, Animation.ABSOLUTE, targetAbsoluteXY.second );
         outAni.setDuration(1000);
         //Trying to fix the clitch, those didn't work
         //outAni.setFillEnabled(true);
         //outAni.setFillAfter(true);
         //outAni.setZAdjustment(Animation.ZORDER_TOP);
 
-        //5- Set animationListener to remove view when animation is finished
+        //4- Set animationListener to remove view when animation is finished
         outAni.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -275,8 +266,9 @@ public class BudgetInfoFragment extends ListFragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                ((FrameLayout)rowView.getParent()).removeView(rowView);
-
+                if (mAnimatedrowBitmapHolderImageView != null){ //In case we've been detached while animation was running
+                    mAnimatedrowBitmapHolderImageView.setVisibility(View.INVISIBLE);
+                }
             }
 
             @Override
@@ -285,8 +277,11 @@ public class BudgetInfoFragment extends ListFragment {
             }
         });
 
+        //Make Bitmap holder ImageView visible
+        mAnimatedrowBitmapHolderImageView.setVisibility(View.VISIBLE);
+
         //6- Animate !!
-        rowView.startAnimation(outAni);
+        mAnimatedrowBitmapHolderImageView.startAnimation(outAni);
 
         if (mListener != null){
             Uri.Builder builder = new Uri.Builder();
@@ -296,6 +291,39 @@ public class BudgetInfoFragment extends ListFragment {
 
             //Bitmap implements Parcelable. We pass it around to BudgetTrackDetailsFragment
             mListener.onBudgetInfoFragmentInteraction(builder.build(), viewCapture);
+        }
+    }
+
+    //Return X and Y ABSOLUTE VALUES of row line View target position on screen
+    private Pair<Integer, Integer> calculateRowAnimTarget(View rowView){
+
+        //calculate the position of the row as well as the target animation position (at bottom of screen)
+        //matching the next fragment layout
+        // find out where the clicked view sits in relationship to the
+        // parent container
+
+        //Retrieve data required for calculation
+        int rowTop = rowView.getTop() + getListView().getTop();
+        //int rowLeft = rowView.getLeft() + getListView().getLeft();
+
+        int listViewBottom = getListView().getBottom();
+        int listViewRight = getListView().getRight();
+
+        int YTargetAbsolute = (listViewBottom - rowTop) - rowView.getHeight();
+
+
+        // First figure out if we're on a one of two fragments configuration
+        FrameLayout endFragmentContainer = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
+
+        if (endFragmentContainer != null){
+            //two fragments configuration
+            return new Pair<>(listViewRight, YTargetAbsolute);
+        }
+        else{
+
+            return new Pair<>(0, YTargetAbsolute);
+            //int absoluteAnimationTargetPx = (listViewBottom - rowTop) - rowView.getHeight();
+
         }
     }
 

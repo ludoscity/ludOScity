@@ -1,6 +1,7 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.FrameLayout;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.udem.ift2906.bixitracksexplorer.Budget.BudgetInfoFragment;
@@ -52,6 +54,20 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Read app params and apply them
+        if(getResources().getBoolean(R.bool.allow_portrait)){
+            if (!getResources().getBoolean(R.bool.allow_landscape)){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
+        }
+        else{
+            if (getResources().getBoolean(R.bool.allow_landscape)){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+        }
+
+
         setContentView(R.layout.activity_main);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -71,6 +87,11 @@ public class MainActivity extends ActionBarActivity
         } catch (IOException | CouchbaseLiteException e) {
             e.printStackTrace();
         }
+
+        FrameLayout endFragment = (FrameLayout)findViewById(R.id.end_fragment_container);
+        if (endFragment != null){
+            endFragment.setVisibility(View.GONE);   //Second fragment only when getting to budgetinfo
+        }
     }
 
     @Override
@@ -80,13 +101,13 @@ public class MainActivity extends ActionBarActivity
         if (position == 4){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, NearbyFragment.newInstance(position + 1))
+                    .replace(R.id.start_fragment_container, NearbyFragment.newInstance(position + 1))
                     .commit();
         }
         else if (position == 3){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, BudgetOverviewFragment.newInstance(position + 1))
+                    .replace(R.id.start_fragment_container, BudgetOverviewFragment.newInstance(position + 1))
                     .commit();
         }
         else
@@ -94,7 +115,7 @@ public class MainActivity extends ActionBarActivity
             // update the main content by replacing fragments
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                    .replace(R.id.start_fragment_container, PlaceholderFragment.newInstance(position + 1))
                     .commit();
         }
 
@@ -179,6 +200,11 @@ public class MainActivity extends ActionBarActivity
             mSubtitle = "";
             restoreActionBar();
 
+            FrameLayout endFragment = (FrameLayout)findViewById(R.id.end_fragment_container);
+            if (endFragment != null){
+                endFragment.setVisibility(View.GONE);   //Second fragment only when getting to budgetinfo
+            }
+
             //Unlocking swipe gesture
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
@@ -197,7 +223,24 @@ public class MainActivity extends ActionBarActivity
 
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack so the user can navigate back
-            transaction.replace(R.id.container, newFragment);
+            transaction.replace(R.id.start_fragment_container, newFragment);
+
+            FrameLayout endContainer = (FrameLayout)findViewById(R.id.end_fragment_container);
+
+            //Create second fragment right away
+            if(endContainer != null){
+                endContainer.setVisibility(View.VISIBLE);
+
+                BudgetTrackDetailsFragment newEndFragment = BudgetTrackDetailsFragment.newInstance("null", null);
+
+                transaction.replace(R.id.end_fragment_container, newEndFragment);
+            }
+
+
+
+
+
+
             transaction.addToBackStack(null);
 
             // Commit the transaction
@@ -215,21 +258,34 @@ public class MainActivity extends ActionBarActivity
         }
         else if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_CLICK_PATH)){
 
-            BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(_uri.getQueryParameter(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM), _infoListRowBitmapRender );
-            mSubtitle = getString(R.string.budgettrackdetails_subtitle);
+            //check if we're too screens configuration
+            FrameLayout endFragmentContainer = (FrameLayout)findViewById(R.id.end_fragment_container);
+            if (endFragmentContainer == null){
+                //One fragment at a time on screen
 
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(_uri.getQueryParameter(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM), _infoListRowBitmapRender );
+                mSubtitle = getString(R.string.budgettrackdetails_subtitle);
 
-            transaction.setCustomAnimations(R.animator.slide_in_top, R.animator.fade_out, R.animator.fade_in, R.animator.slide_out_bottom);
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-            // Replace whatever is in the fragment_container view with this fragment,
-            // and add the transaction to the back stack so the user can navigate back
-            transaction.replace(R.id.container, newFragment);
-            transaction.addToBackStack(null);
+                transaction.setCustomAnimations(R.animator.slide_in_top, R.animator.fade_out, R.animator.fade_in, R.animator.slide_out_bottom);
 
-            // Commit the transaction
-            transaction.commit();
+                // Replace whatever is in the fragment_container view with this fragment,
+                // and add the transaction to the back stack so the user can navigate back
+                transaction.replace(R.id.start_fragment_container, newFragment);
 
+                transaction.addToBackStack(null);
+
+                // Commit the transaction
+                transaction.commit();
+            }
+            else{
+                //We're in two fragments configuration, meaning they are both on screen and will stay there
+                //retrieve it
+                BudgetTrackDetailsFragment detailsFragment = (BudgetTrackDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.end_fragment_container);
+                //pass it new data
+                detailsFragment.updateWithNewTrack(_uri.getQueryParameter(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM), _infoListRowBitmapRender);
+            }
         }
 
         restoreActionBar();

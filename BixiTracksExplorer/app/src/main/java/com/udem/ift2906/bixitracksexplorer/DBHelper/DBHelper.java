@@ -42,7 +42,6 @@ public class DBHelper {
 
     public static void init(Activity activity, Context c) throws IOException, CouchbaseLiteException {
         mManager = new Manager(new AndroidContext(activity), Manager.DEFAULT_OPTIONS);
-        deleteDB(); //As an exercise so that data will be requested from the web
         context = c;
     }
 
@@ -102,7 +101,12 @@ public class DBHelper {
     public static Map<String,Object> retrieveTrack(String trackID) throws CouchbaseLiteException {
         Document doc = mManager.getDatabase(mDbName).getExistingDocument(trackID);
 
-        return doc.getCurrentRevision().getProperties();
+        if (doc != null){
+            return doc.getCurrentRevision().getProperties();
+        }
+
+        return null;
+
         //This is a failed attempt at converting directly into a Track class
         //It is not usefull for this case right now but I just want to keep this piece of code around
         //https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/TypeAdapter.html

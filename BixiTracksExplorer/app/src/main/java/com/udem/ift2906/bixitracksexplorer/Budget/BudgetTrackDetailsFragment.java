@@ -111,7 +111,9 @@ public class BudgetTrackDetailsFragment extends Fragment
                 //Happens on UI thread
                 mTrackDataFromDB = DBHelper.retrieveTrack(mTrackID);
             } catch (CouchbaseLiteException e) {
-                e.printStackTrace();
+
+                //e.printStackTrace();
+                //Keep going, only mean ID is not valid (that happens in multifragments configuration)
             }
 
             //mParam2 = getArguments().getString(ARG_PARAM2);
@@ -126,16 +128,17 @@ public class BudgetTrackDetailsFragment extends Fragment
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.budgetinfotrackdetails_mapfragment)).getMapAsync(this);
 
         mInfoListRowImageView = ((ImageView)inflatedView.findViewById(R.id.budgettrackdetails_row_imageview));
-        mInfoListRowImageView.setVisibility(View.INVISIBLE);    //Will be made Visible after enter animation
-        mInfoListRowImageView.setImageBitmap(mInfoListRowBitmapRender);
 
+        if (mInfoListRowBitmapRender != null)   //Can be null on tablet configuration
+        {
 
-        //Oddly I have to adjust the ImageView height myself to twice the height of the Bitmap
-        //It took ages to find out and is out of reach of my understanding
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mInfoListRowImageView.getLayoutParams();
-        params.width = mInfoListRowBitmapRender.getWidth();
-        params.height = mInfoListRowBitmapRender.getHeight()*2;
-        mInfoListRowImageView.setLayoutParams(params);
+            mInfoListRowImageView.setImageBitmap(mInfoListRowBitmapRender);
+
+            //Oddly I have to adjust the ImageView height myself to twice the height of the Bitmap
+            //It took ages to find out and is out of reach of my understanding
+            //It only affects how the fragment appears on phone (one fragment on screen)
+            applyWeirdFixForPhones();
+        }
 
         mDataLoadingProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgettrackdetails_progressBar);
         // Inflate the layout for this fragment
@@ -149,6 +152,9 @@ public class BudgetTrackDetailsFragment extends Fragment
     }
 
     //On enter animation end we want to switch the Bitmap ImageView visibility
+    //That doesn't happen in multiscreen configuration (fragments are always displayed)
+    //Maybe using an anim as a way to switch the fragment layout ImageView fr the row would
+    //fix the disgracious content overlapping with the animated row
     @Override
     public Animation onCreateAnimation (int transit, boolean enter, int nextAnim) {
         //Check if the superclass already created the animation
@@ -166,7 +172,7 @@ public class BudgetTrackDetailsFragment extends Fragment
                 anim.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
-
+                        mInfoListRowImageView.setVisibility(View.INVISIBLE);
                     }
 
                     @Override
@@ -243,7 +249,12 @@ public class BudgetTrackDetailsFragment extends Fragment
         mMap.setMyLocationEnabled(false);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 10));
 
-        if(mTrackDataFromDB.containsKey("points"))  //Already retrived from database
+        setupUIandTask();
+    }
+
+    private void setupUIandTask(){
+
+        if(mTrackDataFromDB != null && mTrackDataFromDB.containsKey("points"))  //Already retrived from database
         {
             mDataLoadingProgressBar.setVisibility(View.GONE);
             //AddPolyLine
@@ -263,6 +274,36 @@ public class BudgetTrackDetailsFragment extends Fragment
             //Start retrieve task
             new RetrieveFullTrackFromBackend().execute(mTrackID);
         }
+    }
+
+    public void updateWithNewTrack(String _trackID, Bitmap _infoListRowBitmapRender){
+        mTrackID = _trackID;
+        mInfoListRowBitmapRender = _infoListRowBitmapRender;
+
+        try {
+            //Happens on UI thread
+            mTrackDataFromDB = DBHelper.retrieveTrack(mTrackID);
+        } catch (CouchbaseLiteException e) {
+
+            //e.printStackTrace();
+            //Keep going, only mean ID is not valid
+        }
+
+        setupUIandTask();
+
+        mInfoListRowImageView.setImageBitmap(mInfoListRowBitmapRender);
+
+        //Oddly I have to adjust the ImageView height myself to twice the height of the Bitmap
+        //It took ages to find out and is out of reach of my understanding
+        applyWeirdFixForPhones();
+
+    }
+
+    private void applyWeirdFixForPhones(){
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mInfoListRowImageView.getLayoutParams();
+        params.width = mInfoListRowBitmapRender.getWidth();
+        params.height = mInfoListRowBitmapRender.getHeight()*2;
+        mInfoListRowImageView.setLayoutParams(params);
     }
 
     private void addTrackPolylineToMap(){
@@ -344,14 +385,18 @@ public class BudgetTrackDetailsFragment extends Fragment
         protected void onPostExecute(Void aVoid){
             super.onPostExecute(aVoid);
 
-            //addPolyline
-            BudgetTrackDetailsFragment.this.addTrackPolylineToMap();
-            //remove progressBar
-            mDataLoadingProgressBar.setVisibility(View.GONE);
-            //Animates camera
-            animateToTrack();
-            //enables map interactions
-            mMap.getUiSettings().setAllGesturesEnabled(true);
+            if(mTrackDataFromDB != null)
+            {
+                //addPolyline
+                BudgetTrackDetailsFragment.this.addTrackPolylineToMap();
+                //remove progressBar
+                mDataLoadingProgressBar.setVisibility(View.GONE);
+                //Animates camera
+                animateToTrack();
+                //enables map interactions
+                mMap.getUiSettings().setAllGesturesEnabled(true);
+            }
+
         }
 
     }
