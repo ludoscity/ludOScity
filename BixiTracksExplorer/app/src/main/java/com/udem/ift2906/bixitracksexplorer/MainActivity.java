@@ -1,6 +1,7 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,7 +18,10 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
 import com.couchbase.lite.CouchbaseLiteException;
-import com.udem.ift2906.bixitracksexplorer.BudgetInfo.BudgetInfoItem;
+import com.udem.ift2906.bixitracksexplorer.Budget.BudgetInfoFragment;
+import com.udem.ift2906.bixitracksexplorer.Budget.BudgetInfoItem;
+import com.udem.ift2906.bixitracksexplorer.Budget.BudgetOverviewFragment;
+import com.udem.ift2906.bixitracksexplorer.Budget.BudgetTrackDetailsFragment;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 
 import java.io.IOException;
@@ -28,13 +32,16 @@ public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         BudgetOverviewFragment.OnFragmentInteractionListener,
         BudgetInfoFragment.OnFragmentInteractionListener,
-        NearbyFragment.OnFragmentInteractionListener {
+        NearbyFragment.OnFragmentInteractionListener,
+        BudgetTrackDetailsFragment.OnBudgetTrackDetailsFragmentInteractionListener{
 
     //Test test
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
+
+    private DrawerLayout mDrawerLayout;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -51,14 +58,16 @@ public class MainActivity extends ActionBarActivity
         mTitle = getTitle();
         mSubtitle = "";
 
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+                mDrawerLayout);
 
         //Initialize couchbase database
         try {
             DBHelper.init(this, this);
+            BixiTracksExplorerAPIHelper.init();
         } catch (IOException | CouchbaseLiteException e) {
             e.printStackTrace();
         }
@@ -68,13 +77,13 @@ public class MainActivity extends ActionBarActivity
     public void onNavigationDrawerItemSelected(int position) {
 
         //En attendant d'avoir un menu bien rempli, juste pour tester la class NearbyFragment
-        if (position == 3){
+        if (position == 4){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.container, NearbyFragment.newInstance(position + 1))
                     .commit();
         }
-        else if (position == 2){
+        else if (position == 3){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.container, BudgetOverviewFragment.newInstance(position + 1))
@@ -101,9 +110,12 @@ public class MainActivity extends ActionBarActivity
                 mTitle = getString(R.string.title_section2);
                 break;
             case 3:
-                mTitle = getString(R.string.title_section_budget);
+                mTitle = getString(R.string.title_section_favorites);
                 break;
             case 4:
+                mTitle = getString(R.string.title_section_budget);
+                break;
+            case 5:
                 mTitle = getString(R.string.title_section_nearby);
         }
         mSubtitle = "";
@@ -152,7 +164,10 @@ public class MainActivity extends ActionBarActivity
         super.onBackPressed();
         // turn on the Navigation Drawer image;
         // this is called in the LowerLevelFragments
-        mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(true);
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() == 0) {
+            mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(true);
+        }
     }
 
     @Override
@@ -162,20 +177,21 @@ public class MainActivity extends ActionBarActivity
         {
             mTitle = getString(R.string.title_section_budget);
             mSubtitle = "";
-
             restoreActionBar();
 
+            //Unlocking swipe gesture
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
-        else if(uri.getPath().equalsIgnoreCase("/budget_info"))
+        else if(uri.getPath().equalsIgnoreCase("/" + BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_PATH))
         {
             mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(false);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-            String infoType = uri.getQueryParameter("info_type");
-            mTitle = infoType.substring(0, infoType.length()-" :".length());
-            mSubtitle = uri.getQueryParameter("selected_period");
+            mTitle = uri.getQueryParameter(BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_TYPE_PARAM);
+            mSubtitle = uri.getQueryParameter(BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_TIMEPERIOD_PARAM);
 
             // Create fragment and give it required info to set itselfs up
-            BudgetInfoFragment newFragment = BudgetInfoFragment.newInstance(uri.getQueryParameter("info_type"), uri.getQueryParameter("selected_period"), _budgetInfoItemList);
+            BudgetInfoFragment newFragment = BudgetInfoFragment.newInstance(mTitle.toString(), mSubtitle.toString(), _budgetInfoItemList);
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -192,19 +208,41 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onBudgetInfoFragmentInteraction(Uri _uri) {
-        if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_SORT_CHANGED)){
+    public void onBudgetInfoFragmentInteraction(Uri _uri, Bitmap _infoListRowBitmapRender) {
+        if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_SORT_CHANGED_PATH)){
 
-            String [] parts = mSubtitle.toString().split(" ");
-
-            mSubtitle = parts[0] + " - " + _uri.getQueryParameter(BudgetInfoFragment.NEW_SORT_SUBTITLE);
-
-            restoreActionBar();
+            mSubtitle = _uri.getQueryParameter(BudgetInfoFragment.SORT_CHANGED_SUBTITLE_PARAM);
         }
+        else if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_CLICK_PATH)){
+
+            BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(_uri.getQueryParameter(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM), _infoListRowBitmapRender );
+            mSubtitle = getString(R.string.budgettrackdetails_subtitle);
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            transaction.setCustomAnimations(R.animator.slide_in_top, R.animator.fade_out, R.animator.fade_in, R.animator.slide_out_bottom);
+
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack so the user can navigate back
+            transaction.replace(R.id.container, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
+
+        }
+
+        restoreActionBar();
+
     }
 
     @Override
     public void onNearbyFragmentInteraction() {
+
+    }
+
+    @Override
+    public void onBudgetTrackDetailsFragmentInteraction(Uri uri) {
 
     }
 

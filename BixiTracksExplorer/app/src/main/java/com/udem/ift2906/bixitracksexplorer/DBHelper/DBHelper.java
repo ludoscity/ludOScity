@@ -10,6 +10,7 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.QueryOptions;
 import com.couchbase.lite.QueryRow;
+import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -56,7 +57,8 @@ public class DBHelper {
 
     public static void saveTrack(Track toSave) throws CouchbaseLiteException, JSONException {
         Document doc = mManager.getDatabase(mDbName).getDocument(toSave.getKeyTimeUTC());
-        doc.putProperties(new Gson().<Map<String, Object>>fromJson(toSave.toString(), new TypeToken<HashMap<String, Object>>() {}.getType()));
+        doc.putProperties(new Gson().<Map<String, Object>>fromJson(toSave.toString(), new TypeToken<HashMap<String, Object>>() {
+        }.getType()));
     }
 
     public static List<QueryRow> getAllTracks() throws CouchbaseLiteException {
@@ -66,10 +68,85 @@ public class DBHelper {
         return (List<QueryRow>) allDocs.get("rows");
     }
 
+    //Not used because only potential client (so far) BudgetTrackDetails duplicates this data
+    /*public static boolean isTrackPointDataCached(String trackID) throws CouchbaseLiteException {
+        Document doc = mManager.getDatabase(mDbName).getExistingDocument(trackID);
+
+        return doc.getProperties().containsKey("points");
+    }*/
+
+    //Used to add a new entry in corresponding Couchbase Document, only if not already present
+    public static void putNewTrackPropertyAndSave(String _trackID, final String _newPropertyKey, final Object _newPropertyObject ) throws CouchbaseLiteException {
+        Document doc = mManager.getDatabase(mDbName).getExistingDocument(_trackID);
+
+        if (!doc.getProperties().containsKey(_newPropertyKey))
+        {
+            doc.update(new Document.DocumentUpdater() {
+                @Override
+                public boolean update(UnsavedRevision newRevision) {
+                    newRevision.getProperties().put(_newPropertyKey, _newPropertyObject);
+                    return true;
+                }
+            });
+        }
+    }
+
+
+    /**
+     * retrieveTrack
+     * @return Map<String,Object>
+     * @param trackID in form "yyyy-MM-dd'T'HH:mm:ss'Z'"
+     * Retrieves a track from Couchbase from a String complete id. Can't be of API model Track type
+     * because processed data like cost is added to documents and wouldn't map to model fields.
+     */
+    public static Map<String,Object> retrieveTrack(String trackID) throws CouchbaseLiteException {
+        Document doc = mManager.getDatabase(mDbName).getExistingDocument(trackID);
+
+        return doc.getCurrentRevision().getProperties();
+        //This is a failed attempt at converting directly into a Track class
+        //It is not usefull for this case right now but I just want to keep this piece of code around
+        //https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/TypeAdapter.html
+        /*Map<String, Object> convertedProperties = new HashMap<>();
+        for(String key : docProperties.keySet())
+        {
+            if (key.equalsIgnoreCase("rating"))
+            {
+                Double rating = (Double) docProperties.get(key);
+                int intRating = rating.intValue();
+                convertedProperties.put(key, (Integer)intRating);
+            }
+            else
+            {
+                convertedProperties.put(key,docProperties.get(key));
+            }
+
+        }
+
+        //convertedProperties.remove("rating");
+        //convertedProperties.put("rating", 666);
+
+        String JSONTruc = convertedProperties.toString();
+
+        return new Gson().fromJson(convertedProperties.toString(), new TypeToken<Track>() {
+        }.getType());
+        END of failed attempts*/
+    }
+
+    public static StationItem getStation(long id) {
+        Cursor cursor = BixiStationDatabase.getInstance(context).getStation(id);
+
+        cursor.moveToFirst();
+        if (!cursor.isAfterLast()) {
+            return createStation(cursor);
+        }
+
+        return null;
+    }
+
     private static StationItem createStation(Cursor cursor) {
         BixiStation station = new BixiStation();
 
-        station.extra.uid = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_ID));;
+        station.extra.uid = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_ID));
         station.extra.name = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NAME));
         station.latitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LATITUDE));
         station.longitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LONGITUDE));
