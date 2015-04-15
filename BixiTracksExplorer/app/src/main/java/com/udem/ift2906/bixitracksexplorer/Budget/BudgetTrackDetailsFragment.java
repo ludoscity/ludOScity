@@ -310,35 +310,37 @@ public class BudgetTrackDetailsFragment extends Fragment
         List<LatLng> latLngList = new ArrayList<>();
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
-        //TODO: work out why the ValueType for "points" key is not stable
-        //I'm mystified, if anyone has any kind of explanation, I want to understand !
-        //Spent a few hours trying to understand it, to none available
-        try{
-            Iterable<TrackPoint> listTp = (Iterable<TrackPoint>)(mTrackDataFromDB.get("points"));
-            for(TrackPoint tp : listTp){
-                final LatLng latLng = new LatLng(tp.getLat(), tp.getLon());
-                latLngList.add(latLng);
-                boundsBuilder.include(latLng);
-            }
+        if(mTrackDataFromDB.get("points") != null) {
+            //TODO: work out why the ValueType for "points" key is not stable
+            //I'm mystified, if anyone has any kind of explanation, I want to understand !
+            //Spent a few hours trying to understand it, to none available
+            try {
+                Iterable<TrackPoint> listTp = (Iterable<TrackPoint>) (mTrackDataFromDB.get("points"));
+                for (TrackPoint tp : listTp) {
+                    final LatLng latLng = new LatLng(tp.getLat(), tp.getLon());
+                    latLngList.add(latLng);
+                    boundsBuilder.include(latLng);
+                }
 
-        }catch (ClassCastException e){
-            Iterable<LinkedHashMap> listHm = (Iterable<LinkedHashMap>)(mTrackDataFromDB.get("points"));
-            for(LinkedHashMap hm : listHm){
-                final LatLng latLng = new LatLng((Double) hm.get("lat"), (Double) hm.get("lon"));
-                latLngList.add(latLng);
-                boundsBuilder.include(latLng);
+            } catch (ClassCastException e) {
+                Iterable<LinkedHashMap> listHm = (Iterable<LinkedHashMap>) (mTrackDataFromDB.get("points"));
+                for (LinkedHashMap hm : listHm) {
+                    final LatLng latLng = new LatLng((Double) hm.get("lat"), (Double) hm.get("lon"));
+                    latLngList.add(latLng);
+                    boundsBuilder.include(latLng);
+                }
             }
+            //End weird hack
+
+            mTrackBounds = boundsBuilder.build();
+
+            //TODO: Add paid/free color distinction + map legend
+            //TODO: Animate camera to contain Track at appropriate zoom level
+            mMap.addPolyline(new PolylineOptions()
+                    .addAll(latLngList)
+                    .width(5)
+                    .color(Color.BLUE));
         }
-        //End weird hack
-
-        mTrackBounds = boundsBuilder.build();
-
-        //TODO: Add paid/free color distinction + map legend
-        //TODO: Animate camera to contain Track at appropriate zoom level
-        mMap.addPolyline(new PolylineOptions()
-                .addAll(latLngList)
-                .width(5)
-                .color(Color.BLUE));
     }
 
     private void animateToTrack(){
