@@ -52,14 +52,14 @@ public class FavoritesFragment extends Fragment  {
         StationsNetwork stationsNetwork = DBHelper.listStations();
         StationsNetwork stationsNetworkFavorites = new StationsNetwork();
         for(StationItem stationItem: stationsNetwork.stations){
-            if (stationItem.isFavorite()){
+
                 stationsNetworkFavorites.stations.add(stationItem);
-            }
+            
         }
         setCurrentLocation();
 
         mStationListViewAdapter = new StationListViewAdapter(mContext,stationsNetworkFavorites,mCurrentUserLatLng);
-        mFavoritesView.setAdapter(mStationListViewAdapter);
+
     }
 
     @Override
@@ -67,6 +67,7 @@ public class FavoritesFragment extends Fragment  {
                              Bundle savedInstanceState) {
         View inflatedView = layoutInflater.inflate(R.layout.fragment_favoris, container, false);
         mFavoritesView = (ListView) inflatedView.findViewById(R.id.listview_favoris);
+        mFavoritesView.setAdapter(mStationListViewAdapter);
         return inflatedView;
     }
 
