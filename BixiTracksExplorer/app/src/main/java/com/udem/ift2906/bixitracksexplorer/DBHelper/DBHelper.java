@@ -52,6 +52,10 @@ public class DBHelper {
         mManager.getDatabase(mDbName).delete();
     }
 
+    public static boolean gotTracks() throws CouchbaseLiteException {
+        return !getAllTracks().isEmpty();
+    }
+
     /*public static Manager get() {
         return mManager;
     }*/

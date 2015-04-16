@@ -74,6 +74,17 @@ public class BudgetOverviewFragment extends Fragment {
 
     private RetrieveTrackDataAndProcessCostTask mWebLoadingTask = null;
 
+    //Bixi tarification grid
+    private static final long m45minInms = 2700000;
+    private static final long m15minInms = 900000;
+    private static final float m46to60minAddedCost = 1.50f;
+    private static final long m30minInms = 1800000;
+    private static final float m61to90minCost = 3.5f;
+    private static final float mEach30minAfter90 = 7.f;
+
+    //TODO: have this configurable through app settings
+    private static boolean RELOAD_BUDGET_DATA_FROM_WEB_ALWAYS = false;
+
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -103,8 +114,6 @@ public class BudgetOverviewFragment extends Fragment {
                 onInfoClick(getString(R.string.access_cost_label));
             }
         });
-        mAccessCostInfoButton.setEnabled(false);
-
 
         mUseCostInfoButton = (ImageButton) inflatedView.findViewById(R.id.useCostInfoButton);
         mUseCostInfoButton.setOnClickListener(new View.OnClickListener() {
@@ -113,13 +122,11 @@ public class BudgetOverviewFragment extends Fragment {
                 onInfoClick(getString(R.string.use_cost_label));
             }
         });
-        mUseCostInfoButton.setEnabled(false);
 
         mProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgetoverview_progressBar);
         mInterfaceLayout = (LinearLayout) inflatedView.findViewById(R.id.budgetoverview_interface);
 
-        mProgressBar.setVisibility(View.VISIBLE);
-        mInterfaceLayout.setVisibility(View.GONE);
+        setupInterface();
 
         return inflatedView;
     }
@@ -157,15 +164,37 @@ public class BudgetOverviewFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
 
+        if (RELOAD_BUDGET_DATA_FROM_WEB_ALWAYS){
 
-        try {
-            DBHelper.deleteDB();    //for now
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
+            try {
+                DBHelper.deleteDB();
+            } catch (CouchbaseLiteException e) {
+                e.printStackTrace();
+            }
+
+            mDataLoaded = false;
+        }
+        else{
+            try {
+                mDataLoaded = DBHelper.gotTracks();
+            } catch (CouchbaseLiteException e) {
+                e.printStackTrace();
+            }
         }
 
-        mWebLoadingTask = new RetrieveTrackDataAndProcessCostTask();
-        mWebLoadingTask.execute();
+        if (!mDataLoaded) {
+
+            mWebLoadingTask = new RetrieveTrackDataAndProcessCostTask();
+            mWebLoadingTask.execute();
+        }
+        else{
+            try {
+                processCost();
+            } catch (CouchbaseLiteException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     @Override
@@ -183,12 +212,7 @@ public class BudgetOverviewFragment extends Fragment {
     {
         super.onResume();
 
-        if(mDataLoaded){
-            mProgressBar.setVisibility(View.GONE);
-            mInterfaceLayout.setVisibility(View.VISIBLE);
-            mUseCostInfoButton.setEnabled(true);
-        }
-
+        setupInterface();
 
         //Happens when user presses back from TrackBudgetInfoFragment
         //let's tell our parent activity to update the action bar
@@ -233,6 +257,70 @@ public class BudgetOverviewFragment extends Fragment {
         }
     }
 
+    private void setupInterface(){
+        if (mDataLoaded) {
+            mProgressBar.setVisibility(View.GONE);
+            mInterfaceLayout.setVisibility(View.VISIBLE);
+            mUseCostInfoButton.setEnabled(true);
+        }
+        else
+        {
+            mProgressBar.setVisibility(View.VISIBLE);
+            mInterfaceLayout.setVisibility(View.INVISIBLE);
+            mUseCostInfoButton.setEnabled(false);
+            mAccessCostInfoButton.setEnabled(false);
+        }
+    }
+
+    private void processCost() throws CouchbaseLiteException {
+
+        mSeasonAccessCost = mSeasonUseCost = 0.f;
+        mMonthAccessCost = mMonthUseCost = 0.f;
+
+        for (QueryRow qr : DBHelper.getAllTracks())
+        {
+            Document d = qr.getDocument();
+
+            Map<String, Object> properties = d.getProperties();
+
+            long trackDuration = Long.parseLong((String) properties.get("duration"));
+
+            final float trackCost = processCostForDuration(trackDuration, 0.f, 0);
+
+            mBudgetInfoItems.add(new BudgetInfoItem((String) properties.get("key_TimeUTC"),
+                    trackCost, (String) properties.get("startStationName"), (String) properties.get("endStationName"),
+                    trackDuration));
+
+            mSeasonUseCost += trackCost;
+
+            //store the cost in the track document for later use
+            DBHelper.putNewTrackPropertyAndSave((String)d.getProperty("key_TimeUTC"), "cost", trackCost );
+        }
+    }
+
+    private float processCostForDuration(long remainingTime, float accumulatedCost, int costStep) {
+        if (remainingTime < 0.f)
+            return accumulatedCost;
+
+        switch (costStep){
+            case 0: //free first 45 minutes
+                remainingTime -= m45minInms;
+                return processCostForDuration(remainingTime, accumulatedCost, ++costStep);
+            case 1: //46 to 60 minutes
+                accumulatedCost += m46to60minAddedCost;
+                remainingTime -= m15minInms;
+                return processCostForDuration(remainingTime, accumulatedCost, ++costStep);
+            case 2: //61 to 90 minutes
+                accumulatedCost += m61to90minCost;
+                remainingTime -= m30minInms;
+                return processCostForDuration(remainingTime, accumulatedCost, ++costStep);
+            default:    //each subsequent half hour
+                accumulatedCost += mEach30minAfter90;
+                remainingTime -= m30minInms;
+                return processCostForDuration(remainingTime, accumulatedCost, ++costStep);
+        }
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -249,12 +337,7 @@ public class BudgetOverviewFragment extends Fragment {
 
     public class RetrieveTrackDataAndProcessCostTask extends AsyncTask<Void, Void, Void> {
 
-        private static final long m45minInms = 2700000;
-        private static final long m15minInms = 900000;
-        private static final float m46to60minAddedCost = 1.50f;
-        private static final long m30minInms = 1800000;
-        private static final float m61to90minCost = 3.5f;
-        private static final float mEach30minAfter90 = 7.f;
+
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -291,60 +374,14 @@ public class BudgetOverviewFragment extends Fragment {
             return null;
         }
 
-        private void processCost() throws CouchbaseLiteException {
 
-            mSeasonAccessCost = mSeasonUseCost = 0.f;
-            mMonthAccessCost = mMonthUseCost = 0.f;
-
-            for (QueryRow qr : DBHelper.getAllTracks())
-            {
-                Document d = qr.getDocument();
-
-                Map<String, Object> properties = d.getProperties();
-
-                long trackDuration = Long.parseLong((String) properties.get("duration"));
-
-                final float trackCost = processCostForDuration(trackDuration, 0.f, 0);
-
-                mBudgetInfoItems.add(new BudgetInfoItem((String) properties.get("key_TimeUTC"),
-                        trackCost, (String) properties.get("startStationName"), (String) properties.get("endStationName"),
-                        trackDuration));
-
-                mSeasonUseCost += trackCost;
-
-                //store the cost in the track document for later use
-                DBHelper.putNewTrackPropertyAndSave((String)d.getProperty("key_TimeUTC"), "cost", trackCost );
-            }
-        }
-
-        private float processCostForDuration(long remainingTime, float accumulatedCost, int costStep) {
-            if (remainingTime < 0.f)
-                return accumulatedCost;
-
-            switch (costStep){
-                case 0: //free first 45 minutes
-                    remainingTime -= m45minInms;
-                    return processCostForDuration(remainingTime, accumulatedCost, ++costStep);
-                case 1: //46 to 60 minutes
-                    accumulatedCost += m46to60minAddedCost;
-                    remainingTime -= m15minInms;
-                    return processCostForDuration(remainingTime, accumulatedCost, ++costStep);
-                case 2: //61 to 90 minutes
-                    accumulatedCost += m61to90minCost;
-                    remainingTime -= m30minInms;
-                    return processCostForDuration(remainingTime, accumulatedCost, ++costStep);
-                default:    //each subsequent half hour
-                    accumulatedCost += mEach30minAfter90;
-                    remainingTime -= m30minInms;
-                    return processCostForDuration(remainingTime, accumulatedCost, ++costStep);
-            }
-        }
 
         @Override
         protected void onCancelled (Void aVoid){
             super.onCancelled(aVoid);
+            mDataLoaded = true;
 
-            //Do nothing. task is cancelled if fragment is detached
+            //Task is cancelled if fragment is detached
 
         }
 
@@ -355,14 +392,9 @@ public class BudgetOverviewFragment extends Fragment {
 
             updateCost();
 
-            mProgressBar.setVisibility(View.GONE);
-            mInterfaceLayout.setVisibility(View.VISIBLE);
-
             mDataLoaded = true;
 
-            mUseCostInfoButton.setEnabled(true);
-
-            //mAccessCostInfoButton.setEnabled(true);
+            setupInterface();
         }
     }
 }
