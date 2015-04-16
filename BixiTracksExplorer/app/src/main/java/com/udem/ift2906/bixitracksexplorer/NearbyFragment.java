@@ -19,11 +19,6 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiAPI;
-import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiNetwork;
-import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
-import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
-
-import java.util.ArrayList;
 
 
 public class NearbyFragment extends Fragment
@@ -57,18 +52,11 @@ public class NearbyFragment extends Fragment
         mContext = activity;
         try {
             mListener = (OnFragmentInteractionListener) activity;
-            super.onAttach(activity);
             ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-
-        //Used to get user's current location
-        setCurrentLocation();
-
-        //TODO string
-        Toast.makeText(mContext, "Trying download...", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -85,6 +73,8 @@ public class NearbyFragment extends Fragment
         nearbyMap = googleMap;
 
         nearbyMap.setMyLocationEnabled(true);
+        //Used to get user's current location
+        setCurrentLocation();
         nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 10));
         new DownloadWebTask().execute();
     }
@@ -127,8 +117,8 @@ public class NearbyFragment extends Fragment
             stationsNetwork.setUpMarkers();
             stationsNetwork.addMarkersToMap(nearbyMap);
 
-            //mStationListViewAdapter = new StationListViewAdapter(mContext, stationsNetwork, mCurrentUserLatLng);
-            //mStationListView.setAdapter(mStationListViewAdapter);
+            mStationListViewAdapter = new StationListViewAdapter(mContext, stationsNetwork, mCurrentUserLatLng);
+            mStationListView.setAdapter(mStationListViewAdapter);
         }
     }
 }
