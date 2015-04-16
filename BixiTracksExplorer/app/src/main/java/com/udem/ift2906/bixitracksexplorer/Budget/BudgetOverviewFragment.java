@@ -72,6 +72,8 @@ public class BudgetOverviewFragment extends Fragment {
 
     private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
 
+    private RetrieveTrackDataAndProcessCostTask mWebLoadingTask = null;
+
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -161,9 +163,19 @@ public class BudgetOverviewFragment extends Fragment {
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }
-        new RetrieveTrackDataAndProcessCost().execute();
 
+        mWebLoadingTask = new RetrieveTrackDataAndProcessCostTask();
+        mWebLoadingTask.execute();
+    }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mWebLoadingTask != null && !mWebLoadingTask.isCancelled())
+        {
+            mWebLoadingTask.cancel(false);
+            mWebLoadingTask = null;
+        }
     }
 
     @Override
@@ -235,7 +247,7 @@ public class BudgetOverviewFragment extends Fragment {
         public void onBudgetOverviewFragmentInteraction(Uri uri, ArrayList<BudgetInfoItem> _budgetInfoItemList);
     }
 
-    public class RetrieveTrackDataAndProcessCost extends AsyncTask<Void, Void, Void> {
+    public class RetrieveTrackDataAndProcessCostTask extends AsyncTask<Void, Void, Void> {
 
         private static final long m45minInms = 2700000;
         private static final long m15minInms = 900000;
@@ -327,6 +339,15 @@ public class BudgetOverviewFragment extends Fragment {
                     return processCostForDuration(remainingTime, accumulatedCost, ++costStep);
             }
         }
+
+        @Override
+        protected void onCancelled (Void aVoid){
+            super.onCancelled(aVoid);
+
+            //Do nothing. task is cancelled if fragment is detached
+
+        }
+
 
         @Override
         protected void onPostExecute(Void aVoid) {
