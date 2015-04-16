@@ -37,6 +37,8 @@ public class DBHelper {
     private static Manager mManager = null;
     private static final String mDbName = "appdb";
     private static Context context;
+    //TODO SCRAP THIS
+    private static long RANDOM_ID_FROM_CITIES_BIKES_API = 358;
 
     private DBHelper() {}
 
@@ -181,8 +183,10 @@ public class DBHelper {
         return BixiStationDatabase.getInstance(context).isExist(id);
     }
 
-
-
+    //TODO SCRAP THIS
+    public static boolean isDataStationLoaded(){
+        return isExist(RANDOM_ID_FROM_CITIES_BIKES_API);
+    }
     public static boolean isFavorite(long id) {
         return BixiStationDatabase.getInstance(context).isFavorite(id);
     }
