@@ -1,26 +1,28 @@
 package com.udem.ift2906.bixitracksexplorer;
+
 import android.app.Activity;
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.app.*;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import android.widget.ArrayAdapter;
+import com.google.android.gms.maps.model.LatLng;
+import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 
 public class FavoritesFragment extends Fragment  {
     private Context mContext;
     private OnFragmentInteractionListener mListener;
+    private ListView mFavoritesView;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private LocationManager mLocationManager;
+    private LatLng mCurrentUserLatLng;
+    private StationListViewAdapter mStationListViewAdapter;
 
     public interface OnFragmentInteractionListener {
         public void onFavoritesFragmentInteraction();
@@ -47,44 +49,34 @@ public class FavoritesFragment extends Fragment  {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        StationsNetwork stationsNetwork = DBHelper.listStations();
+        StationsNetwork stationsNetworkFavorites = new StationsNetwork();
+        for(StationItem stationItem: stationsNetwork.stations){
+            if (stationItem.isFavorite()){
+                stationsNetworkFavorites.stations.add(stationItem);
+            }
+        }
+        setCurrentLocation();
+
+        mStationListViewAdapter = new StationListViewAdapter(mContext,stationsNetworkFavorites,mCurrentUserLatLng);
+        mFavoritesView.setAdapter(mStationListViewAdapter);
     }
 
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View inflatedView = layoutInflater.inflate(R.layout.fragment_favoris, container, false);
+        mFavoritesView = (ListView) inflatedView.findViewById(R.id.listview_favoris);
+        return inflatedView;
+    }
 
-        ArrayAdapter<String> mFavoritesAdapter;
-
-
-          //fake data pour afficher les favoris
-           String[] data = {
-                "Mon ",
-                "Tue ",
-                "Wed ",
-                "Thurs",
-                "Fri",
-                "Sat",
-                "Sun"
-        };
-
-
-        List<String> favoritesTab = new ArrayList<String>(Arrays.asList(data));
-        mFavoritesAdapter =
-                                new ArrayAdapter<String>(
-                                        getActivity(),
-                                        R.layout.list_item_favoris,
-                                        R.id.list_item_favoris_textview,
-                                        favoritesTab);
-
-       View favoritesView = inflater.inflate(R.layout.fragment_favoris, container, false);
-
-        return favoritesView;
-
-
-
-}
+    public void setCurrentLocation() {
+        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location != null) {
+            mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        }
+    }
 }
 
 

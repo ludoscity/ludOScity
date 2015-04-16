@@ -102,8 +102,6 @@ public class NearbyFragment extends Fragment
         protected Void doInBackground(Void... params) {
             bixiApiInstance = new BixiAPI(mContext);
             stationsNetwork = bixiApiInstance.downloadBixiNetwork();
-
-
             return null;
         }
 
