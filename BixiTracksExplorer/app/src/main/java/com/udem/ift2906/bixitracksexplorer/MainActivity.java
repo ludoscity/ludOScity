@@ -35,7 +35,8 @@ public class MainActivity extends ActionBarActivity
         BudgetOverviewFragment.OnFragmentInteractionListener,
         BudgetInfoFragment.OnFragmentInteractionListener,
         NearbyFragment.OnFragmentInteractionListener,
-        BudgetTrackDetailsFragment.OnBudgetTrackDetailsFragmentInteractionListener{
+        BudgetTrackDetailsFragment.OnBudgetTrackDetailsFragmentInteractionListener,
+        FavoritesFragment.OnFragmentInteractionListener{
 
     //Test test
     /**
@@ -302,6 +303,10 @@ public class MainActivity extends ActionBarActivity
 
     }
 
+    @Override
+    public void onFavoritesFragmentInteraction() {
+
+    }
     /**
      * A placeholder fragment containing a simple view.
      */
