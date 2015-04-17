@@ -283,18 +283,25 @@ public class BudgetOverviewFragment extends Fragment {
 
             Map<String, Object> properties = d.getProperties();
 
+            //Guaranteed to be present
             long trackDuration = Long.parseLong((String) properties.get("duration"));
 
-            final float trackCost = processCostForDuration(trackDuration, 0.f, 0);
+            double trackCost;
+
+            if (properties.get("cost") == null) {
+                trackCost = processCostForDuration(trackDuration, 0.f, 0);
+                //store the cost in the track document for later use
+                DBHelper.putNewTrackPropertyAndSave((String)d.getProperty("key_TimeUTC"), "cost", trackCost );
+            }
+            else
+                trackCost = (Double)properties.get("cost");
+
 
             mBudgetInfoItems.add(new BudgetInfoItem((String) properties.get("key_TimeUTC"),
-                    trackCost, (String) properties.get("startStationName"), (String) properties.get("endStationName"),
+                    (float)trackCost, (String) properties.get("startStationName"), (String) properties.get("endStationName"),
                     trackDuration));
 
             mSeasonUseCost += trackCost;
-
-            //store the cost in the track document for later use
-            DBHelper.putNewTrackPropertyAndSave((String)d.getProperty("key_TimeUTC"), "cost", trackCost );
         }
     }
 
