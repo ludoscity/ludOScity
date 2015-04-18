@@ -5,9 +5,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.SphericalUtil;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * Created by Gevrai on 2015-04-03.
  *
@@ -21,7 +18,6 @@ public class StationItem {
     private int free_bikes;
     private LatLng position;
     private boolean isFavorite;
-    private double meterFromUserLocation;
     private MarkerOptions markerOptions;
     private String timestamp;
 
@@ -64,6 +60,10 @@ public class StationItem {
 
     public double getMeterFromLatLng(LatLng userLocation) {
         return SphericalUtil.computeDistanceBetween(userLocation, position);
+    }
+
+    public double getBearingFromLatLng(LatLng userLocation){
+        return SphericalUtil.computeHeading(userLocation,position);
     }
 
     public LatLng getPosition() {

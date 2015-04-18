@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -40,18 +41,21 @@ public class StationListViewAdapter extends BaseAdapter {
     }
 
     public void sortStationListByClosest(){
-        Collections.sort(mStationList, new Comparator<StationItem>() {
-            @Override
-            public int compare(StationItem lhs, StationItem rhs) {
-                return (int) (lhs.getMeterFromLatLng(mCurrentUserLatLng) - rhs.getMeterFromLatLng(mCurrentUserLatLng));
-            }
-        });
+        if (mCurrentUserLatLng != null) {
+            Collections.sort(mStationList, new Comparator<StationItem>() {
+                @Override
+                public int compare(StationItem lhs, StationItem rhs) {
+                    return (int) (lhs.getMeterFromLatLng(mCurrentUserLatLng) - rhs.getMeterFromLatLng(mCurrentUserLatLng));
+                }
+            });
+        }
     }
 
     public class ViewHolder{
         TextView distance;
         TextView name;
         TextView availability;
+        ImageView directionArrow;
     }
 
     @Override
@@ -78,18 +82,26 @@ public class StationListViewAdapter extends BaseAdapter {
             holder.distance = (TextView) convertView.findViewById(R.id.station_distance);
             holder.name = (TextView) convertView.findViewById(R.id.station_name);
             holder.availability = (TextView) convertView.findViewById(R.id.station_availability);
+            holder.directionArrow = (ImageView) convertView.findViewById(R.id.station_direction_arrow);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-
-        holder.distance.setText(String.valueOf((int)mStationList.get(position).getMeterFromLatLng(mCurrentUserLatLng)) + " m ");
-        holder.name.setText(String.valueOf(mStationList.get(position).getName()));
+        StationItem currentStation= mStationList.get(position);
+        holder.directionArrow.setRotation((float) currentStation.getBearingFromLatLng(mCurrentUserLatLng));
+        if (mCurrentUserLatLng != null) {
+            holder.distance.setText(String.valueOf((int)currentStation.getMeterFromLatLng(mCurrentUserLatLng)) + " m ");
+            holder.directionArrow.setRotation((float) currentStation.getBearingFromLatLng(mCurrentUserLatLng));
+        } else {
+            //TODO better distance message if no user location available
+            holder.distance.setText(String.valueOf("???"));
+        }
+        holder.name.setText(String.valueOf(currentStation.getName()));
 
         //TODO A REVOIR
-        holder.availability.setText("" + mStationList.get(position).getFree_bikes()
+        holder.availability.setText("" + currentStation.getFree_bikes()
                 + "/"
-                + (mStationList.get(position).getFree_bikes()+mStationList.get(position).getEmpty_slots()));
+                + (mStationList.get(position).getFree_bikes()+currentStation.getEmpty_slots()));
 
         return convertView;
     }

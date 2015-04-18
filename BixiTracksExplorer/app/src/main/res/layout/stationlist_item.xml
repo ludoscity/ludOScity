@@ -6,14 +6,16 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:id="@+id/userLocationAware_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:orientation="vertical"
         android:gravity="left">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_next_track"/>
+            android:id="@+id/station_direction_arrow"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:src="@drawable/direction_arrow"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,28 +23,20 @@
             />
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:textSize="16sp"
-            android:id="@+id/station_name"
-            />
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="fill_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:gravity="end">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:textSize="24sp"
-            android:id="@+id/station_availability"
-            />
-    </FrameLayout>
+        android:textSize="16sp"
+        android:id="@+id/station_name"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:textSize="24sp"
+        android:id="@+id/station_availability"
+        />
+
 
 </LinearLayout>
