@@ -10,7 +10,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,6 +40,9 @@ public class NearbyFragment extends Fragment
     private DownloadWebTask mDownloadWebTask;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private ImageButton mRefreshButton;
+    private TextView mLastUpdatedTextView;
+    private Boolean isDownloadCurrentlyExecuting;
 
 
     public static NearbyFragment newInstance(int sectionNumber) {
@@ -60,9 +65,7 @@ public class NearbyFragment extends Fragment
                     + " must implement OnFragmentInteractionListener");
         }
 
-        //Used to get user's current location
         setCurrentLocation();
-
         mDownloadWebTask = new DownloadWebTask();
         mDownloadWebTask.execute();
     }
@@ -84,7 +87,9 @@ public class NearbyFragment extends Fragment
         if(nearbyMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
 
-
+        mRefreshButton = (ImageButton) inflatedView.findViewById(R.id.refreshDatabase_button);
+        setRefreshButtonListener();
+        mLastUpdatedTextView = (TextView) inflatedView.findViewById(R.id.lastUpdated_textView);
 
         mStationListView = (ListView) inflatedView.findViewById(R.id.stationListView);
         return inflatedView;
@@ -116,6 +121,18 @@ public class NearbyFragment extends Fragment
         }
     }
 
+    private void setRefreshButtonListener() {
+        mRefreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!isDownloadCurrentlyExecuting) {
+                    mDownloadWebTask = new DownloadWebTask();
+                    mDownloadWebTask.execute();
+                }
+            }
+        });
+    }
+
     //Pour interaction avec mainActivity
     public interface OnFragmentInteractionListener {
         public void onNearbyFragmentInteraction();
@@ -125,10 +142,10 @@ public class NearbyFragment extends Fragment
         return mContext;
     }
 
-
     public class DownloadWebTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
+            isDownloadCurrentlyExecuting = true;
             bixiApiInstance = new BixiAPI(mContext);
             stationsNetwork = bixiApiInstance.downloadBixiNetwork();
             return null;
@@ -137,23 +154,24 @@ public class NearbyFragment extends Fragment
         @Override
         protected void onCancelled (Void aVoid){
             super.onCancelled(aVoid);
-
             //Do nothing. task is cancelled if fragment is detached
-
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
-            //TODO R.string
-            Toast.makeText(mContext, "Download Successful!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, R.string.download_success, Toast.LENGTH_SHORT).show();
 
             stationsNetwork.setUpMarkers();
             stationsNetwork.addMarkersToMap(nearbyMap);
 
             mStationListViewAdapter = new StationListViewAdapter(mContext, stationsNetwork, mCurrentUserLatLng);
             mStationListView.setAdapter(mStationListViewAdapter);
+
+            //TODO add time awareness
+            mLastUpdatedTextView.setText(R.string.lastUpdated + "1 min ago");
+
+            isDownloadCurrentlyExecuting = false;
         }
     }
 }
