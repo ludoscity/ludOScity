@@ -111,12 +111,6 @@ public class MainActivity extends ActionBarActivity
                     .replace(R.id.start_fragment_container, BudgetOverviewFragment.newInstance(position + 1))
                     .commit();
         }
-        else if (position == 3){
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.start_fragment_container, BudgetOverviewFragment.newInstance(position + 1))
-                    .commit();
-        }
         else if (position == 2){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
@@ -276,7 +270,7 @@ public class MainActivity extends ActionBarActivity
             if (endFragmentContainer == null){
                 //One fragment at a time on screen
 
-                BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(_uri.getQueryParameter(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM), _infoListRowBitmapRender );
+                BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(_uri.getQueryParameter(BudgetInfoFragment.CLICK_TRACKID_PARAM), _infoListRowBitmapRender );
                 mSubtitle = getString(R.string.budgettrackdetails_subtitle);
 
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -297,7 +291,7 @@ public class MainActivity extends ActionBarActivity
                 //retrieve it
                 BudgetTrackDetailsFragment detailsFragment = (BudgetTrackDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.end_fragment_container);
                 //pass it new data
-                detailsFragment.updateWithNewTrack(_uri.getQueryParameter(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM), _infoListRowBitmapRender);
+                detailsFragment.updateWithNewTrack(_uri.getQueryParameter(BudgetInfoFragment.CLICK_TRACKID_PARAM), _infoListRowBitmapRender);
             }
         }
 
