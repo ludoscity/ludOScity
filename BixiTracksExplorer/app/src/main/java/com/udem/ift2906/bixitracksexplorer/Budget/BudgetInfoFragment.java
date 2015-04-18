@@ -11,12 +11,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.LinearInterpolator;
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import com.udem.ift2906.bixitracksexplorer.R;
 
@@ -37,7 +36,7 @@ public class BudgetInfoFragment extends ListFragment {
     public static final String BUDGETINFOITEM_SORT_CHANGED_PATH = "budgetinfoitem_sort_changed";
     public static final String SORT_CHANGED_SUBTITLE_PARAM = "new_sort_subtitle";
     public static final String BUDGETINFOITEM_CLICK_PATH = "budgetinfoitem_click";
-    public static final String BUDGETINFOITEM_TRACKID_PARAM = "track_id";
+    public static final String CLICK_TRACKID_PARAM = "track_id";
 
     private String mInfoType;
     private String mTimePeriod;
@@ -164,6 +163,11 @@ public class BudgetInfoFragment extends ListFragment {
         notifySortCriteriaChangeToActivity();
     }
 
+    @Override
+    public void onViewCreated (View view, Bundle savedInstanceState){
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        super.onViewCreated(view, savedInstanceState);
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -218,8 +222,10 @@ public class BudgetInfoFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
 
 
+        getListView().setItemChecked(position, true);
+
         //Let's animate !!
-        //1- Render the View representing the clicked row in a Bitmap
+        //Render the View representing the clicked row in a Bitmap
         //BitmapFactory.decodeResource(R.layout.budgetinfolist_item);
         Bitmap viewCapture;
 
@@ -227,74 +233,38 @@ public class BudgetInfoFragment extends ListFragment {
         viewCapture = Bitmap.createBitmap(v.getDrawingCache());
         v.setDrawingCacheEnabled(false);
 
-        if(getActivity().findViewById(R.id.end_fragment_container) == null){
-
-            //one screen configuration, disapear row
-            v.setVisibility(View.INVISIBLE);
-        }
-
-
-        //2- retrieve target animation position
         Pair<Integer,Integer> targetAbsoluteXY = calculateRowAnimTarget(v);
 
-        //... set Bitmap on judiciously placed ImageView used as Bitmap holder...
         mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
 
         //... set initial position...
-        RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(v.getWidth(), v
-                .getHeight());
-        rlp.topMargin = v.getTop() + getListView().getTop();//rowTop;
-        rlp.leftMargin = v.getLeft() + getListView().getLeft();//rowLeft;
+        mAnimatedrowBitmapHolderImageView.setX(v.getX());
+        mAnimatedrowBitmapHolderImageView.setY(v.getY());
 
-        mAnimatedrowBitmapHolderImageView.setLayoutParams(rlp);
-
-        //3- Create a TranslateAnimation from initial pos to target pos
-        TranslateAnimation outAni = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0f,Animation.ABSOLUTE,targetAbsoluteXY.first,
-                Animation.RELATIVE_TO_PARENT, 0f, Animation.ABSOLUTE, targetAbsoluteXY.second );
-        outAni.setDuration(1000);
-        //Trying to fix the clitch, those didn't work
-        //outAni.setFillEnabled(true);
-        //outAni.setFillAfter(true);
-        //outAni.setZAdjustment(Animation.ZORDER_TOP);
-
-        //4- Set animationListener to remove view when animation is finished
-        outAni.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                if (mAnimatedrowBitmapHolderImageView != null){ //In case we've been detached while animation was running
-                    mAnimatedrowBitmapHolderImageView.setVisibility(View.INVISIBLE);
-                }
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
+        //Setup animation
+        mAnimatedrowBitmapHolderImageView.animate().x(targetAbsoluteXY.first)
+                .y(targetAbsoluteXY.second)
+                .setDuration(1000)
+                .setInterpolator(new LinearInterpolator());
 
         //Make Bitmap holder ImageView visible
         mAnimatedrowBitmapHolderImageView.setVisibility(View.VISIBLE);
 
-        //6- Animate !!
-        mAnimatedrowBitmapHolderImageView.startAnimation(outAni);
+        //Animate !
+        mAnimatedrowBitmapHolderImageView.animate().start();
 
         if (mListener != null){
             Uri.Builder builder = new Uri.Builder();
 
             builder.appendPath(BUDGETINFOITEM_CLICK_PATH)
-                    .appendQueryParameter(BUDGETINFOITEM_TRACKID_PARAM, mBudgetInfoItems.get(position).getIDAsString());
+                    .appendQueryParameter(CLICK_TRACKID_PARAM, mBudgetInfoItems.get(position).getIDAsString());
 
             //Bitmap implements Parcelable. We pass it around to BudgetTrackDetailsFragment
             mListener.onBudgetInfoFragmentInteraction(builder.build(), viewCapture);
         }
     }
 
-    //Return X and Y ABSOLUTE VALUES of row line View target position on screen
+    //Return X and Y of row line View target position on screen
     private Pair<Integer, Integer> calculateRowAnimTarget(View rowView){
 
         //calculate the position of the row as well as the target animation position (at bottom of screen)
@@ -303,13 +273,13 @@ public class BudgetInfoFragment extends ListFragment {
         // parent container
 
         //Retrieve data required for calculation
-        int rowTop = rowView.getTop() + getListView().getTop();
+        //int rowTop = rowView.getTop() + getListView().getTop();
         //int rowLeft = rowView.getLeft() + getListView().getLeft();
 
         int listViewBottom = getListView().getBottom();
         int listViewRight = getListView().getRight();
 
-        int YTargetAbsolute = (listViewBottom - rowTop) - rowView.getHeight();
+        int YTarget = listViewBottom - rowView.getHeight();
 
 
         // First figure out if we're on a one of two fragments configuration
@@ -317,11 +287,11 @@ public class BudgetInfoFragment extends ListFragment {
 
         if (endFragmentContainer != null){
             //two fragments configuration
-            return new Pair<>(listViewRight, YTargetAbsolute);
+            return new Pair<>(listViewRight, YTarget);
         }
         else{
 
-            return new Pair<>(0, YTargetAbsolute);
+            return new Pair<>(0, YTarget);
             //int absoluteAnimationTargetPx = (listViewBottom - rowTop) - rowView.getHeight();
 
         }

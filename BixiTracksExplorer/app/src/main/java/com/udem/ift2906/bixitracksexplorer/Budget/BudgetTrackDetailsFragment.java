@@ -88,7 +88,7 @@ public class BudgetTrackDetailsFragment extends Fragment
     public static BudgetTrackDetailsFragment newInstance(String trackID, Bitmap _infoListRowBitmapRender) {
         BudgetTrackDetailsFragment fragment = new BudgetTrackDetailsFragment();
         Bundle args = new Bundle();
-        args.putString(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM, trackID);
+        args.putString(BudgetInfoFragment.CLICK_TRACKID_PARAM, trackID);
         args.putParcelable(ARG_ROW_BITMAP_RENDER, _infoListRowBitmapRender);
         //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
@@ -104,7 +104,7 @@ public class BudgetTrackDetailsFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mTrackID = getArguments().getString(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM);
+            mTrackID = getArguments().getString(BudgetInfoFragment.CLICK_TRACKID_PARAM);
             mInfoListRowBitmapRender = getArguments().getParcelable(ARG_ROW_BITMAP_RENDER);
 
             try {
@@ -177,6 +177,7 @@ public class BudgetTrackDetailsFragment extends Fragment
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
+                        getActivity().findViewById(R.id.animatedrow_bitmap_holder_imageview).setVisibility(View.INVISIBLE);
                         mInfoListRowImageView.setVisibility(View.VISIBLE);
                     }
 
