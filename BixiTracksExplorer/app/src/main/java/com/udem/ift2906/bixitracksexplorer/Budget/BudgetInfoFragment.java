@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -162,6 +163,11 @@ public class BudgetInfoFragment extends ListFragment {
         notifySortCriteriaChangeToActivity();
     }
 
+    @Override
+    public void onViewCreated (View view, Bundle savedInstanceState){
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        super.onViewCreated(view, savedInstanceState);
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -216,7 +222,7 @@ public class BudgetInfoFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
 
 
-        v.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+        getListView().setItemChecked(position, true);
 
         //Let's animate !!
         //Render the View representing the clicked row in a Bitmap
