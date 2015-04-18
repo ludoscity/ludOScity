@@ -111,6 +111,18 @@ public class MainActivity extends ActionBarActivity
                     .replace(R.id.start_fragment_container, BudgetOverviewFragment.newInstance(position + 1))
                     .commit();
         }
+        else if (position == 3){
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.start_fragment_container, BudgetOverviewFragment.newInstance(position + 1))
+                    .commit();
+        }
+        else if (position == 2){
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.start_fragment_container, FavoritesFragment.newInstance(position + 1))
+                    .commit();
+        }
         else
         {
             // update the main content by replacing fragments
