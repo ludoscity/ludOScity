@@ -5,21 +5,36 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
 
-    <TextView
+    <LinearLayout
+        android:id="@+id/userLocationAware_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/station_distance"
-        />
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:gravity="left">
+        <ImageView
+            android:id="@+id/station_direction_arrow"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:src="@drawable/direction_arrow"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/station_distance"
+            />
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
+        android:textSize="16sp"
         android:id="@+id/station_name"
         />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="right"
+        android:textSize="24sp"
         android:id="@+id/station_availability"
         />
 

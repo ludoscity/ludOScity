@@ -1,8 +1,5 @@
 package com.udem.ift2906.bixitracksexplorer.BixiAPI;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 public class BixiStation{
     public int empty_slots;
     public Extra extra;

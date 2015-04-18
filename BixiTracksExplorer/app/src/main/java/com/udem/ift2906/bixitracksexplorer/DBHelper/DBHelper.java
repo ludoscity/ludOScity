@@ -37,18 +37,23 @@ public class DBHelper {
     private static Manager mManager = null;
     private static final String mDbName = "appdb";
     private static Context context;
+    //TODO SCRAP THIS
+    private static long RANDOM_ID_FROM_CITIES_BIKES_API = 358;
 
     private DBHelper() {}
 
     public static void init(Activity activity, Context c) throws IOException, CouchbaseLiteException {
         mManager = new Manager(new AndroidContext(activity), Manager.DEFAULT_OPTIONS);
-        deleteDB(); //As an exercise so that data will be requested from the web
         context = c;
     }
 
     public static void deleteDB() throws CouchbaseLiteException {
         //If it crashes here because getDatabase returns null, uninstall and reinstall the app
         mManager.getDatabase(mDbName).delete();
+    }
+
+    public static boolean gotTracks() throws CouchbaseLiteException {
+        return !getAllTracks().isEmpty();
     }
 
     /*public static Manager get() {
@@ -102,7 +107,12 @@ public class DBHelper {
     public static Map<String,Object> retrieveTrack(String trackID) throws CouchbaseLiteException {
         Document doc = mManager.getDatabase(mDbName).getExistingDocument(trackID);
 
-        return doc.getCurrentRevision().getProperties();
+        if (doc != null){
+            return doc.getCurrentRevision().getProperties();
+        }
+
+        return null;
+
         //This is a failed attempt at converting directly into a Track class
         //It is not usefull for this case right now but I just want to keep this piece of code around
         //https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/TypeAdapter.html
@@ -188,8 +198,10 @@ public class DBHelper {
         return BixiStationDatabase.getInstance(context).isExist(id);
     }
 
-
-
+    //TODO SCRAP THIS
+    public static boolean isDataStationLoaded(){
+        return isExist(RANDOM_ID_FROM_CITIES_BIKES_API);
+    }
     public static boolean isFavorite(long id) {
         return BixiStationDatabase.getInstance(context).isFavorite(id);
     }

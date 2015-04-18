@@ -3,7 +3,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
-    <string name="title_section_favorites">Favoris</string>
+    <string name="title_section_favorites">Favorites</string>
     <string name="title_section_budget">Budget</string>
     <string name="title_section_nearby">Nearby</string>
 
@@ -26,8 +26,5 @@
     <string name="budgetinfo_subtitle_by_cost">by amount</string>
     <string name="budgetinfo_subtitle_by_duration">by duration</string>
     <string name="budgetinfo_subtitle_by_date">by date</string>
-
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="budgettrackdetails_subtitle">Trip details</string>
 </resources>

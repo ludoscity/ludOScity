@@ -88,7 +88,7 @@ public class BudgetTrackDetailsFragment extends Fragment
     public static BudgetTrackDetailsFragment newInstance(String trackID, Bitmap _infoListRowBitmapRender) {
         BudgetTrackDetailsFragment fragment = new BudgetTrackDetailsFragment();
         Bundle args = new Bundle();
-        args.putString(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM, trackID);
+        args.putString(BudgetInfoFragment.CLICK_TRACKID_PARAM, trackID);
         args.putParcelable(ARG_ROW_BITMAP_RENDER, _infoListRowBitmapRender);
         //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
@@ -104,14 +104,16 @@ public class BudgetTrackDetailsFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mTrackID = getArguments().getString(BudgetInfoFragment.BUDGETINFOITEM_TRACKID_PARAM);
+            mTrackID = getArguments().getString(BudgetInfoFragment.CLICK_TRACKID_PARAM);
             mInfoListRowBitmapRender = getArguments().getParcelable(ARG_ROW_BITMAP_RENDER);
 
             try {
                 //Happens on UI thread
                 mTrackDataFromDB = DBHelper.retrieveTrack(mTrackID);
             } catch (CouchbaseLiteException e) {
-                e.printStackTrace();
+
+                //e.printStackTrace();
+                //Keep going, only mean ID is not valid (that happens in multifragments configuration)
             }
 
             //mParam2 = getArguments().getString(ARG_PARAM2);
@@ -126,16 +128,17 @@ public class BudgetTrackDetailsFragment extends Fragment
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.budgetinfotrackdetails_mapfragment)).getMapAsync(this);
 
         mInfoListRowImageView = ((ImageView)inflatedView.findViewById(R.id.budgettrackdetails_row_imageview));
-        mInfoListRowImageView.setVisibility(View.INVISIBLE);    //Will be made Visible after enter animation
-        mInfoListRowImageView.setImageBitmap(mInfoListRowBitmapRender);
 
+        if (mInfoListRowBitmapRender != null)   //Can be null on tablet configuration
+        {
 
-        //Oddly I have to adjust the ImageView height myself to twice the height of the Bitmap
-        //It took ages to find out and is out of reach of my understanding
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mInfoListRowImageView.getLayoutParams();
-        params.width = mInfoListRowBitmapRender.getWidth();
-        params.height = mInfoListRowBitmapRender.getHeight()*2;
-        mInfoListRowImageView.setLayoutParams(params);
+            mInfoListRowImageView.setImageBitmap(mInfoListRowBitmapRender);
+
+            //Oddly I have to adjust the ImageView height myself to twice the height of the Bitmap
+            //It took ages to find out and is out of reach of my understanding
+            //It only affects how the fragment appears on phone (one fragment on screen)
+            applyWeirdFixForPhones();
+        }
 
         mDataLoadingProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgettrackdetails_progressBar);
         // Inflate the layout for this fragment
@@ -149,6 +152,9 @@ public class BudgetTrackDetailsFragment extends Fragment
     }
 
     //On enter animation end we want to switch the Bitmap ImageView visibility
+    //That doesn't happen in multiscreen configuration (fragments are always displayed)
+    //Maybe using an anim as a way to switch the fragment layout ImageView fr the row would
+    //fix the disgracious content overlapping with the animated row
     @Override
     public Animation onCreateAnimation (int transit, boolean enter, int nextAnim) {
         //Check if the superclass already created the animation
@@ -166,11 +172,12 @@ public class BudgetTrackDetailsFragment extends Fragment
                 anim.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
-
+                        mInfoListRowImageView.setVisibility(View.INVISIBLE);
                     }
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
+                        getActivity().findViewById(R.id.animatedrow_bitmap_holder_imageview).setVisibility(View.INVISIBLE);
                         mInfoListRowImageView.setVisibility(View.VISIBLE);
                     }
 
@@ -243,7 +250,12 @@ public class BudgetTrackDetailsFragment extends Fragment
         mMap.setMyLocationEnabled(false);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 10));
 
-        if(mTrackDataFromDB.containsKey("points"))  //Already retrived from database
+        setupUIandTask();
+    }
+
+    private void setupUIandTask(){
+
+        if(mTrackDataFromDB != null && mTrackDataFromDB.containsKey("points"))  //Already retrived from database
         {
             mDataLoadingProgressBar.setVisibility(View.GONE);
             //AddPolyLine
@@ -265,39 +277,71 @@ public class BudgetTrackDetailsFragment extends Fragment
         }
     }
 
+    public void updateWithNewTrack(String _trackID, Bitmap _infoListRowBitmapRender){
+        mTrackID = _trackID;
+        mInfoListRowBitmapRender = _infoListRowBitmapRender;
+
+        try {
+            //Happens on UI thread
+            mTrackDataFromDB = DBHelper.retrieveTrack(mTrackID);
+        } catch (CouchbaseLiteException e) {
+
+            //e.printStackTrace();
+            //Keep going, only mean ID is not valid
+        }
+
+        setupUIandTask();
+
+        mInfoListRowImageView.setImageBitmap(mInfoListRowBitmapRender);
+
+        //Oddly I have to adjust the ImageView height myself to twice the height of the Bitmap
+        //It took ages to find out and is out of reach of my understanding
+        applyWeirdFixForPhones();
+
+    }
+
+    private void applyWeirdFixForPhones(){
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mInfoListRowImageView.getLayoutParams();
+        params.width = mInfoListRowBitmapRender.getWidth();
+        params.height = mInfoListRowBitmapRender.getHeight()*2;
+        mInfoListRowImageView.setLayoutParams(params);
+    }
+
     private void addTrackPolylineToMap(){
         List<LatLng> latLngList = new ArrayList<>();
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
-        //TODO: work out why the ValueType for "points" key is not stable
-        //I'm mystified, if anyone has any kind of explanation, I want to understand !
-        //Spent a few hours trying to understand it, to none available
-        try{
-            Iterable<TrackPoint> listTp = (Iterable<TrackPoint>)(mTrackDataFromDB.get("points"));
-            for(TrackPoint tp : listTp){
-                final LatLng latLng = new LatLng(tp.getLat(), tp.getLon());
-                latLngList.add(latLng);
-                boundsBuilder.include(latLng);
-            }
+        if(mTrackDataFromDB.get("points") != null) {
+            //TODO: work out why the ValueType for "points" key is not stable
+            //I'm mystified, if anyone has any kind of explanation, I want to understand !
+            //Spent a few hours trying to understand it, to none available
+            try {
+                Iterable<TrackPoint> listTp = (Iterable<TrackPoint>) (mTrackDataFromDB.get("points"));
+                for (TrackPoint tp : listTp) {
+                    final LatLng latLng = new LatLng(tp.getLat(), tp.getLon());
+                    latLngList.add(latLng);
+                    boundsBuilder.include(latLng);
+                }
 
-        }catch (ClassCastException e){
-            Iterable<LinkedHashMap> listHm = (Iterable<LinkedHashMap>)(mTrackDataFromDB.get("points"));
-            for(LinkedHashMap hm : listHm){
-                final LatLng latLng = new LatLng((Double) hm.get("lat"), (Double) hm.get("lon"));
-                latLngList.add(latLng);
-                boundsBuilder.include(latLng);
+            } catch (ClassCastException e) {
+                Iterable<LinkedHashMap> listHm = (Iterable<LinkedHashMap>) (mTrackDataFromDB.get("points"));
+                for (LinkedHashMap hm : listHm) {
+                    final LatLng latLng = new LatLng((Double) hm.get("lat"), (Double) hm.get("lon"));
+                    latLngList.add(latLng);
+                    boundsBuilder.include(latLng);
+                }
             }
+            //End weird hack
+
+            mTrackBounds = boundsBuilder.build();
+
+            //TODO: Add paid/free color distinction + map legend
+            //TODO: Animate camera to contain Track at appropriate zoom level
+            mMap.addPolyline(new PolylineOptions()
+                    .addAll(latLngList)
+                    .width(5)
+                    .color(Color.BLUE));
         }
-        //End weird hack
-
-        mTrackBounds = boundsBuilder.build();
-
-        //TODO: Add paid/free color distinction + map legend
-        //TODO: Animate camera to contain Track at appropriate zoom level
-        mMap.addPolyline(new PolylineOptions()
-                .addAll(latLngList)
-                .width(5)
-                .color(Color.BLUE));
     }
 
     private void animateToTrack(){
@@ -344,14 +388,18 @@ public class BudgetTrackDetailsFragment extends Fragment
         protected void onPostExecute(Void aVoid){
             super.onPostExecute(aVoid);
 
-            //addPolyline
-            BudgetTrackDetailsFragment.this.addTrackPolylineToMap();
-            //remove progressBar
-            mDataLoadingProgressBar.setVisibility(View.GONE);
-            //Animates camera
-            animateToTrack();
-            //enables map interactions
-            mMap.getUiSettings().setAllGesturesEnabled(true);
+            if(mTrackDataFromDB != null)
+            {
+                //addPolyline
+                BudgetTrackDetailsFragment.this.addTrackPolylineToMap();
+                //remove progressBar
+                mDataLoadingProgressBar.setVisibility(View.GONE);
+                //Animates camera
+                animateToTrack();
+                //enables map interactions
+                mMap.getUiSettings().setAllGesturesEnabled(true);
+            }
+
         }
 
     }
