@@ -99,19 +99,19 @@ public class MainActivity extends ActionBarActivity
     public void onNavigationDrawerItemSelected(int position) {
 
         //En attendant d'avoir un menu bien rempli, juste pour tester la class NearbyFragment
-        if (position == 4){
+        if (position == 0){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.start_fragment_container, NearbyFragment.newInstance(position + 1))
                     .commit();
         }
-        else if (position == 3){
+        else if (position == 2){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.start_fragment_container, BudgetOverviewFragment.newInstance(position + 1))
                     .commit();
         }
-        else if (position == 2){
+        else if (position == 1){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.start_fragment_container, FavoritesFragment.newInstance(position + 1))
@@ -132,19 +132,14 @@ public class MainActivity extends ActionBarActivity
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section1);
+                mTitle = getString(R.string.title_section_nearby);
                 break;
             case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
                 mTitle = getString(R.string.title_section_favorites);
                 break;
-            case 4:
+            case 3:
                 mTitle = getString(R.string.title_section_budget);
                 break;
-            case 5:
-                mTitle = getString(R.string.title_section_nearby);
         }
         mSubtitle = "";
 
