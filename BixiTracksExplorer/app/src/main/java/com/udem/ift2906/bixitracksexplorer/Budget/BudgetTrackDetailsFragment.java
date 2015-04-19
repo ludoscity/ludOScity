@@ -1,7 +1,6 @@
 package com.udem.ift2906.bixitracksexplorer.Budget;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,9 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,7 +31,9 @@ import com.udem.ift2906.bixitracksexplorer.R;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.GetTrackFromTimeUTCKeyStringResponse;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.TrackPoint;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class BudgetTrackDetailsFragment extends Fragment
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     //private static final String TRACK_ID = "param1";
-    private static final String ARG_ROW_BITMAP_RENDER = "infolistRowBitmapRender";
+    private static final String ARG_BUDGETINFOITEM_LIST = "budgetInfoItemList";
 
     //Can't be of type Track because we add data in Couchbase documents that wouldn't
     //map to API model fields
@@ -62,9 +62,9 @@ public class BudgetTrackDetailsFragment extends Fragment
     //is good enough to not impact UI responsiveness.
     private static Map<String,Object> mTrackDataFromDB;
 
-    // TODO: Rename and change types of parameters
-    private String mTrackID;
-    //private String mParam2;
+    private int mBudgetInfoItemPos;
+    private List<BudgetInfoItem> mBudgetInfoItemList;
+    private int mCurrentSortCriteria;
 
     private OnBudgetTrackDetailsFragmentInteractionListener mListener;
 
@@ -73,23 +73,23 @@ public class BudgetTrackDetailsFragment extends Fragment
 
     private ProgressBar mDataLoadingProgressBar;
 
-    private Bitmap mInfoListRowBitmapRender;
-    private ImageView mInfoListRowImageView;
+    private View mInfoListRowView;
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param trackID Parameter 1.
-     * @param _infoListRowBitmapRender
+     * @param _budgetInfoItemPos where did the click happened.
+     * @param _budgetInfoItemList the actual list of BudgetInfoItem
      * @return A new instance of fragment BudgetTrackDetailsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static BudgetTrackDetailsFragment newInstance(String trackID, Bitmap _infoListRowBitmapRender) {
+    public static BudgetTrackDetailsFragment newInstance(int _budgetInfoItemPos, ArrayList<BudgetInfoItem> _budgetInfoItemList, int _sortCriteria) {
         BudgetTrackDetailsFragment fragment = new BudgetTrackDetailsFragment();
         Bundle args = new Bundle();
-        args.putString(BudgetInfoFragment.CLICK_TRACKID_PARAM, trackID);
-        args.putParcelable(ARG_ROW_BITMAP_RENDER, _infoListRowBitmapRender);
+        args.putInt(BudgetInfoFragment.CLICK_ITEMPOS_PARAM, _budgetInfoItemPos);
+        args.putInt(BudgetInfoFragment.CLICK_SORT_CRITERIA_PARAM, _sortCriteria);
+        args.putParcelableArrayList(ARG_BUDGETINFOITEM_LIST, _budgetInfoItemList);
         //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         fragment.setHasOptionsMenu(true);
@@ -104,21 +104,21 @@ public class BudgetTrackDetailsFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mTrackID = getArguments().getString(BudgetInfoFragment.CLICK_TRACKID_PARAM);
-            mInfoListRowBitmapRender = getArguments().getParcelable(ARG_ROW_BITMAP_RENDER);
+            mBudgetInfoItemPos = getArguments().getInt(BudgetInfoFragment.CLICK_ITEMPOS_PARAM);
+            mBudgetInfoItemList = getArguments().getParcelableArrayList(ARG_BUDGETINFOITEM_LIST);
+            mCurrentSortCriteria = getArguments().getInt(BudgetInfoFragment.CLICK_SORT_CRITERIA_PARAM);
 
-            try {
-                //Happens on UI thread
-                mTrackDataFromDB = DBHelper.retrieveTrack(mTrackID);
-            } catch (CouchbaseLiteException e) {
+            if (mBudgetInfoItemPos != -1) {
 
-                //e.printStackTrace();
-                //Keep going, only mean ID is not valid (that happens in multifragments configuration)
+                try {
+                    //Happens on UI thread
+                    mTrackDataFromDB = DBHelper.retrieveTrack(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString());
+                } catch (CouchbaseLiteException e) {
+
+                    e.printStackTrace();
+                }
             }
-
-            //mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -127,18 +127,8 @@ public class BudgetTrackDetailsFragment extends Fragment
         if (mMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.budgetinfotrackdetails_mapfragment)).getMapAsync(this);
 
-        mInfoListRowImageView = ((ImageView)inflatedView.findViewById(R.id.budgettrackdetails_row_imageview));
-
-        if (mInfoListRowBitmapRender != null)   //Can be null on tablet configuration
-        {
-
-            mInfoListRowImageView.setImageBitmap(mInfoListRowBitmapRender);
-
-            //Oddly I have to adjust the ImageView height myself to twice the height of the Bitmap
-            //It took ages to find out and is out of reach of my understanding
-            //It only affects how the fragment appears on phone (one fragment on screen)
-            applyWeirdFixForPhones();
-        }
+        mInfoListRowView = inflatedView.findViewById(R.id.budgettrackdetails_row_view);
+        mInfoListRowView.setActivated(true);
 
         mDataLoadingProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgettrackdetails_progressBar);
         // Inflate the layout for this fragment
@@ -172,13 +162,13 @@ public class BudgetTrackDetailsFragment extends Fragment
                 anim.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
-                        mInfoListRowImageView.setVisibility(View.INVISIBLE);
+                        mInfoListRowView.setVisibility(View.INVISIBLE);
                     }
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         getActivity().findViewById(R.id.animatedrow_bitmap_holder_imageview).setVisibility(View.INVISIBLE);
-                        mInfoListRowImageView.setVisibility(View.VISIBLE);
+                        mInfoListRowView.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -202,13 +192,6 @@ public class BudgetTrackDetailsFragment extends Fragment
                 .findFragmentById(R.id.budgetinfotrackdetails_mapfragment);
         if (f != null)
             getActivity().getFragmentManager().beginTransaction().remove(f).commit();
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onBudgetTrackDetailsFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -253,7 +236,20 @@ public class BudgetTrackDetailsFragment extends Fragment
         setupUIandTask();
     }
 
+    private class ViewHolder{
+        TextView sortCriteriaLine1;
+        TextView sortCriteriaLine2;
+        TextView startStationName;
+        TextView endStationName;
+        TextView additionalInfoLine1;
+        TextView additionalInfoLine2;
+    }
+
     private void setupUIandTask(){
+
+        //Add two screen config here
+
+        setupInfoItemView();
 
         if(mTrackDataFromDB != null && mTrackDataFromDB.containsKey("points"))  //Already retrived from database
         {
@@ -273,38 +269,69 @@ public class BudgetTrackDetailsFragment extends Fragment
             //Display progressBar
             mDataLoadingProgressBar.setVisibility(View.VISIBLE);
             //Start retrieve task
-            new RetrieveFullTrackFromBackend().execute(mTrackID);
+            new RetrieveFullTrackFromBackend().execute(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString());
         }
     }
 
-    public void updateWithNewTrack(String _trackID, Bitmap _infoListRowBitmapRender){
-        mTrackID = _trackID;
-        mInfoListRowBitmapRender = _infoListRowBitmapRender;
+    private void setupInfoItemView(){
+
+        ViewHolder holder = (ViewHolder) mInfoListRowView.getTag();
+
+        if (holder == null){
+            holder = new ViewHolder();
+
+            holder.sortCriteriaLine1 = (TextView) mInfoListRowView.findViewById(R.id.budgetinfoitem_sort_criteria_line1);
+            holder.sortCriteriaLine2 = (TextView) mInfoListRowView.findViewById(R.id.budgetinfoitem_sort_criteria_line2);
+            holder.startStationName = (TextView) mInfoListRowView.findViewById(R.id.budgetinfoitem_start_station_name);
+            holder.endStationName = (TextView) mInfoListRowView.findViewById(R.id.budgetinfoitem_end_station_name);
+            holder.additionalInfoLine1 = (TextView) mInfoListRowView.findViewById(R.id.budgetinfoitem_info_line1);
+            holder.additionalInfoLine2 = (TextView) mInfoListRowView.findViewById(R.id.budgetinfoitem_info_line2);
+            mInfoListRowView.setTag(holder);
+        }
+
+        holder.startStationName.setText(mBudgetInfoItemList.get(mBudgetInfoItemPos).getStartStationName());
+        holder.endStationName.setText(mBudgetInfoItemList.get(mBudgetInfoItemPos).getEndStationName());
+
+        if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_COST) {
+            holder.sortCriteriaLine1.setText(String.format("%.2f", mBudgetInfoItemList.get(mBudgetInfoItemPos).getCost()) + "$");
+            holder.sortCriteriaLine2.setVisibility(View.GONE);
+            holder.additionalInfoLine1.setText(String.valueOf(mBudgetInfoItemList.get(mBudgetInfoItemPos).getDurationInMinutes()));
+            holder.additionalInfoLine2.setVisibility(View.VISIBLE);
+            holder.additionalInfoLine2.setText("min");
+        }
+        else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION){
+            holder.sortCriteriaLine1.setText(String.valueOf(mBudgetInfoItemList.get(mBudgetInfoItemPos).getDurationInMinutes()));
+            holder.sortCriteriaLine2.setVisibility(View.VISIBLE);
+            holder.sortCriteriaLine2.setText("min");
+            holder.additionalInfoLine1.setText(String.format("%.2f", mBudgetInfoItemList.get(mBudgetInfoItemPos).getCost()) + "$");
+            holder.additionalInfoLine2.setVisibility(View.GONE);
+        }
+        else{   //SORT_CRITERIA_DATE
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(mBudgetInfoItemList.get(mBudgetInfoItemPos).getTimestampAsDate());
+
+            holder.sortCriteriaLine1.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
+            holder.sortCriteriaLine2.setVisibility(View.VISIBLE);
+            holder.sortCriteriaLine2.setText(new SimpleDateFormat("MMM").format(cal.getTime()));
+            holder.additionalInfoLine1.setText(String.format("%.2f", mBudgetInfoItemList.get(mBudgetInfoItemPos).getCost()) + "$");
+            holder.additionalInfoLine2.setVisibility(View.GONE);
+        }
+    }
+
+    public void updateWithNewTrack(int _budgetInfoItemPos, ArrayList<BudgetInfoItem> _budgetInfoItemList, int _sortCriteria){
+        mBudgetInfoItemList = _budgetInfoItemList;
+        mBudgetInfoItemPos = _budgetInfoItemPos;
+        mCurrentSortCriteria = _sortCriteria;
 
         try {
             //Happens on UI thread
-            mTrackDataFromDB = DBHelper.retrieveTrack(mTrackID);
+            mTrackDataFromDB = DBHelper.retrieveTrack(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString());
         } catch (CouchbaseLiteException e) {
 
-            //e.printStackTrace();
-            //Keep going, only mean ID is not valid
+            e.printStackTrace();
         }
 
         setupUIandTask();
-
-        mInfoListRowImageView.setImageBitmap(mInfoListRowBitmapRender);
-
-        //Oddly I have to adjust the ImageView height myself to twice the height of the Bitmap
-        //It took ages to find out and is out of reach of my understanding
-        applyWeirdFixForPhones();
-
-    }
-
-    private void applyWeirdFixForPhones(){
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mInfoListRowImageView.getLayoutParams();
-        params.width = mInfoListRowBitmapRender.getWidth();
-        params.height = mInfoListRowBitmapRender.getHeight()*2;
-        mInfoListRowImageView.setLayoutParams(params);
     }
 
     private void addTrackPolylineToMap(){
@@ -373,9 +400,9 @@ public class BudgetTrackDetailsFragment extends Fragment
 
             if (fullTrackResponse.getTrack() != null){
                 try {
-                    DBHelper.putNewTrackPropertyAndSave(mTrackID, "points", fullTrackResponse.getTrack().getPoints());
+                    DBHelper.putNewTrackPropertyAndSave(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString(), "points", fullTrackResponse.getTrack().getPoints());
                     //Happens in ASyncTask
-                    mTrackDataFromDB = DBHelper.retrieveTrack(mTrackID);
+                    mTrackDataFromDB = DBHelper.retrieveTrack(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString());
                 } catch (CouchbaseLiteException e) {
                     e.printStackTrace();
                 }
@@ -399,8 +426,6 @@ public class BudgetTrackDetailsFragment extends Fragment
                 //enables map interactions
                 mMap.getUiSettings().setAllGesturesEnabled(true);
             }
-
         }
-
     }
 }
