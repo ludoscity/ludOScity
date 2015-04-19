@@ -13,17 +13,14 @@
             android:name="com.google.android.gms.maps.MapFragment"
             android:id="@+id/budgetinfotrackdetails_mapfragment"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"/>
 
-        <ImageView
+        <include
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:scaleType="matrix"
-            android:adjustViewBounds="true"
-
-            android:id="@+id/budgettrackdetails_row_imageview" />
+            layout="@layout/budgetinfolist_item"
+            android:id="@+id/budgettrackdetails_row_view"/>
 
         </LinearLayout>
 

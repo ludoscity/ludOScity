@@ -2,7 +2,6 @@ package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -243,7 +242,7 @@ public class MainActivity extends ActionBarActivity
             if(endContainer != null){
                 endContainer.setVisibility(View.VISIBLE);
 
-                BudgetTrackDetailsFragment newEndFragment = BudgetTrackDetailsFragment.newInstance("null", null);
+                BudgetTrackDetailsFragment newEndFragment = BudgetTrackDetailsFragment.newInstance(-1, null, -1);
 
                 transaction.replace(R.id.end_fragment_container, newEndFragment);
             }
@@ -263,7 +262,7 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onBudgetInfoFragmentInteraction(Uri _uri, Bitmap _infoListRowBitmapRender) {
+    public void onBudgetInfoFragmentInteraction(Uri _uri, ArrayList<BudgetInfoItem> _budgetInfoItemList) {
         if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_SORT_CHANGED_PATH)){
 
             mSubtitle = _uri.getQueryParameter(BudgetInfoFragment.SORT_CHANGED_SUBTITLE_PARAM);
@@ -275,7 +274,9 @@ public class MainActivity extends ActionBarActivity
             if (endFragmentContainer == null){
                 //One fragment at a time on screen
 
-                BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(_uri.getQueryParameter(BudgetInfoFragment.CLICK_TRACKID_PARAM), _infoListRowBitmapRender );
+                BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_ITEMPOS_PARAM)),
+                        _budgetInfoItemList,
+                        Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_SORT_CRITERIA_PARAM)));
                 mSubtitle = getString(R.string.budgettrackdetails_subtitle);
 
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -296,7 +297,9 @@ public class MainActivity extends ActionBarActivity
                 //retrieve it
                 BudgetTrackDetailsFragment detailsFragment = (BudgetTrackDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.end_fragment_container);
                 //pass it new data
-                detailsFragment.updateWithNewTrack(_uri.getQueryParameter(BudgetInfoFragment.CLICK_TRACKID_PARAM), _infoListRowBitmapRender);
+                detailsFragment.updateWithNewTrack(Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_ITEMPOS_PARAM)),
+                        _budgetInfoItemList,
+                        Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_SORT_CRITERIA_PARAM)));
             }
         }
 

@@ -14,7 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -32,6 +32,7 @@ import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.T
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,25 +55,30 @@ public class BudgetOverviewFragment extends Fragment {
     private TextView mAccessCostValueTextView;
     private TextView mUseCostValueTextView;
     private TextView mTotalCostValueTextView;
-    private ProgressBar mProgressBar;
+    private RelativeLayout mLoadingInterfaceLayout;
     private LinearLayout mInterfaceLayout;
+
+    private TextView mLoadingProgressTextView;
 
     private ImageButton mAccessCostInfoButton;
     private ImageButton mUseCostInfoButton;
 
     private String mSelectedPeriod;
 
-    private float mSeasonAccessCost;
-    private float mSeasonUseCost;
+    private static float mSeasonAccessCost;
+    private static float mSeasonUseCost;
 
-    private float mMonthAccessCost;
-    private float mMonthUseCost;
+    private static float mMonthAccessCost;
+    private static float mMonthUseCost;
 
-    private boolean mDataLoaded = false;
+    private static boolean mCostCalculated = false;
+
+    private static boolean mDataLoaded = false;
 
     private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
 
     private RetrieveTrackDataAndProcessCostTask mWebLoadingTask = null;
+    private ProcessCostTask mProcessCostTask = null;
 
     //Bixi tarification grid
     private static final long m45minInms = 2700000;
@@ -83,7 +89,7 @@ public class BudgetOverviewFragment extends Fragment {
     private static final float mEach30minAfter90 = 7.f;
 
     //TODO: have this configurable through app settings
-    private static boolean RELOAD_BUDGET_DATA_FROM_WEB_ALWAYS = false;
+    private static boolean RELOAD_BUDGET_DATA_FROM_WEB_ALWAYS = true;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -123,8 +129,10 @@ public class BudgetOverviewFragment extends Fragment {
             }
         });
 
-        mProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgetoverview_progressBar);
+        mLoadingInterfaceLayout = (RelativeLayout) inflatedView.findViewById(R.id.budgetoverview_loading_interface);
         mInterfaceLayout = (LinearLayout) inflatedView.findViewById(R.id.budgetoverview_interface);
+
+        mLoadingProgressTextView = (TextView)inflatedView.findViewById(R.id.budgetoverview_progressbar_label);
 
         setupInterface();
 
@@ -188,13 +196,11 @@ public class BudgetOverviewFragment extends Fragment {
             mWebLoadingTask.execute();
         }
         else{
-            try {
-                processCost();
-            } catch (CouchbaseLiteException e) {
-                e.printStackTrace();
+            if (!mCostCalculated) {
+                mProcessCostTask = new ProcessCostTask();
+                mProcessCostTask.execute();
             }
         }
-
     }
 
     @Override
@@ -204,6 +210,11 @@ public class BudgetOverviewFragment extends Fragment {
         {
             mWebLoadingTask.cancel(false);
             mWebLoadingTask = null;
+        }
+        if(mProcessCostTask != null && !mProcessCostTask.isCancelled())
+        {
+            mProcessCostTask.cancel(false);
+            mProcessCostTask = null;
         }
     }
 
@@ -258,14 +269,14 @@ public class BudgetOverviewFragment extends Fragment {
     }
 
     private void setupInterface(){
-        if (mDataLoaded) {
-            mProgressBar.setVisibility(View.GONE);
+        if (mDataLoaded && mCostCalculated) {
+            mLoadingInterfaceLayout.setVisibility(View.GONE);
             mInterfaceLayout.setVisibility(View.VISIBLE);
             mUseCostInfoButton.setEnabled(true);
         }
         else
         {
-            mProgressBar.setVisibility(View.VISIBLE);
+            mLoadingInterfaceLayout.setVisibility(View.VISIBLE);
             mInterfaceLayout.setVisibility(View.INVISIBLE);
             mUseCostInfoButton.setEnabled(false);
             mAccessCostInfoButton.setEnabled(false);
@@ -277,7 +288,10 @@ public class BudgetOverviewFragment extends Fragment {
         mSeasonAccessCost = mSeasonUseCost = 0.f;
         mMonthAccessCost = mMonthUseCost = 0.f;
 
-        for (QueryRow qr : DBHelper.getAllTracks())
+        int trackCount = 0;
+        List<QueryRow> allTracks = DBHelper.getAllTracks();
+
+        for (QueryRow qr : allTracks)
         {
             Document d = qr.getDocument();
 
@@ -302,7 +316,20 @@ public class BudgetOverviewFragment extends Fragment {
                     trackDuration));
 
             mSeasonUseCost += trackCost;
+
+            ++trackCount;
+
+            String progress = getString(R.string.budgetoverview_loading_costs) + trackCount + "/" + allTracks.size();
+
+            if (mProcessCostTask != null){
+                mProcessCostTask.publish(progress);
+            }
+            if (mWebLoadingTask != null){
+                mWebLoadingTask.publish(progress);
+            }
         }
+
+        mCostCalculated = true;
     }
 
     private float processCostForDuration(long remainingTime, float accumulatedCost, int costStep) {
@@ -342,9 +369,11 @@ public class BudgetOverviewFragment extends Fragment {
         public void onBudgetOverviewFragmentInteraction(Uri uri, ArrayList<BudgetInfoItem> _budgetInfoItemList);
     }
 
-    public class RetrieveTrackDataAndProcessCostTask extends AsyncTask<Void, Void, Void> {
+    public class RetrieveTrackDataAndProcessCostTask extends AsyncTask<Void, String, Void> {
 
-
+        public void publish(String progress){
+            publishProgress(progress);
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -362,7 +391,10 @@ public class BudgetOverviewFragment extends Fragment {
                 collection.setItems(listTracksResponse.getTrackList());
             }
 
-            for (Track t : collection.getItems())
+            List<Track> trackList = collection.getItems();
+            int trackCounter = 0;
+
+            for (Track t : trackList)
             {
 
                 try {
@@ -370,6 +402,11 @@ public class BudgetOverviewFragment extends Fragment {
                 } catch (CouchbaseLiteException | JSONException e) {
                     e.printStackTrace();
                 }
+
+                ++trackCounter;
+
+                String progress = getString(R.string.budgetoverview_loading_tracks) + trackCounter +"/" + trackList.size();
+                publishProgress(progress);
             }
 
             try {
@@ -379,6 +416,11 @@ public class BudgetOverviewFragment extends Fragment {
             }
 
             return null;
+        }
+
+        protected void onProgressUpdate(String... progress) {
+            mLoadingProgressTextView.setText(progress[0]);
+
         }
 
 
@@ -401,6 +443,47 @@ public class BudgetOverviewFragment extends Fragment {
 
             mDataLoaded = true;
 
+            setupInterface();
+        }
+    }
+
+    public class ProcessCostTask extends AsyncTask<Void, String, Void> {
+
+        public void publish(String progress){
+            publishProgress(progress);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            try {
+                processCost();
+            } catch (CouchbaseLiteException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        protected void onProgressUpdate(String... progress) {
+            mLoadingProgressTextView.setText(progress[0]);
+
+        }
+
+        @Override
+        protected void onCancelled (Void aVoid){
+            super.onCancelled(aVoid);
+
+            //Task is cancelled if fragment is detached
+
+        }
+
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            updateCost();
             setupInterface();
         }
     }

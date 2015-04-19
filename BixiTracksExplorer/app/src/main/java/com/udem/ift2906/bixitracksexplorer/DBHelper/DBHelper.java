@@ -37,6 +37,7 @@ public class DBHelper {
     private static Manager mManager = null;
     private static final String mDbName = "appdb";
     private static Context context;
+    private static boolean mGotTracks;
     //TODO SCRAP THIS
     private static long RANDOM_ID_FROM_CITIES_BIKES_API = 358;
 
@@ -45,6 +46,7 @@ public class DBHelper {
     public static void init(Activity activity, Context c) throws IOException, CouchbaseLiteException {
         mManager = new Manager(new AndroidContext(activity), Manager.DEFAULT_OPTIONS);
         context = c;
+        mGotTracks = !getAllTracks().isEmpty();
     }
 
     public static void deleteDB() throws CouchbaseLiteException {
@@ -53,7 +55,7 @@ public class DBHelper {
     }
 
     public static boolean gotTracks() throws CouchbaseLiteException {
-        return !getAllTracks().isEmpty();
+        return mGotTracks;
     }
 
     /*public static Manager get() {

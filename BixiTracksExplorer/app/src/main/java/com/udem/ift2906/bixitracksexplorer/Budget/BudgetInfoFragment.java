@@ -36,7 +36,8 @@ public class BudgetInfoFragment extends ListFragment {
     public static final String BUDGETINFOITEM_SORT_CHANGED_PATH = "budgetinfoitem_sort_changed";
     public static final String SORT_CHANGED_SUBTITLE_PARAM = "new_sort_subtitle";
     public static final String BUDGETINFOITEM_CLICK_PATH = "budgetinfoitem_click";
-    public static final String CLICK_TRACKID_PARAM = "track_id";
+    public static final String CLICK_ITEMPOS_PARAM = "item_pos";
+    public static final String CLICK_SORT_CRITERIA_PARAM = "sort_criteria";
 
     private String mInfoType;
     private String mTimePeriod;
@@ -205,7 +206,7 @@ public class BudgetInfoFragment extends ListFragment {
         builder.appendQueryParameter(SORT_CHANGED_SUBTITLE_PARAM, subtitle);
 
         if (mListener != null){
-            mListener.onBudgetInfoFragmentInteraction(builder.build(), null);
+            mListener.onBudgetInfoFragmentInteraction(builder.build(), mBudgetInfoItems);
         }
     }
 
@@ -224,43 +225,47 @@ public class BudgetInfoFragment extends ListFragment {
 
         getListView().setItemChecked(position, true);
 
-        //Let's animate !!
-        //Render the View representing the clicked row in a Bitmap
-        //BitmapFactory.decodeResource(R.layout.budgetinfolist_item);
-        Bitmap viewCapture;
+        FrameLayout endFragment = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
+        if (endFragment == null){
+            //Let's animate !!
+            //Render the View representing the clicked row in a Bitmap
+            //BitmapFactory.decodeResource(R.layout.budgetinfolist_item);
+            Bitmap viewCapture;
 
-        v.setDrawingCacheEnabled(true);
-        viewCapture = Bitmap.createBitmap(v.getDrawingCache());
-        v.setDrawingCacheEnabled(false);
+            v.setDrawingCacheEnabled(true);
+            viewCapture = Bitmap.createBitmap(v.getDrawingCache());
+            v.setDrawingCacheEnabled(false);
 
-        Pair<Integer,Integer> targetAbsoluteXY = calculateRowAnimTarget(v);
+            Pair<Integer,Integer> targetAbsoluteXY = calculateRowAnimTarget(v);
 
-        mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
+            mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
 
-        //... set initial position...
-        mAnimatedrowBitmapHolderImageView.setX(v.getX());
-        mAnimatedrowBitmapHolderImageView.setY(v.getY());
+            //... set initial position...
+            mAnimatedrowBitmapHolderImageView.setX(v.getX());
+            mAnimatedrowBitmapHolderImageView.setY(v.getY());
 
-        //Setup animation
-        mAnimatedrowBitmapHolderImageView.animate().x(targetAbsoluteXY.first)
-                .y(targetAbsoluteXY.second)
-                .setDuration(1000)
-                .setInterpolator(new LinearInterpolator());
+            //Setup animation
+            mAnimatedrowBitmapHolderImageView.animate().x(targetAbsoluteXY.first)
+                    .y(targetAbsoluteXY.second)
+                    .setDuration(1000)
+                    .setInterpolator(new LinearInterpolator());
 
-        //Make Bitmap holder ImageView visible
-        mAnimatedrowBitmapHolderImageView.setVisibility(View.VISIBLE);
+            //Make Bitmap holder ImageView visible
+            mAnimatedrowBitmapHolderImageView.setVisibility(View.VISIBLE);
 
-        //Animate !
-        mAnimatedrowBitmapHolderImageView.animate().start();
+            //Animate !
+            mAnimatedrowBitmapHolderImageView.animate().start();
+        }
 
         if (mListener != null){
             Uri.Builder builder = new Uri.Builder();
 
             builder.appendPath(BUDGETINFOITEM_CLICK_PATH)
-                    .appendQueryParameter(CLICK_TRACKID_PARAM, mBudgetInfoItems.get(position).getIDAsString());
+                    .appendQueryParameter(CLICK_ITEMPOS_PARAM, Integer.toString(position))
+                    .appendQueryParameter(CLICK_SORT_CRITERIA_PARAM, Integer.toString(mCurrentSortCriteria));
 
-            //Bitmap implements Parcelable. We pass it around to BudgetTrackDetailsFragment
-            mListener.onBudgetInfoFragmentInteraction(builder.build(), viewCapture);
+            //BugetInfoItem implements Parcelable.
+            mListener.onBudgetInfoFragmentInteraction(builder.build(), mBudgetInfoItems);
         }
     }
 
@@ -308,7 +313,7 @@ public class BudgetInfoFragment extends ListFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onBudgetInfoFragmentInteraction(Uri _uri, Bitmap _infoListRowBitmapRender);
+        public void onBudgetInfoFragmentInteraction(Uri _uri, ArrayList<BudgetInfoItem> _budgetInfoItemList);
     }
 
 }
