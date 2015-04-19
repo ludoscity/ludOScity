@@ -19,6 +19,8 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/generic_please_wait"
             android:id="@+id/budgetoverview_progressbar_label"
+            android:singleLine="false"
+            android:gravity="center_horizontal"
             android:layout_centerInParent="true"
             />
 

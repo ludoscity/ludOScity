@@ -89,7 +89,7 @@ public class BudgetOverviewFragment extends Fragment {
     private static final float mEach30minAfter90 = 7.f;
 
     //TODO: have this configurable through app settings
-    private static boolean RELOAD_BUDGET_DATA_FROM_WEB_ALWAYS = false;
+    private static boolean RELOAD_BUDGET_DATA_FROM_WEB_ALWAYS = true;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -319,8 +319,13 @@ public class BudgetOverviewFragment extends Fragment {
 
             ++trackCount;
 
-            if (mProcessCostTask!= null){
-                mProcessCostTask.publish(getString(R.string.budgetoverview_loading_costs) + trackCount + "/" + allTracks.size()  );
+            String progress = getString(R.string.budgetoverview_loading_costs) + trackCount + "/" + allTracks.size();
+
+            if (mProcessCostTask != null){
+                mProcessCostTask.publish(progress);
+            }
+            if (mWebLoadingTask != null){
+                mWebLoadingTask.publish(progress);
             }
         }
 
@@ -364,7 +369,11 @@ public class BudgetOverviewFragment extends Fragment {
         public void onBudgetOverviewFragmentInteraction(Uri uri, ArrayList<BudgetInfoItem> _budgetInfoItemList);
     }
 
-    public class RetrieveTrackDataAndProcessCostTask extends AsyncTask<Void, Void, Void> {
+    public class RetrieveTrackDataAndProcessCostTask extends AsyncTask<Void, String, Void> {
+
+        public void publish(String progress){
+            publishProgress(progress);
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -382,7 +391,10 @@ public class BudgetOverviewFragment extends Fragment {
                 collection.setItems(listTracksResponse.getTrackList());
             }
 
-            for (Track t : collection.getItems())
+            List<Track> trackList = collection.getItems();
+            int trackCounter = 0;
+
+            for (Track t : trackList)
             {
 
                 try {
@@ -390,6 +402,11 @@ public class BudgetOverviewFragment extends Fragment {
                 } catch (CouchbaseLiteException | JSONException e) {
                     e.printStackTrace();
                 }
+
+                ++trackCounter;
+
+                String progress = getString(R.string.budgetoverview_loading_tracks) + trackCounter +"/" + trackList.size();
+                publishProgress(progress);
             }
 
             try {
@@ -399,6 +416,11 @@ public class BudgetOverviewFragment extends Fragment {
             }
 
             return null;
+        }
+
+        protected void onProgressUpdate(String... progress) {
+            mLoadingProgressTextView.setText(progress[0]);
+
         }
 
 
