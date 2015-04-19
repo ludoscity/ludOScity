@@ -14,7 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -54,7 +54,7 @@ public class BudgetOverviewFragment extends Fragment {
     private TextView mAccessCostValueTextView;
     private TextView mUseCostValueTextView;
     private TextView mTotalCostValueTextView;
-    private ProgressBar mProgressBar;
+    private RelativeLayout mLoadingInterfaceLayout;
     private LinearLayout mInterfaceLayout;
 
     private ImageButton mAccessCostInfoButton;
@@ -126,7 +126,7 @@ public class BudgetOverviewFragment extends Fragment {
             }
         });
 
-        mProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgetoverview_progressBar);
+        mLoadingInterfaceLayout = (RelativeLayout) inflatedView.findViewById(R.id.budgetoverview_loading_interface);
         mInterfaceLayout = (LinearLayout) inflatedView.findViewById(R.id.budgetoverview_interface);
 
         setupInterface();
@@ -265,13 +265,13 @@ public class BudgetOverviewFragment extends Fragment {
 
     private void setupInterface(){
         if (mDataLoaded && mCostCalculated) {
-            mProgressBar.setVisibility(View.GONE);
+            mLoadingInterfaceLayout.setVisibility(View.GONE);
             mInterfaceLayout.setVisibility(View.VISIBLE);
             mUseCostInfoButton.setEnabled(true);
         }
         else
         {
-            mProgressBar.setVisibility(View.VISIBLE);
+            mLoadingInterfaceLayout.setVisibility(View.VISIBLE);
             mInterfaceLayout.setVisibility(View.INVISIBLE);
             mUseCostInfoButton.setEnabled(false);
             mAccessCostInfoButton.setEnabled(false);

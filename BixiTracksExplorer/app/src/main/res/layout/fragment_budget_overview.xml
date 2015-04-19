@@ -3,13 +3,26 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="fill_parent">
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
+    <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/budgetoverview_progressBar"
-        android:visibility="gone"
-        android:layout_gravity="center" />
+        android:id="@+id/budgetoverview_loading_interface"
+        android:layout_height="fill_parent">
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/access_cost_label"
+            android:id="@+id/budgetoverview_progressbar_label"
+            android:layout_centerInParent="true"
+            />
+
+    </RelativeLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical" android:layout_width="match_parent"
