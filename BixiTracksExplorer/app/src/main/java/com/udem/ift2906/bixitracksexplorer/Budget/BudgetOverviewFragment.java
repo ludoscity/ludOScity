@@ -32,6 +32,7 @@ import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.T
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,6 +57,8 @@ public class BudgetOverviewFragment extends Fragment {
     private TextView mTotalCostValueTextView;
     private RelativeLayout mLoadingInterfaceLayout;
     private LinearLayout mInterfaceLayout;
+
+    private TextView mLoadingProgressTextView;
 
     private ImageButton mAccessCostInfoButton;
     private ImageButton mUseCostInfoButton;
@@ -128,6 +131,8 @@ public class BudgetOverviewFragment extends Fragment {
 
         mLoadingInterfaceLayout = (RelativeLayout) inflatedView.findViewById(R.id.budgetoverview_loading_interface);
         mInterfaceLayout = (LinearLayout) inflatedView.findViewById(R.id.budgetoverview_interface);
+
+        mLoadingProgressTextView = (TextView)inflatedView.findViewById(R.id.budgetoverview_progressbar_label);
 
         setupInterface();
 
@@ -283,7 +288,10 @@ public class BudgetOverviewFragment extends Fragment {
         mSeasonAccessCost = mSeasonUseCost = 0.f;
         mMonthAccessCost = mMonthUseCost = 0.f;
 
-        for (QueryRow qr : DBHelper.getAllTracks())
+        int trackCount = 0;
+        List<QueryRow> allTracks = DBHelper.getAllTracks();
+
+        for (QueryRow qr : allTracks)
         {
             Document d = qr.getDocument();
 
@@ -308,6 +316,12 @@ public class BudgetOverviewFragment extends Fragment {
                     trackDuration));
 
             mSeasonUseCost += trackCost;
+
+            ++trackCount;
+
+            if (mProcessCostTask!= null){
+                mProcessCostTask.publish(getString(R.string.budgetoverview_loading_costs) + trackCount + "/" + allTracks.size()  );
+            }
         }
 
         mCostCalculated = true;
@@ -351,8 +365,6 @@ public class BudgetOverviewFragment extends Fragment {
     }
 
     public class RetrieveTrackDataAndProcessCostTask extends AsyncTask<Void, Void, Void> {
-
-
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -413,7 +425,11 @@ public class BudgetOverviewFragment extends Fragment {
         }
     }
 
-    public class ProcessCostTask extends AsyncTask<Void, Void, Void> {
+    public class ProcessCostTask extends AsyncTask<Void, String, Void> {
+
+        public void publish(String progress){
+            publishProgress(progress);
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -425,6 +441,11 @@ public class BudgetOverviewFragment extends Fragment {
             }
 
             return null;
+        }
+
+        protected void onProgressUpdate(String... progress) {
+            mLoadingProgressTextView.setText(progress[0]);
+
         }
 
         @Override
