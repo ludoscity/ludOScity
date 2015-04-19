@@ -240,9 +240,9 @@ public class BudgetInfoFragment extends ListFragment {
 
             mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
 
-            //... set initial position...
-            mAnimatedrowBitmapHolderImageView.setX(v.getX());
-            mAnimatedrowBitmapHolderImageView.setY(v.getY());
+        //... set initial position...
+        mAnimatedrowBitmapHolderImageView.setX(v.getX());
+        mAnimatedrowBitmapHolderImageView.setY(v.getY() + getActivity().findViewById(R.id.toolbar_main).getHeight());
 
             //Setup animation
             mAnimatedrowBitmapHolderImageView.animate().x(targetAbsoluteXY.first)
@@ -284,7 +284,7 @@ public class BudgetInfoFragment extends ListFragment {
         int listViewBottom = getListView().getBottom();
         int listViewRight = getListView().getRight();
 
-        int YTarget = listViewBottom - rowView.getHeight();
+        int YTarget = listViewBottom - rowView.getHeight() + getActivity().findViewById(R.id.toolbar_main).getHeight();
 
 
         // First figure out if we're on a one of two fragments configuration
