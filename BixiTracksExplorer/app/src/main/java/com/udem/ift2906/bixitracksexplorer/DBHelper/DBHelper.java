@@ -142,17 +142,6 @@ public class DBHelper {
         END of failed attempts*/
     }
 
-    public static StationItem getStation(long id) {
-        Cursor cursor = BixiStationDatabase.getInstance(context).getStation(id);
-
-        cursor.moveToFirst();
-        if (!cursor.isAfterLast()) {
-            return createStation(cursor);
-        }
-
-        return null;
-    }
-
     private static StationItem createStation(Cursor cursor) {
         BixiStation station = new BixiStation();
 
@@ -202,6 +191,7 @@ public class DBHelper {
     public static boolean isDataStationLoaded(){
         return isExist(RANDOM_ID_FROM_CITIES_BIKES_API);
     }
+
     public static boolean isFavorite(long id) {
         return BixiStationDatabase.getInstance(context).isFavorite(id);
     }

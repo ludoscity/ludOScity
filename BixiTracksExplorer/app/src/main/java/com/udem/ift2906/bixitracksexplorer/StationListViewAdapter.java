@@ -88,7 +88,6 @@ public class StationListViewAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
         StationItem currentStation= mStationList.get(position);
-        holder.directionArrow.setRotation((float) currentStation.getBearingFromLatLng(mCurrentUserLatLng));
         if (mCurrentUserLatLng != null) {
             holder.distance.setText(String.valueOf((int)currentStation.getMeterFromLatLng(mCurrentUserLatLng)) + " m ");
             holder.directionArrow.setRotation((float) currentStation.getBearingFromLatLng(mCurrentUserLatLng));

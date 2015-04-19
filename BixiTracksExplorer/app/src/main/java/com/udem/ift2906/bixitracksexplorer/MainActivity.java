@@ -35,6 +35,7 @@ public class MainActivity extends ActionBarActivity
         BudgetOverviewFragment.OnFragmentInteractionListener,
         BudgetInfoFragment.OnFragmentInteractionListener,
         NearbyFragment.OnFragmentInteractionListener,
+        UserSettingsFragment.OnFragmentInteractionListener,
         BudgetTrackDetailsFragment.OnBudgetTrackDetailsFragmentInteractionListener,
         FavoritesFragment.OnFragmentInteractionListener{
 
@@ -111,6 +112,12 @@ public class MainActivity extends ActionBarActivity
                     .replace(R.id.start_fragment_container, BudgetOverviewFragment.newInstance(position + 1))
                     .commit();
         }
+        else if (position == 3){
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.start_fragment_container, UserSettingsFragment.newInstance(position + 1))
+                    .commit();
+        }
         else if (position == 1){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
@@ -139,6 +146,9 @@ public class MainActivity extends ActionBarActivity
                 break;
             case 3:
                 mTitle = getString(R.string.title_section_budget);
+                break;
+            case 4:
+                mTitle = getString(R.string.title_section_settings);
                 break;
         }
         mSubtitle = "";
@@ -308,6 +318,12 @@ public class MainActivity extends ActionBarActivity
     public void onFavoritesFragmentInteraction() {
 
     }
+
+    @Override
+    public void onSettingsFragmentInteraction() {
+
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */

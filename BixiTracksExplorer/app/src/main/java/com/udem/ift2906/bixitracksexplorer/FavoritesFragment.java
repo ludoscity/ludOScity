@@ -49,7 +49,7 @@ public class FavoritesFragment extends Fragment  {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-        StationsNetwork stationsNetwork = DBHelper.listStations();
+        StationsNetwork stationsNetwork = DBHelper.getStationsNetwork();
         StationsNetwork stationsNetworkFavorites = new StationsNetwork();
         for(StationItem stationItem: stationsNetwork.stations){
 

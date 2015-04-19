@@ -40,6 +40,8 @@ public class NearbyFragment extends Fragment
     private ListView mStationListView;
     private StationsNetwork stationsNetwork;
 
+    private DownloadWebTask mDownloadWebTask;
+
     private static final String ARG_SECTION_NUMBER = "section_number";
 
 
