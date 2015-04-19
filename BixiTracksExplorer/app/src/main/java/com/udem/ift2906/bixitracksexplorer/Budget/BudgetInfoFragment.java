@@ -225,34 +225,37 @@ public class BudgetInfoFragment extends ListFragment {
 
         getListView().setItemChecked(position, true);
 
-        //Let's animate !!
-        //Render the View representing the clicked row in a Bitmap
-        //BitmapFactory.decodeResource(R.layout.budgetinfolist_item);
-        Bitmap viewCapture;
+        FrameLayout endFragment = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
+        if (endFragment == null){
+            //Let's animate !!
+            //Render the View representing the clicked row in a Bitmap
+            //BitmapFactory.decodeResource(R.layout.budgetinfolist_item);
+            Bitmap viewCapture;
 
-        v.setDrawingCacheEnabled(true);
-        viewCapture = Bitmap.createBitmap(v.getDrawingCache());
-        v.setDrawingCacheEnabled(false);
+            v.setDrawingCacheEnabled(true);
+            viewCapture = Bitmap.createBitmap(v.getDrawingCache());
+            v.setDrawingCacheEnabled(false);
 
-        Pair<Integer,Integer> targetAbsoluteXY = calculateRowAnimTarget(v);
+            Pair<Integer,Integer> targetAbsoluteXY = calculateRowAnimTarget(v);
 
-        mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
+            mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
 
-        //... set initial position...
-        mAnimatedrowBitmapHolderImageView.setX(v.getX());
-        mAnimatedrowBitmapHolderImageView.setY(v.getY());
+            //... set initial position...
+            mAnimatedrowBitmapHolderImageView.setX(v.getX());
+            mAnimatedrowBitmapHolderImageView.setY(v.getY());
 
-        //Setup animation
-        mAnimatedrowBitmapHolderImageView.animate().x(targetAbsoluteXY.first)
-                .y(targetAbsoluteXY.second)
-                .setDuration(1000)
-                .setInterpolator(new LinearInterpolator());
+            //Setup animation
+            mAnimatedrowBitmapHolderImageView.animate().x(targetAbsoluteXY.first)
+                    .y(targetAbsoluteXY.second)
+                    .setDuration(1000)
+                    .setInterpolator(new LinearInterpolator());
 
-        //Make Bitmap holder ImageView visible
-        mAnimatedrowBitmapHolderImageView.setVisibility(View.VISIBLE);
+            //Make Bitmap holder ImageView visible
+            mAnimatedrowBitmapHolderImageView.setVisibility(View.VISIBLE);
 
-        //Animate !
-        mAnimatedrowBitmapHolderImageView.animate().start();
+            //Animate !
+            mAnimatedrowBitmapHolderImageView.animate().start();
+        }
 
         if (mListener != null){
             Uri.Builder builder = new Uri.Builder();

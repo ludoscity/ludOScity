@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -128,7 +129,14 @@ public class BudgetTrackDetailsFragment extends Fragment
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.budgetinfotrackdetails_mapfragment)).getMapAsync(this);
 
         mInfoListRowView = inflatedView.findViewById(R.id.budgettrackdetails_row_view);
-        mInfoListRowView.setActivated(true);
+
+        FrameLayout endFragment = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
+        if (endFragment != null){
+            mInfoListRowView.setVisibility(View.GONE);
+        }
+        else{
+            mInfoListRowView.setActivated(true);
+        }
 
         mDataLoadingProgressBar = (ProgressBar) inflatedView.findViewById(R.id.budgettrackdetails_progressBar);
         // Inflate the layout for this fragment
@@ -247,9 +255,10 @@ public class BudgetTrackDetailsFragment extends Fragment
 
     private void setupUIandTask(){
 
-        //Add two screen config here
-
-        setupInfoItemView();
+        FrameLayout endFragment = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
+        if (endFragment == null){
+            setupInfoItemView();
+        }
 
         if(mTrackDataFromDB != null && mTrackDataFromDB.containsKey("points"))  //Already retrived from database
         {
@@ -266,10 +275,15 @@ public class BudgetTrackDetailsFragment extends Fragment
         {
             //Disable map interactions
             mMap.getUiSettings().setAllGesturesEnabled(false);
-            //Display progressBar
-            mDataLoadingProgressBar.setVisibility(View.VISIBLE);
+
             //Start retrieve task
-            new RetrieveFullTrackFromBackend().execute(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString());
+            if (mBudgetInfoItemPos != -1){
+                //Display progressBar
+                mDataLoadingProgressBar.setVisibility(View.VISIBLE);
+
+                new RetrieveFullTrackFromBackend().execute(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString());
+            }
+
         }
     }
 
