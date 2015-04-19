@@ -89,7 +89,7 @@ public class BudgetOverviewFragment extends Fragment {
     private static final float mEach30minAfter90 = 7.f;
 
     //TODO: have this configurable through app settings
-    private static boolean RELOAD_BUDGET_DATA_FROM_WEB_ALWAYS = true;
+    private static boolean RELOAD_BUDGET_DATA_FROM_WEB_ALWAYS = false;
 
     /**
      * Returns a new instance of this fragment for the given section
