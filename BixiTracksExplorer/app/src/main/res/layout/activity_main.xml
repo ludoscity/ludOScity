@@ -5,8 +5,13 @@
     android:clipChildren="false"
     tools:context=".MainActivity">
 
+    <include
+        android:id="@+id/toolbar_main"
+        layout="@layout/toolbar" />
+
     <android.support.v4.widget.DrawerLayout android:id="@+id/drawer_layout"
-        android:layout_width="match_parent" android:layout_height="match_parent">
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_main">
 
             <FrameLayout android:id="@+id/start_fragment_container" android:layout_width="fill_parent"
                 android:layout_height="match_parent" >
