@@ -70,7 +70,7 @@ public class StationListViewAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return (long) mStationList.get(position).getUid();
+        return mStationList.get(position).getUid();
     }
 
     @Override
@@ -89,6 +89,7 @@ public class StationListViewAdapter extends BaseAdapter {
         }
         StationItem currentStation= mStationList.get(position);
         if (mCurrentUserLatLng != null) {
+            holder.directionArrow.setRotation((float) currentStation.getBearingFromLatLng(mCurrentUserLatLng));
             holder.distance.setText(String.valueOf((int)currentStation.getMeterFromLatLng(mCurrentUserLatLng)) + " m ");
             holder.directionArrow.setRotation((float) currentStation.getBearingFromLatLng(mCurrentUserLatLng));
         } else {

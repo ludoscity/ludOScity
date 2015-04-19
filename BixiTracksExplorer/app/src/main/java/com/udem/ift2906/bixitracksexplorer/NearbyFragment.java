@@ -10,7 +10,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,11 +41,14 @@ public class NearbyFragment extends Fragment
     private OnFragmentInteractionListener mListener;
     private StationListViewAdapter mStationListViewAdapter;
     private ListView mStationListView;
-    private StationsNetwork stationsNetwork;
+    private StationsNetwork mStationsNetwork;
 
     private DownloadWebTask mDownloadWebTask;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private ImageButton mRefreshButton;
+    private TextView mLastUpdatedTextView;
+    private Boolean isDownloadCurrentlyExecuting;
 
 
     public static NearbyFragment newInstance(int sectionNumber) {
@@ -66,9 +72,7 @@ public class NearbyFragment extends Fragment
                     + " must implement OnFragmentInteractionListener");
         }
 
-        //Used to get user's current location
         setCurrentLocation();
-
         mDownloadWebTask = new DownloadWebTask();
         mDownloadWebTask.execute();
     }
@@ -90,10 +94,25 @@ public class NearbyFragment extends Fragment
         if(nearbyMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
 
-
+        mRefreshButton = (ImageButton) inflatedView.findViewById(R.id.refreshDatabase_button);
+        setRefreshButtonListener();
+        mLastUpdatedTextView = (TextView) inflatedView.findViewById(R.id.lastUpdated_textView);
 
         mStationListView = (ListView) inflatedView.findViewById(R.id.stationListView);
+        setOnClickItemListenerStationListView();
         return inflatedView;
+    }
+
+    private void setOnClickItemListenerStationListView() {
+        mStationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                StationItem stationClicked = mStationsNetwork.stations.get(position);
+                long uid = stationClicked.getUid();
+                String stationName = stationClicked.getName();
+                mListener.onNearbyFragmentInteraction(uid, stationName);
+            }
+        });
     }
 
     @Override
@@ -121,44 +140,57 @@ public class NearbyFragment extends Fragment
         }
     }
 
+    private void setRefreshButtonListener() {
+        mRefreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!isDownloadCurrentlyExecuting) {
+                    mDownloadWebTask = new DownloadWebTask();
+                    mDownloadWebTask.execute();
+                }
+            }
+        });
+    }
+
     //Pour interaction avec mainActivity
     public interface OnFragmentInteractionListener {
-        public void onNearbyFragmentInteraction();
+        public void onNearbyFragmentInteraction(long uid, String stationName);
     }
 
     public Context getContext() {
         return mContext;
     }
 
-
     public class DownloadWebTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
+            isDownloadCurrentlyExecuting = true;
             bixiApiInstance = new BixiAPI(mContext);
-            stationsNetwork = bixiApiInstance.downloadBixiNetwork();
+            mStationsNetwork = bixiApiInstance.downloadBixiNetwork();
             return null;
         }
 
         @Override
         protected void onCancelled (Void aVoid){
             super.onCancelled(aVoid);
-
             //Do nothing. task is cancelled if fragment is detached
-
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            Toast.makeText(mContext, R.string.download_success, Toast.LENGTH_SHORT).show();
 
-            //TODO R.string
-            Toast.makeText(mContext, "Download Successful!", Toast.LENGTH_SHORT).show();
+            mStationsNetwork.setUpMarkers();
+            mStationsNetwork.addMarkersToMap(nearbyMap);
 
-            stationsNetwork.setUpMarkers();
-            stationsNetwork.addMarkersToMap(nearbyMap);
-
-            mStationListViewAdapter = new StationListViewAdapter(mContext, stationsNetwork, mCurrentUserLatLng);
+            mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng);
             mStationListView.setAdapter(mStationListViewAdapter);
+
+            //TODO add time awareness
+            mLastUpdatedTextView.setText(R.string.lastUpdated + "1 min ago");
+
+            isDownloadCurrentlyExecuting = false;
         }
     }
 }

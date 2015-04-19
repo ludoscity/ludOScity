@@ -37,7 +37,8 @@ public class MainActivity extends ActionBarActivity
         NearbyFragment.OnFragmentInteractionListener,
         UserSettingsFragment.OnFragmentInteractionListener,
         BudgetTrackDetailsFragment.OnBudgetTrackDetailsFragmentInteractionListener,
-        FavoritesFragment.OnFragmentInteractionListener{
+        FavoritesFragment.OnFragmentInteractionListener,
+        StationInfoFragment.OnFragmentInteractionListener{
 
     //Test test
     /**
@@ -311,8 +312,14 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onNearbyFragmentInteraction() {
-
+    public void onNearbyFragmentInteraction(long uid, String stationName) {
+        mTitle = stationName;
+        restoreActionBar();
+        StationInfoFragment newFragment = StationInfoFragment.newInstance(uid, this);
+        FragmentTransaction transaction= getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.start_fragment_container, newFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -327,6 +334,12 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onSettingsFragmentInteraction() {
+
+    }
+
+
+    @Override
+    public void onStationInfoFragmentInteraction(Uri uri) {
 
     }
 
