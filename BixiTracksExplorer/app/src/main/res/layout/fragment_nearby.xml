@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.udem.ift2906.bixitracksexplorer.NearbyFragment">
+    tools:context="com.udem.ift2906.bixitracksexplorer.NearbyFragment"
+    android:id="@+id/nearbyFragmentLayout">
 
     <fragment
         xmlns:android="http://schemas.android.com/apk/res/android"

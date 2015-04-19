@@ -19,18 +19,33 @@
         map:mapType="normal"
         map:liteMode="true"/>
 
-    <GridLayout
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="0px"
         android:layout_weight="2">
 
         <ImageView
-            android:layout_width="100dp"
+            android:id="@+id/arrow_container"
+            android:src="@drawable/direction_arrow"
+            android:layout_width="0px"
             android:layout_height="100dp"
-            android:layout_gravity="left|top"
-            android:id="@+id/arrow_container"></ImageView>
+            android:layout_weight="1"
+            android:layout_gravity="left|top"></ImageView>
 
-    </GridLayout>
+        <LinearLayout
+            android:layout_width="0px"
+            android:layout_height="fill_parent"
+            android:layout_weight="3">
+
+            <TextView
+                android:id="@+id/stationName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+            </LinearLayout>
+
+    </LinearLayout>
 
 
 </LinearLayout>

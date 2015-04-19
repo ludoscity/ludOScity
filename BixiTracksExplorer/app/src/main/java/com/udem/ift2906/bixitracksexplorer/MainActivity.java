@@ -67,8 +67,6 @@ public class MainActivity extends ActionBarActivity
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             }
         }
-
-
         setContentView(R.layout.activity_main);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);

@@ -3,28 +3,27 @@ package com.udem.ift2906.bixitracksexplorer;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 
-public class StationInfoFragment extends Fragment {
+public class StationInfoFragment extends Fragment implements OnMapReadyCallback {
     private static final String ARG_stationUID = "stationUID";
-    private String mStationUID;
-
     private String TAG = "stationInfo";
 
     private OnFragmentInteractionListener mListener;
     private StationItem mStationItem;
 
-    public static StationInfoFragment newInstance(String stationUID) {
+    public static StationInfoFragment newInstance(long stationUID) {
         StationInfoFragment fragment = new StationInfoFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_stationUID, stationUID);
+        args.putLong(ARG_stationUID, stationUID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -36,14 +35,9 @@ public class StationInfoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mStationUID = getArguments().getString(ARG_stationUID);
-        }
-
+        long mStationUID = getArguments().getLong(ARG_stationUID);
         Log.d(TAG, "Requesting station " + mStationUID);
-        mStationItem = DBHelper.getStation(Long.parseLong(mStationUID));
-
-
+        mStationItem = DBHelper.getStation(mStationUID);
 
 
     }
@@ -77,6 +71,11 @@ public class StationInfoFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
     }
 
     /**

@@ -26,7 +26,8 @@ public class StationItem {
         //TODO Changes to markers are to be done here (for now)
         markerOptions = new MarkerOptions()
                 .position(position)
-                .title(name);
+                .title(name)
+                .snippet("Bikes available: " + free_bikes + "/" + (empty_slots+free_bikes));
     }
 
     public StationItem(BixiStation _station, boolean isFavorite, String date) {
