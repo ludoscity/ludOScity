@@ -62,17 +62,20 @@ public class BudgetOverviewFragment extends Fragment {
 
     private String mSelectedPeriod;
 
-    private float mSeasonAccessCost;
-    private float mSeasonUseCost;
+    private static float mSeasonAccessCost;
+    private static float mSeasonUseCost;
 
-    private float mMonthAccessCost;
-    private float mMonthUseCost;
+    private static float mMonthAccessCost;
+    private static float mMonthUseCost;
 
-    private boolean mDataLoaded = false;
+    private static boolean mCostCalculated = false;
+
+    private static boolean mDataLoaded = false;
 
     private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
 
     private RetrieveTrackDataAndProcessCostTask mWebLoadingTask = null;
+    private ProcessCostTask mProcessCostTask = null;
 
     //Bixi tarification grid
     private static final long m45minInms = 2700000;
@@ -188,13 +191,11 @@ public class BudgetOverviewFragment extends Fragment {
             mWebLoadingTask.execute();
         }
         else{
-            try {
-                processCost();
-            } catch (CouchbaseLiteException e) {
-                e.printStackTrace();
+            if (!mCostCalculated) {
+                mProcessCostTask = new ProcessCostTask();
+                mProcessCostTask.execute();
             }
         }
-
     }
 
     @Override
@@ -204,6 +205,11 @@ public class BudgetOverviewFragment extends Fragment {
         {
             mWebLoadingTask.cancel(false);
             mWebLoadingTask = null;
+        }
+        if(mProcessCostTask != null && !mProcessCostTask.isCancelled())
+        {
+            mProcessCostTask.cancel(false);
+            mProcessCostTask = null;
         }
     }
 
@@ -258,7 +264,7 @@ public class BudgetOverviewFragment extends Fragment {
     }
 
     private void setupInterface(){
-        if (mDataLoaded) {
+        if (mDataLoaded && mCostCalculated) {
             mProgressBar.setVisibility(View.GONE);
             mInterfaceLayout.setVisibility(View.VISIBLE);
             mUseCostInfoButton.setEnabled(true);
@@ -303,6 +309,8 @@ public class BudgetOverviewFragment extends Fragment {
 
             mSeasonUseCost += trackCost;
         }
+
+        mCostCalculated = true;
     }
 
     private float processCostForDuration(long remainingTime, float accumulatedCost, int costStep) {
@@ -401,6 +409,38 @@ public class BudgetOverviewFragment extends Fragment {
 
             mDataLoaded = true;
 
+            setupInterface();
+        }
+    }
+
+    public class ProcessCostTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            try {
+                processCost();
+            } catch (CouchbaseLiteException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onCancelled (Void aVoid){
+            super.onCancelled(aVoid);
+
+            //Task is cancelled if fragment is detached
+
+        }
+
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            updateCost();
             setupInterface();
         }
     }
