@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,7 +36,7 @@ public class NearbyFragment extends Fragment
     private OnFragmentInteractionListener mListener;
     private StationListViewAdapter mStationListViewAdapter;
     private ListView mStationListView;
-    private StationsNetwork stationsNetwork;
+    private StationsNetwork mStationsNetwork;
 
     private DownloadWebTask mDownloadWebTask;
 
@@ -92,7 +93,20 @@ public class NearbyFragment extends Fragment
         mLastUpdatedTextView = (TextView) inflatedView.findViewById(R.id.lastUpdated_textView);
 
         mStationListView = (ListView) inflatedView.findViewById(R.id.stationListView);
+        setOnClickItemListenerStationListView();
         return inflatedView;
+    }
+
+    private void setOnClickItemListenerStationListView() {
+        mStationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                StationItem stationClicked = mStationsNetwork.stations.get(position);
+                long uid = stationClicked.getUid();
+                String stationName = stationClicked.getName();
+                mListener.onNearbyFragmentInteraction(uid, stationName);
+            }
+        });
     }
 
     @Override
@@ -135,7 +149,7 @@ public class NearbyFragment extends Fragment
 
     //Pour interaction avec mainActivity
     public interface OnFragmentInteractionListener {
-        public void onNearbyFragmentInteraction();
+        public void onNearbyFragmentInteraction(long uid, String stationName);
     }
 
     public Context getContext() {
@@ -147,7 +161,7 @@ public class NearbyFragment extends Fragment
         protected Void doInBackground(Void... params) {
             isDownloadCurrentlyExecuting = true;
             bixiApiInstance = new BixiAPI(mContext);
-            stationsNetwork = bixiApiInstance.downloadBixiNetwork();
+            mStationsNetwork = bixiApiInstance.downloadBixiNetwork();
             return null;
         }
 
@@ -162,10 +176,10 @@ public class NearbyFragment extends Fragment
             super.onPostExecute(aVoid);
             Toast.makeText(mContext, R.string.download_success, Toast.LENGTH_SHORT).show();
 
-            stationsNetwork.setUpMarkers();
-            stationsNetwork.addMarkersToMap(nearbyMap);
+            mStationsNetwork.setUpMarkers();
+            mStationsNetwork.addMarkersToMap(nearbyMap);
 
-            mStationListViewAdapter = new StationListViewAdapter(mContext, stationsNetwork, mCurrentUserLatLng);
+            mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng);
             mStationListView.setAdapter(mStationListViewAdapter);
 
             //TODO add time awareness

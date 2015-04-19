@@ -1,10 +1,6 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.internal.widget.AdapterViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +21,7 @@ import java.util.List;
  * TODO sort by proximity to user
  *
  */
-public class StationListViewAdapter extends BaseAdapter implements AdapterViewCompat.OnItemClickListener {
+public class StationListViewAdapter extends BaseAdapter {
     LayoutInflater mInflater;
     Context mContext;
 
@@ -55,15 +51,6 @@ public class StationListViewAdapter extends BaseAdapter implements AdapterViewCo
         }
     }
 
-    @Override
-    public void onItemClick(AdapterViewCompat<?> adapterViewCompat, View view, int i, long l) {
-        StationItem station = (StationItem) adapterViewCompat.getItemAtPosition(i);
-        FragmentManager fragmentManager = ((FragmentActivity) mContext).getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.nearbyFragmentLayout, StationInfoFragment.newInstance(station.getUid()))
-                .commit();
-    }
-
     public class ViewHolder{
         TextView distance;
         TextView name;
@@ -83,7 +70,7 @@ public class StationListViewAdapter extends BaseAdapter implements AdapterViewCo
 
     @Override
     public long getItemId(int position) {
-        return (long) mStationList.get(position).getUid();
+        return mStationList.get(position).getUid();
     }
 
     @Override

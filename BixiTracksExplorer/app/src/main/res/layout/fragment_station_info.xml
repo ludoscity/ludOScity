@@ -31,7 +31,8 @@
             android:layout_width="0px"
             android:layout_height="100dp"
             android:layout_weight="1"
-            android:layout_gravity="left|top"></ImageView>
+            android:layout_gravity="left|top"
+            android:rotation="0"/>
 
         <LinearLayout
             android:layout_width="0px"
