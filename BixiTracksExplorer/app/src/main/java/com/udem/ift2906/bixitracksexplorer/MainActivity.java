@@ -248,7 +248,7 @@ public class MainActivity extends ActionBarActivity
             if(endContainer != null){
                 endContainer.setVisibility(View.VISIBLE);
 
-                BudgetTrackDetailsFragment newEndFragment = BudgetTrackDetailsFragment.newInstance(-1, null, -1);
+                BudgetTrackDetailsFragment newEndFragment = BudgetTrackDetailsFragment.newInstance(-1, null, -1, true);
 
                 transaction.replace(R.id.end_fragment_container, newEndFragment);
             }
@@ -277,7 +277,8 @@ public class MainActivity extends ActionBarActivity
 
                 BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_ITEMPOS_PARAM)),
                         _budgetInfoItemList,
-                        Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_SORT_CRITERIA_PARAM)));
+                        Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_SORT_CRITERIA_PARAM)),
+                        false);
                 mSubtitle = getString(R.string.budgettrackdetails_subtitle);
 
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

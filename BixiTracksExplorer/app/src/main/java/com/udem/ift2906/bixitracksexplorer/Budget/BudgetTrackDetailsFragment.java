@@ -76,9 +76,9 @@ public class BudgetTrackDetailsFragment extends Fragment
 
     private View mInfoListRowView;
 
-    private MenuItem mNextMenuItem;
-    private MenuItem mPreviousMenuItem;
-    private MenuItem mCriteriaMenuItem;
+    private MenuItem mNextMenuItem = null;
+    private MenuItem mPreviousMenuItem = null;
+    private MenuItem mCriteriaMenuItem = null;
 
     /**
      * Use this factory method to create a new instance of
@@ -89,7 +89,7 @@ public class BudgetTrackDetailsFragment extends Fragment
      * @return A new instance of fragment BudgetTrackDetailsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static BudgetTrackDetailsFragment newInstance(int _budgetInfoItemPos, ArrayList<BudgetInfoItem> _budgetInfoItemList, int _sortCriteria) {
+    public static BudgetTrackDetailsFragment newInstance(int _budgetInfoItemPos, ArrayList<BudgetInfoItem> _budgetInfoItemList, int _sortCriteria, boolean _multiFragment) {
         BudgetTrackDetailsFragment fragment = new BudgetTrackDetailsFragment();
         Bundle args = new Bundle();
         args.putInt(BudgetInfoFragment.CLICK_ITEMPOS_PARAM, _budgetInfoItemPos);
@@ -97,7 +97,7 @@ public class BudgetTrackDetailsFragment extends Fragment
         args.putParcelableArrayList(ARG_BUDGETINFOITEM_LIST, _budgetInfoItemList);
         //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
-        fragment.setHasOptionsMenu(true);
+        fragment.setHasOptionsMenu(!_multiFragment);
         return fragment;
     }
 
@@ -161,17 +161,20 @@ public class BudgetTrackDetailsFragment extends Fragment
 
     private void setupActionItems(){
 
+        if (mPreviousMenuItem == null)  //We are in multifragments config, no actions
+            return;
+
         mPreviousMenuItem.setVisible(true);
         mNextMenuItem.setVisible(true);
 
-        if (mBudgetInfoItemPos == 0) {
+        if(mBudgetInfoItemPos == -1) {
+            mPreviousMenuItem.setVisible(false);
+            mNextMenuItem.setVisible(false);
+        }
+        else if (mBudgetInfoItemPos == 0) {
             mPreviousMenuItem.setVisible(false);
         }
         else if (mBudgetInfoItemPos == mBudgetInfoItemList.size()-1){
-            mNextMenuItem.setVisible(false);
-        }
-        else if(mBudgetInfoItemPos == -1) {
-            mPreviousMenuItem.setVisible(false);
             mNextMenuItem.setVisible(false);
         }
 

@@ -5,7 +5,7 @@
     android:clipChildren="false"
     tools:context=".MainActivity">
     <include
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar_main"
         layout="@layout/toolbar" />
 
         <!-- A DrawerLayout using match_parent for both width and height to consume the full space available. -->
