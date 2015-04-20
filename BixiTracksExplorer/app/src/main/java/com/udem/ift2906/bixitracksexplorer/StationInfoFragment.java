@@ -47,7 +47,7 @@ public class StationInfoFragment extends Fragment implements OnMapReadyCallback 
         super.onCreate(savedInstanceState);
         long mStationUID = getArguments().getLong(ARG_stationUID);
         Log.d(TAG, "Requesting station from DBHelper: " + mStationUID);
-        mStationItem = DBHelper.getStation(mStationUID);
+        mStationItem = DBHelper.getStationItem(mStationUID);
         setCurrentLocation();
 
     }

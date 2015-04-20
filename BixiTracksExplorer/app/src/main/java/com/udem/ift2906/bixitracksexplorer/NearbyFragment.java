@@ -22,11 +22,6 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiAPI;
-import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiNetwork;
-import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
-import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
-
-import java.util.ArrayList;
 
 
 public class NearbyFragment extends Fragment
@@ -181,6 +176,7 @@ public class NearbyFragment extends Fragment
             super.onPostExecute(aVoid);
             Toast.makeText(mContext, R.string.download_success, Toast.LENGTH_SHORT).show();
 
+            //TODO : What if map is not ready when we're done here
             mStationsNetwork.setUpMarkers();
             mStationsNetwork.addMarkersToMap(nearbyMap);
 
