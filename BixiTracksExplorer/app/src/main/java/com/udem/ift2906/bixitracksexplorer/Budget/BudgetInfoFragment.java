@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -46,6 +47,8 @@ public class BudgetInfoFragment extends ListFragment {
     private int mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;
 
     private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
+
+    private float mLastCheckedViewY = 0.f;
 
     private OnFragmentInteractionListener mListener;
 
@@ -110,6 +113,8 @@ public class BudgetInfoFragment extends ListFragment {
                 return true;
 
             case R.id.budgetInfoSortCriteria:
+                BudgetInfoItem checkedItem = beginSort();
+
                 if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_COST){
                     item.setIcon(R.drawable.ic_action_duration);
                     mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION;
@@ -126,12 +131,42 @@ public class BudgetInfoFragment extends ListFragment {
                     ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByCostAndNotify(mSortOrderHighToLow);
                 }
 
+                endSort(checkedItem);
+
                 notifySortCriteriaChangeToActivity();
                 return true;
 
         }
 
         return false;
+    }
+
+    private BudgetInfoItem beginSort(){
+
+        int checkedItemPos = getListView().getCheckedItemPosition();
+        BudgetInfoItem checkedItem = null;
+        if ( checkedItemPos != AdapterView.INVALID_POSITION){
+
+            getListView().setItemChecked(checkedItemPos, false);
+            checkedItem = (BudgetInfoItem)getListView().getItemAtPosition(checkedItemPos);
+
+        }
+
+        return checkedItem;
+    }
+
+    private void endSort(BudgetInfoItem checkedBefore){
+        if (checkedBefore != null){
+            for (int i = 0; i < mBudgetInfoItems.size(); ++i) {
+                BudgetInfoItem curItem = (BudgetInfoItem) getListView().getItemAtPosition(i);
+
+                if (curItem == checkedBefore) {
+                    getListView().setItemChecked(i, true);
+                    getListView().setSelectionFromTop(i,(int)mLastCheckedViewY);
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -240,9 +275,10 @@ public class BudgetInfoFragment extends ListFragment {
 
             mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
 
-        //... set initial position...
-        mAnimatedrowBitmapHolderImageView.setX(v.getX());
-        mAnimatedrowBitmapHolderImageView.setY(v.getY() + getActivity().findViewById(R.id.toolbar_main).getHeight());
+            //... set initial position...
+            mLastCheckedViewY = v.getY();
+            mAnimatedrowBitmapHolderImageView.setX(v.getX());
+            mAnimatedrowBitmapHolderImageView.setY(mLastCheckedViewY + getActivity().findViewById(R.id.toolbar_main).getHeight());
 
             //Setup animation
             mAnimatedrowBitmapHolderImageView.animate().x(targetAbsoluteXY.first)
