@@ -76,6 +76,10 @@ public class BudgetTrackDetailsFragment extends Fragment
 
     private View mInfoListRowView;
 
+    private MenuItem mNextMenuItem;
+    private MenuItem mPreviousMenuItem;
+    private MenuItem mCriteriaMenuItem;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -147,6 +151,41 @@ public class BudgetTrackDetailsFragment extends Fragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
 
         menuInflater.inflate(R.menu.menu_budget_track_details, menu);
+
+        mPreviousMenuItem = menu.findItem(R.id.budgetTrackDetailsPrevious);
+        mNextMenuItem = menu.findItem(R.id.budgetTrackDetailsNext);
+        mCriteriaMenuItem = menu.findItem(R.id.budgetTrackDetailsCriteria);
+
+        setupActionItems();
+    }
+
+    private void setupActionItems(){
+
+        mPreviousMenuItem.setVisible(true);
+        mNextMenuItem.setVisible(true);
+
+        if (mBudgetInfoItemPos == 0) {
+            mPreviousMenuItem.setVisible(false);
+        }
+        else if (mBudgetInfoItemPos == mBudgetInfoItemList.size()-1){
+            mNextMenuItem.setVisible(false);
+        }
+        else if(mBudgetInfoItemPos == -1) {
+            mPreviousMenuItem.setVisible(false);
+            mNextMenuItem.setVisible(false);
+        }
+
+        switch (mCurrentSortCriteria){
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_COST:
+                mCriteriaMenuItem.setIcon(R.drawable.ic_action_cost);
+                break;
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION:
+                mCriteriaMenuItem.setIcon(R.drawable.ic_action_duration);
+                break;
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_DATE:
+                mCriteriaMenuItem.setIcon(R.drawable.ic_action_date);
+                break;
+        }
     }
 
     //On enter animation end we want to switch the Bitmap ImageView visibility
@@ -228,9 +267,51 @@ public class BudgetTrackDetailsFragment extends Fragment
                 //called when the up affordance/carat in actionbar is pressed
                 getActivity().onBackPressed();
                 return true;
+            case R.id.budgetTrackDetailsNext:
+                ++mBudgetInfoItemPos;
+                trackChanged();
+                return true;
+            case R.id.budgetTrackDetailsPrevious:
+                --mBudgetInfoItemPos;
+                trackChanged();
+                return true;
+
+            case R.id.budgetTrackDetailsCriteria:
+                if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_COST){
+                    item.setIcon(R.drawable.ic_action_duration);
+                    mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION;
+                }
+                else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION){
+                    item.setIcon(R.drawable.ic_action_date);
+                    mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DATE;
+                }
+                else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DATE){
+                    item.setIcon(R.drawable.ic_action_cost);
+                    mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;
+                }
+
+                setupInfoItemView();
+
+                return true;
         }
 
         return false;
+    }
+
+    private void trackChanged(){
+
+        mMap.clear();
+
+        try {
+            //Happens on UI thread
+            mTrackDataFromDB = DBHelper.retrieveTrack(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString());
+        } catch (CouchbaseLiteException e) {
+
+            e.printStackTrace();
+        }
+
+        setupUIandTask();
+
     }
 
     @Override
@@ -254,6 +335,8 @@ public class BudgetTrackDetailsFragment extends Fragment
     }
 
     private void setupUIandTask(){
+
+        setupActionItems();
 
         FrameLayout endFragment = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
         if (endFragment == null){
@@ -337,15 +420,7 @@ public class BudgetTrackDetailsFragment extends Fragment
         mBudgetInfoItemPos = _budgetInfoItemPos;
         mCurrentSortCriteria = _sortCriteria;
 
-        try {
-            //Happens on UI thread
-            mTrackDataFromDB = DBHelper.retrieveTrack(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString());
-        } catch (CouchbaseLiteException e) {
-
-            e.printStackTrace();
-        }
-
-        setupUIandTask();
+        trackChanged();
     }
 
     private void addTrackPolylineToMap(){

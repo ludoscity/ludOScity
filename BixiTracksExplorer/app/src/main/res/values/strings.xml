@@ -10,11 +10,6 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_example">Example action</string>
-
-    <string name="action_settings">Settings</string>
-
-
     <string name="download_success">Bixi Stations Data downloaded with success!</string>
     <string name="noData">Connection needed for data download!</string>
     <string name="timespan_season">Season</string>
@@ -29,8 +24,8 @@
     <string name="budgettrackdetails_subtitle">Trip details</string>
     <string name="title_section_settings">Settings</string>
     <string name="setting_auto_update_nearby">ALLO</string>
-    <string name="budgetoverview_loading_costs">Calculated costs\n</string>
-    <string name="budgetoverview_loading_tracks">Downloaded trips\n</string>
+    <string name="budgetoverview_loading_costs">Calculating cost\n</string>
+    <string name="budgetoverview_loading_tracks">Downloading trip\n</string>
     <string name="generic_please_wait">Please wait…</string>
     <string name="lastUpdated">Last updated</string>
     <string name="minsAgo">minutes ago.</string>
