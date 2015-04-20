@@ -78,6 +78,7 @@ public class BudgetTrackDetailsFragment extends Fragment
 
     private MenuItem mNextMenuItem;
     private MenuItem mPreviousMenuItem;
+    private MenuItem mCriteriaMenuItem;
 
     /**
      * Use this factory method to create a new instance of
@@ -153,11 +154,12 @@ public class BudgetTrackDetailsFragment extends Fragment
 
         mPreviousMenuItem = menu.findItem(R.id.budgetTrackDetailsPrevious);
         mNextMenuItem = menu.findItem(R.id.budgetTrackDetailsNext);
+        mCriteriaMenuItem = menu.findItem(R.id.budgetTrackDetailsCriteria);
 
-        setupPrevNext();
+        setupActionItems();
     }
 
-    private void setupPrevNext(){
+    private void setupActionItems(){
 
         mPreviousMenuItem.setVisible(true);
         mNextMenuItem.setVisible(true);
@@ -167,6 +169,22 @@ public class BudgetTrackDetailsFragment extends Fragment
         }
         else if (mBudgetInfoItemPos == mBudgetInfoItemList.size()-1){
             mNextMenuItem.setVisible(false);
+        }
+        else if(mBudgetInfoItemPos == -1) {
+            mPreviousMenuItem.setVisible(false);
+            mNextMenuItem.setVisible(false);
+        }
+
+        switch (mCurrentSortCriteria){
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_COST:
+                mCriteriaMenuItem.setIcon(R.drawable.ic_action_cost);
+                break;
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION:
+                mCriteriaMenuItem.setIcon(R.drawable.ic_action_duration);
+                break;
+            case BudgetInfoListViewAdapter.SORT_CRITERIA_DATE:
+                mCriteriaMenuItem.setIcon(R.drawable.ic_action_date);
+                break;
         }
     }
 
@@ -251,13 +269,29 @@ public class BudgetTrackDetailsFragment extends Fragment
                 return true;
             case R.id.budgetTrackDetailsNext:
                 ++mBudgetInfoItemPos;
-                setupPrevNext();
                 trackChanged();
                 return true;
             case R.id.budgetTrackDetailsPrevious:
                 --mBudgetInfoItemPos;
-                setupPrevNext();
                 trackChanged();
+                return true;
+
+            case R.id.budgetTrackDetailsCriteria:
+                if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_COST){
+                    item.setIcon(R.drawable.ic_action_duration);
+                    mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION;
+                }
+                else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION){
+                    item.setIcon(R.drawable.ic_action_date);
+                    mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DATE;
+                }
+                else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DATE){
+                    item.setIcon(R.drawable.ic_action_cost);
+                    mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;
+                }
+
+                setupInfoItemView();
+
                 return true;
         }
 
@@ -301,6 +335,8 @@ public class BudgetTrackDetailsFragment extends Fragment
     }
 
     private void setupUIandTask(){
+
+        setupActionItems();
 
         FrameLayout endFragment = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
         if (endFragment == null){

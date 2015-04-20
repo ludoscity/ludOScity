@@ -6,6 +6,10 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_action_previous_track"/>
     <item
+        android:id="@+id/budgetTrackDetailsCriteria"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_cost"/>
+    <item
         android:id="@+id/budgetTrackDetailsNext"
         app:showAsAction="always"
         android:icon="@drawable/ic_action_next_track"/>
