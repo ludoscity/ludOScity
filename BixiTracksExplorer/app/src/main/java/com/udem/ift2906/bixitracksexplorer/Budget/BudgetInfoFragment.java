@@ -49,6 +49,7 @@ public class BudgetInfoFragment extends ListFragment {
     private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
 
     private float mLastCheckedViewY = 0.f;
+    private float mLastCheckedViewX = 0.f;
 
     private OnFragmentInteractionListener mListener;
 
@@ -262,6 +263,9 @@ public class BudgetInfoFragment extends ListFragment {
 
         getListView().setItemChecked(position, true);
 
+        mLastCheckedViewY = v.getY();
+        mLastCheckedViewX = v.getX();
+
         FrameLayout endFragment = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
         if (endFragment == null){
             //Let's animate !!
@@ -278,8 +282,8 @@ public class BudgetInfoFragment extends ListFragment {
             mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
 
             //... set initial position...
-            mLastCheckedViewY = v.getY();
-            mAnimatedrowBitmapHolderImageView.setX(v.getX());
+            //under the actionBar
+            mAnimatedrowBitmapHolderImageView.setX(mLastCheckedViewX);
             mAnimatedrowBitmapHolderImageView.setY(mLastCheckedViewY + getActivity().findViewById(R.id.toolbar_main).getHeight());
 
             //Setup animation
