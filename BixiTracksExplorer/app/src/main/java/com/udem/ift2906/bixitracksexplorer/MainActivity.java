@@ -53,6 +53,7 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
     private CharSequence mSubtitle;
+    private int mPositionLastItemSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +104,10 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+        //TODO Do it better: don't replace fragment if its the same as current
+        if (position == mPositionLastItemSelected)
+            return;
+        mPositionLastItemSelected = position;
 
         //En attendant d'avoir un menu bien rempli, juste pour tester la class NearbyFragment
         if (position == 0){
