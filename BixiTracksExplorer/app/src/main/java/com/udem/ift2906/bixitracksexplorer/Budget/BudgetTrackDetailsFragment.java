@@ -76,6 +76,9 @@ public class BudgetTrackDetailsFragment extends Fragment
 
     private View mInfoListRowView;
 
+    private MenuItem mNextMenuItem;
+    private MenuItem mPreviousMenuItem;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -147,6 +150,24 @@ public class BudgetTrackDetailsFragment extends Fragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
 
         menuInflater.inflate(R.menu.menu_budget_track_details, menu);
+
+        mPreviousMenuItem = menu.findItem(R.id.budgetTrackDetailsPrevious);
+        mNextMenuItem = menu.findItem(R.id.budgetTrackDetailsNext);
+
+        setupPrevNext();
+    }
+
+    private void setupPrevNext(){
+
+        mPreviousMenuItem.setVisible(true);
+        mNextMenuItem.setVisible(true);
+
+        if (mBudgetInfoItemPos == 0) {
+            mPreviousMenuItem.setVisible(false);
+        }
+        else if (mBudgetInfoItemPos == mBudgetInfoItemList.size()-1){
+            mNextMenuItem.setVisible(false);
+        }
     }
 
     //On enter animation end we want to switch the Bitmap ImageView visibility
@@ -228,9 +249,35 @@ public class BudgetTrackDetailsFragment extends Fragment
                 //called when the up affordance/carat in actionbar is pressed
                 getActivity().onBackPressed();
                 return true;
+            case R.id.budgetTrackDetailsNext:
+                ++mBudgetInfoItemPos;
+                setupPrevNext();
+                trackChanged();
+                return true;
+            case R.id.budgetTrackDetailsPrevious:
+                --mBudgetInfoItemPos;
+                setupPrevNext();
+                trackChanged();
+                return true;
         }
 
         return false;
+    }
+
+    private void trackChanged(){
+
+        mMap.clear();
+
+        try {
+            //Happens on UI thread
+            mTrackDataFromDB = DBHelper.retrieveTrack(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString());
+        } catch (CouchbaseLiteException e) {
+
+            e.printStackTrace();
+        }
+
+        setupUIandTask();
+
     }
 
     @Override
@@ -337,15 +384,7 @@ public class BudgetTrackDetailsFragment extends Fragment
         mBudgetInfoItemPos = _budgetInfoItemPos;
         mCurrentSortCriteria = _sortCriteria;
 
-        try {
-            //Happens on UI thread
-            mTrackDataFromDB = DBHelper.retrieveTrack(mBudgetInfoItemList.get(mBudgetInfoItemPos).getIDAsString());
-        } catch (CouchbaseLiteException e) {
-
-            e.printStackTrace();
-        }
-
-        setupUIandTask();
+        trackChanged();
     }
 
     private void addTrackPolylineToMap(){
