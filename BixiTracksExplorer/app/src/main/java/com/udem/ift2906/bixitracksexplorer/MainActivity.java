@@ -2,6 +2,7 @@ package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -44,8 +45,8 @@ public class MainActivity extends ActionBarActivity
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
-
     private DrawerLayout mDrawerLayout;
+    public static Resources resources;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -56,6 +57,8 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        resources = getResources();
 
         //Read app params and apply them
         if(getResources().getBoolean(R.bool.allow_portrait)){

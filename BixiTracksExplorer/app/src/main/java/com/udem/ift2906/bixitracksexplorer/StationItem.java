@@ -29,8 +29,11 @@ public class StationItem implements Parcelable {
         //TODO Changes to markers are to be done here (for now)
         markerOptions = new MarkerOptions()
                 .position(position)
-                .title(name)
-                .snippet("Bikes available: " + free_bikes + "/" + (empty_slots + free_bikes));
+                .title(name);
+        if (!locked)
+            markerOptions.snippet(MainActivity.resources.getString(R.string.bikesAvailable) + free_bikes + "/" + (empty_slots + free_bikes));
+        else
+            markerOptions.snippet(MainActivity.resources.getString(R.string.stationIsLocked));
     }
 
     public StationItem(BixiStation _station, boolean isFavorite, String date) {
@@ -42,7 +45,7 @@ public class StationItem implements Parcelable {
         this.position = new LatLng(_station.latitude, _station.longitude);
         this.isFavorite = isFavorite;
         this.timestamp = date;
-
+        setUpMarker();
     }
 
     public StationItem(Parcel in){
@@ -116,5 +119,13 @@ public class StationItem implements Parcelable {
         dest.writeParcelable(position, flags);
         dest.writeByte((byte) (isFavorite? 1:0));
         dest.writeString(timestamp);
+    }
+
+    public String getDistanceStringFromLatLng(LatLng currentUserLatLng) {
+        int distance = (int) getMeterFromLatLng(currentUserLatLng);
+        if (distance < 1000)
+            return "" + distance + " m";
+        distance = distance/1000;
+        return String.format("%d.3",distance) + " km";
     }
 }
