@@ -1,5 +1,8 @@
 package com.udem.ift2906.bixitracksexplorer;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.SphericalUtil;
@@ -10,7 +13,7 @@ import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
  *
  * Simple item holding the data necessary for each stations to be shown in listViewAdapter
  */
-public class StationItem {
+public class StationItem implements Parcelable {
     private long uid;
     private String name;
     private boolean locked;
@@ -27,7 +30,7 @@ public class StationItem {
         markerOptions = new MarkerOptions()
                 .position(position)
                 .title(name)
-                .snippet("Bikes available: " + free_bikes + "/" + (empty_slots+free_bikes));
+                .snippet("Bikes available: " + free_bikes + "/" + (empty_slots + free_bikes));
     }
 
     public StationItem(BixiStation _station, boolean isFavorite, String date) {
@@ -42,6 +45,17 @@ public class StationItem {
 
     }
 
+    public StationItem(Parcel in){
+        uid = in.readLong();
+        name = in.readString();
+        locked = in.readByte() != 0;
+        empty_slots = in.readInt();
+        free_bikes = in.readInt();
+        position = in.readParcelable(LatLng.class.getClassLoader());
+        isFavorite = in.readByte() != 0;
+        timestamp = in.readString();
+        setUpMarker();
+    }
 
     public long getUid() {
         return uid;
@@ -85,5 +99,22 @@ public class StationItem {
 
     public String getTimestamp() {
         return timestamp;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(uid);
+        dest.writeString(name);
+        dest.writeByte((byte) (locked? 1:0));
+        dest.writeInt(empty_slots);
+        dest.writeInt(free_bikes);
+        dest.writeParcelable(position, flags);
+        dest.writeByte((byte) (isFavorite? 1:0));
+        dest.writeString(timestamp);
     }
 }

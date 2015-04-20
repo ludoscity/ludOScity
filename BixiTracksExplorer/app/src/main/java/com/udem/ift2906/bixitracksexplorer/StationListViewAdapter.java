@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -55,7 +54,6 @@ public class StationListViewAdapter extends BaseAdapter {
         TextView distance;
         TextView name;
         TextView availability;
-        ImageView directionArrow;
     }
 
     @Override
@@ -82,16 +80,13 @@ public class StationListViewAdapter extends BaseAdapter {
             holder.distance = (TextView) convertView.findViewById(R.id.station_distance);
             holder.name = (TextView) convertView.findViewById(R.id.station_name);
             holder.availability = (TextView) convertView.findViewById(R.id.station_availability);
-            holder.directionArrow = (ImageView) convertView.findViewById(R.id.station_direction_arrow);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         StationItem currentStation= mStationList.get(position);
         if (mCurrentUserLatLng != null) {
-            holder.directionArrow.setRotation((float) currentStation.getBearingFromLatLng(mCurrentUserLatLng));
-            holder.distance.setText(String.valueOf((int)currentStation.getMeterFromLatLng(mCurrentUserLatLng)) + " m ");
-            holder.directionArrow.setRotation((float) currentStation.getBearingFromLatLng(mCurrentUserLatLng));
+            holder.distance.setText(String.valueOf((int) currentStation.getMeterFromLatLng(mCurrentUserLatLng)) + " m ");
         } else {
             //TODO better distance message if no user location available
             holder.distance.setText(String.valueOf("???"));

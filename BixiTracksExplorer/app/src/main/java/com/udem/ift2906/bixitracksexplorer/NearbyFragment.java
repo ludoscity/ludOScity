@@ -7,11 +7,14 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,25 +29,27 @@ import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiAPI;
 
 public class NearbyFragment extends Fragment
         implements OnMapReadyCallback {
+    private Context mContext;
     private GoogleMap nearbyMap = null;
-    private BixiAPI bixiApiInstance;
     private LatLng mCurrentUserLatLng;
     private LocationManager mLocationManager;
-
-    private Context mContext;
 
     private OnFragmentInteractionListener mListener;
     private StationListViewAdapter mStationListViewAdapter;
     private ListView mStationListView;
     private StationsNetwork mStationsNetwork;
 
-    private DownloadWebTask mDownloadWebTask;
-
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private ImageButton mRefreshButton;
+
     private TextView mLastUpdatedTextView;
+    private ImageButton mRefreshButton;
+    private View mStationInfo;
+    private boolean isStationInfoVisible;
+    private ImageView mDirectionArrow;
     private Boolean isDownloadCurrentlyExecuting;
 
+    private DownloadWebTask mDownloadWebTask;
+    private BixiAPI bixiApiInstance;
 
     public static NearbyFragment newInstance(int sectionNumber) {
         NearbyFragment fragment = new NearbyFragment();
@@ -85,15 +90,14 @@ public class NearbyFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         View inflatedView = layoutInflater.inflate(R.layout.fragment_nearby, viewGroup, false);
-
         if(nearbyMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
-
         mRefreshButton = (ImageButton) inflatedView.findViewById(R.id.refreshDatabase_button);
         setRefreshButtonListener();
         mLastUpdatedTextView = (TextView) inflatedView.findViewById(R.id.lastUpdated_textView);
-
         mStationListView = (ListView) inflatedView.findViewById(R.id.stationListView);
+        mStationInfo = inflatedView.findViewById(R.id.stationInfo);
+        mDirectionArrow = (ImageView) inflatedView.findViewById(R.id.arrowImage);
         setOnClickItemListenerStationListView();
         return inflatedView;
     }
@@ -102,12 +106,56 @@ public class NearbyFragment extends Fragment
         mStationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                StationItem stationClicked = mStationsNetwork.stations.get(position);
-                long uid = stationClicked.getUid();
-                String stationName = stationClicked.getName();
-                mListener.onNearbyFragmentInteraction(uid, stationName);
+                replaceListViewByInfoView(mStationsNetwork.stations.get(position));
             }
         });
+    }
+
+    private void replaceListViewByInfoView(StationItem stationItem) {
+        isStationInfoVisible = true;
+        mStationListView.setVisibility(View.GONE);
+        mStationInfo.setVisibility(View.VISIBLE);
+        mListener.onNearbyFragmentInteraction(stationItem.getName(),false);
+        if(mCurrentUserLatLng != null)
+            mDirectionArrow.setRotation((float)stationItem.getBearingFromLatLng(mCurrentUserLatLng));
+        else
+            mDirectionArrow.setVisibility(View.INVISIBLE);
+        //Set Sensor management
+        //sensorManager.registerListener(this, sensorMagneticField, SensorManager.SENSOR_DELAY_NORMAL);
+        // Back press should revert to listView
+        this.getView().setFocusableInTouchMode(true);
+        this.getView().setOnKeyListener( new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey( View v, int keyCode, KeyEvent event )
+            {
+                if( keyCode == KeyEvent.KEYCODE_BACK && isStationInfoVisible ) {
+                    replaceInfoViewByListView();
+                    return true;
+                }
+                return false;
+            }
+        } );
+    }
+
+    private void replaceInfoViewByListView(){
+        isStationInfoVisible = false;
+        mStationListView.setVisibility(View.VISIBLE);
+        mStationInfo.setVisibility(View.GONE);
+        mListener.onNearbyFragmentInteraction(getString(R.string.title_section_nearby),true);
+        //sensorManager.unregisterListener(this, sensorMagneticField);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Get item selected and deal with it
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //called when the up affordance/carat in actionbar is pressed
+                replaceInfoViewByListView();
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -122,9 +170,10 @@ public class NearbyFragment extends Fragment
     @Override
     public void onMapReady(GoogleMap googleMap) {
         nearbyMap = googleMap;
-
         nearbyMap.setMyLocationEnabled(true);
-        nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 10));
+        if (mCurrentUserLatLng != null)
+            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 5));
+        else nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 5));
     }
 
     public void setCurrentLocation() {
@@ -149,7 +198,7 @@ public class NearbyFragment extends Fragment
 
     //Pour interaction avec mainActivity
     public interface OnFragmentInteractionListener {
-        public void onNearbyFragmentInteraction(long uid, String stationName);
+        public void onNearbyFragmentInteraction(String title,boolean isNavDrawerEnabled);
     }
 
     public Context getContext() {
@@ -179,13 +228,10 @@ public class NearbyFragment extends Fragment
             //TODO : What if map is not ready when we're done here
             mStationsNetwork.setUpMarkers();
             mStationsNetwork.addMarkersToMap(nearbyMap);
-
             mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng);
             mStationListView.setAdapter(mStationListViewAdapter);
-
             //TODO add time awareness
-            mLastUpdatedTextView.setText(R.string.lastUpdated + "1 min ago");
-
+            mLastUpdatedTextView.setText(getString(R.string.lastUpdated) + "1 min ago");
             isDownloadCurrentlyExecuting = false;
         }
     }

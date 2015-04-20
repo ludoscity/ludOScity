@@ -5,23 +5,13 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:id="@+id/userLocationAware_layout"
+    <TextView
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:gravity="left">
-        <ImageView
-            android:id="@+id/station_direction_arrow"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:src="@drawable/direction_arrow"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/station_distance"
-            />
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="5dp"
+        android:id="@+id/station_distance"
+        />
 
     <TextView
         android:layout_width="wrap_content"
@@ -37,6 +27,4 @@
         android:textSize="24sp"
         android:id="@+id/station_availability"
         />
-
-
 </LinearLayout>
