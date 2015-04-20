@@ -100,48 +100,50 @@ public class BudgetInfoFragment extends ListFragment {
                 getActivity().onBackPressed();
                 return true;
 
-            case R.id.budgetInfoSortOrder:
+            case R.id.budgetInfoSortOrder: {
 
-                ((BudgetInfoListViewAdapter)getListAdapter()).reverseSortOrderAndNotify();
-                if(mSortOrderHighToLow){
+                BudgetInfoItem checkedItem = sortChangeBegin();
+
+                ((BudgetInfoListViewAdapter) getListAdapter()).reverseSortOrderAndNotify();
+                if (mSortOrderHighToLow) {
                     item.setIcon(R.drawable.ic_action_sort_low_to_high);
-                }
-                else{
+                } else {
                     item.setIcon(R.drawable.ic_action_sort_high_to_low);
                 }
                 mSortOrderHighToLow = !mSortOrderHighToLow;
+
+                sortChangeEnd(checkedItem);
+
                 return true;
+            }
+            case R.id.budgetInfoSortCriteria: {
+                BudgetInfoItem checkedItem = sortChangeBegin();
 
-            case R.id.budgetInfoSortCriteria:
-                BudgetInfoItem checkedItem = beginSort();
-
-                if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_COST){
+                if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_COST) {
                     item.setIcon(R.drawable.ic_action_duration);
                     mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION;
-                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByDurationAndNotify(mSortOrderHighToLow);
-                }
-                else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION){
+                    ((BudgetInfoListViewAdapter) getListAdapter()).sortTracksByDurationAndNotify(mSortOrderHighToLow);
+                } else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION) {
                     item.setIcon(R.drawable.ic_action_date);
                     mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DATE;
-                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByDateAndNotify(mSortOrderHighToLow);
-                }
-                else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DATE){
+                    ((BudgetInfoListViewAdapter) getListAdapter()).sortTracksByDateAndNotify(mSortOrderHighToLow);
+                } else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DATE) {
                     item.setIcon(R.drawable.ic_action_cost);
                     mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;
-                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByCostAndNotify(mSortOrderHighToLow);
+                    ((BudgetInfoListViewAdapter) getListAdapter()).sortTracksByCostAndNotify(mSortOrderHighToLow);
                 }
 
-                endSort(checkedItem);
+                sortChangeEnd(checkedItem);
 
                 notifySortCriteriaChangeToActivity();
                 return true;
-
+            }
         }
 
         return false;
     }
 
-    private BudgetInfoItem beginSort(){
+    private BudgetInfoItem sortChangeBegin(){
 
         int checkedItemPos = getListView().getCheckedItemPosition();
         BudgetInfoItem checkedItem = null;
@@ -155,7 +157,7 @@ public class BudgetInfoFragment extends ListFragment {
         return checkedItem;
     }
 
-    private void endSort(BudgetInfoItem checkedBefore){
+    private void sortChangeEnd(BudgetInfoItem checkedBefore){
         if (checkedBefore != null){
             for (int i = 0; i < mBudgetInfoItems.size(); ++i) {
                 BudgetInfoItem curItem = (BudgetInfoItem) getListView().getItemAtPosition(i);
