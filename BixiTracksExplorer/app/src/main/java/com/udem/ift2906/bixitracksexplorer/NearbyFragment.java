@@ -2,6 +2,7 @@ package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -31,10 +32,11 @@ import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiAPI;
 
 
 public class NearbyFragment extends Fragment
-        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener {
+        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener, GoogleMap.OnCameraChangeListener, GoogleMap.OnInfoWindowClickListener {
     private Context mContext;
     private GoogleMap nearbyMap = null;
     private LatLng mCurrentUserLatLng;
+    private CameraPosition mBackCameraPosition;
 
     private OnFragmentInteractionListener mListener;
     private StationListViewAdapter mStationListViewAdapter;
@@ -52,7 +54,7 @@ public class NearbyFragment extends Fragment
 
     private DownloadWebTask mDownloadWebTask;
     private BixiAPI bixiApiInstance;
-    private CameraPosition mBackCameraPosition;
+
 
     public static NearbyFragment newInstance(int sectionNumber) {
         NearbyFragment fragment = new NearbyFragment();
@@ -77,6 +79,7 @@ public class NearbyFragment extends Fragment
 
         mDownloadWebTask = new DownloadWebTask();
         mDownloadWebTask.execute();
+
     }
 
     @Override
@@ -120,19 +123,25 @@ public class NearbyFragment extends Fragment
         mListener.onNearbyFragmentInteraction(stationItem.getName(), false);
         //Remember the current cameraPosition
         mBackCameraPosition = nearbyMap.getCameraPosition();
-        //Build new map
-        nearbyMap.clear();
-        nearbyMap.addMarker(stationItem.getMarkerOptions());
+        // Hide all other ground overlays
+        LatLng stationPosition = stationItem.getPosition();
+        for (StationsNetwork.MarkerContainer markerContainer: mStationsNetwork.markerContainers){
+            if(!stationPosition.equals(markerContainer.marker.getPosition())){
+                markerContainer.groundOverlay.setVisible(false);
+                markerContainer.marker.hideInfoWindow();
+            }
+            else markerContainer.marker.showInfoWindow();
+        }
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
         boundsBuilder.include(stationItem.getPosition());
-        setCurrentLocation();
+        // Direction arrow only available if user location is known
         if(mCurrentUserLatLng != null) {
             boundsBuilder.include(mCurrentUserLatLng);
             mDirectionArrow.setRotation((float) stationItem.getBearingFromLatLng(mCurrentUserLatLng));
         }else
             mDirectionArrow.setVisibility(View.INVISIBLE);
         // Move map camera to focus station and user
-        nearbyMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(),50));
+        nearbyMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(),100));
         // Set back button to return to normal nearby view with list
         this.getView().setFocusableInTouchMode(true);
         this.getView().setOnKeyListener(new View.OnKeyListener() {
@@ -154,8 +163,11 @@ public class NearbyFragment extends Fragment
         // Put 'nearby' as title in the action bar and reset access to drawer
         mListener.onNearbyFragmentInteraction(getString(R.string.title_section_nearby), true);
         nearbyMap.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
-        nearbyMap.clear();
-        mStationsNetwork.addMarkersToMap(nearbyMap);
+        // Restore map
+        for (StationsNetwork.MarkerContainer markerContainer: mStationsNetwork.markerContainers){
+            markerContainer.groundOverlay.setVisible(true);
+            markerContainer.marker.hideInfoWindow();
+        }
     }
 
     @Override
@@ -188,9 +200,10 @@ public class NearbyFragment extends Fragment
             nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
         else nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
         nearbyMap.setOnMarkerClickListener(this);
+        nearbyMap.setOnInfoWindowClickListener(this);
         nearbyMap.setOnMyLocationChangeListener(this);
+        nearbyMap.setOnCameraChangeListener(this);
     }
-
 
     private void setRefreshButtonListener() {
         mRefreshButton.setOnClickListener(new View.OnClickListener() {
@@ -208,8 +221,10 @@ public class NearbyFragment extends Fragment
     public boolean onMarkerClick(Marker marker) {
         int i = mStationListViewAdapter.getPositionInList(marker);
         Log.d("onMarkerClick","Scroll view to " + i);
-        if (i!= -1)
+        if (i!= -1) {
             mStationListView.smoothScrollToPosition(i);
+            mStationListView.setItemChecked(i, true);
+        }
         return false;
     }
 
@@ -226,6 +241,27 @@ public class NearbyFragment extends Fragment
             mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             if(mStationListViewAdapter != null)
                 mStationListViewAdapter.setCurrentUserLatLng(mCurrentUserLatLng);
+        }
+    }
+
+    @Override
+    public void onCameraChange(CameraPosition cameraPosition) {
+        Log.d("CameraZoomLevel", Float.toString(cameraPosition.zoom));
+        float maxZoom = 16;
+        if (cameraPosition.zoom > maxZoom){
+            nearbyMap.animateCamera(CameraUpdateFactory.zoomTo(maxZoom));
+        }
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        if(!isStationInfoVisible) {
+            for (StationItem station : mStationsNetwork.stations) {
+                if (station.getPosition().equals(marker.getPosition())) {
+                    replaceListViewByInfoView(station);
+                    return;
+                }
+            }
         }
     }
 
@@ -265,7 +301,8 @@ public class NearbyFragment extends Fragment
             mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng);
             mStationListView.setAdapter(mStationListViewAdapter);
             //TODO add time awareness
-            mLastUpdatedTextView.setText(getString(R.string.lastUpdated) + "1 min ago");
+            mLastUpdatedTextView.setText(getString(R.string.lastUpdated) +" "+ getString(R.string.momentsAgo));
+            mLastUpdatedTextView.setTextColor(Color.LTGRAY);
             isDownloadCurrentlyExecuting = false;
         }
     }

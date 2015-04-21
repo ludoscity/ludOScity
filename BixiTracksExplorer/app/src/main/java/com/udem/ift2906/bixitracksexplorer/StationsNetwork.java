@@ -1,6 +1,8 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
 
@@ -9,14 +11,27 @@ import java.util.ArrayList;
  */
 public class StationsNetwork {
     public ArrayList<StationItem> stations;
+    public ArrayList<MarkerContainer> markerContainers;
 
+    public class MarkerContainer{
+        Marker marker;
+        GroundOverlay groundOverlay;
+        MarkerContainer(Marker marker, GroundOverlay groundOverlay){
+            this.marker = marker;
+            this.groundOverlay = groundOverlay;
+        }
+    }
     public StationsNetwork() {
         stations = new ArrayList<>();
+        markerContainers = new ArrayList<>();
     }
 
-    public void addMarkersToMap(GoogleMap nearbyMap) {
+    public void addMarkersToMap(GoogleMap map) {
         for (StationItem item: stations){
-            nearbyMap.addMarker(item.getMarkerOptions());
+            markerContainers.add(new MarkerContainer(
+                    map.addMarker(item.getMarkerOptions()),
+                    map.addGroundOverlay(item.getGroundOverlayOptions()))
+            );
         }
     }
 }

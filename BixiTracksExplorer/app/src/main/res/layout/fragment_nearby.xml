@@ -75,12 +75,10 @@
             android:layout_height="fill_parent"
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
-            android:padding="4px"
+            android:padding="1px"
             android:clickable="true"
             android:layout_gravity="right"
             />
 
     </LinearLayout>
-
-
 </LinearLayout>

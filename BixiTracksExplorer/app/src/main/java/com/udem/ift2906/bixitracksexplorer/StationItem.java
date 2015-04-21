@@ -3,9 +3,13 @@ package com.udem.ift2906.bixitracksexplorer;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.SphericalUtil;
+import com.google.maps.android.clustering.ClusterItem;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
 
 /**
@@ -13,7 +17,7 @@ import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
  *
  * Simple item holding the data necessary for each stations to be shown in listViewAdapter
  */
-public class StationItem implements Parcelable {
+public class StationItem implements Parcelable, ClusterItem {
     private long uid;
     private String name;
     private boolean locked;
@@ -22,18 +26,38 @@ public class StationItem implements Parcelable {
     private LatLng position;
     private boolean isFavorite;
     private MarkerOptions markerOptions;
+    private GroundOverlayOptions groundOverlayOptions;
     private String timestamp;
 
+    private static final BitmapDescriptor redIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_red);
+    private static final BitmapDescriptor greyIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_grey);
+    private static final BitmapDescriptor greenIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_green);
+    private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_yellow);
 
     public void setUpMarker(){
         //TODO Changes to markers are to be done here (for now)
         markerOptions = new MarkerOptions()
                 .position(position)
-                .title(name);
+                .title(name)
+                .alpha(0)
+                .anchor(0.5f,0.5f)
+                .infoWindowAnchor(0.5f,0.5f);
         if (!locked)
             markerOptions.snippet(MainActivity.resources.getString(R.string.bikesAvailable) + free_bikes + "/" + (empty_slots + free_bikes));
         else
             markerOptions.snippet(MainActivity.resources.getString(R.string.stationIsLocked));
+        // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
+        groundOverlayOptions = new GroundOverlayOptions()
+                .position(position, 50)
+                .transparency(0.1f);
+        if (locked)
+            groundOverlayOptions.image(greyIcon);
+        else if (free_bikes == 0)
+            groundOverlayOptions.image(redIcon);
+        else if (free_bikes < 3)
+            groundOverlayOptions.image(yellowIcon);
+        else
+            groundOverlayOptions.image(greenIcon);
     }
 
     public StationItem(BixiStation _station, boolean isFavorite, String date) {
@@ -95,6 +119,8 @@ public class StationItem implements Parcelable {
     public MarkerOptions getMarkerOptions() {
         return markerOptions;
     }
+
+    public GroundOverlayOptions getGroundOverlayOptions() {return groundOverlayOptions;}
 
     public boolean isLocked() {
         return locked;
