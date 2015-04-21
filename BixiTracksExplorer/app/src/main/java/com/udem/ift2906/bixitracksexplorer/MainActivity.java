@@ -53,7 +53,7 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
     private CharSequence mSubtitle;
-    private int mPositionLastItemSelected;
+    private int mPositionLastItemSelected = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
