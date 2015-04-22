@@ -58,7 +58,8 @@ public class FavoritesFragment extends Fragment  {
         }
         setCurrentLocation();
 
-        mStationListViewAdapter = new StationListViewAdapter(mContext,stationsNetworkFavorites,mCurrentUserLatLng);
+        //Todo no longer valid (isLookingForBikes)
+        mStationListViewAdapter = new StationListViewAdapter(mContext,stationsNetworkFavorites,mCurrentUserLatLng,true);
 
     }
 

@@ -60,11 +60,13 @@ public class NearbyFragment extends Fragment
     private boolean isStationInfoVisible;
     private ImageView mDirectionArrow;
     private boolean isDownloadCurrentlyExecuting;
-    private MenuItem mFavoriteStarOn=null;
-    private MenuItem mFavoriteStarOff=null;
+    private MenuItem mFavoriteStarOn;
+    private MenuItem mFavoriteStarOff;
+    private MenuItem mParkingSwitch;
 
     private DownloadWebTask mDownloadWebTask;
     private BixiAPI bixiApiInstance;
+    private boolean mIsLookingForBikes;
 
 
     public static NearbyFragment newInstance(int sectionNumber) {
@@ -91,6 +93,9 @@ public class NearbyFragment extends Fragment
 
         mDownloadWebTask = new DownloadWebTask();
         mDownloadWebTask.execute();
+
+        //TODO move this affectation
+        mIsLookingForBikes = true;
 
     }
 
@@ -127,9 +132,12 @@ public class NearbyFragment extends Fragment
         inflater.inflate(R.menu.menu_nearby,menu);
         mFavoriteStarOn = menu.findItem(R.id.favoriteStarOn);
         mFavoriteStarOff = menu.findItem(R.id.favoriteStarOff);
+        mParkingSwitch = menu.findItem(R.id.showParkingAvailability);
         if (!isStationInfoVisible) {
             mFavoriteStarOn.setVisible(false);
             mFavoriteStarOff.setVisible(false);
+        } else {
+            mParkingSwitch.setVisible(false);
         }
         Log.d("onCreateOptionsMenu","menu created");
     }
@@ -156,17 +164,17 @@ public class NearbyFragment extends Fragment
         mListener.onNearbyFragmentInteraction(stationItem.getName(), false);
         //Remember the current cameraPosition
         mBackCameraPosition = nearbyMap.getCameraPosition();
-        // Hide all other ground overlays
-        LatLng stationPosition = stationItem.getPosition();
-        for (StationsNetwork.MarkerContainer markerContainer: mStationsNetwork.markerContainers){
-            if(!stationPosition.equals(markerContainer.marker.getPosition())){
-                markerContainer.groundOverlay.setVisible(false);
-                markerContainer.marker.hideInfoWindow();
-            }
-            // Show InfoWindow only if the station would appear small
-            else if(mCurrentUserLatLng != null && stationItem.getMeterFromLatLng(mCurrentUserLatLng)>1000)
-                markerContainer.marker.showInfoWindow();
+        // Hide all ground overlays
+        for (StationItem station: mStationsNetwork.stations) {
+            station.getGroundOverlay().setVisible(false);
+            station.getMarker().hideInfoWindow();
         }
+        // Show only current one
+        mCurrentInfoStation.getGroundOverlay().setVisible(true);
+        // Show InfoWindow only if the station would appear small on the map
+        if(mCurrentUserLatLng != null && stationItem.getMeterFromLatLng(mCurrentUserLatLng)>1000)
+            mCurrentInfoStation.getMarker().showInfoWindow();
+
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
         boundsBuilder.include(stationItem.getPosition());
         // Direction arrow only available if user location is known
@@ -199,7 +207,6 @@ public class NearbyFragment extends Fragment
                 return false;
             }
         });
-        // Show station information
     }
 
     private void replaceInfoViewByListView(){
@@ -210,9 +217,9 @@ public class NearbyFragment extends Fragment
         mListener.onNearbyFragmentInteraction(getString(R.string.title_section_nearby), true);
         nearbyMap.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
         // Restore map
-        for (StationsNetwork.MarkerContainer markerContainer: mStationsNetwork.markerContainers){
-            markerContainer.groundOverlay.setVisible(true);
-            markerContainer.marker.hideInfoWindow();
+        for (StationItem station: mStationsNetwork.stations){
+            station.getGroundOverlay().setVisible(true);
+            station.getMarker().hideInfoWindow();
         }
         // Hide the star
         mFavoriteStarOn.setVisible(false);
@@ -234,6 +241,10 @@ public class NearbyFragment extends Fragment
             case R.id.favoriteStarOff:
                 if(isStationInfoVisible)
                     changeFavoriteValue();
+                return true;
+            case R.id.showParkingAvailability:
+                mIsLookingForBikes = !mIsLookingForBikes;
+                lookingForBikes(mIsLookingForBikes);
                 return true;
         }
         return false;
@@ -328,6 +339,13 @@ public class NearbyFragment extends Fragment
         }
     }
 
+    public void lookingForBikes(boolean isLookingForBikes){
+        for(StationItem station: mStationsNetwork.stations){
+            station.updateMarker(isLookingForBikes);
+            mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
+        }
+    }
+
     //Pour interaction avec mainActivity
     public interface OnFragmentInteractionListener {
         public void onNearbyFragmentInteraction(String title,boolean isNavDrawerEnabled);
@@ -361,7 +379,7 @@ public class NearbyFragment extends Fragment
             mStationsNetwork.addMarkersToMap(nearbyMap);
             if(mCurrentUserLatLng != null)
                 nearbyMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
-            mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng);
+            mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng, mIsLookingForBikes);
             mStationListView.setAdapter(mStationListViewAdapter);
             //TODO add time awareness
             mLastUpdatedTextView.setText(getString(R.string.lastUpdated) +" "+ getString(R.string.momentsAgo));

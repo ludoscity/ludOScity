@@ -3,10 +3,13 @@ package com.udem.ift2906.bixitracksexplorer;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterItem;
@@ -26,9 +29,15 @@ public class StationItem implements Parcelable, ClusterItem {
     private int free_bikes;
     private LatLng position;
     private boolean isFavorite;
+    private String timestamp;
+
     private MarkerOptions markerOptions;
     private GroundOverlayOptions groundOverlayOptions;
-    private String timestamp;
+
+
+    private Marker marker;
+    private GroundOverlay groundOverlay;
+
 
     private static final BitmapDescriptor redIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_red);
     private static final BitmapDescriptor greyIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_grey);
@@ -36,7 +45,7 @@ public class StationItem implements Parcelable, ClusterItem {
     private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_yellow);
 
     public void setUpMarker(){
-        //TODO Changes to markers are to be done here (for now)
+        //TODO isLookingForBike?
         markerOptions = new MarkerOptions()
                 .position(position)
                 .title(name)
@@ -97,20 +106,20 @@ public class StationItem implements Parcelable, ClusterItem {
         return empty_slots;
     }
 
-    public int getFree_bikes() {
-        return free_bikes;
-    }
+    public int getFree_bikes() { return free_bikes; }
 
     public double getMeterFromLatLng(LatLng userLocation) {
-        return SphericalUtil.computeDistanceBetween(userLocation, position);
-    }
+        return SphericalUtil.computeDistanceBetween(userLocation, position);}
 
     public double getBearingFromLatLng(LatLng userLocation){
-        return SphericalUtil.computeHeading(userLocation,position);
-    }
+        return SphericalUtil.computeHeading(userLocation,position);}
 
-    public LatLng getPosition() {
-        return position;
+    public LatLng getPosition() {return position;}
+
+    public Marker getMarker() {return marker;}
+
+    public GroundOverlay getGroundOverlay() {
+        return groundOverlay;
     }
 
     public boolean isFavorite() {
@@ -121,12 +130,6 @@ public class StationItem implements Parcelable, ClusterItem {
         isFavorite = b;
         DBHelper.updateFavorite(b,uid);
     }
-
-    public MarkerOptions getMarkerOptions() {
-        return markerOptions;
-    }
-
-    public GroundOverlayOptions getGroundOverlayOptions() {return groundOverlayOptions;}
 
     public boolean isLocked() {
         return locked;
@@ -159,5 +162,32 @@ public class StationItem implements Parcelable, ClusterItem {
             return "" + distance + " m";
         distance = distance/1000;
         return String.format("%d.3",distance) + " km";
+    }
+
+    public void addMarkerToMap(GoogleMap map){
+        marker = map.addMarker(markerOptions);
+        groundOverlay = map.addGroundOverlay(groundOverlayOptions);
+    }
+
+    public void updateMarker(boolean isLookingForBikes) {
+        if (isLookingForBikes){
+            if (free_bikes == 0)
+                groundOverlay.setImage(redIcon);
+            else if (free_bikes < 3)
+                groundOverlay.setImage(yellowIcon);
+            // check if the overlay is not already green
+            else if (empty_slots < 3)
+                // overlay isn't green yet
+                groundOverlay.setImage(greenIcon);
+        } else {
+            if (empty_slots == 0)
+                groundOverlay.setImage(redIcon);
+            else if (empty_slots < 3)
+                groundOverlay.setImage(yellowIcon);
+            // check if the overlay is not already green
+            else if (free_bikes < 3)
+                // overlay isn't green yet
+                groundOverlay.setImage(greenIcon);
+        }
     }
 }

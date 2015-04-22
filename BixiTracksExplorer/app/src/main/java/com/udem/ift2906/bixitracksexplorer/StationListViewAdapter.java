@@ -26,11 +26,16 @@ public class StationListViewAdapter extends BaseAdapter {
     private List<StationItem> mStationList = null;
     private LatLng mCurrentUserLatLng;
 
-    StationListViewAdapter(Context _context, StationsNetwork _stationsNetwork, LatLng _currentUserLatLng){
+
+
+    private boolean mIsLookingForBikes;
+
+    StationListViewAdapter(Context _context, StationsNetwork _stationsNetwork, LatLng _currentUserLatLng,boolean isLookingForBikes){
         mContext = _context;
         mStationList = _stationsNetwork.stations;
         mInflater = LayoutInflater.from(_context);
         mCurrentUserLatLng = _currentUserLatLng;
+        mIsLookingForBikes = isLookingForBikes;
         sortStationListByClosest();
     }
 
@@ -50,6 +55,13 @@ public class StationListViewAdapter extends BaseAdapter {
             i++;
         }
         return -1;
+    }
+
+    public void lookingForBikesNotify(boolean isLookingForBikes) {
+        if (mIsLookingForBikes != isLookingForBikes){
+            mIsLookingForBikes = isLookingForBikes;
+            notifyDataSetChanged();
+        }
     }
 
     public void sortStationListByClosest(){
@@ -106,10 +118,10 @@ public class StationListViewAdapter extends BaseAdapter {
         }
         holder.name.setText(String.valueOf(currentStation.getName()));
 
-        //TODO A REVOIR
-        holder.availability.setText("" + currentStation.getFree_bikes()
-                + "/"
-                + (mStationList.get(position).getFree_bikes()+currentStation.getEmpty_slots()));
+        if (mIsLookingForBikes)
+            holder.availability.setText(String.valueOf(currentStation.getFree_bikes()));
+        else
+            holder.availability.setText(String.valueOf(currentStation.getEmpty_slots()));
 
         return convertView;
     }
