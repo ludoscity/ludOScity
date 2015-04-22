@@ -340,10 +340,14 @@ public class NearbyFragment extends Fragment
     }
 
     public void lookingForBikes(boolean isLookingForBikes){
-        if(isLookingForBikes)
-            Toast.makeText(mContext,getString(R.string.findABikes),Toast.LENGTH_SHORT).show();
-        else
-            Toast.makeText(mContext,getString(R.string.findAParkings),Toast.LENGTH_SHORT).show();
+        if(isLookingForBikes) {
+            mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
+            Toast.makeText(mContext, getString(R.string.findABikes), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            mParkingSwitch.setIcon(R.drawable.ic_action_find_dock);
+            Toast.makeText(mContext, getString(R.string.findAParkings), Toast.LENGTH_SHORT).show();
+        }
 
         for(StationItem station: mStationsNetwork.stations){
             station.updateMarker(isLookingForBikes);
