@@ -1,7 +1,6 @@
 package com.udem.ift2906.bixitracksexplorer.BixiAPI;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -11,12 +10,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 import com.udem.ift2906.bixitracksexplorer.StationItem;
-import com.udem.ift2906.bixitracksexplorer.StationListViewAdapter;
 import com.udem.ift2906.bixitracksexplorer.StationsNetwork;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -30,17 +27,10 @@ import java.util.Date;
 /**
  * Created by Gevrai on 15-03-26.
  *
- * API simpliste qui download le fichier JSON de bixi-montreal sur citybik.es et l'enregistre dans
- * les sharedPreferences pour accès hors ligne
- *
- * TODO Create Bixi class from json.
- *
  */
 
 public class BixiAPI{
     private String url = "http://api.citybik.es/v2/networks/bixi-montreal?fields=stations";
-    private String dataName = "DATA";
-    private String preferenceName = "BixiStationsData";
     Context context;
     BixiNetwork bixiNetwork = null;
     StationsNetwork stationsNetwork = null;
@@ -56,6 +46,7 @@ public class BixiAPI{
                 String data = EntityUtils.toString(getHttp(url), HTTP.UTF_8);
 
                 Gson gson = new GsonBuilder().create();
+
                 bixiNetwork = gson.fromJson(data, BixiNetwork.class);
 
                 stationsNetwork = new StationsNetwork();
@@ -84,7 +75,7 @@ public class BixiAPI{
         return mWifi.isConnected();
     }
 
-    public HttpEntity getHttp(String url) throws ClientProtocolException, IOException {
+    public HttpEntity getHttp(String url) throws IOException {
         HttpClient httpClient = new DefaultHttpClient();
         HttpGet http = new HttpGet(url);
         HttpResponse response = httpClient.execute(http);

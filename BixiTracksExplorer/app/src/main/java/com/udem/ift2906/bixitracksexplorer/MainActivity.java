@@ -2,6 +2,7 @@ package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,18 +45,21 @@ public class MainActivity extends ActionBarActivity
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
-
     private DrawerLayout mDrawerLayout;
+    public static Resources resources;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
     private CharSequence mSubtitle;
+    private int mPositionLastItemSelected = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        resources = getResources();
 
         //Read app params and apply them
         if(getResources().getBoolean(R.bool.allow_portrait)){
@@ -70,6 +75,8 @@ public class MainActivity extends ActionBarActivity
 
 
         setContentView(R.layout.activity_main);
+        setSupportActionBar((Toolbar)findViewById(R.id.toolbar_main));
+
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -97,6 +104,10 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+        //TODO Do it better: don't replace fragment if its the same as current
+        if (position == mPositionLastItemSelected)
+            return;
+        mPositionLastItemSelected = position;
 
         //En attendant d'avoir un menu bien rempli, juste pour tester la class NearbyFragment
         if (position == 0){
@@ -184,9 +195,9 @@ public class MainActivity extends ActionBarActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        //if (id == R.id.action_settings) {
+        //    return true;
+        //}
 
         return super.onOptionsItemSelected(item);
     }
@@ -242,15 +253,10 @@ public class MainActivity extends ActionBarActivity
             if(endContainer != null){
                 endContainer.setVisibility(View.VISIBLE);
 
-                BudgetTrackDetailsFragment newEndFragment = BudgetTrackDetailsFragment.newInstance(-1, null, -1);
+                BudgetTrackDetailsFragment newEndFragment = BudgetTrackDetailsFragment.newInstance(-1, null, -1, true);
 
                 transaction.replace(R.id.end_fragment_container, newEndFragment);
             }
-
-
-
-
-
 
             transaction.addToBackStack(null);
 
@@ -276,7 +282,8 @@ public class MainActivity extends ActionBarActivity
 
                 BudgetTrackDetailsFragment newFragment = BudgetTrackDetailsFragment.newInstance(Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_ITEMPOS_PARAM)),
                         _budgetInfoItemList,
-                        Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_SORT_CRITERIA_PARAM)));
+                        Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_SORT_CRITERIA_PARAM)),
+                        false);
                 mSubtitle = getString(R.string.budgettrackdetails_subtitle);
 
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -308,8 +315,10 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onNearbyFragmentInteraction() {
-
+    public void onNearbyFragmentInteraction(String title, boolean isDrawerIndicatorEnabled) {
+        mTitle = title;
+        mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(isDrawerIndicatorEnabled);
+        restoreActionBar();
     }
 
     @Override

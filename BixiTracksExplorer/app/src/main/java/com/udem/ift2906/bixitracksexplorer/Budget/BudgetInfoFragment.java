@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -46,6 +47,9 @@ public class BudgetInfoFragment extends ListFragment {
     private int mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;
 
     private ArrayList<BudgetInfoItem> mBudgetInfoItems = new ArrayList<>();
+
+    private float mLastCheckedViewY = 0.f;
+    private float mLastCheckedViewX = 0.f;
 
     private OnFragmentInteractionListener mListener;
 
@@ -97,41 +101,75 @@ public class BudgetInfoFragment extends ListFragment {
                 getActivity().onBackPressed();
                 return true;
 
-            case R.id.budgetInfoSortOrder:
+            case R.id.budgetInfoSortOrder: {
 
-                ((BudgetInfoListViewAdapter)getListAdapter()).reverseSortOrderAndNotify();
-                if(mSortOrderHighToLow){
+                BudgetInfoItem checkedItem = sortChangeBegin();
+
+                ((BudgetInfoListViewAdapter) getListAdapter()).reverseSortOrderAndNotify();
+                if (mSortOrderHighToLow) {
                     item.setIcon(R.drawable.ic_action_sort_low_to_high);
-                }
-                else{
+                } else {
                     item.setIcon(R.drawable.ic_action_sort_high_to_low);
                 }
                 mSortOrderHighToLow = !mSortOrderHighToLow;
-                return true;
 
-            case R.id.budgetInfoSortCriteria:
-                if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_COST){
+                sortChangeEnd(checkedItem);
+
+                return true;
+            }
+            case R.id.budgetInfoSortCriteria: {
+                BudgetInfoItem checkedItem = sortChangeBegin();
+
+                if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_COST) {
                     item.setIcon(R.drawable.ic_action_duration);
                     mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION;
-                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByDurationAndNotify(mSortOrderHighToLow);
-                }
-                else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION){
+                    ((BudgetInfoListViewAdapter) getListAdapter()).sortTracksByDurationAndNotify(mSortOrderHighToLow);
+                } else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DURATION) {
                     item.setIcon(R.drawable.ic_action_date);
                     mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_DATE;
-                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByDateAndNotify(mSortOrderHighToLow);
-                }
-                else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DATE){
+                    ((BudgetInfoListViewAdapter) getListAdapter()).sortTracksByDateAndNotify(mSortOrderHighToLow);
+                } else if (mCurrentSortCriteria == BudgetInfoListViewAdapter.SORT_CRITERIA_DATE) {
                     item.setIcon(R.drawable.ic_action_cost);
                     mCurrentSortCriteria = BudgetInfoListViewAdapter.SORT_CRITERIA_COST;
-                    ((BudgetInfoListViewAdapter)getListAdapter()).sortTracksByCostAndNotify(mSortOrderHighToLow);
+                    ((BudgetInfoListViewAdapter) getListAdapter()).sortTracksByCostAndNotify(mSortOrderHighToLow);
                 }
+
+                sortChangeEnd(checkedItem);
 
                 notifySortCriteriaChangeToActivity();
                 return true;
-
+            }
         }
 
         return false;
+    }
+
+    private BudgetInfoItem sortChangeBegin(){
+
+        int checkedItemPos = getListView().getCheckedItemPosition();
+        BudgetInfoItem checkedItem = null;
+        if ( checkedItemPos != AdapterView.INVALID_POSITION){
+
+            getListView().setItemChecked(checkedItemPos, false);
+            checkedItem = (BudgetInfoItem)getListView().getItemAtPosition(checkedItemPos);
+
+        }
+
+        return checkedItem;
+    }
+
+    private void sortChangeEnd(BudgetInfoItem checkedBefore){
+        if (checkedBefore != null){
+            for (int i = 0; i < mBudgetInfoItems.size(); ++i) {
+                BudgetInfoItem curItem = (BudgetInfoItem) getListView().getItemAtPosition(i);
+
+                if (curItem == checkedBefore) {
+                    getListView().setItemChecked(i, true);
+                    getListView().setSelectionFromTop(i,(int)mLastCheckedViewY);
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -225,6 +263,9 @@ public class BudgetInfoFragment extends ListFragment {
 
         getListView().setItemChecked(position, true);
 
+        mLastCheckedViewY = v.getY();
+        mLastCheckedViewX = v.getX();
+
         FrameLayout endFragment = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
         if (endFragment == null){
             //Let's animate !!
@@ -241,8 +282,9 @@ public class BudgetInfoFragment extends ListFragment {
             mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
 
             //... set initial position...
-            mAnimatedrowBitmapHolderImageView.setX(v.getX());
-            mAnimatedrowBitmapHolderImageView.setY(v.getY());
+            //under the actionBar
+            mAnimatedrowBitmapHolderImageView.setX(mLastCheckedViewX);
+            mAnimatedrowBitmapHolderImageView.setY(mLastCheckedViewY + getActivity().findViewById(R.id.toolbar_main).getHeight());
 
             //Setup animation
             mAnimatedrowBitmapHolderImageView.animate().x(targetAbsoluteXY.first)
@@ -284,7 +326,7 @@ public class BudgetInfoFragment extends ListFragment {
         int listViewBottom = getListView().getBottom();
         int listViewRight = getListView().getRight();
 
-        int YTarget = listViewBottom - rowView.getHeight();
+        int YTarget = listViewBottom - rowView.getHeight() + getActivity().findViewById(R.id.toolbar_main).getHeight();
 
 
         // First figure out if we're on a one of two fragments configuration

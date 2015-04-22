@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.udem.ift2906.bixitracksexplorer.NearbyFragment">
+    tools:context="com.udem.ift2906.bixitracksexplorer.NearbyFragment"
+    android:id="@+id/nearbyFragmentLayout">
 
     <fragment
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -12,13 +13,72 @@
         android:id="@+id/mapNearby"
         android:layout_width="fill_parent"
         android:layout_height="0px"
-        android:layout_weight="3"/>
+        android:layout_weight="6"/>
 
-    <ListView
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="0px"
-        android:layout_weight="2"
-        android:id="@+id/stationListView" />
+        android:layout_weight="4">
 
+        <ListView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/stationListView" />
 
+        <LinearLayout
+            android:id="@+id/stationInfo"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/arrowImage"
+                android:src="@drawable/direction_arrow"
+                android:layout_width="0px"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:layout_gravity="left|top"
+                android:rotation="0"/>
+
+            <LinearLayout
+                android:layout_width="0px"
+                android:layout_height="fill_parent"
+                android:layout_weight="3">
+
+                <TextView
+                    android:id="@+id/stationName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"/>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0px"
+        android:layout_weight="0.5"
+        android:background="@color/background_material_dark">
+        <TextView
+            android:id="@+id/lastUpdated_textView"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:gravity="center"
+            android:text="@string/lastUpdated"/>
+
+        <ImageButton
+            android:id="@+id/refreshDatabase_button"
+            android:src="@drawable/ic_action_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:padding="1px"
+            android:clickable="true"
+            android:layout_gravity="right"
+            />
+
+    </LinearLayout>
 </LinearLayout>

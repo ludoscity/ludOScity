@@ -5,10 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,8 +18,6 @@ import java.util.List;
  * Created by Gevrai on 2015-04-03.
  *
  * Adapter used to show the datas of every stationItem
- * TODO sort by proximity to user
- *
  */
 public class StationListViewAdapter extends BaseAdapter {
     LayoutInflater mInflater;
@@ -36,8 +34,22 @@ public class StationListViewAdapter extends BaseAdapter {
         sortStationListByClosest();
     }
 
-    public void setCurrentUserLatLng(LatLng mCurrentUserLatLng) {
-        this.mCurrentUserLatLng = mCurrentUserLatLng;
+    public void setCurrentUserLatLng(LatLng currentUserLatLng) {
+        if (mCurrentUserLatLng != currentUserLatLng) {
+            this.mCurrentUserLatLng = currentUserLatLng;
+            sortStationListByClosest();
+            notifyDataSetChanged();
+        }
+    }
+
+    public int getPositionInList(Marker marker){
+        int i = 0;
+        for (StationItem stationItem: mStationList){
+            if (stationItem.getName().equals(marker.getTitle()))
+                return i;
+            i++;
+        }
+        return -1;
     }
 
     public void sortStationListByClosest(){
@@ -55,7 +67,6 @@ public class StationListViewAdapter extends BaseAdapter {
         TextView distance;
         TextView name;
         TextView availability;
-        ImageView directionArrow;
     }
 
     @Override
@@ -70,7 +81,7 @@ public class StationListViewAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return (long) mStationList.get(position).getUid();
+        return mStationList.get(position).getUid();
     }
 
     @Override
@@ -82,18 +93,16 @@ public class StationListViewAdapter extends BaseAdapter {
             holder.distance = (TextView) convertView.findViewById(R.id.station_distance);
             holder.name = (TextView) convertView.findViewById(R.id.station_name);
             holder.availability = (TextView) convertView.findViewById(R.id.station_availability);
-            holder.directionArrow = (ImageView) convertView.findViewById(R.id.station_direction_arrow);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         StationItem currentStation= mStationList.get(position);
         if (mCurrentUserLatLng != null) {
-            holder.distance.setText(String.valueOf((int)currentStation.getMeterFromLatLng(mCurrentUserLatLng)) + " m ");
-            holder.directionArrow.setRotation((float) currentStation.getBearingFromLatLng(mCurrentUserLatLng));
+            holder.distance.setVisibility(View.VISIBLE);
+            holder.distance.setText(currentStation.getDistanceStringFromLatLng(mCurrentUserLatLng));
         } else {
-            //TODO better distance message if no user location available
-            holder.distance.setText(String.valueOf("???"));
+            holder.distance.setVisibility(View.GONE);
         }
         holder.name.setText(String.valueOf(currentStation.getName()));
 
