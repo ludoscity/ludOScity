@@ -13,6 +13,7 @@ public class StationsNetwork {
     public ArrayList<StationItem> stations;
     public ArrayList<MarkerContainer> markerContainers;
 
+    // Class representing a marker and it's corresponding
     public class MarkerContainer{
         Marker marker;
         GroundOverlay groundOverlay;

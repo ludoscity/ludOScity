@@ -23,7 +23,7 @@
         <ListView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/stationListView" />
+            android:id="@+id/stationListView"/>
 
         <LinearLayout
             android:id="@+id/stationInfo"
@@ -32,26 +32,48 @@
             android:layout_height="fill_parent"
             android:visibility="gone">
 
-            <ImageView
-                android:id="@+id/arrowImage"
-                android:src="@drawable/direction_arrow"
-                android:layout_width="0px"
-                android:layout_height="100dp"
-                android:layout_weight="1"
-                android:layout_gravity="left|top"
-                android:rotation="0"/>
-
             <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="0px"
                 android:layout_height="fill_parent"
                 android:layout_weight="3">
 
                 <TextView
-                    android:id="@+id/stationName"
+                    android:id="@+id/stationInfo_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"/>
+                    android:layout_gravity="top|center_horizontal"
+                    android:textSize="@dimen/abc_text_size_title_material"/>
+                <TextView
+                    android:id="@+id/stationInfo_bikeAvailability"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|center_horizontal"
+                    android:textSize="@dimen/abc_text_size_title_material"/>
+                <TextView
+                    android:id="@+id/stationInfo_parkingAvailability"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|center_horizontal"
+                    android:textSize="@dimen/abc_text_size_title_material"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0px"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/arrowImage"
+                    android:src="@drawable/direction_arrow"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="top"
+                    android:rotation="0"/>
+
+            </LinearLayout>
+
         </LinearLayout>
     </RelativeLayout>
 

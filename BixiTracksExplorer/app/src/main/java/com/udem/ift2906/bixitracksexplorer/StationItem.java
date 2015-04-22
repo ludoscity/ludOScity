@@ -11,6 +11,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterItem;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
+import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 
 /**
  * Created by Gevrai on 2015-04-03.
@@ -43,7 +44,7 @@ public class StationItem implements Parcelable, ClusterItem {
                 .anchor(0.5f,0.5f)
                 .infoWindowAnchor(0.5f,0.5f);
         if (!locked)
-            markerOptions.snippet(MainActivity.resources.getString(R.string.bikesAvailable) + free_bikes + "/" + (empty_slots + free_bikes));
+            markerOptions.snippet(MainActivity.resources.getString(R.string.bikesAvailability) + free_bikes + "/" + (empty_slots + free_bikes));
         else
             markerOptions.snippet(MainActivity.resources.getString(R.string.stationIsLocked));
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
@@ -114,6 +115,11 @@ public class StationItem implements Parcelable, ClusterItem {
 
     public boolean isFavorite() {
         return isFavorite;
+    }
+
+    public void setFavorite(Boolean b){
+        isFavorite = b;
+        DBHelper.updateFavorite(b,uid);
     }
 
     public MarkerOptions getMarkerOptions() {

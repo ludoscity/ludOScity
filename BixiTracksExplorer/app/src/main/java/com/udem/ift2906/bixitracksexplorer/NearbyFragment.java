@@ -10,6 +10,8 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,23 +36,32 @@ import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiAPI;
 public class NearbyFragment extends Fragment
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener, GoogleMap.OnCameraChangeListener, GoogleMap.OnInfoWindowClickListener {
     private Context mContext;
+    private OnFragmentInteractionListener mListener;
+
     private GoogleMap nearbyMap = null;
     private LatLng mCurrentUserLatLng;
     private CameraPosition mBackCameraPosition;
+    private float mMaxZoom = 16f;
 
-    private OnFragmentInteractionListener mListener;
     private StationListViewAdapter mStationListViewAdapter;
     private ListView mStationListView;
     private StationsNetwork mStationsNetwork;
+    private StationItem mCurrentInfoStation;
+    private TextView mStationNameView;
+    private TextView mStationBikeAvailView;
+    private TextView mStationParkingAvailView;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private TextView mLastUpdatedTextView;
+
     private ImageButton mRefreshButton;
-    private View mStationInfo;
+    private View mStationInfoView;
     private boolean isStationInfoVisible;
     private ImageView mDirectionArrow;
     private boolean isDownloadCurrentlyExecuting;
+    private MenuItem mFavoriteStarOn=null;
+    private MenuItem mFavoriteStarOff=null;
 
     private DownloadWebTask mDownloadWebTask;
     private BixiAPI bixiApiInstance;
@@ -60,6 +71,7 @@ public class NearbyFragment extends Fragment
         NearbyFragment fragment = new NearbyFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        fragment.setHasOptionsMenu(true);
         fragment.setArguments(args);
         return fragment;
     }
@@ -102,9 +114,24 @@ public class NearbyFragment extends Fragment
         mLastUpdatedTextView = (TextView) inflatedView.findViewById(R.id.lastUpdated_textView);
         mStationListView = (ListView) inflatedView.findViewById(R.id.stationListView);
         setOnClickItemListenerStationListView();
-        mStationInfo = inflatedView.findViewById(R.id.stationInfo);
+        mStationInfoView = inflatedView.findViewById(R.id.stationInfo);
         mDirectionArrow = (ImageView) inflatedView.findViewById(R.id.arrowImage);
+        mStationNameView = (TextView) inflatedView.findViewById(R.id.stationInfo_name);
+        mStationBikeAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_bikeAvailability);
+        mStationParkingAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_parkingAvailability);
         return inflatedView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_nearby,menu);
+        mFavoriteStarOn = menu.findItem(R.id.favoriteStarOn);
+        mFavoriteStarOff = menu.findItem(R.id.favoriteStarOff);
+        if (!isStationInfoVisible) {
+            mFavoriteStarOn.setVisible(false);
+            mFavoriteStarOff.setVisible(false);
+        }
+        Log.d("onCreateOptionsMenu","menu created");
     }
 
     private void setOnClickItemListenerStationListView() {
@@ -118,8 +145,14 @@ public class NearbyFragment extends Fragment
 
     private void replaceListViewByInfoView(StationItem stationItem) {
         isStationInfoVisible = true;
+        mCurrentInfoStation = stationItem;
+        // Add favorite button
+        if (stationItem.isFavorite())
+            mFavoriteStarOn.setVisible(true);
+        else mFavoriteStarOff.setVisible(true);
+        // Switch views
         mStationListView.setVisibility(View.GONE);
-        mStationInfo.setVisibility(View.VISIBLE);
+        mStationInfoView.setVisibility(View.VISIBLE);
         mListener.onNearbyFragmentInteraction(stationItem.getName(), false);
         //Remember the current cameraPosition
         mBackCameraPosition = nearbyMap.getCameraPosition();
@@ -130,7 +163,9 @@ public class NearbyFragment extends Fragment
                 markerContainer.groundOverlay.setVisible(false);
                 markerContainer.marker.hideInfoWindow();
             }
-            else markerContainer.marker.showInfoWindow();
+            // Show InfoWindow only if the station would appear small
+            else if(mCurrentUserLatLng != null && stationItem.getMeterFromLatLng(mCurrentUserLatLng)>1000)
+                markerContainer.marker.showInfoWindow();
         }
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
         boundsBuilder.include(stationItem.getPosition());
@@ -140,8 +175,18 @@ public class NearbyFragment extends Fragment
             mDirectionArrow.setRotation((float) stationItem.getBearingFromLatLng(mCurrentUserLatLng));
         }else
             mDirectionArrow.setVisibility(View.INVISIBLE);
+        // Set station information
+        mStationNameView.setText(mCurrentInfoStation.getName());
+        if (mCurrentInfoStation.getFree_bikes() < 2)
+            mStationBikeAvailView.setText(mCurrentInfoStation.getFree_bikes() +" "+ getString(R.string.bikeAvailable_sing));
+        else
+            mStationBikeAvailView.setText(mCurrentInfoStation.getFree_bikes() +" "+ getString(R.string.bikesAvailable_plur));
+        if (mCurrentInfoStation.getEmpty_slots() < 2)
+            mStationParkingAvailView.setText(mCurrentInfoStation.getEmpty_slots()+" "+ getString(R.string.parkingAvailable_sing));
+        else
+            mStationParkingAvailView.setText(mCurrentInfoStation.getEmpty_slots()+" "+ getString(R.string.parkingsAvailable_plur));
         // Move map camera to focus station and user
-        nearbyMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(),100));
+        nearbyMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100));
         // Set back button to return to normal nearby view with list
         this.getView().setFocusableInTouchMode(true);
         this.getView().setOnKeyListener(new View.OnKeyListener() {
@@ -154,12 +199,13 @@ public class NearbyFragment extends Fragment
                 return false;
             }
         });
+        // Show station information
     }
 
     private void replaceInfoViewByListView(){
         isStationInfoVisible = false;
         mStationListView.setVisibility(View.VISIBLE);
-        mStationInfo.setVisibility(View.GONE);
+        mStationInfoView.setVisibility(View.GONE);
         // Put 'nearby' as title in the action bar and reset access to drawer
         mListener.onNearbyFragmentInteraction(getString(R.string.title_section_nearby), true);
         nearbyMap.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
@@ -168,6 +214,9 @@ public class NearbyFragment extends Fragment
             markerContainer.groundOverlay.setVisible(true);
             markerContainer.marker.hideInfoWindow();
         }
+        // Hide the star
+        mFavoriteStarOn.setVisible(false);
+        mFavoriteStarOff.setVisible(false);
     }
 
     @Override
@@ -178,8 +227,30 @@ public class NearbyFragment extends Fragment
                 //called when the up affordance/carat in actionbar is pressed
                 replaceInfoViewByListView();
                 return true;
+            case R.id.favoriteStarOn:
+                if(isStationInfoVisible)
+                    changeFavoriteValue();
+                return true;
+            case R.id.favoriteStarOff:
+                if(isStationInfoVisible)
+                    changeFavoriteValue();
+                return true;
         }
         return false;
+    }
+
+    private void changeFavoriteValue() {
+        if(mCurrentInfoStation.isFavorite()){
+            mCurrentInfoStation.setFavorite(false);
+            mFavoriteStarOff.setVisible(true);
+            mFavoriteStarOn.setVisible(false);
+            Toast.makeText(mContext,getString(R.string.removedFromFavorites),Toast.LENGTH_SHORT).show();
+        } else {
+            mCurrentInfoStation.setFavorite(true);
+            mFavoriteStarOff.setVisible(false);
+            mFavoriteStarOn.setVisible(true);
+            Toast.makeText(mContext,getString(R.string.addedToFavorites),Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -195,7 +266,6 @@ public class NearbyFragment extends Fragment
     public void onMapReady(GoogleMap googleMap) {
         nearbyMap = googleMap;
         nearbyMap.setMyLocationEnabled(true);
-        setCurrentLocation();
         if (mCurrentUserLatLng != null)
             nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
         else nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
@@ -209,7 +279,7 @@ public class NearbyFragment extends Fragment
         mRefreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isDownloadCurrentlyExecuting) {
+                if (!isDownloadCurrentlyExecuting) {
                     mDownloadWebTask = new DownloadWebTask();
                     mDownloadWebTask.execute();
                 }
@@ -220,18 +290,12 @@ public class NearbyFragment extends Fragment
     @Override
     public boolean onMarkerClick(Marker marker) {
         int i = mStationListViewAdapter.getPositionInList(marker);
-        Log.d("onMarkerClick","Scroll view to " + i);
-        if (i!= -1) {
+        Log.d("onMarkerClick", "Scroll view to " + i);
+        if (i != -1) {
             mStationListView.smoothScrollToPosition(i);
             mStationListView.setItemChecked(i, true);
         }
         return false;
-    }
-
-    public void setCurrentLocation() {
-        Location location = nearbyMap.getMyLocation();
-        if (location != null)
-            mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
     }
 
     @Override
@@ -247,9 +311,8 @@ public class NearbyFragment extends Fragment
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         Log.d("CameraZoomLevel", Float.toString(cameraPosition.zoom));
-        float maxZoom = 16;
-        if (cameraPosition.zoom > maxZoom){
-            nearbyMap.animateCamera(CameraUpdateFactory.zoomTo(maxZoom));
+        if (cameraPosition.zoom > mMaxZoom){
+            nearbyMap.animateCamera(CameraUpdateFactory.zoomTo(mMaxZoom));
         }
     }
 

@@ -30,7 +30,13 @@
     <string name="lastUpdated">Updated from citibik.es</string>
     <string name="momentsAgo">moments ago.</string>
     <string name="minsAgo">min ago.</string>
-    <string name="bikesAvailable">Bikes available:</string>
+    <string name="bikesAvailability">Bikes available:</string>
+    <string name="bikeAvailable_sing">bike available.</string>
+    <string name="bikesAvailable_plur">bikes available.</string>
+    <string name="parkingAvailable_sing">parking space.</string>
+    <string name="parkingsAvailable_plur">parking spaces.</string>
     <string name="stationIsLocked">Locked</string>
+    <string name="removedFromFavorites">Favorite removed</string>
+    <string name="addedToFavorites">Favorite added</string>
 
 </resources>

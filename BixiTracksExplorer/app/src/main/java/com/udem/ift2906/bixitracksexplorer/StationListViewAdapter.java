@@ -86,6 +86,7 @@ public class StationListViewAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        StationItem currentStation= mStationList.get(position);
         final ViewHolder holder;
         if (convertView == null){
             holder = new ViewHolder();
@@ -97,7 +98,6 @@ public class StationListViewAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        StationItem currentStation= mStationList.get(position);
         if (mCurrentUserLatLng != null) {
             holder.distance.setVisibility(View.VISIBLE);
             holder.distance.setText(currentStation.getDistanceStringFromLatLng(mCurrentUserLatLng));

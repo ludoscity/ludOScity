@@ -1,4 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     tools:context="com.udem.ift2906.bixitracksexplorer.NearbyFragment">
 
+    <item
+        android:id="@+id/favoriteStarOn"
+        app:showAsAction="always"
+        android:icon="@android:drawable/btn_star_big_on"/>
+    <item
+        android:id="@+id/favoriteStarOff"
+        app:showAsAction="always"
+        android:icon="@android:drawable/btn_star_big_off"/>
 </menu>
