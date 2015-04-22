@@ -72,7 +72,9 @@ public class StationItem implements Parcelable, ClusterItem {
 
     public StationItem(BixiStation _station, boolean isFavorite, String date) {
         this.uid = _station.extra.uid;
-        this.name = _station.extra.name;
+        // 'Hacky' remove first 7 characters which are a station code
+        // ex: "6156 - Marie-Anne / de la Roche"
+        this.name = _station.name.substring(7);
         this.locked = _station.extra.locked;
         this.empty_slots = _station.empty_slots;
         this.free_bikes = _station.free_bikes;
