@@ -1,6 +1,8 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import android.content.Context;
+import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,8 +27,6 @@ public class StationListViewAdapter extends BaseAdapter {
 
     private List<StationItem> mStationList = null;
     private LatLng mCurrentUserLatLng;
-
-
 
     private boolean mIsLookingForBikes;
 
@@ -116,8 +116,9 @@ public class StationListViewAdapter extends BaseAdapter {
         } else {
             holder.distance.setVisibility(View.GONE);
         }
-        holder.name.setText(String.valueOf(currentStation.getName()));
+        holder.name.setText(Html.fromHtml(currentStation.getName()).toString());
 
+        Log.d("Font test-string vs charSequence", currentStation.getName() + " vs. " + holder.name.getText());
         if (mIsLookingForBikes)
             holder.availability.setText(String.valueOf(currentStation.getFree_bikes()));
         else
