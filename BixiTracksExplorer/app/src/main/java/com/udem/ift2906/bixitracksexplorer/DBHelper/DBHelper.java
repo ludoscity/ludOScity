@@ -231,6 +231,17 @@ public class DBHelper {
         return true;
     }
 
+    public static boolean updateFavorite(Boolean isFavorite, long id) {
+        ContentValues cv = new ContentValues();
+
+        cv.put(BixiStationDatabase.COLUMN_ID, id);
+        cv.put(BixiStationDatabase.COLUMN_FAVORITE, isFavorite ? 1 : 0);
+
+        BixiStationDatabase.getInstance(context).updateRow(cv, id);
+
+        return true;
+    }
+
     public static void addNetwork(StationsNetwork stationsNetwork) {
         for (StationItem station : stationsNetwork.stations) {
             if (isExist(station.getUid()))
