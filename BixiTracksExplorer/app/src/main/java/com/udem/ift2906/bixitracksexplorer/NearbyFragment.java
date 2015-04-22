@@ -340,6 +340,11 @@ public class NearbyFragment extends Fragment
     }
 
     public void lookingForBikes(boolean isLookingForBikes){
+        if(isLookingForBikes)
+            Toast.makeText(mContext,getString(R.string.findABikes),Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(mContext,getString(R.string.findAParkings),Toast.LENGTH_SHORT).show();
+
         for(StationItem station: mStationsNetwork.stations){
             station.updateMarker(isLookingForBikes);
             mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
