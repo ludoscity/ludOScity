@@ -70,6 +70,18 @@ public class StationItem implements Parcelable, ClusterItem {
         setUpMarker();
     }
 
+    public StationItem(long uid, String name, LatLng position, int free_bikes, int empty_slots, String timestamp, boolean locked, boolean isFavorite) {
+        this.uid = uid;
+        this.name = name;
+        this.locked = locked;
+        this.empty_slots = empty_slots;
+        this.free_bikes = free_bikes;
+        this.position = position;
+        this.isFavorite = isFavorite;
+        this.timestamp = timestamp;
+        setUpMarker();
+    }
+
     public void setUpMarker(){
         //TODO isLookingForBike?
         markerOptions = new MarkerOptions()
