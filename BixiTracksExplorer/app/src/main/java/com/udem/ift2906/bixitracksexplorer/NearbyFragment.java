@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -45,6 +46,8 @@ public class NearbyFragment extends Fragment
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener, GoogleMap.OnCameraChangeListener, GoogleMap.OnInfoWindowClickListener {
     private Context mContext;
     private OnFragmentInteractionListener mListener;
+    private static final String ARG_SECTION_NUMBER = "section_number";
+    private static final String PREF_WEBTASK_LAST_TIMESTAMP_MS = "last_refresh_timestamp";
 
     private GoogleMap nearbyMap = null;
     private LatLng mCurrentUserLatLng;
@@ -59,28 +62,25 @@ public class NearbyFragment extends Fragment
     private TextView mStationNameView;
     private TextView mStationBikeAvailView;
     private TextView mStationParkingAvailView;
-
-    private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String PREF_WEBTASK_LAST_TIMESTAMP_MS = "last_refresh_timestamp";
-
     private TextView mLastUpdatedTextView;
     private ProgressBar mUpdateProgressBar;
-
     private TextView mBikesOrParkingColumn;
-    private ImageButton mRefreshButton;
     private View mStationInfoViewHolder;
     private View mStationListViewHolder;
+    private ImageView mRefreshButton;
+    private View mStationInfoView;
     private ImageView mDirectionArrow;
     private MenuItem mFavoriteStarOn;
     private MenuItem mFavoriteStarOff;
     private MenuItem mParkingSwitch;
+    private View mDownloadBar;
 
     private DownloadWebTask mDownloadWebTask;
     private BixiAPI bixiApiInstance;
     private boolean mIsLookingForBikes;
     private boolean isDownloadCurrentlyExecuting;
     private boolean isStationInfoVisible;
-
+    private boolean isAlreadyZoomedToUser;
 
     public static NearbyFragment newInstance(int sectionNumber) {
         NearbyFragment fragment = new NearbyFragment();
@@ -95,7 +95,6 @@ public class NearbyFragment extends Fragment
     public void onStart() {
         super.onStart();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
         if (sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0) == 0) { //Means ask never successfully completed
             //Because webtask launches DB task, we know that a value there means actual data in the DB
             mDownloadWebTask = new DownloadWebTask();
@@ -109,37 +108,25 @@ public class NearbyFragment extends Fragment
     //Safe to call from multiple point in code, refreshing the UI elements with the most recent data available
     //Takes care of map readyness check
     //Safely updates everything based on checking the last update timestamp
-    private void setupUI(boolean _zoomOnCurrentUserLatLong){
+    private void setupUI(){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         long lastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
         if (lastRefreshTimestamp != 0){
-
             long now = System.currentTimeMillis();
             long difference = now - lastRefreshTimestamp;
-
-            mLastUpdatedTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) + getString(R.string.minsAgo));
-
-            //long differenceInMinutes = difference / DateUtils.MINUTE_IN_MILLIS;
-
-            //from : http://stackoverflow.com/questions/25355611/how-to-get-time-difference-between-two-dates-in-android-app
-            //long differenceInSeconds = difference / DateUtils.SECOND_IN_MILLIS;
-// formatted will be HH:MM:SS or MM:SS
-            //String formatted = DateUtils.formatElapsedTime(differenceInSeconds);
+            if (difference < DateUtils.MINUTE_IN_MILLIS)
+                mLastUpdatedTextView.setText(getString(R.string.lastUpdated)+" "+ getString(R.string.momentsAgo));
+            else
+                mLastUpdatedTextView.setText(getString(R.string.lastUpdated)+" "+ Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo));
 
             if(nearbyMap != null) {
-
                 if (mStationsNetwork != null)
                     mStationsNetwork.addMarkersToMap(nearbyMap);
-
-                if (mCurrentUserLatLng != null && _zoomOnCurrentUserLatLong)
-                    nearbyMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
-
                 mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng, mIsLookingForBikes);
                 mStationListView.setAdapter(mStationListViewAdapter);
             }
 
-        }
-        else{
+        } else{
             mLastUpdatedTextView.setText(getString(R.string.nearbyfragment_default_never_web_updated));
         }
     }
@@ -155,10 +142,8 @@ public class NearbyFragment extends Fragment
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-
         //TODO move this affectation
         mIsLookingForBikes = true;
-
     }
 
     @Override
@@ -176,9 +161,11 @@ public class NearbyFragment extends Fragment
         View inflatedView = layoutInflater.inflate(R.layout.fragment_nearby, viewGroup, false);
         if(nearbyMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
-        mRefreshButton = (ImageButton) inflatedView.findViewById(R.id.refreshDatabase_button);
+        mRefreshButton = (ImageView) inflatedView.findViewById(R.id.refreshDatabase_button);
+        mDownloadBar = inflatedView.findViewById(R.id.downloadBar);
         setRefreshButtonListener();
         mLastUpdatedTextView = (TextView) inflatedView.findViewById(R.id.lastUpdated_textView);
+        mLastUpdatedTextView.setTextColor(Color.LTGRAY);
         mStationListView = (ListView) inflatedView.findViewById(R.id.stationListView);
         setOnClickItemListenerStationListView();
         mStationListViewHolder = inflatedView.findViewById(R.id.stationList);
@@ -189,8 +176,8 @@ public class NearbyFragment extends Fragment
         mStationParkingAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_parkingAvailability);
         mUpdateProgressBar = (ProgressBar) inflatedView.findViewById(R.id.refreshDatabase_progressbar);
         mUpdateProgressBar.setVisibility(View.INVISIBLE);
-        setupUI(false);
         mBikesOrParkingColumn = (TextView) inflatedView.findViewById(R.id.bikesOrParkingColumn);
+        setupUI();
         return inflatedView;
     }
 
@@ -346,21 +333,20 @@ public class NearbyFragment extends Fragment
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        isAlreadyZoomedToUser = false;
         nearbyMap = googleMap;
         nearbyMap.setMyLocationEnabled(true);
-        if (mCurrentUserLatLng != null)
-            nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
-        else nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
+        nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
         nearbyMap.setOnMarkerClickListener(this);
         nearbyMap.setOnInfoWindowClickListener(this);
         nearbyMap.setOnMyLocationChangeListener(this);
         nearbyMap.setOnCameraChangeListener(this);
-
-        setupUI(false);
+        setupUI();
     }
 
     private void setRefreshButtonListener() {
-        mRefreshButton.setOnClickListener(new View.OnClickListener() {
+        // TODO maybe not a good idea, the whole view is clickable to start a download
+        mDownloadBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isDownloadCurrentlyExecuting) {
@@ -378,7 +364,6 @@ public class NearbyFragment extends Fragment
         Log.d("onMarkerClick", "Scroll view to " + i);
         if (i != -1) {
             mStationListView.smoothScrollToPosition(i);
-            mStationListView.setItemChecked(i, true);
         }
         return false;
     }
@@ -386,10 +371,15 @@ public class NearbyFragment extends Fragment
     @Override
     public void onMyLocationChange(Location location) {
         if(location != null) {
-            Log.d("onMyLocationChange", "new location "+location.toString());
+            Log.d("onMyLocationChange", "new location " + location.toString());
             mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-            if(mStationListViewAdapter != null)
+            if (mStationListViewAdapter != null)
                 mStationListViewAdapter.setCurrentUserLatLng(mCurrentUserLatLng);
+            if (!isAlreadyZoomedToUser && nearbyMap != null) {
+                Log.d("onMyLocationChange","isAlreadyZoomedToUser = "+isAlreadyZoomedToUser);
+                nearbyMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
+                isAlreadyZoomedToUser = true;
+            }
         }
     }
 
@@ -417,14 +407,18 @@ public class NearbyFragment extends Fragment
         String toastText;
         Drawable icon;
         mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
-
+        Typeface textTypeface = mStationBikeAvailView.getTypeface();
         if(isLookingForBikes) {
             mBikesOrParkingColumn.setText(R.string.bikes);
+            mStationBikeAvailView.setTypeface(textTypeface, Typeface.BOLD);
+            mStationParkingAvailView.setTypeface(textTypeface, Typeface.NORMAL);
             mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
             toastText = getString(R.string.findABikes);
             icon = getResources().getDrawable(R.drawable.bike_icon_toast);
         } else {
             mBikesOrParkingColumn.setText(R.string.parking);
+            mStationBikeAvailView.setTypeface(textTypeface, Typeface.NORMAL);
+            mStationParkingAvailView.setTypeface(textTypeface, Typeface.BOLD);
             mParkingSwitch.setIcon(R.drawable.ic_action_find_dock);
             toastText = getString(R.string.findAParkings);
             icon = getResources().getDrawable(R.drawable.parking_icon_toast);
@@ -510,12 +504,8 @@ public class NearbyFragment extends Fragment
             mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);*/
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
             sp.edit().putLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, Calendar.getInstance().getTimeInMillis()).apply();
-            //mLastUpdatedTextView.setText(getString(R.string.lastUpdated) +" "+ getString(R.string.momentsAgo));
-            //TODO : change this color/backgroun depending on data freshness, making it more and more visisible it's outdated
-            mLastUpdatedTextView.setTextColor(Color.LTGRAY);
             isDownloadCurrentlyExecuting = false;
-
-            setupUI(false);
+            setupUI();
         }
     }
 }

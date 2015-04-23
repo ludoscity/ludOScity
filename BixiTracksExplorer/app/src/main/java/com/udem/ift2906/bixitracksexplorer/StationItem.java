@@ -91,8 +91,15 @@ public class StationItem implements Parcelable, ClusterItem {
                 .alpha(0)
                 .anchor(0.5f,0.5f)
                 .infoWindowAnchor(0.5f,0.5f);
-        if (!locked)
-            markerOptions.snippet(MainActivity.resources.getString(R.string.bikesAvailability) + free_bikes + "/" + (empty_slots + free_bikes));
+        if (!locked) {
+            String parkings;
+            String bikes;
+            if(empty_slots < 2) parkings = MainActivity.resources.getString(R.string.parking) +": ";
+            else parkings = MainActivity.resources.getString(R.string.parkings)+": ";
+            if (free_bikes < 2) bikes = MainActivity.resources.getString(R.string.bike)+": ";
+            else bikes = MainActivity.resources.getString(R.string.bikes)+": ";
+            markerOptions.snippet(bikes + free_bikes + "   " + parkings + empty_slots);
+        }
         else
             markerOptions.snippet(MainActivity.resources.getString(R.string.stationIsLocked));
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...

@@ -24,6 +24,7 @@
 
         <!-- STATION LIST VIEW -->
         <LinearLayout
+
             android:id="@+id/stationList"
             android:orientation="vertical"
             android:layout_width="fill_parent"
@@ -35,7 +36,7 @@
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:background="#BBDEFB">
+                android:background="#1976D2">
 
                 <TextView
                     android:layout_width="0px"
@@ -47,6 +48,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textStyle="bold"
+                    android:textColor="@color/primary_text_default_material_dark"
                     />
 
                 <TextView
@@ -58,7 +60,7 @@
                     android:layout_weight="0.66"
                     android:ellipsize="end"
                     android:singleLine="true"
-
+                    android:textColor="@color/primary_text_default_material_dark"
                     />
 
                 <TextView
@@ -70,6 +72,7 @@
                     android:text="@string/bikes"
                     android:layout_weight="0.18"
                     android:textStyle="bold"
+                    android:textColor="@color/primary_text_default_material_dark"
                     />
             </LinearLayout>
 
@@ -82,51 +85,88 @@
 
         <!-- STATION INFO -->
         <LinearLayout
+            android:visibility="gone"
             android:id="@+id/stationInfo"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:visibility="gone">
+            >
+            <!-- STATION NAME -->
+            <TextView
+                android:id="@+id/stationInfo_name"
+                android:text="Station name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center_horizontal"
+                android:padding="5dp"
+                android:textSize="@dimen/abc_text_size_title_material"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center"
+                android:textColor="@color/primary_text_default_material_dark"
+                android:background="#1976D2"/>
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0px"
-                android:layout_height="fill_parent"
-                android:layout_weight="3">
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/stationInfo_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|center_horizontal"
-                    android:textSize="@dimen/abc_text_size_title_material"/>
-                <TextView
-                    android:id="@+id/stationInfo_bikeAvailability"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|center_horizontal"
-                    android:textSize="@dimen/abc_text_size_title_material"/>
-                <TextView
-                    android:id="@+id/stationInfo_parkingAvailability"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|center_horizontal"
-                    android:textSize="@dimen/abc_text_size_title_material"/>
-            </LinearLayout>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0px"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3">
+                    <TextView
+                        android:id="@+id/stationInfo_bikeAvailability"
+                        android:text="24 bikes available"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0px"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textSize="24dp"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:id="@+id/stationInfo_parkingAvailability"
+                        android:text="13 docks available"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0px"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textSize="24dp"/>
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="0px"
+                        android:layout_weight="1"
+                        />
+                </LinearLayout>
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0px"
-                android:layout_height="fill_parent"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:id="@+id/arrowImage"
-                    android:src="@drawable/direction_arrow"
-                    android:layout_width="fill_parent"
+                <!-- RIGHT SIDE: USER LOCATION-->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0px"
                     android:layout_height="fill_parent"
-                    android:layout_gravity="top"
-                    android:rotation="0"/>
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0px"
+                        android:layout_weight="2"
+                        android:text="356 m"
+                        android:textSize="24dp"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        />
+
+                    <ImageView
+                        android:id="@+id/arrowImage"
+                        android:src="@drawable/direction_arrow"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0px"
+                        android:layout_weight="3"
+                        android:padding="5dp"
+                        android:rotation="0"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -136,6 +176,7 @@
 
     <!-- LAST UPDATED -->
     <LinearLayout
+        android:id="@+id/downloadBar"
         android:layout_width="fill_parent"
         android:layout_height="0px"
         android:layout_weight="0.5"
@@ -150,7 +191,8 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="3dp">
 
             <ProgressBar
                 android:layout_width="wrap_content"
@@ -160,7 +202,7 @@
                 android:layout_centerInParent="true"
                 />
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/refreshDatabase_button"
                 android:src="@drawable/ic_action_refresh"
                 android:layout_width="wrap_content"
@@ -168,7 +210,6 @@
                 android:adjustViewBounds="true"
                 android:scaleType="centerInside"
                 android:padding="1px"
-                android:clickable="true"
                 android:layout_centerInParent="true"
                 android:layout_gravity="right"
                 />
