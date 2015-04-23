@@ -4,7 +4,8 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:baselineAligned="true">
+    android:baselineAligned="true"
+    android:background="#E3F2FD">
 
     <TextView
         android:layout_width="0px"
@@ -16,6 +17,7 @@
         android:ellipsize="end"
         android:singleLine="true"
         android:textStyle="bold"
+
         />
 
     <TextView
