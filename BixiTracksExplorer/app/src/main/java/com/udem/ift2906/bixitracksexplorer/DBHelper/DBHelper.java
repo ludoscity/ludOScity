@@ -148,7 +148,7 @@ public class DBHelper {
         BixiStation station = new BixiStation();
 
         station.extra.uid = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_ID));
-        station.extra.name = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NAME));
+        station.name = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NAME));
         station.latitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LATITUDE));
         station.longitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LONGITUDE));
         station.free_bikes = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NB_BIKES_AVAILABLE));
