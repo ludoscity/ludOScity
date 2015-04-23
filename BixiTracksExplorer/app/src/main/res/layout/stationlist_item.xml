@@ -4,8 +4,7 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:baselineAligned="true"
-    android:background="#E3F2FD">
+    android:baselineAligned="true">
 
     <TextView
         android:layout_width="0px"
