@@ -44,6 +44,19 @@ public class StationItem implements Parcelable, ClusterItem {
     private static final BitmapDescriptor greenIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_green);
     private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_yellow);
 
+    public StationItem(long uid, String name, LatLng position, int free_bikes, int empty_slots, String timestamp, boolean locked, boolean isFavorite) {
+        this.uid = uid;
+        this.name = name;
+        this.locked = locked;
+        this.empty_slots = empty_slots;
+        this.free_bikes = free_bikes;
+        this.position = position;
+        this.isFavorite = isFavorite;
+        this.timestamp = timestamp;
+        setUpMarker();
+    }
+
+    // Constructor to be used ONLY when parsing the json file since it trims the name
     public StationItem(BixiStation _station, boolean isFavorite, String date) {
         this.uid = _station.extra.uid;
         // 'Hacky' remove first 7 characters which are a station code
@@ -67,18 +80,6 @@ public class StationItem implements Parcelable, ClusterItem {
         position = in.readParcelable(LatLng.class.getClassLoader());
         isFavorite = in.readByte() != 0;
         timestamp = in.readString();
-        setUpMarker();
-    }
-
-    public StationItem(long uid, String name, LatLng position, int free_bikes, int empty_slots, String timestamp, boolean locked, boolean isFavorite) {
-        this.uid = uid;
-        this.name = name;
-        this.locked = locked;
-        this.empty_slots = empty_slots;
-        this.free_bikes = free_bikes;
-        this.position = position;
-        this.isFavorite = isFavorite;
-        this.timestamp = timestamp;
         setUpMarker();
     }
 

@@ -57,7 +57,8 @@ public class NearbyFragment extends Fragment
     private TextView mLastUpdatedTextView;
     private TextView mBikesOrParkingColumn;
     private ImageButton mRefreshButton;
-    private View mStationInfoView;
+    private View mStationInfoViewHolder;
+    private View mStationListViewHolder;
     private ImageView mDirectionArrow;
     private MenuItem mFavoriteStarOn;
     private MenuItem mFavoriteStarOff;
@@ -68,6 +69,7 @@ public class NearbyFragment extends Fragment
     private boolean mIsLookingForBikes;
     private boolean isDownloadCurrentlyExecuting;
     private boolean isStationInfoVisible;
+
 
     public static NearbyFragment newInstance(int sectionNumber) {
         NearbyFragment fragment = new NearbyFragment();
@@ -119,7 +121,8 @@ public class NearbyFragment extends Fragment
         mLastUpdatedTextView = (TextView) inflatedView.findViewById(R.id.lastUpdated_textView);
         mStationListView = (ListView) inflatedView.findViewById(R.id.stationListView);
         setOnClickItemListenerStationListView();
-        mStationInfoView = inflatedView.findViewById(R.id.stationInfo);
+        mStationListViewHolder = inflatedView.findViewById(R.id.stationList);
+        mStationInfoViewHolder = inflatedView.findViewById(R.id.stationInfo);
         mDirectionArrow = (ImageView) inflatedView.findViewById(R.id.arrowImage);
         mStationNameView = (TextView) inflatedView.findViewById(R.id.stationInfo_name);
         mStationBikeAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_bikeAvailability);
@@ -161,8 +164,8 @@ public class NearbyFragment extends Fragment
             mFavoriteStarOn.setVisible(true);
         else mFavoriteStarOff.setVisible(true);
         // Switch views
-        mStationListView.setVisibility(View.GONE);
-        mStationInfoView.setVisibility(View.VISIBLE);
+        mStationListViewHolder.setVisibility(View.GONE);
+        mStationInfoViewHolder.setVisibility(View.VISIBLE);
         mListener.onNearbyFragmentInteraction(stationItem.getName(), false);
         //Remember the current cameraPosition
         mBackCameraPosition = nearbyMap.getCameraPosition();
@@ -214,8 +217,8 @@ public class NearbyFragment extends Fragment
 
     private void replaceInfoViewByListView(){
         isStationInfoVisible = false;
-        mStationListView.setVisibility(View.VISIBLE);
-        mStationInfoView.setVisibility(View.GONE);
+        mStationListViewHolder.setVisibility(View.VISIBLE);
+        mStationInfoViewHolder.setVisibility(View.GONE);
         // Put 'nearby' as title in the action bar and reset access to drawer
         mListener.onNearbyFragmentInteraction(getString(R.string.title_section_nearby), true);
         nearbyMap.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
