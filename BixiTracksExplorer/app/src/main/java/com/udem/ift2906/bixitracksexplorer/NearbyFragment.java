@@ -107,7 +107,7 @@ public class NearbyFragment extends Fragment
     //Safe to call from multiple point in code, refreshing the UI elements with the most recent data available
     //Takes care of map readyness check
     //Safely updates everything based on checking the last update timestamp
-    private void setupUI(){
+    private void setupUI(boolean _zoomOnCurrentUserLatLong){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         long lastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
         if (lastRefreshTimestamp != 0){
@@ -129,7 +129,7 @@ public class NearbyFragment extends Fragment
                 if (mStationsNetwork != null)
                     mStationsNetwork.addMarkersToMap(nearbyMap);
 
-                if (mCurrentUserLatLng != null)
+                if (mCurrentUserLatLng != null && _zoomOnCurrentUserLatLong)
                     nearbyMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
 
                 mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng, mIsLookingForBikes);
@@ -186,7 +186,7 @@ public class NearbyFragment extends Fragment
         mStationParkingAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_parkingAvailability);
         mUpdateProgressBar = (ProgressBar) inflatedView.findViewById(R.id.refreshDatabase_progressbar);
         mUpdateProgressBar.setVisibility(View.INVISIBLE);
-        setupUI();
+        setupUI(false);
         mBikesOrParkingColumn = (TextView) inflatedView.findViewById(R.id.bikesOrParkingColumn);
         return inflatedView;
     }
@@ -353,7 +353,7 @@ public class NearbyFragment extends Fragment
         nearbyMap.setOnMyLocationChangeListener(this);
         nearbyMap.setOnCameraChangeListener(this);
 
-        setupUI();
+        setupUI(false);
     }
 
     private void setRefreshButtonListener() {
@@ -498,7 +498,9 @@ public class NearbyFragment extends Fragment
             mUpdateProgressBar.setVisibility(View.INVISIBLE);
             mRefreshButton.setVisibility(View.VISIBLE);
 
-            Toast.makeText(mContext, R.string.download_success, Toast.LENGTH_SHORT).show();
+            //Removed this Toast as progressBar AND updated textView with time in minutes already convey the idea
+            //Maybe have a toat if it was NOT a success
+            //Toast.makeText(mContext, R.string.download_success, Toast.LENGTH_SHORT).show();
 
             //DO SET HERE
             /*SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -510,7 +512,7 @@ public class NearbyFragment extends Fragment
             mLastUpdatedTextView.setTextColor(Color.LTGRAY);
             isDownloadCurrentlyExecuting = false;
 
-            setupUI();
+            setupUI(false);
         }
     }
 }
