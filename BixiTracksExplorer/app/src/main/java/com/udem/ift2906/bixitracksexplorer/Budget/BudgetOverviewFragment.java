@@ -324,6 +324,9 @@ public class BudgetOverviewFragment extends Fragment {
             if (mProcessCostTask != null){
                 mProcessCostTask.publish(progress);
             }
+            if (mWebLoadingTask != null){
+                mWebLoadingTask.publish(progress);
+            }
         }
 
         mCostCalculated = true;
@@ -367,6 +370,10 @@ public class BudgetOverviewFragment extends Fragment {
     }
 
     public class RetrieveTrackDataAndProcessCostTask extends AsyncTask<Void, String, Void> {
+
+        public void publish(String progress){
+            publishProgress(progress);
+        }
 
         @Override
         protected Void doInBackground(Void... params) {

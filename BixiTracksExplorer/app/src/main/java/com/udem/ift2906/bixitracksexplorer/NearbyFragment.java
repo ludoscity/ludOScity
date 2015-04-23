@@ -2,12 +2,15 @@ package com.udem.ift2906.bixitracksexplorer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -21,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,13 +37,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiAPI;
+import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 
+import java.util.Calendar;
 
 public class NearbyFragment extends Fragment
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener, GoogleMap.OnCameraChangeListener, GoogleMap.OnInfoWindowClickListener {
     private Context mContext;
     private OnFragmentInteractionListener mListener;
-    private static final String ARG_SECTION_NUMBER = "section_number";
 
     private GoogleMap nearbyMap = null;
     private LatLng mCurrentUserLatLng;
@@ -54,7 +59,13 @@ public class NearbyFragment extends Fragment
     private TextView mStationNameView;
     private TextView mStationBikeAvailView;
     private TextView mStationParkingAvailView;
+
+    private static final String ARG_SECTION_NUMBER = "section_number";
+    private static final String PREF_WEBTASK_LAST_TIMESTAMP_MS = "last_refresh_timestamp";
+
     private TextView mLastUpdatedTextView;
+    private ProgressBar mUpdateProgressBar;
+
     private TextView mBikesOrParkingColumn;
     private ImageButton mRefreshButton;
     private View mStationInfoView;
@@ -79,6 +90,58 @@ public class NearbyFragment extends Fragment
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        if (sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0) == 0) { //Means ask never successfully completed
+            //Because webtask launches DB task, we know that a value there means actual data in the DB
+            mDownloadWebTask = new DownloadWebTask();
+            mDownloadWebTask.execute();
+        }
+        else{   //Having a timestamp means some data exists in the db, as both task are intimately linked
+            mStationsNetwork = DBHelper.getStationsNetwork();
+        }
+    }
+
+    //Safe to call from multiple point in code, refreshing the UI elements with the most recent data available
+    //Takes care of map readyness check
+    //Safely updates everything based on checking the last update timestamp
+    private void setupUI(){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        long lastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
+        if (lastRefreshTimestamp != 0){
+
+            long now = System.currentTimeMillis();
+            long difference = now - lastRefreshTimestamp;
+
+            mLastUpdatedTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) + getString(R.string.minsAgo));
+
+            //long differenceInMinutes = difference / DateUtils.MINUTE_IN_MILLIS;
+
+            //from : http://stackoverflow.com/questions/25355611/how-to-get-time-difference-between-two-dates-in-android-app
+            //long differenceInSeconds = difference / DateUtils.SECOND_IN_MILLIS;
+// formatted will be HH:MM:SS or MM:SS
+            //String formatted = DateUtils.formatElapsedTime(differenceInSeconds);
+
+            if(nearbyMap != null) {
+
+                if (mStationsNetwork != null)
+                    mStationsNetwork.addMarkersToMap(nearbyMap);
+
+                if (mCurrentUserLatLng != null)
+                    nearbyMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
+
+                mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng, mIsLookingForBikes);
+                mStationListView.setAdapter(mStationListViewAdapter);
+            }
+
+        }
+        else{
+            mLastUpdatedTextView.setText(getString(R.string.nearbyfragment_default_never_web_updated));
+        }
+    }
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mContext = activity;
@@ -90,9 +153,6 @@ public class NearbyFragment extends Fragment
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-
-        mDownloadWebTask = new DownloadWebTask();
-        mDownloadWebTask.execute();
 
         //TODO move this affectation
         mIsLookingForBikes = true;
@@ -124,6 +184,9 @@ public class NearbyFragment extends Fragment
         mStationNameView = (TextView) inflatedView.findViewById(R.id.stationInfo_name);
         mStationBikeAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_bikeAvailability);
         mStationParkingAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_parkingAvailability);
+        mUpdateProgressBar = (ProgressBar) inflatedView.findViewById(R.id.refreshDatabase_progressbar);
+        mUpdateProgressBar.setVisibility(View.INVISIBLE);
+        setupUI();
         mBikesOrParkingColumn = (TextView) inflatedView.findViewById(R.id.bikesOrParkingColumn);
         return inflatedView;
     }
@@ -289,6 +352,8 @@ public class NearbyFragment extends Fragment
         nearbyMap.setOnInfoWindowClickListener(this);
         nearbyMap.setOnMyLocationChangeListener(this);
         nearbyMap.setOnCameraChangeListener(this);
+
+        setupUI();
     }
 
     private void setRefreshButtonListener() {
@@ -310,6 +375,7 @@ public class NearbyFragment extends Fragment
         Log.d("onMarkerClick", "Scroll view to " + i);
         if (i != -1) {
             mStationListView.smoothScrollToPosition(i);
+            mStationListView.setItemChecked(i, true);
         }
         return false;
     }
@@ -399,31 +465,52 @@ public class NearbyFragment extends Fragment
         protected Void doInBackground(Void... params) {
             isDownloadCurrentlyExecuting = true;
             bixiApiInstance = new BixiAPI(mContext);
+            //A Task that launches an other task, ok I want it to show the progress in the user interface
+            //I finally advised gainst cvhanging anything, instead I'll add a setting to display Database toast, and OFF by default
+            //I do that because it seems it's not blocking / crasing if we try to navigate the interface anyway
+            //Let the user choose when to update.
+            //TODO : have the auto update function activated through settings, expressed in maximum rotteness of record to be refreshed automatically on NearbyFragment launch
             mStationsNetwork = bixiApiInstance.downloadBixiNetwork();
             return null;
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mUpdateProgressBar.setVisibility(View.VISIBLE);
+            mRefreshButton.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
         protected void onCancelled (Void aVoid){
             super.onCancelled(aVoid);
-            //Do nothing. task is cancelled if fragment is detached
+            //Set interface back -- Not even nescessary right now as fragment is completely
+            //scrapped each time. Might be usefull in the future.
+            mUpdateProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshButton.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+            //switch progressbar view visibility
+            mUpdateProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshButton.setVisibility(View.VISIBLE);
+
             Toast.makeText(mContext, R.string.download_success, Toast.LENGTH_SHORT).show();
 
-            //TODO : What if map is not ready when we're done here
-            mStationsNetwork.addMarkersToMap(nearbyMap);
-            if(mCurrentUserLatLng != null)
-                nearbyMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
-            mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng, mIsLookingForBikes);
-            mStationListView.setAdapter(mStationListViewAdapter);
-            //TODO add time awareness
-            mLastUpdatedTextView.setText(getString(R.string.lastUpdated) +" "+ getString(R.string.momentsAgo));
+            //DO SET HERE
+            /*SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);*/
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            sp.edit().putLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, Calendar.getInstance().getTimeInMillis()).apply();
+            //mLastUpdatedTextView.setText(getString(R.string.lastUpdated) +" "+ getString(R.string.momentsAgo));
+            //TODO : change this color/backgroun depending on data freshness, making it more and more visisible it's outdated
             mLastUpdatedTextView.setTextColor(Color.LTGRAY);
             isDownloadCurrentlyExecuting = false;
+
+            setupUI();
         }
     }
 }
