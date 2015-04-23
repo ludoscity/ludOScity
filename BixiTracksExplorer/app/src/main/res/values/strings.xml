@@ -39,11 +39,16 @@
     <string name="removedFromFavorites">Favorite removed</string>
     <string name="addedToFavorites">Favorite added</string>
     <string name="findABikes">Find a bike</string>
-    <string name="findAParkings">Find a dock</string>
-   <string name="distance">Distance</string>
-   <string name="station">Station</string>
-   <string name="bikes">Bikes</string>
-   <string name="parking">Parking</string>
     <string name="setting_auto_update">Auto-Update when internet</string>
     <string name="setting_fabrice">Fabrice!</string>
+    <string name="findAParkings">Find a parking</string>
+    <string name="distance">Distance</string>
+    <string name="station">Station</string>
+    <string name="bikes">Bikes</string>
+    <string name="bike">Bike</string>
+    <string name="parking">Parking</string>
+    <string name="parkings">Parkings:</string>
+    <string name="nearbyfragment_default_never_web_updated">No data: tap to update from citibik.es</string>
+    <string name="noFavorite">No favorites</string>
+
 </resources>

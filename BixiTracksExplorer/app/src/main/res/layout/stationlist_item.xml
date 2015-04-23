@@ -2,10 +2,12 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
+    android:background="?android:attr/activatedBackgroundIndicator"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:baselineAligned="true"
-    android:background="#E3F2FD">
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:baselineAligned="true">
 
     <TextView
         android:layout_width="0px"
@@ -13,7 +15,7 @@
         android:layout_gravity="center"
         android:padding="5dp"
         android:id="@+id/station_distance"
-        android:layout_weight="0.14"
+        android:layout_weight="0.18"
         android:ellipsize="end"
         android:singleLine="true"
         android:textStyle="bold"
@@ -24,6 +26,7 @@
         android:layout_width="0px"
         android:layout_height="fill_parent"
         android:textSize="16sp"
+        android:fontFamily="sans-serif-condensed"
         android:gravity="center"
         android:id="@+id/station_name"
         android:layout_weight="0.66"

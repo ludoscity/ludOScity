@@ -12,9 +12,9 @@ import com.couchbase.lite.QueryOptions;
 import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
 import com.udem.ift2906.bixitracksexplorer.StationItem;
 import com.udem.ift2906.bixitracksexplorer.StationsNetwork;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
@@ -66,6 +66,7 @@ public class DBHelper {
         Document doc = mManager.getDatabase(mDbName).getDocument(toSave.getKeyTimeUTC());
         doc.putProperties(new Gson().<Map<String, Object>>fromJson(toSave.toString(), new TypeToken<HashMap<String, Object>>() {
         }.getType()));
+        mGotTracks = true; // mGotTracks = !getAllTracks().isEmpty(); in init()
     }
 
     public static List<QueryRow> getAllTracks() throws CouchbaseLiteException {
@@ -101,7 +102,7 @@ public class DBHelper {
 
     /**
      * retrieveTrack
-     * @return Map<String,Object>
+     * @return Map String&Object
      * @param trackID in form "yyyy-MM-dd'T'HH:mm:ss'Z'"
      * Retrieves a track from Couchbase from a String complete id. Can't be of API model Track type
      * because processed data like cost is added to documents and wouldn't map to model fields.
@@ -145,19 +146,19 @@ public class DBHelper {
     }
 
     private static StationItem createStation(Cursor cursor) {
-        BixiStation station = new BixiStation();
 
-        station.extra.uid = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_ID));
-        station.name = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NAME));
-        station.latitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LATITUDE));
-        station.longitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LONGITUDE));
-        station.free_bikes = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NB_BIKES_AVAILABLE));
-        station.empty_slots = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NB_DOCKS_AVAILABLE));
-        station.timestamp = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LAST_UPDATE));
-        station.extra.locked = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_IS_LOCKED)) > 0;
+        long uid = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_ID));
+        String name = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NAME));
+        double latitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LATITUDE));
+        double longitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LONGITUDE));
+        int free_bikes = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NB_BIKES_AVAILABLE));
+        int empty_slots = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NB_DOCKS_AVAILABLE));
+        String timestamp = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LAST_UPDATE));
+        boolean locked = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_IS_LOCKED)) > 0;
         boolean isFavorite = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_FAVORITE)) > 0;
 
-        return new StationItem(station, isFavorite, cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LAST_UPDATE)));
+        LatLng position = new LatLng(latitude,longitude);
+        return new StationItem(uid,name,position,free_bikes,empty_slots,timestamp,locked,isFavorite);
     }
 
     public static StationsNetwork getStationsNetwork(){
@@ -187,11 +188,6 @@ public class DBHelper {
 
     public static boolean isExist(long id) {
         return BixiStationDatabase.getInstance(context).isExist(id);
-    }
-
-    //TODO SCRAP THIS
-    public static boolean isDataStationLoaded(){
-        return isExist(RANDOM_ID_FROM_CITIES_BIKES_API);
     }
 
     public static boolean isFavorite(long id) {

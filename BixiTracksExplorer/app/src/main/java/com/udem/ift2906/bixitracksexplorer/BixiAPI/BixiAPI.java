@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -23,6 +22,8 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+//import android.widget.Toast;
 
 /**
  * Created by Gevrai on 15-03-26.
@@ -89,11 +90,12 @@ public class BixiAPI{
             return null;
         }
 
-        @Override
+        //Should happen or not on settings fragment/prefs ?
+        /*@Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
             Toast.makeText(context, "DatabaseUpdate Successful!", Toast.LENGTH_LONG).show();
-        }
+        }*/
     }
 }

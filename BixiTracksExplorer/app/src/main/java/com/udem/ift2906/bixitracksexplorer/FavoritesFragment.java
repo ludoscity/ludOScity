@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
@@ -18,11 +19,13 @@ public class FavoritesFragment extends Fragment  {
     private Context mContext;
     private OnFragmentInteractionListener mListener;
     private ListView mFavoritesView;
+    private TextView mNoFavoritesView;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
     private LocationManager mLocationManager;
     private LatLng mCurrentUserLatLng;
     private StationListViewAdapter mStationListViewAdapter;
+    private boolean hasFavorite;
 
     public interface OnFragmentInteractionListener {
         public void onFavoritesFragmentInteraction();
@@ -51,16 +54,15 @@ public class FavoritesFragment extends Fragment  {
         }
         StationsNetwork stationsNetwork = DBHelper.getStationsNetwork();
         StationsNetwork stationsNetworkFavorites = new StationsNetwork();
-        for(StationItem stationItem: stationsNetwork.stations){
-              if(stationItem.isFavorite()) {
+        for(StationItem stationItem: stationsNetwork.stations)
+              if(stationItem.isFavorite())
                   stationsNetworkFavorites.stations.add(stationItem);
-              }
-        }
+
         setCurrentLocation();
+        hasFavorite = !stationsNetworkFavorites.stations.isEmpty();
 
-        //Todo no longer valid (isLookingForBikes)
+        //Todo CUSTOM VIEW FOR FAVORITES
         mStationListViewAdapter = new StationListViewAdapter(mContext,stationsNetworkFavorites,mCurrentUserLatLng,true);
-
     }
 
     @Override
@@ -69,6 +71,14 @@ public class FavoritesFragment extends Fragment  {
         View inflatedView = layoutInflater.inflate(R.layout.fragment_favoris, container, false);
         mFavoritesView = (ListView) inflatedView.findViewById(R.id.listview_favoris);
         mFavoritesView.setAdapter(mStationListViewAdapter);
+        mNoFavoritesView = (TextView) inflatedView.findViewById(R.id.noFavorite_holder);
+        if (!hasFavorite) {
+            mNoFavoritesView.setVisibility(View.VISIBLE);
+            mFavoritesView.setVisibility(View.GONE);
+        } else {
+            mNoFavoritesView.setVisibility(View.GONE);
+            mFavoritesView.setVisibility(View.VISIBLE);
+        }
         return inflatedView;
     }
 
