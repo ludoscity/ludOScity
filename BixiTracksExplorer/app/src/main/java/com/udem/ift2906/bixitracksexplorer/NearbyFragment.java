@@ -3,11 +3,13 @@ package com.udem.ift2906.bixitracksexplorer;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -342,17 +344,32 @@ public class NearbyFragment extends Fragment
     public void lookingForBikes(boolean isLookingForBikes){
         if(isLookingForBikes) {
             mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
-            Toast.makeText(mContext, getString(R.string.findABikes), Toast.LENGTH_SHORT).show();
+            // Create a toast with icon
+            TextView toastView = new TextView(mContext);
+            toastView.setText(R.string.findABikes);
+            toastView.setTextSize(24f);
+            toastView.setGravity(Gravity.CENTER);
+            Drawable icon = getResources().getDrawable(R.drawable.bike_icon_toast);
+            icon.setBounds(0,0,64,64);
+            toastView.setCompoundDrawables(icon,null,null,null);
+            toastView.setCompoundDrawablePadding(16);
+            toastView.setBackgroundColor(Color.DKGRAY);
+            Toast toast = new Toast(mContext);
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.setView(toastView);
+            toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL,0,0);
+            toast.show();
         }
         else {
             mParkingSwitch.setIcon(R.drawable.ic_action_find_dock);
             Toast.makeText(mContext, getString(R.string.findAParkings), Toast.LENGTH_SHORT).show();
         }
 
-        for(StationItem station: mStationsNetwork.stations){
+        for(StationItem station: mStationsNetwork.stations)
             station.updateMarker(isLookingForBikes);
-            mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
-        }
+
+        mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
+
     }
 
     //Pour interaction avec mainActivity
