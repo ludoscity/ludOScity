@@ -16,74 +16,68 @@
         android:layout_height="0px"
         android:layout_weight="6"/>
 
-
-
     <!-- VIEW HOLDER FOR STATION LIST AND STATION INFO -->
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="0px"
         android:layout_weight="4">
 
+        <!-- STATION LIST VIEW -->
         <LinearLayout
             android:id="@+id/stationList"
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
 
-        <!-- COLUMN DESCRIPTION -->
-        <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="#BBDEFB">
+            <!-- COLUMN DESCRIPTION -->
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#BBDEFB">
 
-            <TextView
-                android:layout_width="0px"
+                <TextView
+                    android:layout_width="0px"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="center"
+                    android:padding="5dp"
+                    android:text="@string/distance"
+                    android:layout_weight="0.18"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textStyle="bold"
+                    />
+
+                <TextView
+                    android:layout_width="0px"
+                    android:layout_height="fill_parent"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:text="@string/station"
+                    android:layout_weight="0.66"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+
+                    />
+
+                <TextView
+                    android:id="@+id/bikesOrParkingColumn"
+                    android:layout_width="0px"
+                    android:layout_height="fill_parent"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:text="@string/bikes"
+                    android:layout_weight="0.18"
+                    android:textStyle="bold"
+                    />
+            </LinearLayout>
+
+            <!-- STATION LIST -->
+            <ListView
+                android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_gravity="center"
-                android:padding="5dp"
-                android:text="@string/distance"
-                android:layout_weight="0.18"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textStyle="bold"
-                />
-
-            <TextView
-                android:layout_width="0px"
-                android:layout_height="fill_parent"
-                android:textSize="16sp"
-                android:gravity="center"
-                android:text="@string/station"
-                android:layout_weight="0.66"
-                android:ellipsize="end"
-                android:singleLine="true"
-
-                />
-
-            <TextView
-                android:id="@+id/bikesOrParkingColumn"
-                android:layout_width="0px"
-                android:layout_height="fill_parent"
-                android:textSize="16sp"
-                android:gravity="center"
-                android:text="@string/bikes"
-                android:layout_weight="0.18"
-                android:textStyle="bold"
-                />
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0px"
-        android:layout_weight="4">
-
-        </LinearLayout>
-        <!-- STATION LIST -->
-        <ListView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/stationListView"/>
+                android:id="@+id/stationListView"/>
          </LinearLayout>
 
         <!-- STATION INFO -->
@@ -137,8 +131,10 @@
             </LinearLayout>
 
         </LinearLayout>
+
     </RelativeLayout>
 
+    <!-- LAST UPDATED -->
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0px"
@@ -180,4 +176,5 @@
         </RelativeLayout>
 
     </LinearLayout>
+
 </LinearLayout>
