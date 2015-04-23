@@ -380,8 +380,11 @@ public class NearbyFragment extends Fragment
             isDownloadCurrentlyExecuting = true;
             bixiApiInstance = new BixiAPI(mContext);
             //A Task that launches an other task, ok I want it to show the progress in the user interface
-            //I'll pass it a reference to the progressBar, now I have to insure they don't fight for visibility control
-            //or one always switch visibility back first
+            //I finally advised gainst cvhanging anything, instead I'll add a setting to display Database toast, and OFF by default
+            //I do that because it seems it's not blocking / crasing if we try to navigate the interface anyway
+            //TODO : Check if some data is already present in db, retrieve timestamp and directly display how old it is in interface
+            //Let the user choose when to update.
+            //TODO : have the auto update function activated through settings, expressed in maximum rotteness of record to be refreshed automatically on NearbyFragment launch
             mStationsNetwork = bixiApiInstance.downloadBixiNetwork();
             return null;
         }
@@ -396,7 +399,8 @@ public class NearbyFragment extends Fragment
         @Override
         protected void onCancelled (Void aVoid){
             super.onCancelled(aVoid);
-            //Set interface back
+            //Set interface back -- Not even nescessary right now as fragment is completely
+            //scrapped each time. Might be usefull in the future.
             mUpdateProgressBar.setVisibility(View.INVISIBLE);
             mRefreshButton.setVisibility(View.VISIBLE);
         }
@@ -406,6 +410,8 @@ public class NearbyFragment extends Fragment
             super.onPostExecute(aVoid);
 
             //switch progressbar view visibility
+            mUpdateProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshButton.setVisibility(View.VISIBLE);
 
             Toast.makeText(mContext, R.string.download_success, Toast.LENGTH_SHORT).show();
 
@@ -420,8 +426,7 @@ public class NearbyFragment extends Fragment
             mLastUpdatedTextView.setTextColor(Color.LTGRAY);
             isDownloadCurrentlyExecuting = false;
 
-            mUpdateProgressBar.setVisibility(View.INVISIBLE);
-            mRefreshButton.setVisibility(View.VISIBLE);
+
         }
     }
 }
