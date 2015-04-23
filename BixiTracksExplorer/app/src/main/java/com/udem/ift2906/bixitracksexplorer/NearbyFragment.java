@@ -39,29 +39,26 @@ public class NearbyFragment extends Fragment
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener, GoogleMap.OnCameraChangeListener, GoogleMap.OnInfoWindowClickListener {
     private Context mContext;
     private OnFragmentInteractionListener mListener;
+    private static final String ARG_SECTION_NUMBER = "section_number";
 
     private GoogleMap nearbyMap = null;
     private LatLng mCurrentUserLatLng;
     private CameraPosition mBackCameraPosition;
     private float mMaxZoom = 16f;
 
-    private StationListViewAdapter mStationListViewAdapter;
-    private ListView mStationListView;
     private StationsNetwork mStationsNetwork;
     private StationItem mCurrentInfoStation;
+    private StationListViewAdapter mStationListViewAdapter;
+
+    private ListView mStationListView;
     private TextView mStationNameView;
     private TextView mStationBikeAvailView;
     private TextView mStationParkingAvailView;
-
-    private static final String ARG_SECTION_NUMBER = "section_number";
-
     private TextView mLastUpdatedTextView;
-
+    private TextView mBikesOrParkingColumn;
     private ImageButton mRefreshButton;
     private View mStationInfoView;
-    private boolean isStationInfoVisible;
     private ImageView mDirectionArrow;
-    private boolean isDownloadCurrentlyExecuting;
     private MenuItem mFavoriteStarOn;
     private MenuItem mFavoriteStarOff;
     private MenuItem mParkingSwitch;
@@ -69,7 +66,8 @@ public class NearbyFragment extends Fragment
     private DownloadWebTask mDownloadWebTask;
     private BixiAPI bixiApiInstance;
     private boolean mIsLookingForBikes;
-
+    private boolean isDownloadCurrentlyExecuting;
+    private boolean isStationInfoVisible;
 
     public static NearbyFragment newInstance(int sectionNumber) {
         NearbyFragment fragment = new NearbyFragment();
@@ -126,6 +124,7 @@ public class NearbyFragment extends Fragment
         mStationNameView = (TextView) inflatedView.findViewById(R.id.stationInfo_name);
         mStationBikeAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_bikeAvailability);
         mStationParkingAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_parkingAvailability);
+        mBikesOrParkingColumn = (TextView) inflatedView.findViewById(R.id.bikesOrParkingColumn);
         return inflatedView;
     }
 
@@ -348,11 +347,15 @@ public class NearbyFragment extends Fragment
     public void lookingForBikes(boolean isLookingForBikes){
         String toastText;
         Drawable icon;
+        mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
+
         if(isLookingForBikes) {
+            mBikesOrParkingColumn.setText(R.string.bikes);
             mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
             toastText = getString(R.string.findABikes);
             icon = getResources().getDrawable(R.drawable.bike_icon_toast);
         } else {
+            mBikesOrParkingColumn.setText(R.string.parking);
             mParkingSwitch.setIcon(R.drawable.ic_action_find_dock);
             toastText = getString(R.string.findAParkings);
             icon = getResources().getDrawable(R.drawable.parking_icon_toast);
@@ -379,7 +382,6 @@ public class NearbyFragment extends Fragment
 
         for(StationItem station: mStationsNetwork.stations){
             station.updateMarker(isLookingForBikes);
-            mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
         }
     }
 
