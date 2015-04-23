@@ -173,7 +173,6 @@ public class MainActivity extends ActionBarActivity
         actionBar.setSubtitle(mSubtitle);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNavigationDrawerFragment.isDrawerOpen()) {

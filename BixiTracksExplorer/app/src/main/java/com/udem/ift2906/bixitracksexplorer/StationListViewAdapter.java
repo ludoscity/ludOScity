@@ -1,8 +1,7 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import android.content.Context;
-import android.text.Html;
-import android.util.Log;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +28,7 @@ public class StationListViewAdapter extends BaseAdapter {
     private LatLng mCurrentUserLatLng;
 
     private boolean mIsLookingForBikes;
+    private int mCurrentItemSelected;
 
     StationListViewAdapter(Context _context, StationsNetwork _stationsNetwork, LatLng _currentUserLatLng,boolean isLookingForBikes){
         mContext = _context;
@@ -62,6 +62,14 @@ public class StationListViewAdapter extends BaseAdapter {
             mIsLookingForBikes = isLookingForBikes;
             notifyDataSetChanged();
         }
+    }
+
+    public void setItemSelected(int pos){
+        if (mCurrentItemSelected != -1)
+            mStationList.get(mCurrentItemSelected).setSelected(false);
+        mCurrentItemSelected = pos;
+        mStationList.get(pos).setSelected(true);
+        notifyDataSetChanged();
     }
 
     public void sortStationListByClosest(){
@@ -116,13 +124,26 @@ public class StationListViewAdapter extends BaseAdapter {
         } else {
             holder.distance.setVisibility(View.GONE);
         }
-        holder.name.setText(Html.fromHtml(currentStation.getName()).toString());
 
-        Log.d("Font test-string vs charSequence", currentStation.getName() + " vs. " + holder.name.getText());
+        holder.name.setText(currentStation.getName());
+        // Show bike/parking ammount depending on search parameter
         if (mIsLookingForBikes)
             holder.availability.setText(String.valueOf(currentStation.getFree_bikes()));
         else
             holder.availability.setText(String.valueOf(currentStation.getEmpty_slots()));
+
+        // Color change between selected and not selected
+        if (currentStation.isSelected()){
+            holder.name.setTextColor(Color.LTGRAY);
+            holder.availability.setTextColor(Color.LTGRAY);
+            holder.distance.setTextColor(Color.LTGRAY);
+            convertView.setBackgroundColor(mContext.getResources().getColor(R.color.material_blue_grey_800));
+        } else {
+            holder.name.setTextColor(Color.DKGRAY);
+            holder.availability.setTextColor(Color.DKGRAY);
+            holder.distance.setTextColor(Color.DKGRAY);
+            convertView.setBackgroundColor(mContext.getResources().getColor(R.color.background_material_light));
+        }
 
         return convertView;
     }

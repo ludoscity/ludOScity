@@ -149,6 +149,7 @@ public class NearbyFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 replaceListViewByInfoView(mStationsNetwork.stations.get(position));
+                mStationListViewAdapter.setItemSelected(position);
             }
         });
     }
@@ -173,6 +174,7 @@ public class NearbyFragment extends Fragment
         }
         // Show only current one
         mCurrentInfoStation.getGroundOverlay().setVisible(true);
+        mCurrentInfoStation.getMarker().showInfoWindow();
         // Show InfoWindow only if the station would appear small on the map
         if(mCurrentUserLatLng != null && stationItem.getMeterFromLatLng(mCurrentUserLatLng)>1000)
             mCurrentInfoStation.getMarker().showInfoWindow();
@@ -219,10 +221,9 @@ public class NearbyFragment extends Fragment
         mListener.onNearbyFragmentInteraction(getString(R.string.title_section_nearby), true);
         nearbyMap.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
         // Restore map
-        for (StationItem station: mStationsNetwork.stations){
+        for (StationItem station: mStationsNetwork.stations)
             station.getGroundOverlay().setVisible(true);
-            station.getMarker().hideInfoWindow();
-        }
+        mCurrentInfoStation.getMarker().hideInfoWindow();
         // Hide the star
         mFavoriteStarOn.setVisible(false);
         mFavoriteStarOff.setVisible(false);
@@ -253,17 +254,20 @@ public class NearbyFragment extends Fragment
     }
 
     private void changeFavoriteValue() {
+        Toast toast;
         if(mCurrentInfoStation.isFavorite()){
             mCurrentInfoStation.setFavorite(false);
             mFavoriteStarOff.setVisible(true);
             mFavoriteStarOn.setVisible(false);
-            Toast.makeText(mContext,getString(R.string.removedFromFavorites),Toast.LENGTH_SHORT).show();
+            toast = Toast.makeText(mContext,getString(R.string.removedFromFavorites),Toast.LENGTH_SHORT);
         } else {
             mCurrentInfoStation.setFavorite(true);
             mFavoriteStarOff.setVisible(false);
             mFavoriteStarOn.setVisible(true);
-            Toast.makeText(mContext,getString(R.string.addedToFavorites),Toast.LENGTH_SHORT).show();
+            toast = Toast.makeText(mContext,getString(R.string.addedToFavorites),Toast.LENGTH_SHORT);
         }
+        toast.setGravity(Gravity.CENTER,0,0);
+        toast.show();
     }
 
     @Override
@@ -303,10 +307,10 @@ public class NearbyFragment extends Fragment
     @Override
     public boolean onMarkerClick(Marker marker) {
         int i = mStationListViewAdapter.getPositionInList(marker);
+        mStationListViewAdapter.setItemSelected(i);
         Log.d("onMarkerClick", "Scroll view to " + i);
         if (i != -1) {
             mStationListView.smoothScrollToPosition(i);
-            mStationListView.setItemChecked(i, true);
         }
         return false;
     }
@@ -342,34 +346,41 @@ public class NearbyFragment extends Fragment
     }
 
     public void lookingForBikes(boolean isLookingForBikes){
+        String toastText;
+        Drawable icon;
         if(isLookingForBikes) {
             mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
-            // Create a toast with icon
-            TextView toastView = new TextView(mContext);
-            toastView.setText(R.string.findABikes);
-            toastView.setTextSize(24f);
-            toastView.setGravity(Gravity.CENTER);
-            Drawable icon = getResources().getDrawable(R.drawable.bike_icon_toast);
-            icon.setBounds(0,0,64,64);
-            toastView.setCompoundDrawables(icon,null,null,null);
-            toastView.setCompoundDrawablePadding(16);
-            toastView.setBackgroundColor(Color.DKGRAY);
-            Toast toast = new Toast(mContext);
-            toast.setDuration(Toast.LENGTH_SHORT);
-            toast.setView(toastView);
-            toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL,0,0);
-            toast.show();
-        }
-        else {
+            toastText = getString(R.string.findABikes);
+            icon = getResources().getDrawable(R.drawable.bike_icon_toast);
+        } else {
             mParkingSwitch.setIcon(R.drawable.ic_action_find_dock);
-            Toast.makeText(mContext, getString(R.string.findAParkings), Toast.LENGTH_SHORT).show();
+            toastText = getString(R.string.findAParkings);
+            icon = getResources().getDrawable(R.drawable.parking_icon_toast);
         }
+        // Create a toast with icon and text
+        //Todo create this as XML layout
+        TextView toastView = new TextView(mContext);
+        toastView.setAlpha(0.25f);
+        toastView.setBackgroundColor(getResources().getColor(R.color.background_floating_material_dark));
+        toastView.setShadowLayer(2.75f,0,0,R.color.background_floating_material_dark);
+        toastView.setText(toastText);
+        toastView.setTextSize(24f);
+        toastView.setTextColor(getResources().getColor(R.color.primary_text_default_material_dark));
+        toastView.setGravity(Gravity.CENTER);
+        icon.setBounds(0,0,64,64);
+        toastView.setCompoundDrawables(icon,null,null,null);
+        toastView.setCompoundDrawablePadding(16);
+        toastView.setPadding(5,5,5,5);
+        Toast toast = new Toast(mContext);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(toastView);
+        toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL,0,0);
+        toast.show();
 
-        for(StationItem station: mStationsNetwork.stations)
+        for(StationItem station: mStationsNetwork.stations){
             station.updateMarker(isLookingForBikes);
-
-        mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
-
+            mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
+        }
     }
 
     //Pour interaction avec mainActivity

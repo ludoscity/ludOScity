@@ -52,9 +52,9 @@ public class FavoritesFragment extends Fragment  {
         StationsNetwork stationsNetwork = DBHelper.getStationsNetwork();
         StationsNetwork stationsNetworkFavorites = new StationsNetwork();
         for(StationItem stationItem: stationsNetwork.stations){
-
-                stationsNetworkFavorites.stations.add(stationItem);
-            
+              if(stationItem.isFavorite()) {
+                  stationsNetworkFavorites.stations.add(stationItem);
+              }
         }
         setCurrentLocation();
 
