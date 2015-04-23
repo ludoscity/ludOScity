@@ -38,8 +38,6 @@ public class DBHelper {
     private static final String mDbName = "appdb";
     private static Context context;
     private static boolean mGotTracks;
-    //TODO SCRAP THIS
-    private static long RANDOM_ID_FROM_CITIES_BIKES_API = 358;
 
     private DBHelper() {}
 
@@ -175,7 +173,7 @@ public class DBHelper {
         return stationsNetwork;
     }
 
-    public static StationItem getStationItem(long id) {
+    /*public static StationItem getStationItem(long id) {
         Cursor cursor = BixiStationDatabase.getInstance(context).getStation(id);
 
         cursor.moveToFirst();
@@ -184,7 +182,7 @@ public class DBHelper {
         }
 
         return null;
-    }
+    }*/
 
     public static boolean isExist(long id) {
         return BixiStationDatabase.getInstance(context).isExist(id);
