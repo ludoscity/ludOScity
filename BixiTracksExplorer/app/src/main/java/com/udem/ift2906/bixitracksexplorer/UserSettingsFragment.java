@@ -37,6 +37,28 @@ public class UserSettingsFragment extends Fragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+
+
+
+
+    public static UserSettingsFragment newInstance(int sectionNumber) {
+            UserSettingsFragment fragment = new UserSettingsFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            fragment.setHasOptionsMenu(true);
+            return fragment;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View inflatedView = layoutInflater.inflate(R.layout.fragment_settings, container, false);
+
+        autoUpdate_nearby = (CheckBox) inflatedView.findViewById(R.id.checkBox_setting_auto_update);
+        autoupdate_budget = (CheckBox) inflatedView.findViewById(R.id.checkBox_setting_fabrice);
 
         autoupdate_budget.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -62,29 +84,6 @@ public class UserSettingsFragment extends Fragment {
 
         autoUpdate_nearby.setChecked(sharedPref.getBoolean("setting.auto_update.nearby", true));
         autoupdate_budget.setChecked(sharedPref.getBoolean("setting.auto_update.budget", false));
-    }
-
-
-
-
-
-    public static UserSettingsFragment newInstance(int sectionNumber) {
-            UserSettingsFragment fragment = new UserSettingsFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            fragment.setHasOptionsMenu(true);
-            return fragment;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View inflatedView = layoutInflater.inflate(R.layout.fragment_settings, container, false);
-
-        autoUpdate_nearby = (CheckBox) inflatedView.findViewById(R.id.checkBox_setting_auto_update);
-        autoupdate_budget = (CheckBox) inflatedView.findViewById(R.id.checkBox_setting_fabrice);
-
 
         return inflatedView;
     }
