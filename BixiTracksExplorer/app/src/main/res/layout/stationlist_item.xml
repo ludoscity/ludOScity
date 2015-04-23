@@ -3,29 +3,45 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:baselineAligned="true"
+    android:background="#E3F2FD">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0px"
+        android:layout_height="fill_parent"
         android:layout_gravity="center"
         android:padding="5dp"
         android:id="@+id/station_distance"
+        android:layout_weight="0.14"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textStyle="bold"
+
         />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="0px"
         android:layout_height="fill_parent"
         android:textSize="16sp"
         android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
         android:id="@+id/station_name"
+        android:layout_weight="0.66"
+        android:ellipsize="end"
+        android:singleLine="true"
+
         />
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="right"
-        android:textSize="24sp"
+        android:layout_width="0px"
+        android:layout_height="fill_parent"
+        android:textSize="16sp"
+        android:gravity="center"
         android:id="@+id/station_availability"
+        android:layout_weight="0.15"
+        android:textStyle="bold"
         />
+
+
 </LinearLayout>

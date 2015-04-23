@@ -15,6 +15,50 @@
         android:layout_height="0px"
         android:layout_weight="6"/>
 
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#BBDEFB">
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:padding="5dp"
+           android:text="@string/distance"
+            android:layout_weight="0.14"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="fill_parent"
+            android:textSize="16sp"
+            android:gravity="center"
+           android:text="@string/station"
+            android:layout_weight="0.66"
+            android:ellipsize="end"
+            android:singleLine="true"
+
+            />
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="fill_parent"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:text="@string/bikes"
+            android:layout_weight="0.15"
+            android:textStyle="bold"
+            />
+
+
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="0px"
