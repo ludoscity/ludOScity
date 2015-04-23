@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +55,7 @@ public class NearbyFragment extends Fragment
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private TextView mLastUpdatedTextView;
+    private ProgressBar mUpdateProgressBar;
 
     private ImageButton mRefreshButton;
     private View mStationInfoView;
@@ -79,6 +81,13 @@ public class NearbyFragment extends Fragment
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        mDownloadWebTask = new DownloadWebTask();
+        mDownloadWebTask.execute();
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mContext = activity;
@@ -90,9 +99,6 @@ public class NearbyFragment extends Fragment
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-
-        mDownloadWebTask = new DownloadWebTask();
-        mDownloadWebTask.execute();
 
         //TODO move this affectation
         mIsLookingForBikes = true;
@@ -124,6 +130,8 @@ public class NearbyFragment extends Fragment
         mStationNameView = (TextView) inflatedView.findViewById(R.id.stationInfo_name);
         mStationBikeAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_bikeAvailability);
         mStationParkingAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_parkingAvailability);
+        mUpdateProgressBar = (ProgressBar) inflatedView.findViewById(R.id.refreshDatabase_progressbar);
+        mUpdateProgressBar.setVisibility(View.INVISIBLE);
         return inflatedView;
     }
 
@@ -365,23 +373,40 @@ public class NearbyFragment extends Fragment
     }
 
     public class DownloadWebTask extends AsyncTask<Void, Void, Void> {
+
+        //Add on PreExecute to setup progressbar View over button (or in layout ?)
         @Override
         protected Void doInBackground(Void... params) {
             isDownloadCurrentlyExecuting = true;
             bixiApiInstance = new BixiAPI(mContext);
+            //A Task that launches an other task, ok I want it to show the progress in the user interface
+            //I'll pass it a reference to the progressBar, now I have to insure they don't fight for visibility control
+            //or one always switch visibility back first
             mStationsNetwork = bixiApiInstance.downloadBixiNetwork();
             return null;
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mUpdateProgressBar.setVisibility(View.VISIBLE);
+            mRefreshButton.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
         protected void onCancelled (Void aVoid){
             super.onCancelled(aVoid);
-            //Do nothing. task is cancelled if fragment is detached
+            //Set interface back
+            mUpdateProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshButton.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+            //switch progressbar view visibility
+
             Toast.makeText(mContext, R.string.download_success, Toast.LENGTH_SHORT).show();
 
             //TODO : What if map is not ready when we're done here
@@ -394,6 +419,9 @@ public class NearbyFragment extends Fragment
             mLastUpdatedTextView.setText(getString(R.string.lastUpdated) +" "+ getString(R.string.momentsAgo));
             mLastUpdatedTextView.setTextColor(Color.LTGRAY);
             isDownloadCurrentlyExecuting = false;
+
+            mUpdateProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshButton.setVisibility(View.VISIBLE);
         }
     }
 }
