@@ -66,6 +66,7 @@ public class DBHelper {
         Document doc = mManager.getDatabase(mDbName).getDocument(toSave.getKeyTimeUTC());
         doc.putProperties(new Gson().<Map<String, Object>>fromJson(toSave.toString(), new TypeToken<HashMap<String, Object>>() {
         }.getType()));
+        mGotTracks = true; // mGotTracks = !getAllTracks().isEmpty(); in init()
     }
 
     public static List<QueryRow> getAllTracks() throws CouchbaseLiteException {
@@ -101,7 +102,7 @@ public class DBHelper {
 
     /**
      * retrieveTrack
-     * @return Map<String,Object>
+     * @return Map String&Object
      * @param trackID in form "yyyy-MM-dd'T'HH:mm:ss'Z'"
      * Retrieves a track from Couchbase from a String complete id. Can't be of API model Track type
      * because processed data like cost is added to documents and wouldn't map to model fields.
@@ -174,7 +175,7 @@ public class DBHelper {
         return stationsNetwork;
     }
 
-    public static StationItem getStationItem(long id) {
+    /*public static StationItem getStationItem(long id) {
         Cursor cursor = BixiStationDatabase.getInstance(context).getStation(id);
 
         cursor.moveToFirst();
@@ -183,15 +184,10 @@ public class DBHelper {
         }
 
         return null;
-    }
+    }*/
 
     public static boolean isExist(long id) {
         return BixiStationDatabase.getInstance(context).isExist(id);
-    }
-
-    //TODO SCRAP THIS
-    public static boolean isDataStationLoaded(){
-        return isExist(RANDOM_ID_FROM_CITIES_BIKES_API);
     }
 
     public static boolean isFavorite(long id) {
