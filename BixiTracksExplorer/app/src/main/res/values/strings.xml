@@ -6,10 +6,8 @@
     <string name="title_section_favorites">Favorites</string>
     <string name="title_section_budget">Budget</string>
     <string name="title_section_nearby">Nearby</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
     <string name="download_success">Bixi Stations Data downloaded with success!</string>
     <string name="noData">Connection needed for data download!</string>
     <string name="timespan_season">Season</string>
@@ -41,14 +39,13 @@
     <string name="findABikes">Find a bike</string>
     <string name="setting_auto_update">Auto-Update when internet</string>
     <string name="setting_fabrice">Fabrice!</string>
-    <string name="findAParkings">Find a parking</string>
+    <string name="findAParking">Find a parking</string>
     <string name="distance">Distance</string>
     <string name="station">Station</string>
     <string name="bikes">Bikes</string>
     <string name="bike">Bike</string>
     <string name="parking">Parking</string>
-    <string name="parkings">Parkings:</string>
+    <string name="parkings">Parkings</string>
     <string name="nearbyfragment_default_never_web_updated">No data: tap to update from citibik.es</string>
     <string name="noFavorite">No favorites</string>
-
 </resources>

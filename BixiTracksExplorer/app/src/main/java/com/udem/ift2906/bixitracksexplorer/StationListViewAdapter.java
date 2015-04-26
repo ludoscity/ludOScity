@@ -67,8 +67,8 @@ public class StationListViewAdapter extends BaseAdapter {
     public void setItemSelected(int pos){
         if (mCurrentItemSelected != -1)
             mStationList.get(mCurrentItemSelected).setSelected(false);
-        mCurrentItemSelected = pos;
         mStationList.get(pos).setSelected(true);
+        mCurrentItemSelected = pos;
         notifyDataSetChanged();
     }
 
@@ -144,7 +144,6 @@ public class StationListViewAdapter extends BaseAdapter {
             holder.distance.setTextColor(Color.DKGRAY);
             convertView.setBackgroundColor(mContext.getResources().getColor(R.color.background_material_light));
         }
-
         return convertView;
     }
 }

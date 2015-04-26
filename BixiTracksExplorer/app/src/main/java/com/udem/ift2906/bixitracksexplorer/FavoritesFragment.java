@@ -18,14 +18,16 @@ import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 public class FavoritesFragment extends Fragment  {
     private Context mContext;
     private OnFragmentInteractionListener mListener;
-    private ListView mFavoritesView;
+    private View mFavoritesView;
     private TextView mNoFavoritesView;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
     private LocationManager mLocationManager;
     private LatLng mCurrentUserLatLng;
-    private StationListViewAdapter mStationListViewAdapter;
+    private FavoritesListViewAdapter mFavoritesStationListViewAdapter;
     private boolean hasFavorite;
+    private ListView mFavoritesList;
+    private StationsNetwork mStationsNetworkFavorites;
 
     public interface OnFragmentInteractionListener {
         public void onFavoritesFragmentInteraction();
@@ -52,30 +54,32 @@ public class FavoritesFragment extends Fragment  {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        // TODO get favorites station list directly from DB
         StationsNetwork stationsNetwork = DBHelper.getStationsNetwork();
-        StationsNetwork stationsNetworkFavorites = new StationsNetwork();
+        mStationsNetworkFavorites = new StationsNetwork();
         for(StationItem stationItem: stationsNetwork.stations)
               if(stationItem.isFavorite())
-                  stationsNetworkFavorites.stations.add(stationItem);
+                  mStationsNetworkFavorites.stations.add(stationItem);
 
         setCurrentLocation();
-        hasFavorite = !stationsNetworkFavorites.stations.isEmpty();
-
-        //Todo CUSTOM VIEW FOR FAVORITES
-        mStationListViewAdapter = new StationListViewAdapter(mContext,stationsNetworkFavorites,mCurrentUserLatLng,true);
+        hasFavorite = !mStationsNetworkFavorites.stations.isEmpty();
     }
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View inflatedView = layoutInflater.inflate(R.layout.fragment_favoris, container, false);
-        mFavoritesView = (ListView) inflatedView.findViewById(R.id.listview_favoris);
-        mFavoritesView.setAdapter(mStationListViewAdapter);
+        mFavoritesView = inflatedView.findViewById(R.id.favoritesListView_Holder);
         mNoFavoritesView = (TextView) inflatedView.findViewById(R.id.noFavorite_holder);
+
+        // Show the correct view if user has favorites or not
         if (!hasFavorite) {
             mNoFavoritesView.setVisibility(View.VISIBLE);
             mFavoritesView.setVisibility(View.GONE);
         } else {
+            mFavoritesStationListViewAdapter = new FavoritesListViewAdapter(mContext,mStationsNetworkFavorites,mCurrentUserLatLng);
+            mFavoritesList = (ListView) inflatedView.findViewById(R.id.favorites_listView);
+            mFavoritesList.setAdapter(mFavoritesStationListViewAdapter);
             mNoFavoritesView.setVisibility(View.GONE);
             mFavoritesView.setVisibility(View.VISIBLE);
         }

@@ -47,35 +47,34 @@ public class NearbyFragment extends Fragment
     private OnFragmentInteractionListener mListener;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String PREF_WEBTASK_LAST_TIMESTAMP_MS = "last_refresh_timestamp";
+    private DownloadWebTask mDownloadWebTask;
+    private BixiAPI bixiApiInstance;
 
     private GoogleMap nearbyMap = null;
     private LatLng mCurrentUserLatLng;
     private CameraPosition mBackCameraPosition;
     private float mMaxZoom = 16f;
 
-    private StationsNetwork mStationsNetwork;
-    private StationItem mCurrentInfoStation;
-    private StationListViewAdapter mStationListViewAdapter;
-
-    private ListView mStationListView;
-    private TextView mStationNameView;
-    private TextView mStationBikeAvailView;
-    private TextView mStationParkingAvailView;
-    private TextView mLastUpdatedTextView;
-    private ProgressBar mUpdateProgressBar;
-    private TextView mBikesOrParkingColumn;
-    private View mStationInfoViewHolder;
-    private View mStationListViewHolder;
-    private ImageView mRefreshButton;
-    private View mStationInfoView;
-    private ImageView mDirectionArrow;
     private MenuItem mFavoriteStarOn;
     private MenuItem mFavoriteStarOff;
     private MenuItem mParkingSwitch;
+    private View mStationInfoViewHolder;
+    private View mStationListViewHolder;
+    private StationsNetwork mStationsNetwork;
+    private StationListViewAdapter mStationListViewAdapter;
+    private TextView mBikesOrParkingColumn;
+    private ListView mStationListView;
+    private StationItem mCurrentInfoStation;
+    private TextView mStationInfoNameView;
+    private TextView mStationInfoBikeAvailView;
+    private TextView mStationInfoParkingAvailView;
+    private TextView mStationInfoDistanceView;
+    private ImageView mDirectionArrow;
+    private TextView mLastUpdatedTextView;
+    private ProgressBar mUpdateProgressBar;
+    private ImageView mRefreshButton;
     private View mDownloadBar;
 
-    private DownloadWebTask mDownloadWebTask;
-    private BixiAPI bixiApiInstance;
     private boolean mIsLookingForBikes;
     private boolean isDownloadCurrentlyExecuting;
     private boolean isStationInfoVisible;
@@ -166,22 +165,27 @@ public class NearbyFragment extends Fragment
         View inflatedView = layoutInflater.inflate(R.layout.fragment_nearby, viewGroup, false);
         if(nearbyMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
-        mRefreshButton = (ImageView) inflatedView.findViewById(R.id.refreshDatabase_button);
-        mDownloadBar = inflatedView.findViewById(R.id.downloadBar);
-        setRefreshButtonListener();
-        mLastUpdatedTextView = (TextView) inflatedView.findViewById(R.id.lastUpdated_textView);
-        mLastUpdatedTextView.setTextColor(Color.LTGRAY);
+        // List view
         mStationListView = (ListView) inflatedView.findViewById(R.id.stationListView);
         setOnClickItemListenerStationListView();
         mStationListViewHolder = inflatedView.findViewById(R.id.stationList);
+        mBikesOrParkingColumn = (TextView) inflatedView.findViewById(R.id.bikesOrParkingColumn);
+        // Station Info
         mStationInfoViewHolder = inflatedView.findViewById(R.id.stationInfo);
         mDirectionArrow = (ImageView) inflatedView.findViewById(R.id.arrowImage);
-        mStationNameView = (TextView) inflatedView.findViewById(R.id.stationInfo_name);
-        mStationBikeAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_bikeAvailability);
-        mStationParkingAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_parkingAvailability);
+        mStationInfoNameView = (TextView) inflatedView.findViewById(R.id.stationInfo_name);
+        mStationInfoDistanceView = (TextView) inflatedView.findViewById(R.id.stationInfo_distance);
+        mStationInfoBikeAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_bikeAvailability);
+        mStationInfoParkingAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_parkingAvailability);
+        // Update Bar
+        mLastUpdatedTextView = (TextView) inflatedView.findViewById(R.id.lastUpdated_textView);
+        mLastUpdatedTextView.setTextColor(Color.LTGRAY);
         mUpdateProgressBar = (ProgressBar) inflatedView.findViewById(R.id.refreshDatabase_progressbar);
         mUpdateProgressBar.setVisibility(View.INVISIBLE);
-        mBikesOrParkingColumn = (TextView) inflatedView.findViewById(R.id.bikesOrParkingColumn);
+        mRefreshButton = (ImageView) inflatedView.findViewById(R.id.refreshDatabase_button);
+        mDownloadBar = inflatedView.findViewById(R.id.downloadBar);
+        setRefreshButtonListener();
+
         setupUI();
         return inflatedView;
     }
@@ -206,7 +210,7 @@ public class NearbyFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 replaceListViewByInfoView(mStationsNetwork.stations.get(position));
-                mStationListViewAdapter.setItemSelected(position);
+                //mStationListViewAdapter.setItemSelected(position);
             }
         });
     }
@@ -238,22 +242,28 @@ public class NearbyFragment extends Fragment
 
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
         boundsBuilder.include(stationItem.getPosition());
-        // Direction arrow only available if user location is known
+        // Direction arrow and distance only available if user location is known
         if(mCurrentUserLatLng != null) {
             boundsBuilder.include(mCurrentUserLatLng);
             mDirectionArrow.setRotation((float) stationItem.getBearingFromLatLng(mCurrentUserLatLng));
-        }else
+            mStationInfoDistanceView.setText(mCurrentInfoStation.getDistanceStringFromLatLng(mCurrentUserLatLng));
+            mDirectionArrow.setVisibility(View.VISIBLE);
+            mStationInfoDistanceView.setVisibility(View.VISIBLE);
+        }else {
             mDirectionArrow.setVisibility(View.INVISIBLE);
+            mStationInfoDistanceView.setVisibility(View.INVISIBLE);
+        }
         // Set station information
-        mStationNameView.setText(mCurrentInfoStation.getName());
+        mStationInfoNameView.setText(mCurrentInfoStation.getName());
         if (mCurrentInfoStation.getFree_bikes() < 2)
-            mStationBikeAvailView.setText(mCurrentInfoStation.getFree_bikes() +" "+ getString(R.string.bikeAvailable_sing));
+            mStationInfoBikeAvailView.setText(mCurrentInfoStation.getFree_bikes() +" "+ getString(R.string.bikeAvailable_sing));
         else
-            mStationBikeAvailView.setText(mCurrentInfoStation.getFree_bikes() +" "+ getString(R.string.bikesAvailable_plur));
+            mStationInfoBikeAvailView.setText(mCurrentInfoStation.getFree_bikes() +" "+ getString(R.string.bikesAvailable_plur));
+
         if (mCurrentInfoStation.getEmpty_slots() < 2)
-            mStationParkingAvailView.setText(mCurrentInfoStation.getEmpty_slots()+" "+ getString(R.string.parkingAvailable_sing));
+            mStationInfoParkingAvailView.setText(mCurrentInfoStation.getEmpty_slots()+" "+ getString(R.string.parkingAvailable_sing));
         else
-            mStationParkingAvailView.setText(mCurrentInfoStation.getEmpty_slots()+" "+ getString(R.string.parkingsAvailable_plur));
+            mStationInfoParkingAvailView.setText(mCurrentInfoStation.getEmpty_slots()+" "+ getString(R.string.parkingsAvailable_plur));
         // Move map camera to focus station and user
         nearbyMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100));
         // Set back button to return to normal nearby view with list
@@ -281,6 +291,7 @@ public class NearbyFragment extends Fragment
         for (StationItem station: mStationsNetwork.stations)
             station.getGroundOverlay().setVisible(true);
         mCurrentInfoStation.getMarker().hideInfoWindow();
+        mCurrentInfoStation = null;
         // Hide the star
         mFavoriteStarOn.setVisible(false);
         mFavoriteStarOff.setVisible(false);
@@ -312,6 +323,8 @@ public class NearbyFragment extends Fragment
 
     private void changeFavoriteValue() {
         Toast toast;
+        if (!isStationInfoVisible)
+            return;
         if(mCurrentInfoStation.isFavorite()){
             mCurrentInfoStation.setFavorite(false);
             mFavoriteStarOff.setVisible(true);
@@ -385,6 +398,9 @@ public class NearbyFragment extends Fragment
                 nearbyMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
                 isAlreadyZoomedToUser = true;
             }
+            if (mCurrentInfoStation != null){
+                mStationInfoDistanceView.setText(String.valueOf(mCurrentInfoStation.getDistanceStringFromLatLng(mCurrentUserLatLng)));
+            }
         }
     }
 
@@ -412,20 +428,20 @@ public class NearbyFragment extends Fragment
         String toastText;
         Drawable icon;
         mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
-        Typeface textTypeface = mStationBikeAvailView.getTypeface();
+        Typeface textTypeface = mStationInfoBikeAvailView.getTypeface();
         if(isLookingForBikes) {
             mBikesOrParkingColumn.setText(R.string.bikes);
-            mStationBikeAvailView.setTypeface(textTypeface, Typeface.BOLD);
-            mStationParkingAvailView.setTypeface(textTypeface, Typeface.NORMAL);
+            mStationInfoBikeAvailView.setTypeface(textTypeface, Typeface.BOLD);
+            mStationInfoParkingAvailView.setTypeface(textTypeface, Typeface.NORMAL);
             mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
             toastText = getString(R.string.findABikes);
             icon = getResources().getDrawable(R.drawable.bike_icon_toast);
         } else {
             mBikesOrParkingColumn.setText(R.string.parking);
-            mStationBikeAvailView.setTypeface(textTypeface, Typeface.NORMAL);
-            mStationParkingAvailView.setTypeface(textTypeface, Typeface.BOLD);
+            mStationInfoBikeAvailView.setTypeface(textTypeface, Typeface.NORMAL);
+            mStationInfoParkingAvailView.setTypeface(textTypeface, Typeface.BOLD);
             mParkingSwitch.setIcon(R.drawable.ic_action_find_dock);
-            toastText = getString(R.string.findAParkings);
+            toastText = getString(R.string.findAParking);
             icon = getResources().getDrawable(R.drawable.parking_icon_toast);
         }
         // Create a toast with icon and text
