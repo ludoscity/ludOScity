@@ -22,6 +22,7 @@ import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.T
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,6 +172,20 @@ public class DBHelper {
         cursor.close();
 
         return stationsNetwork;
+    }
+
+    public static ArrayList<StationItem> getFavoriteStations(){
+        ArrayList<StationItem> items = new ArrayList<>();
+        Cursor cursor = BixiStationDatabase.getInstance(context).getFavoriteStations();
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            items.add(createStation(cursor));
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        return items;
     }
 
     /*public static StationItem getStationItem(long id) {
