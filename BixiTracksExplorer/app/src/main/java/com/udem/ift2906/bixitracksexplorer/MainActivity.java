@@ -29,6 +29,8 @@ import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity
@@ -45,6 +47,10 @@ public class MainActivity extends ActionBarActivity
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
+    private static final String TAG_NEARBY_FRAGMENT = "nearby_fragment";
+    private static final String TAG_FAVORITES_FRAGMENT = "favorites_fragment";
+    private Map<Integer, Fragment> mFragmentPerSectionPos = new HashMap<>();
+    private static final String TAG_BUDGET_FRAGMENT = "budget_fragment";
     private DrawerLayout mDrawerLayout;
     public static Resources resources;
 
@@ -112,15 +118,37 @@ public class MainActivity extends ActionBarActivity
         //En attendant d'avoir un menu bien rempli, juste pour tester la class NearbyFragment
         if (position == 0){
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.start_fragment_container, NearbyFragment.newInstance(position + 1))
-                    .commit();
+
+            Fragment frag =  fragmentManager.findFragmentByTag(TAG_NEARBY_FRAGMENT);
+            // If the Fragment is non-null, then it is currently being
+            // retained across a configuration change.
+            if (frag == null) {
+            //if (!mFragmentPerSectionPos.containsKey(position)){
+                frag = NearbyFragment.newInstance(position + 1);
+
+                mFragmentPerSectionPos.put(position, frag);
+                switchFragmentVisibility(fragmentManager.beginTransaction().add(R.id.start_fragment_container, frag, TAG_NEARBY_FRAGMENT), position).commit();
+            }else{
+                mFragmentPerSectionPos.put(position, frag);
+                switchFragmentVisibility(fragmentManager.beginTransaction(), position).commit();
+            }
         }
         else if (position == 2){
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.start_fragment_container, BudgetOverviewFragment.newInstance(position + 1))
-                    .commit();
+
+            Fragment frag =  fragmentManager.findFragmentByTag(TAG_BUDGET_FRAGMENT);
+            // If the Fragment is non-null, then it is currently being
+            // retained across a configuration change.
+            if (frag == null) {
+            //if (!mFragmentPerSectionPos.containsKey(position)){
+                frag = BudgetOverviewFragment.newInstance(position + 1);
+                mFragmentPerSectionPos.put(position, frag);
+                //fragmentManager.beginTransaction().add(R.id.start_fragment_container, newFrag, TAG_BUDGET_FRAGMENT).commit();
+                switchFragmentVisibility(fragmentManager.beginTransaction().add(R.id.start_fragment_container, frag, TAG_BUDGET_FRAGMENT), position).commit();
+            }else{
+                mFragmentPerSectionPos.put(position, frag);
+                switchFragmentVisibility(fragmentManager.beginTransaction(), position).commit();
+            }
         }
         else if (position == 3){
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -130,9 +158,20 @@ public class MainActivity extends ActionBarActivity
         }
         else if (position == 1){
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.start_fragment_container, FavoritesFragment.newInstance(position + 1))
-                    .commit();
+
+            Fragment frag =  fragmentManager.findFragmentByTag(TAG_FAVORITES_FRAGMENT);
+            // If the Fragment is non-null, then it is currently being
+            // retained across a configuration change.
+            if (frag == null) {
+            //if (!mFragmentPerSectionPos.containsKey(position)){
+                frag = FavoritesFragment.newInstance(position + 1);
+                mFragmentPerSectionPos.put(position, frag);
+
+                switchFragmentVisibility(fragmentManager.beginTransaction().add(R.id.start_fragment_container, frag, TAG_FAVORITES_FRAGMENT), position).commit();
+            }else{
+                mFragmentPerSectionPos.put(position, frag);
+                switchFragmentVisibility(fragmentManager.beginTransaction(), position).commit();
+            }
         }
         else
         {
@@ -144,6 +183,20 @@ public class MainActivity extends ActionBarActivity
         }
 
 
+    }
+
+    private FragmentTransaction switchFragmentVisibility(FragmentTransaction _inTrans, int _posToShow){
+
+        for (int pos : mFragmentPerSectionPos.keySet()){
+            if (pos == _posToShow){
+                _inTrans.show(mFragmentPerSectionPos.get(pos));
+            }
+            else{
+                _inTrans.hide(mFragmentPerSectionPos.get(pos));
+            }
+        }
+
+        return _inTrans;
     }
 
     public void onSectionAttached(int number) {
@@ -209,6 +262,7 @@ public class MainActivity extends ActionBarActivity
         FragmentManager fm = getSupportFragmentManager();
         if (fm.getBackStackEntryCount() == 0) {
             mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(true);
+            switchFragmentVisibility(getSupportFragmentManager().beginTransaction(), mPositionLastItemSelected).commit();
         }
     }
 
@@ -228,6 +282,8 @@ public class MainActivity extends ActionBarActivity
 
             //Unlocking swipe gesture
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+
+            switchFragmentVisibility(getSupportFragmentManager().beginTransaction(), 2).commit();
         }
         else if(uri.getPath().equalsIgnoreCase("/" + BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_PATH))
         {
@@ -244,7 +300,7 @@ public class MainActivity extends ActionBarActivity
 
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack so the user can navigate back
-            transaction.replace(R.id.start_fragment_container, newFragment);
+            transaction.add(R.id.start_fragment_container, newFragment);
 
             FrameLayout endContainer = (FrameLayout)findViewById(R.id.end_fragment_container);
 
@@ -261,6 +317,8 @@ public class MainActivity extends ActionBarActivity
 
             // Commit the transaction
             transaction.commit();
+
+            switchFragmentVisibility(getSupportFragmentManager().beginTransaction(), -1).commit();
         }
 
 
@@ -291,7 +349,7 @@ public class MainActivity extends ActionBarActivity
 
                 // Replace whatever is in the fragment_container view with this fragment,
                 // and add the transaction to the back stack so the user can navigate back
-                transaction.replace(R.id.start_fragment_container, newFragment);
+                transaction.add(R.id.start_fragment_container, newFragment);
 
                 transaction.addToBackStack(null);
 

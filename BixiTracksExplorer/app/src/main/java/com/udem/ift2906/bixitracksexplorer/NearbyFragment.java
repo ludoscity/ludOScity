@@ -152,6 +152,16 @@ public class NearbyFragment extends Fragment
             mDownloadWebTask.cancel(false);
             mDownloadWebTask = null;
         }
+
+        mListener = null;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Retain this fragment across configuration changes.
+        setRetainInstance(true);
     }
 
     @Override
@@ -225,7 +235,8 @@ public class NearbyFragment extends Fragment
         // Switch views
         mStationListViewHolder.setVisibility(View.GONE);
         mStationInfoViewHolder.setVisibility(View.VISIBLE);
-        mListener.onNearbyFragmentInteraction(stationItem.getName(), false);
+        if(mListener != null)
+            mListener.onNearbyFragmentInteraction(stationItem.getName(), false);
         //Remember the current cameraPosition
         mBackCameraPosition = nearbyMap.getCameraPosition();
         // Hide all ground overlays
@@ -285,7 +296,8 @@ public class NearbyFragment extends Fragment
         mStationListViewHolder.setVisibility(View.VISIBLE);
         mStationInfoViewHolder.setVisibility(View.GONE);
         // Put 'nearby' as title in the action bar and reset access to drawer
-        mListener.onNearbyFragmentInteraction(getString(R.string.title_section_nearby), true);
+        if (mListener != null)
+            mListener.onNearbyFragmentInteraction(getString(R.string.title_section_nearby), true);
         nearbyMap.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
         // Restore map
         for (StationItem station: mStationsNetwork.stations)
@@ -345,8 +357,10 @@ public class NearbyFragment extends Fragment
         super.onDestroyView();
         MapFragment f = (MapFragment) getActivity().getFragmentManager()
                 .findFragmentById(R.id.mapNearby);
-        if (f != null)
+        if (f != null) {
             getActivity().getFragmentManager().beginTransaction().remove(f).commit();
+            nearbyMap = null;
+        }
     }
 
     @Override

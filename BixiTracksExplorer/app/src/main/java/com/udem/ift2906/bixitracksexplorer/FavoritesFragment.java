@@ -66,6 +66,14 @@ public class FavoritesFragment extends Fragment  {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Retain this fragment across configuration changes.
+        setRetainInstance(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View inflatedView = layoutInflater.inflate(R.layout.fragment_favoris, container, false);
