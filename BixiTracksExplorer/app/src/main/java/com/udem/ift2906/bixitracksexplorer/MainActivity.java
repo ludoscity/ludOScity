@@ -121,7 +121,11 @@ public class MainActivity extends ActionBarActivity
 
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        DBHelper.closeDatabase();
+    }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
