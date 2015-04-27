@@ -79,6 +79,7 @@ public class NearbyFragment extends Fragment
     private boolean isDownloadCurrentlyExecuting;
     private boolean isStationInfoVisible;
     private boolean isAlreadyZoomedToUser;
+    private boolean isMarkersUpdated;
 
     public static NearbyFragment newInstance(int sectionNumber) {
         NearbyFragment fragment = new NearbyFragment();
@@ -118,8 +119,11 @@ public class NearbyFragment extends Fragment
                 mLastUpdatedTextView.setText(getString(R.string.lastUpdated)+" "+ Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo));
 
             if(nearbyMap != null) {
-                if (mStationsNetwork != null)
+                if (mStationsNetwork != null && !isMarkersUpdated) {
+                    nearbyMap.clear();
                     mStationsNetwork.addMarkersToMap(nearbyMap);
+                    isMarkersUpdated = true;
+                }
                 mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng, mIsLookingForBikes);
                 mStationListView.setAdapter(mStationListViewAdapter);
             }
@@ -378,6 +382,7 @@ public class NearbyFragment extends Fragment
     @Override
     public void onMapReady(GoogleMap googleMap) {
         isAlreadyZoomedToUser = false;
+        isMarkersUpdated = false;
         nearbyMap = googleMap;
         nearbyMap.setMyLocationEnabled(true);
         nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
@@ -552,6 +557,7 @@ public class NearbyFragment extends Fragment
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
             sp.edit().putLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, Calendar.getInstance().getTimeInMillis()).apply();
             isDownloadCurrentlyExecuting = false;
+            isMarkersUpdated = false;
             setupUI();
         }
     }
