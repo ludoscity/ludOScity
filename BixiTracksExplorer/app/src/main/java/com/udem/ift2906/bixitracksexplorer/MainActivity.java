@@ -107,12 +107,32 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("lastSelected", mPositionLastItemSelected);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        mPositionLastItemSelected = savedInstanceState.getInt("lastSelected");
+
+    }
+
+
+
+    @Override
     public void onNavigationDrawerItemSelected(int position) {
         //TODO Do it better: don't replace fragment if its the same as current
         if (position == mPositionLastItemSelected)
             return;
         mPositionLastItemSelected = position;
+        setupFragmentsForPos(mPositionLastItemSelected);
+    }
 
+    private void setupFragmentsForPos(int position) {
         /////////////////////////////////////////////////////////////////////////////
         //TODO : Sort out this spaghetti monster in formation
         if (position == 0){
