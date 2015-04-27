@@ -116,4 +116,11 @@ public class BixiStationDatabase extends SQLiteOpenHelper {
 
         return c;
     }
+
+    public Cursor getFavoriteStations() {
+        String args[] = new String[] { "1" };
+        Cursor c = getWritableDatabase().rawQuery("select * from "+TABLE_NAME+" where "+COLUMN_FAVORITE+" = ?", args);
+
+        return c;
+    }
 }
