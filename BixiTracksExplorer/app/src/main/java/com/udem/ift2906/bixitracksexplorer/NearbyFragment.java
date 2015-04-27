@@ -183,6 +183,7 @@ public class NearbyFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
+        isMarkersUpdated = false;
         setupUI();
     }
 
