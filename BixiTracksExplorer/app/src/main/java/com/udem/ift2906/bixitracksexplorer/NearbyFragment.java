@@ -140,7 +140,6 @@ public class NearbyFragment extends Fragment
         if (!hidden){
             ((MainActivity) getActivity()).onSectionHiddenChanged(
                     getArguments().getInt(ARG_SECTION_NUMBER));
-
         }
     }
 

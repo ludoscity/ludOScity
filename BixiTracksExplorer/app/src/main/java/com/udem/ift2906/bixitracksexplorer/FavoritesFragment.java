@@ -45,11 +45,10 @@ public class FavoritesFragment extends Fragment  {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-
         if (!hidden){
             ((MainActivity) getActivity()).onSectionHiddenChanged(
                     getArguments().getInt(ARG_SECTION_NUMBER));
-
+            setUpUI();
         }
     }
 
@@ -65,21 +64,11 @@ public class FavoritesFragment extends Fragment  {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-        // TODO get favorites station list directly from DB
-        StationsNetwork stationsNetwork = DBHelper.getStationsNetwork();
-        mStationsNetworkFavorites = new StationsNetwork();
-        for(StationItem stationItem: stationsNetwork.stations)
-              if(stationItem.isFavorite())
-                  mStationsNetworkFavorites.stations.add(stationItem);
-
-        setCurrentLocation();
-        hasFavorite = !mStationsNetworkFavorites.stations.isEmpty();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
     }
@@ -90,19 +79,30 @@ public class FavoritesFragment extends Fragment  {
         View inflatedView = layoutInflater.inflate(R.layout.fragment_favoris, container, false);
         mFavoritesView = inflatedView.findViewById(R.id.favoritesListView_Holder);
         mNoFavoritesView = (TextView) inflatedView.findViewById(R.id.noFavorite_holder);
+        mFavoritesList = (ListView) inflatedView.findViewById(R.id.favorites_listView);
+        setUpUI();
+        return inflatedView;
+    }
 
+    public void setUpUI(){
+        // TODO get favorites station list directly from DB
+        StationsNetwork stationsNetwork = DBHelper.getStationsNetwork();
+        mStationsNetworkFavorites = new StationsNetwork();
+        for(StationItem stationItem: stationsNetwork.stations)
+            if(stationItem.isFavorite())
+                mStationsNetworkFavorites.stations.add(stationItem);
+        mFavoritesStationListViewAdapter = new FavoritesListViewAdapter(mContext,mStationsNetworkFavorites,mCurrentUserLatLng);
+        mFavoritesList.setAdapter(mFavoritesStationListViewAdapter);
+        setCurrentLocation();
+        hasFavorite = !mStationsNetworkFavorites.stations.isEmpty();
         // Show the correct view if user has favorites or not
         if (!hasFavorite) {
             mNoFavoritesView.setVisibility(View.VISIBLE);
             mFavoritesView.setVisibility(View.GONE);
         } else {
-            mFavoritesStationListViewAdapter = new FavoritesListViewAdapter(mContext,mStationsNetworkFavorites,mCurrentUserLatLng);
-            mFavoritesList = (ListView) inflatedView.findViewById(R.id.favorites_listView);
-            mFavoritesList.setAdapter(mFavoritesStationListViewAdapter);
             mNoFavoritesView.setVisibility(View.GONE);
             mFavoritesView.setVisibility(View.VISIBLE);
         }
-        return inflatedView;
     }
 
     public void setCurrentLocation() {
