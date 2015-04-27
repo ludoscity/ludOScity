@@ -128,6 +128,18 @@ public class NearbyFragment extends Fragment
             mLastUpdatedTextView.setText(getString(R.string.nearbyfragment_default_never_web_updated));
         }
     }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+
+        if (!hidden){
+            ((MainActivity) getActivity()).onSectionHiddenChanged(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
+
+        }
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

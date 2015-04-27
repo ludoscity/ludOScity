@@ -169,6 +169,17 @@ public class BudgetOverviewFragment extends Fragment {
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+
+        if (!hidden){
+            ((MainActivity) getActivity()).onSectionHiddenChanged(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
+
+        }
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {

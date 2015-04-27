@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ListView;
 
 /**
  * Created by Looney on 19-04-15.
@@ -23,6 +22,17 @@ public class UserSettingsFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         public void onSettingsFragmentInteraction();
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+
+        if (!hidden){
+            ((MainActivity) getActivity()).onSectionHiddenChanged(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
+
+        }
     }
 
     @Override

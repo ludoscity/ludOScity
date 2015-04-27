@@ -43,7 +43,18 @@ public class FavoritesFragment extends Fragment  {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+
+        if (!hidden){
+            ((MainActivity) getActivity()).onSectionHiddenChanged(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
+
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {   //Only happening on orientation change now
         super.onAttach(activity);
         mContext = activity;
         try {

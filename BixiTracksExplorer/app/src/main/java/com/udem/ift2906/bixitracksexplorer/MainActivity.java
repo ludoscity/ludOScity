@@ -1,6 +1,5 @@
 package com.udem.ift2906.bixitracksexplorer;
 
-import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -12,12 +11,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -49,14 +45,13 @@ public class MainActivity extends ActionBarActivity
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private static final String TAG_NEARBY_FRAGMENT = "nearby_fragment";
     private static final String TAG_FAVORITES_FRAGMENT = "favorites_fragment";
-    private Map<Integer, Fragment> mFragmentPerSectionPos = new HashMap<>();
     private static final String TAG_BUDGET_FRAGMENT = "budget_fragment";
+    private static final String TAG_SETTINGS_FRAGMENT = "settings_fragment";
+    private Map<Integer, Fragment> mFragmentPerSectionPos = new HashMap<>();
+
     private DrawerLayout mDrawerLayout;
     public static Resources resources;
 
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
     private CharSequence mTitle;
     private CharSequence mSubtitle;
     private int mPositionLastItemSelected = -1;
@@ -85,8 +80,8 @@ public class MainActivity extends ActionBarActivity
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
-        mSubtitle = "";
+        setActivityTitle(getTitle());
+        setActivitySubtitle("");
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         // Set up the drawer.
@@ -115,7 +110,8 @@ public class MainActivity extends ActionBarActivity
             return;
         mPositionLastItemSelected = position;
 
-        //En attendant d'avoir un menu bien rempli, juste pour tester la class NearbyFragment
+        /////////////////////////////////////////////////////////////////////////////
+        //TODO : Sort out this spaghetti monster in formation
         if (position == 0){
             FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -126,6 +122,7 @@ public class MainActivity extends ActionBarActivity
             //if (!mFragmentPerSectionPos.containsKey(position)){
                 frag = NearbyFragment.newInstance(position + 1);
 
+                //Can't be optimised in if : need to be called right before visibilitySwitch
                 mFragmentPerSectionPos.put(position, frag);
                 switchFragmentVisibility(fragmentManager.beginTransaction().add(R.id.start_fragment_container, frag, TAG_NEARBY_FRAGMENT), position).commit();
             }else{
@@ -142,6 +139,8 @@ public class MainActivity extends ActionBarActivity
             if (frag == null) {
             //if (!mFragmentPerSectionPos.containsKey(position)){
                 frag = BudgetOverviewFragment.newInstance(position + 1);
+
+                //Can't be optimised in if : need to be called right before visibilitySwitch
                 mFragmentPerSectionPos.put(position, frag);
                 //fragmentManager.beginTransaction().add(R.id.start_fragment_container, newFrag, TAG_BUDGET_FRAGMENT).commit();
                 switchFragmentVisibility(fragmentManager.beginTransaction().add(R.id.start_fragment_container, frag, TAG_BUDGET_FRAGMENT), position).commit();
@@ -152,9 +151,23 @@ public class MainActivity extends ActionBarActivity
         }
         else if (position == 3){
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.start_fragment_container, UserSettingsFragment.newInstance(position + 1))
-                    .commit();
+
+            Fragment frag =  fragmentManager.findFragmentByTag(TAG_SETTINGS_FRAGMENT);
+            // If the Fragment is non-null, then it is currently being
+            // retained across a configuration change.
+            if (frag == null) {
+                //if (!mFragmentPerSectionPos.containsKey(position)){
+                frag = UserSettingsFragment.newInstance(position + 1);
+
+                //Can't be optimised in if : need to be called right before visibilitySwitch
+                mFragmentPerSectionPos.put(position, frag);
+                //fragmentManager.beginTransaction().add(R.id.start_fragment_container, newFrag, TAG_BUDGET_FRAGMENT).commit();
+                switchFragmentVisibility(fragmentManager.beginTransaction().add(R.id.start_fragment_container, frag, TAG_SETTINGS_FRAGMENT), position).commit();
+            }else{
+                mFragmentPerSectionPos.put(position, frag);
+                switchFragmentVisibility(fragmentManager.beginTransaction(), position).commit();
+            }
+
         }
         else if (position == 1){
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -165,24 +178,15 @@ public class MainActivity extends ActionBarActivity
             if (frag == null) {
             //if (!mFragmentPerSectionPos.containsKey(position)){
                 frag = FavoritesFragment.newInstance(position + 1);
-                mFragmentPerSectionPos.put(position, frag);
 
+                //Can't be optimised in if : need to be called right before visibilitySwitch
+                mFragmentPerSectionPos.put(position, frag);
                 switchFragmentVisibility(fragmentManager.beginTransaction().add(R.id.start_fragment_container, frag, TAG_FAVORITES_FRAGMENT), position).commit();
             }else{
                 mFragmentPerSectionPos.put(position, frag);
                 switchFragmentVisibility(fragmentManager.beginTransaction(), position).commit();
             }
         }
-        else
-        {
-            // update the main content by replacing fragments
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.start_fragment_container, PlaceholderFragment.newInstance(position + 1))
-                    .commit();
-        }
-
-
     }
 
     private FragmentTransaction switchFragmentVisibility(FragmentTransaction _inTrans, int _posToShow){
@@ -202,19 +206,38 @@ public class MainActivity extends ActionBarActivity
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section_nearby);
+                setActivityTitle(getString(R.string.title_section_nearby));
                 break;
             case 2:
-                mTitle = getString(R.string.title_section_favorites);
+                setActivityTitle(getString(R.string.title_section_favorites));
                 break;
             case 3:
-                mTitle = getString(R.string.title_section_budget);
+                setActivityTitle(getString(R.string.title_section_budget));
                 break;
             case 4:
-                mTitle = getString(R.string.title_section_settings);
+                setActivityTitle(getString(R.string.title_section_settings));
                 break;
         }
-        mSubtitle = "";
+        setActivitySubtitle("");
+
+    }
+
+    public void onSectionHiddenChanged(int number) {
+        switch (number) {
+            case 1:
+                setActivityTitle(getString(R.string.title_section_nearby));
+                break;
+            case 2:
+                setActivityTitle(getString(R.string.title_section_favorites));
+                break;
+            case 3:
+                setActivityTitle(getString(R.string.title_section_budget));
+                break;
+            case 4:
+                setActivityTitle(getString(R.string.title_section_settings));
+                break;
+        }
+        setActivitySubtitle("");
 
     }
 
@@ -222,8 +245,8 @@ public class MainActivity extends ActionBarActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
-        actionBar.setSubtitle(mSubtitle);
+        actionBar.setTitle(getActivityTitle());
+        actionBar.setSubtitle(getActivitySubtitle());
     }
 
     @Override
@@ -271,8 +294,8 @@ public class MainActivity extends ActionBarActivity
 
         if (uri.getPath().equalsIgnoreCase("/budget_overview_onresume"))
         {
-            mTitle = getString(R.string.title_section_budget);
-            mSubtitle = "";
+            setActivityTitle(getString(R.string.title_section_budget));
+            setActivitySubtitle("");
             restoreActionBar();
 
             FrameLayout endFragment = (FrameLayout)findViewById(R.id.end_fragment_container);
@@ -290,11 +313,11 @@ public class MainActivity extends ActionBarActivity
             mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(false);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-            mTitle = uri.getQueryParameter(BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_TYPE_PARAM);
-            mSubtitle = uri.getQueryParameter(BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_TIMEPERIOD_PARAM);
+            setActivityTitle(uri.getQueryParameter(BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_TYPE_PARAM));
+            setActivitySubtitle(uri.getQueryParameter(BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_TIMEPERIOD_PARAM));
 
             // Create fragment and give it required info to set itselfs up
-            BudgetInfoFragment newFragment = BudgetInfoFragment.newInstance(mTitle.toString(), mSubtitle.toString(), _budgetInfoItemList);
+            BudgetInfoFragment newFragment = BudgetInfoFragment.newInstance(getActivityTitle().toString(), getActivitySubtitle().toString(), _budgetInfoItemList);
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -328,7 +351,7 @@ public class MainActivity extends ActionBarActivity
     public void onBudgetInfoFragmentInteraction(Uri _uri, ArrayList<BudgetInfoItem> _budgetInfoItemList) {
         if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_SORT_CHANGED_PATH)){
 
-            mSubtitle = _uri.getQueryParameter(BudgetInfoFragment.SORT_CHANGED_SUBTITLE_PARAM);
+            setActivitySubtitle(_uri.getQueryParameter(BudgetInfoFragment.SORT_CHANGED_SUBTITLE_PARAM));
         }
         else if (_uri.getPath().equalsIgnoreCase("/" + BudgetInfoFragment.BUDGETINFOITEM_CLICK_PATH)){
 
@@ -341,7 +364,7 @@ public class MainActivity extends ActionBarActivity
                         _budgetInfoItemList,
                         Integer.parseInt(_uri.getQueryParameter(BudgetInfoFragment.CLICK_SORT_CRITERIA_PARAM)),
                         false);
-                mSubtitle = getString(R.string.budgettrackdetails_subtitle);
+                setActivitySubtitle(getString(R.string.budgettrackdetails_subtitle));
 
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -373,7 +396,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onNearbyFragmentInteraction(String title, boolean isDrawerIndicatorEnabled) {
-        mTitle = title;
+        setActivityTitle(title);
         mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(isDrawerIndicatorEnabled);
         restoreActionBar();
     }
@@ -394,101 +417,21 @@ public class MainActivity extends ActionBarActivity
     }
 
     /**
-     * A placeholder fragment containing a simple view.
+     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
-    public static class PlaceholderFragment extends Fragment {
-
-        //final static String ARG_POSITION = "position";
-        //int mCurrentPosition = -1;
-
-        ExpandableListView mExpListView;
-        //ExpandableListAdapter mListAdapter;
-
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            return inflater.inflate(R.layout.fragment_main, container, false);
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
-
-        @Override
-        public void onStart() {
-            super.onStart();
-
-//            // During startup, check if there are arguments passed to the fragment.
-//            // onStart is a good place to do this because the layout has already been
-//            // applied to the fragment at this point so we can safely call the method
-//            // below that sets the article text.
-//            Bundle args = getArguments();
-//            if (args != null) {
-//                // Set article based on argument passed in
-//                updateArticleView(args.getInt(ARG_POSITION));
-//            } else if (mCurrentPosition != -1) {
-//                // Set article based on saved instance state defined during onCreateView
-//                updateArticleView(mCurrentPosition);
-//            }
-
-            // get the listview
-            mExpListView = (ExpandableListView) getActivity().findViewById(R.id.lvExp);
-
-            //I should have a progress bar in my group / item layouts and activate them
-            //OR have a completely separated loading fragment
-            // preparing list data
-            prepareListData();
-
-
-        }
-
-        //public void updateArticleView(int position) {
-            //TextView article = (TextView) getActivity().findViewById(R.id.article);
-            //article.setText(Ipsum.Articles[position]);
-            //mCurrentPosition = position;
-        //}
-
-        @Override
-        public void onSaveInstanceState(Bundle outState) {
-            super.onSaveInstanceState(outState);
-
-            // Save the current article selection in case we need to recreate the fragment
-            //outState.putInt(ARG_POSITION, mCurrentPosition);
-        }
-
-        private void prepareListData()
-        {
-
-            //start ASynchTask that retrieves data over the web
-            new RetrieveTrackListTask(getActivity()).execute(mExpListView);
-        }
+    public CharSequence getActivityTitle() {
+        return mTitle;
     }
 
+    public void setActivityTitle(CharSequence mTitle) {
+        this.mTitle = mTitle;
+    }
 
+    public CharSequence getActivitySubtitle() {
+        return mSubtitle;
+    }
+
+    public void setActivitySubtitle(CharSequence mSubtitle) {
+        this.mSubtitle = mSubtitle;
+    }
 }
