@@ -266,6 +266,9 @@ public class BudgetInfoFragment extends ListFragment {
         mLastCheckedViewY = v.getY();
         mLastCheckedViewX = v.getX();
 
+
+        setMenuVisibility(false);
+
         FrameLayout endFragment = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
         if (endFragment == null){
             //Let's animate !!

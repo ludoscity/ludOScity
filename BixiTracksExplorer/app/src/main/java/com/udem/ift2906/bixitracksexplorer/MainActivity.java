@@ -47,6 +47,7 @@ public class MainActivity extends ActionBarActivity
     private static final String TAG_FAVORITES_FRAGMENT = "favorites_fragment";
     private static final String TAG_BUDGET_FRAGMENT = "budget_fragment";
     private static final String TAG_SETTINGS_FRAGMENT = "settings_fragment";
+    private static final String TAG_BUDGETINFO_FRAGMENT = "budgetinfo_fragment";
     private Map<Integer, Fragment> mFragmentPerSectionPos = new HashMap<>();
 
     private DrawerLayout mDrawerLayout;
@@ -287,6 +288,11 @@ public class MainActivity extends ActionBarActivity
             mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(true);
             switchFragmentVisibility(getSupportFragmentManager().beginTransaction(), mPositionLastItemSelected).commit();
         }
+
+        Fragment frag = fm.findFragmentByTag(TAG_BUDGETINFO_FRAGMENT);
+
+        if (frag !=null)
+            frag.setMenuVisibility(true);
     }
 
     @Override
@@ -323,7 +329,7 @@ public class MainActivity extends ActionBarActivity
 
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack so the user can navigate back
-            transaction.add(R.id.start_fragment_container, newFragment);
+            transaction.add(R.id.start_fragment_container, newFragment, TAG_BUDGETINFO_FRAGMENT);
 
             FrameLayout endContainer = (FrameLayout)findViewById(R.id.end_fragment_container);
 
@@ -370,8 +376,8 @@ public class MainActivity extends ActionBarActivity
 
                 transaction.setCustomAnimations(R.animator.slide_in_top, R.animator.fade_out, R.animator.fade_in, R.animator.slide_out_bottom);
 
-                // Replace whatever is in the fragment_container view with this fragment,
-                // and add the transaction to the back stack so the user can navigate back
+
+                //TODO : Figure out how to get the opacity animation lost since I replaced the .replace by .add
                 transaction.add(R.id.start_fragment_container, newFragment);
 
                 transaction.addToBackStack(null);
