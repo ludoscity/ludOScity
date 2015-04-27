@@ -47,8 +47,10 @@ public class MainActivity extends ActionBarActivity
     private static final String TAG_FAVORITES_FRAGMENT = "favorites_fragment";
     private static final String TAG_BUDGET_FRAGMENT = "budget_fragment";
     private static final String TAG_SETTINGS_FRAGMENT = "settings_fragment";
-    private static final String TAG_BUDGETINFO_FRAGMENT = "budgetinfo_fragment";
     private Map<Integer, Fragment> mFragmentPerSectionPos = new HashMap<>();
+
+    //Not a section fragment, just keeping track for back navigation handling
+    private static final String TAG_BUDGETINFO_FRAGMENT = "budgetinfo_fragment";
 
     private DrawerLayout mDrawerLayout;
     public static Resources resources;
