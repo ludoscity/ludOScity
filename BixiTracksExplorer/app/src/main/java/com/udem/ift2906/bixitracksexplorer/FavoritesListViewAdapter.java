@@ -23,9 +23,9 @@ public class FavoritesListViewAdapter extends BaseAdapter {
     private List<StationItem> mStationList = null;
     private LatLng mCurrentUserLatLng;
 
-    FavoritesListViewAdapter(Context _context, StationsNetwork _stationsNetwork, LatLng _currentUserLatLng){
+    FavoritesListViewAdapter(Context _context, List<StationItem> _stationsNetwork, LatLng _currentUserLatLng){
         mContext = _context;
-        mStationList = _stationsNetwork.stations;
+        mStationList = _stationsNetwork;
         mInflater = LayoutInflater.from(_context);
         mCurrentUserLatLng = _currentUserLatLng;
         sortStationListByClosest();

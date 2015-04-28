@@ -55,8 +55,7 @@ public class NearbyFragment extends Fragment
     private CameraPosition mBackCameraPosition;
     private float mMaxZoom = 16f;
 
-    private MenuItem mFavoriteStarOn;
-    private MenuItem mFavoriteStarOff;
+    private MenuItem mFavoriteStar;
     private MenuItem mParkingSwitch;
     private View mStationInfoViewHolder;
     private View mStationListViewHolder;
@@ -75,11 +74,15 @@ public class NearbyFragment extends Fragment
     private ImageView mRefreshButton;
     private View mDownloadBar;
 
+    private int mIconStarOn = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
+    private int mIconStarOff = R.drawable.abc_btn_rating_star_off_mtrl_alpha;
+
     private boolean mIsLookingForBikes;
     private boolean isDownloadCurrentlyExecuting;
     private boolean isStationInfoVisible;
     private boolean isAlreadyZoomedToUser;
     private boolean isMarkersUpdated;
+
 
     public static NearbyFragment newInstance(int sectionNumber) {
         NearbyFragment fragment = new NearbyFragment();
@@ -219,15 +222,9 @@ public class NearbyFragment extends Fragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_nearby,menu);
-        mFavoriteStarOn = menu.findItem(R.id.favoriteStarOn);
-        mFavoriteStarOff = menu.findItem(R.id.favoriteStarOff);
+        mFavoriteStar = menu.findItem(R.id.favoriteStar);
         mParkingSwitch = menu.findItem(R.id.showParkingAvailability);
-        if (!isStationInfoVisible) {
-            mFavoriteStarOn.setVisible(false);
-            mFavoriteStarOff.setVisible(false);
-        } else {
-            mParkingSwitch.setVisible(false);
-        }
+        mFavoriteStar.setVisible(false);
         Log.d("onCreateOptionsMenu","menu created");
     }
 
@@ -235,19 +232,28 @@ public class NearbyFragment extends Fragment
         mStationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                replaceListViewByInfoView(mStationsNetwork.stations.get(position));
+                replaceListViewByInfoView(mStationsNetwork.stations.get(position),false);
                 //mStationListViewAdapter.setItemSelected(position);
             }
         });
     }
 
-    private void replaceListViewByInfoView(StationItem stationItem) {
+    private void replaceListViewByInfoView(StationItem stationItem, final boolean isFromOutsideNearby) {
         isStationInfoVisible = true;
-        mCurrentInfoStation = stationItem;
-        // Add favorite button
-        if (stationItem.isFavorite())
-            mFavoriteStarOn.setVisible(true);
-        else mFavoriteStarOff.setVisible(true);
+        if (isFromOutsideNearby){
+            for (StationItem station: mStationsNetwork.stations)
+                if (station.getPosition().equals(stationItem.getPosition()))
+                    mCurrentInfoStation = station;
+        } else {
+            mCurrentInfoStation = stationItem;
+        }
+        // Manage star button
+        mFavoriteStar.setVisible(true);
+        if (mCurrentInfoStation.isFavorite()) {
+            mFavoriteStar.setIcon(mIconStarOn);
+        }else{
+            mFavoriteStar.setIcon(mIconStarOff);
+        }
         // Switch views
         mStationListViewHolder.setVisibility(View.GONE);
         mStationInfoViewHolder.setVisibility(View.VISIBLE);
@@ -300,6 +306,9 @@ public class NearbyFragment extends Fragment
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && isStationInfoVisible) {
                     replaceInfoViewByListView();
+                    if (isFromOutsideNearby){
+                        return false;
+                    }
                     return true;
                 }
                 return false;
@@ -320,9 +329,8 @@ public class NearbyFragment extends Fragment
             station.getGroundOverlay().setVisible(true);
         mCurrentInfoStation.getMarker().hideInfoWindow();
         mCurrentInfoStation = null;
-        // Hide the star
-        mFavoriteStarOn.setVisible(false);
-        mFavoriteStarOff.setVisible(false);
+        // Hide the star in menu
+        mFavoriteStar.setVisible(false);
     }
 
     @Override
@@ -333,13 +341,9 @@ public class NearbyFragment extends Fragment
                 //called when the up affordance/carat in actionbar is pressed
                 replaceInfoViewByListView();
                 return true;
-            case R.id.favoriteStarOn:
+            case R.id.favoriteStar:
                 if(isStationInfoVisible)
-                    changeFavoriteValue();
-                return true;
-            case R.id.favoriteStarOff:
-                if(isStationInfoVisible)
-                    changeFavoriteValue();
+                    changeFavoriteValue(mCurrentInfoStation.isFavorite());
                 return true;
             case R.id.showParkingAvailability:
                 mIsLookingForBikes = !mIsLookingForBikes;
@@ -349,22 +353,20 @@ public class NearbyFragment extends Fragment
         return false;
     }
 
-    private void changeFavoriteValue() {
+    private void changeFavoriteValue(boolean isFavorite) {
         Toast toast;
         if (!isStationInfoVisible)
             return;
-        if(mCurrentInfoStation.isFavorite()){
+        if(isFavorite){
             mCurrentInfoStation.setFavorite(false);
-            mFavoriteStarOff.setVisible(true);
-            mFavoriteStarOn.setVisible(false);
+            mFavoriteStar.setIcon(mIconStarOff);
             toast = Toast.makeText(mContext,getString(R.string.removedFromFavorites),Toast.LENGTH_SHORT);
         } else {
             mCurrentInfoStation.setFavorite(true);
-            mFavoriteStarOff.setVisible(false);
-            mFavoriteStarOn.setVisible(true);
+            mFavoriteStar.setIcon(mIconStarOn);
             toast = Toast.makeText(mContext,getString(R.string.addedToFavorites),Toast.LENGTH_SHORT);
         }
-        toast.setGravity(Gravity.CENTER,0,0);
+        toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
 
@@ -448,7 +450,7 @@ public class NearbyFragment extends Fragment
         if(!isStationInfoVisible) {
             for (StationItem station : mStationsNetwork.stations) {
                 if (station.getPosition().equals(marker.getPosition())) {
-                    replaceListViewByInfoView(station);
+                    replaceListViewByInfoView(station, false);
                     return;
                 }
             }
@@ -459,18 +461,13 @@ public class NearbyFragment extends Fragment
         String toastText;
         Drawable icon;
         mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
-        Typeface textTypeface = mStationInfoBikeAvailView.getTypeface();
         if(isLookingForBikes) {
             mBikesOrParkingColumn.setText(R.string.bikes);
-            mStationInfoBikeAvailView.setTypeface(textTypeface, Typeface.BOLD);
-            mStationInfoParkingAvailView.setTypeface(textTypeface, Typeface.NORMAL);
             mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
             toastText = getString(R.string.findABikes);
             icon = getResources().getDrawable(R.drawable.bike_icon_toast);
         } else {
             mBikesOrParkingColumn.setText(R.string.parking);
-            mStationInfoBikeAvailView.setTypeface(textTypeface, Typeface.NORMAL);
-            mStationInfoParkingAvailView.setTypeface(textTypeface, Typeface.BOLD);
             mParkingSwitch.setIcon(R.drawable.ic_action_find_dock);
             toastText = getString(R.string.findAParking);
             icon = getResources().getDrawable(R.drawable.parking_icon_toast);
@@ -500,6 +497,11 @@ public class NearbyFragment extends Fragment
         }
     }
 
+    public void showStationInfoFromOutside(StationItem stationToShow) {
+        mParkingSwitch.setVisible(true);
+        replaceListViewByInfoView(stationToShow, true);
+    }
+
     //Pour interaction avec mainActivity
     public interface OnFragmentInteractionListener {
         public void onNearbyFragmentInteraction(String title,boolean isNavDrawerEnabled);
@@ -526,6 +528,7 @@ public class NearbyFragment extends Fragment
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            mLastUpdatedTextView.setText(getString(R.string.updating));
             mUpdateProgressBar.setVisibility(View.VISIBLE);
             mRefreshButton.setVisibility(View.INVISIBLE);
         }

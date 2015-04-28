@@ -55,6 +55,8 @@ public class MainActivity extends ActionBarActivity
     private DrawerLayout mDrawerLayout;
     public static Resources resources;
 
+    public NearbyFragment mNearbyFragment;
+
     private CharSequence mTitle;
     private CharSequence mSubtitle;
     private int mPositionLastItemSelected = -1;
@@ -148,7 +150,7 @@ public class MainActivity extends ActionBarActivity
             if (frag == null) {
             //if (!mFragmentPerSectionPos.containsKey(position)){
                 frag = NearbyFragment.newInstance(position + 1);
-
+                mNearbyFragment = (NearbyFragment) frag;
                 //Can't be optimised in if : need to be called right before visibilitySwitch
                 mFragmentPerSectionPos.put(position, frag);
                 switchFragmentVisibility(fragmentManager.beginTransaction().add(R.id.start_fragment_container, frag, TAG_NEARBY_FRAGMENT), position).commit();
@@ -439,8 +441,12 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onFavoritesFragmentInteraction() {
-
+    public void onFavoritesFragmentInteraction(StationItem stationToShow) {
+        //mPositionLastItemSelected = -1;
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.addToBackStack("favorite section");
+        switchFragmentVisibility(ft,0).commit();
+        mNearbyFragment.showStationInfoFromOutside(stationToShow);
     }
 
     @Override

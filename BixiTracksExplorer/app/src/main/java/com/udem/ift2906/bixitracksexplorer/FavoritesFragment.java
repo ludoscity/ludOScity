@@ -9,13 +9,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
 
-public class FavoritesFragment extends Fragment  {
+import java.util.ArrayList;
+
+public class FavoritesFragment extends Fragment {
     private Context mContext;
     private OnFragmentInteractionListener mListener;
     private View mFavoritesView;
@@ -27,10 +30,10 @@ public class FavoritesFragment extends Fragment  {
     private FavoritesListViewAdapter mFavoritesStationListViewAdapter;
     private boolean hasFavorite;
     private ListView mFavoritesList;
-    private StationsNetwork mStationsNetworkFavorites;
+    private ArrayList<StationItem> mStationsFavorites;
 
     public interface OnFragmentInteractionListener {
-        public void onFavoritesFragmentInteraction();
+        public void onFavoritesFragmentInteraction(StationItem stationToShow);
     }
 
     public static FavoritesFragment newInstance(int sectionNumber) {
@@ -85,16 +88,12 @@ public class FavoritesFragment extends Fragment  {
     }
 
     public void setUpUI(){
-        // TODO get favorites station list directly from DB
-        StationsNetwork stationsNetwork = DBHelper.getStationsNetwork();
-        mStationsNetworkFavorites = new StationsNetwork();
-        for(StationItem stationItem: stationsNetwork.stations)
-            if(stationItem.isFavorite())
-                mStationsNetworkFavorites.stations.add(stationItem);
-        mFavoritesStationListViewAdapter = new FavoritesListViewAdapter(mContext,mStationsNetworkFavorites,mCurrentUserLatLng);
+        mStationsFavorites = DBHelper.getFavoriteStations();
+        mFavoritesStationListViewAdapter = new FavoritesListViewAdapter(mContext,mStationsFavorites,mCurrentUserLatLng);
         mFavoritesList.setAdapter(mFavoritesStationListViewAdapter);
+        setOnClickItemListenerStationListView();
         setCurrentLocation();
-        hasFavorite = !mStationsNetworkFavorites.stations.isEmpty();
+        hasFavorite = !mStationsFavorites.isEmpty();
         // Show the correct view if user has favorites or not
         if (!hasFavorite) {
             mNoFavoritesView.setVisibility(View.VISIBLE);
@@ -111,6 +110,16 @@ public class FavoritesFragment extends Fragment  {
         if (location != null) {
             mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
         }
+    }
+
+    private void setOnClickItemListenerStationListView() {
+        mFavoritesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                StationItem stationToShow = mStationsFavorites.get(position);
+                mListener.onFavoritesFragmentInteraction(stationToShow);
+            }
+        });
     }
 }
 
