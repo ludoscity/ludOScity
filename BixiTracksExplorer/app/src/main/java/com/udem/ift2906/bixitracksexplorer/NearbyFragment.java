@@ -156,7 +156,7 @@ public class NearbyFragment extends Fragment
 
                             //... then about next update
                             //Should come from something keeping tabs on time, maybe this runnable itself
-                            long wishedUpdateTime = runnableLastRefreshTimestamp + 130000;  //comes from Prefs
+                            long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60 ;  //comes from Prefs
 
                             if (now >= wishedUpdateTime) {
 
