@@ -134,6 +134,9 @@ public class BudgetTrackDetailsFragment extends Fragment
 
         mInfoListRowView = inflatedView.findViewById(R.id.budgettrackdetails_row_view);
 
+        //Bugfix : crash when clicking on Row View in details fragment
+        mInfoListRowView.setOnClickListener(null);
+
         FrameLayout endFragment = (FrameLayout)getActivity().findViewById(R.id.end_fragment_container);
         if (endFragment != null){
             mInfoListRowView.setVisibility(View.GONE);
