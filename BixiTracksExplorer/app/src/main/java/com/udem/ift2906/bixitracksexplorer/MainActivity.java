@@ -49,6 +49,11 @@ public class MainActivity extends ActionBarActivity
     private static final String TAG_SETTINGS_FRAGMENT = "settings_fragment";
     private Map<Integer, Fragment> mFragmentPerSectionPos = new HashMap<>();
 
+    private static final int DRAWER_POS_NEARBY_FRAGMENT = 0;
+    private static final int DRAWER_POS_FAVORITES_FRAGMENT = 1;
+    private static final int DRAWER_POS_BUDGET_FRAGMENT = 2;
+    private static final int DRAWER_POS_SETTINGS_FRAGMENT = 3;
+
     //Not a section fragment, just keeping track for back navigation handling
     private static final String TAG_BUDGETINFO_FRAGMENT = "budgetinfo_fragment";
 
@@ -141,7 +146,7 @@ public class MainActivity extends ActionBarActivity
     private void setupFragmentsForPos(int position) {
         /////////////////////////////////////////////////////////////////////////////
         //TODO : Sort out this spaghetti monster in formation
-        if (position == 0){
+        if (position == DRAWER_POS_NEARBY_FRAGMENT){
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             Fragment frag =  fragmentManager.findFragmentByTag(TAG_NEARBY_FRAGMENT);
@@ -159,7 +164,7 @@ public class MainActivity extends ActionBarActivity
                 switchFragmentVisibility(fragmentManager.beginTransaction(), position).commit();
             }
         }
-        else if (position == 2){
+        else if (position == DRAWER_POS_BUDGET_FRAGMENT){
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             Fragment frag =  fragmentManager.findFragmentByTag(TAG_BUDGET_FRAGMENT);
@@ -178,7 +183,7 @@ public class MainActivity extends ActionBarActivity
                 switchFragmentVisibility(fragmentManager.beginTransaction(), position).commit();
             }
         }
-        else if (position == 3){
+        else if (position == DRAWER_POS_SETTINGS_FRAGMENT){
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             Fragment frag =  fragmentManager.findFragmentByTag(TAG_SETTINGS_FRAGMENT);
@@ -198,7 +203,7 @@ public class MainActivity extends ActionBarActivity
             }
 
         }
-        else if (position == 1){
+        else if (position == DRAWER_POS_FAVORITES_FRAGMENT){
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             Fragment frag =  fragmentManager.findFragmentByTag(TAG_FAVORITES_FRAGMENT);
@@ -340,8 +345,8 @@ public class MainActivity extends ActionBarActivity
             //Unlocking swipe gesture
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
-            if (mPositionLastItemSelected == 2)
-                switchFragmentVisibility(getSupportFragmentManager().beginTransaction(), 2).commit();
+            if (mPositionLastItemSelected == DRAWER_POS_BUDGET_FRAGMENT)
+                switchFragmentVisibility(getSupportFragmentManager().beginTransaction(), DRAWER_POS_BUDGET_FRAGMENT).commit();
         }
         else if(uri.getPath().equalsIgnoreCase("/" + BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_PATH))
         {
