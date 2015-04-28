@@ -128,61 +128,67 @@ public class NearbyFragment extends Fragment
                     @Override
                     public void run() {
 
-                        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                        long runnableLastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
-
                         long now = System.currentTimeMillis();
-                        long difference = now - runnableLastRefreshTimestamp;
 
-                        StringBuilder updateTextBuilder = new StringBuilder();
+                        //Update not already in progress
+                        if (mDownloadWebTask == null) {
 
-                        //First taking care of past time...
-                        if (difference < DateUtils.MINUTE_IN_MILLIS)
-                            updateTextBuilder.append(getString(R.string.momentsAgo)).append(" ").append(getString(R.string.fromCitibik_es));//mUpdateTextView.setText();
-                        else
-                            updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(R.string.minsAgo)).append(" ").append(getString(R.string.fromCitibik_es));
-                        //mUpdateTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
+                            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                            long runnableLastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
 
-                        //long differenceInMinutes = difference / DateUtils.MINUTE_IN_MILLIS;
+                            long difference = now - runnableLastRefreshTimestamp;
 
-                        //from : http://stackoverflow.com/questions/25355611/how-to-get-time-difference-between-two-dates-in-android-app
-                        //long differenceInSeconds = difference / DateUtils.SECOND_IN_MILLIS;
+                            StringBuilder updateTextBuilder = new StringBuilder();
+
+                            //First taking care of past time...
+                            if (difference < DateUtils.MINUTE_IN_MILLIS)
+                                updateTextBuilder.append(getString(R.string.momentsAgo)).append(" ").append(getString(R.string.fromCitibik_es));//mUpdateTextView.setText();
+                            else
+                                updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(R.string.minsAgo)).append(" ").append(getString(R.string.fromCitibik_es));
+                            //mUpdateTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
+
+                            //long differenceInMinutes = difference / DateUtils.MINUTE_IN_MILLIS;
+
+                            //from : http://stackoverflow.com/questions/25355611/how-to-get-time-difference-between-two-dates-in-android-app
+                            //long differenceInSeconds = difference / DateUtils.SECOND_IN_MILLIS;
 // formatted will be HH:MM:SS or MM:SS
-                        //String formatted = DateUtils.formatElapsedTime(differenceInSeconds);
+                            //String formatted = DateUtils.formatElapsedTime(differenceInSeconds);
 
-                        //... then about next update
-                        //Should come from something keeping tabs on time, maybe this runnable itself
-                        long wishedUpdateTime = lastUpdateTime + 130000;  //comes from Prefs
+                            //... then about next update
+                            //Should come from something keeping tabs on time, maybe this runnable itself
+                            long wishedUpdateTime = runnableLastRefreshTimestamp + 130000;  //comes from Prefs
 
-                        if (now >= wishedUpdateTime) {
+                            if (now >= wishedUpdateTime) {
 
-                            //Put a string same length as the other one ?
-                            updateTextBuilder.append(" Updating");
+                                //Put a string same length as the other one ?
+                                updateTextBuilder.append(" ").append(getString(R.string.updating));
 
-                            //Run update
-                            if (mDownloadWebTask == null) {
+                                //Run update
+
                                 mDownloadWebTask = new DownloadWebTask();
                                 mDownloadWebTask.execute();
+
+
+                                lastUpdateTime = now;
+                            } else {
+
+                                updateTextBuilder.append(" ").append(getString(R.string.nextUpdate)).append(" ");
+
+
+                                long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
+
+                                // formatted will be HH:MM:SS or MM:SS
+                                updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
+
+                                updateTextBuilder.append(" ").append(getString(R.string.minuteAbbreviated));
                             }
 
-                            lastUpdateTime = now;
-                        } else {
-
-                            updateTextBuilder.append(" Next update ");
-
-
-                            long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
-
-                            // formatted will be HH:MM:SS or MM:SS
-                            updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
-
-                            updateTextBuilder.append("min");
+                            mUpdateTextView.setText(updateTextBuilder.toString());
                         }
-
-                        mUpdateTextView.setText(updateTextBuilder.toString());
 
                         lastRunTime = now;
 
+                        //Update UI will be refreshed every second
                         mUpdateRefreshHandler.postDelayed(mUpdateRefreshRunnableCode, 1000);
                     }
                 };
@@ -211,8 +217,18 @@ public class NearbyFragment extends Fragment
         super.onHiddenChanged(hidden);
 
         if (!hidden){
+            //Recreate handler to maintain update TextView String
+            mUpdateRefreshHandler = new Handler();
+            setupUI();
+
             ((MainActivity) getActivity()).onSectionHiddenChanged(
                     getArguments().getInt(ARG_SECTION_NUMBER));
+
+        }
+        else{
+            mUpdateRefreshHandler.removeCallbacks(mUpdateRefreshRunnableCode);
+            mUpdateRefreshRunnableCode = null;
+            mUpdateRefreshHandler = null;
         }
     }
 
