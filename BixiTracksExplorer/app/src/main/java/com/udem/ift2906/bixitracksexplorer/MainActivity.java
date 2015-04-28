@@ -340,7 +340,8 @@ public class MainActivity extends ActionBarActivity
             //Unlocking swipe gesture
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
-            switchFragmentVisibility(getSupportFragmentManager().beginTransaction(), 2).commit();
+            if (mPositionLastItemSelected == 2)
+                switchFragmentVisibility(getSupportFragmentManager().beginTransaction(), 2).commit();
         }
         else if(uri.getPath().equalsIgnoreCase("/" + BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_PATH))
         {
