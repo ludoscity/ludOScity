@@ -281,6 +281,8 @@ public class NearbyFragment extends Fragment
     public void onResume() {
         super.onResume();
         isMarkersUpdated = false;
+        if(mUpdateRefreshHandler == null)
+            mUpdateRefreshHandler = new Handler();
         setupUI();
     }
 
