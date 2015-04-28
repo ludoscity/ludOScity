@@ -218,18 +218,18 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
-    private FragmentTransaction switchFragmentVisibility(FragmentTransaction _inTrans, int _posToShow){
+    private FragmentTransaction switchFragmentVisibility(FragmentTransaction _inOutTrans, int _posToShow){
 
         for (int pos : mFragmentPerSectionPos.keySet()){
             if (pos == _posToShow){
-                _inTrans.show(mFragmentPerSectionPos.get(pos));
+                _inOutTrans.show(mFragmentPerSectionPos.get(pos));
             }
             else{
-                _inTrans.hide(mFragmentPerSectionPos.get(pos));
+                _inOutTrans.hide(mFragmentPerSectionPos.get(pos));
             }
         }
 
-        return _inTrans;
+        return _inOutTrans;
     }
 
     public void onSectionAttached(int number) {
