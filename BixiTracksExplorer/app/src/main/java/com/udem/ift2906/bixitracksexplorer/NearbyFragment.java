@@ -4,11 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
@@ -47,8 +47,11 @@ public class NearbyFragment extends Fragment
     private OnFragmentInteractionListener mListener;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String PREF_WEBTASK_LAST_TIMESTAMP_MS = "last_refresh_timestamp";
-    private DownloadWebTask mDownloadWebTask;
+    private DownloadWebTask mDownloadWebTask = null;
     private BixiAPI bixiApiInstance;
+
+    private Handler mUpdateRefreshHandler = null;
+    private Runnable mUpdateRefreshRunnableCode = null;
 
     private GoogleMap nearbyMap = null;
     private LatLng mCurrentUserLatLng;
@@ -69,7 +72,7 @@ public class NearbyFragment extends Fragment
     private TextView mStationInfoParkingAvailView;
     private TextView mStationInfoDistanceView;
     private ImageView mDirectionArrow;
-    private TextView mLastUpdatedTextView;
+    private TextView mUpdateTextView;
     private ProgressBar mUpdateProgressBar;
     private ImageView mRefreshButton;
     private View mDownloadBar;
@@ -78,7 +81,6 @@ public class NearbyFragment extends Fragment
     private int mIconStarOff = R.drawable.abc_btn_rating_star_off_mtrl_alpha;
 
     private boolean mIsLookingForBikes;
-    private boolean isDownloadCurrentlyExecuting;
     private boolean isStationInfoVisible;
     private boolean isAlreadyZoomedToUser;
     private boolean isMarkersUpdated;
@@ -114,12 +116,80 @@ public class NearbyFragment extends Fragment
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         long lastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
         if (lastRefreshTimestamp != 0){
-            long now = System.currentTimeMillis();
-            long difference = now - lastRefreshTimestamp;
-            if (difference < DateUtils.MINUTE_IN_MILLIS)
-                mLastUpdatedTextView.setText(getString(R.string.lastUpdated)+" "+ getString(R.string.momentsAgo));
-            else
-                mLastUpdatedTextView.setText(getString(R.string.lastUpdated)+" "+ Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo));
+
+            if (mUpdateRefreshRunnableCode == null) {
+                //BEWARE THE INLINE NON TRIVIAL CLASS DECLARATION !!
+                mUpdateRefreshRunnableCode = new Runnable() {
+
+                    private final long startTime = System.currentTimeMillis();
+                    private long lastRunTime;
+                    private long lastUpdateTime = System.currentTimeMillis();   //Update should be run automatically ?
+
+                    @Override
+                    public void run() {
+
+                        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        long runnableLastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
+
+                        long now = System.currentTimeMillis();
+                        long difference = now - runnableLastRefreshTimestamp;
+
+                        StringBuilder updateTextBuilder = new StringBuilder();
+
+                        //First taking care of past time...
+                        if (difference < DateUtils.MINUTE_IN_MILLIS)
+                            updateTextBuilder.append(getString(R.string.momentsAgo)).append(" ").append(getString(R.string.fromCitibik_es));//mUpdateTextView.setText();
+                        else
+                            updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(R.string.minsAgo)).append(" ").append(getString(R.string.fromCitibik_es));
+                        //mUpdateTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
+
+                        //long differenceInMinutes = difference / DateUtils.MINUTE_IN_MILLIS;
+
+                        //from : http://stackoverflow.com/questions/25355611/how-to-get-time-difference-between-two-dates-in-android-app
+                        //long differenceInSeconds = difference / DateUtils.SECOND_IN_MILLIS;
+// formatted will be HH:MM:SS or MM:SS
+                        //String formatted = DateUtils.formatElapsedTime(differenceInSeconds);
+
+                        //... then about next update
+                        //Should come from something keeping tabs on time, maybe this runnable itself
+                        long wishedUpdateTime = lastUpdateTime + 130000;  //comes from Prefs
+
+                        if (now >= wishedUpdateTime) {
+
+                            //Put a string same length as the other one ?
+                            updateTextBuilder.append(" Updating");
+
+                            //Run update
+                            if (mDownloadWebTask == null) {
+                                mDownloadWebTask = new DownloadWebTask();
+                                mDownloadWebTask.execute();
+                            }
+
+                            lastUpdateTime = now;
+                        } else {
+
+                            updateTextBuilder.append(" Next update ");
+
+
+                            long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
+
+                            // formatted will be HH:MM:SS or MM:SS
+                            updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
+
+                            updateTextBuilder.append("min");
+                        }
+
+                        mUpdateTextView.setText(updateTextBuilder.toString());
+
+                        lastRunTime = now;
+
+                        mUpdateRefreshHandler.postDelayed(mUpdateRefreshRunnableCode, 1000);
+                    }
+                };
+
+                mUpdateRefreshHandler.post(mUpdateRefreshRunnableCode);
+            }
+
 
             if(nearbyMap != null) {
                 if (mStationsNetwork != null && !isMarkersUpdated) {
@@ -132,7 +202,7 @@ public class NearbyFragment extends Fragment
             }
 
         } else{
-            mLastUpdatedTextView.setText(getString(R.string.nearbyfragment_default_never_web_updated));
+            mUpdateTextView.setText(getString(R.string.nearbyfragment_default_never_web_updated));
         }
     }
 
@@ -158,6 +228,10 @@ public class NearbyFragment extends Fragment
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+
+        mUpdateRefreshHandler = new Handler();
+
+
         //TODO move this affectation
         mIsLookingForBikes = true;
     }
@@ -172,6 +246,11 @@ public class NearbyFragment extends Fragment
         }
 
         mListener = null;
+
+        mUpdateRefreshHandler.removeCallbacks(mUpdateRefreshRunnableCode);
+        mUpdateRefreshRunnableCode = null;
+        mUpdateRefreshHandler = null;
+
     }
 
     @Override
@@ -207,8 +286,8 @@ public class NearbyFragment extends Fragment
         mStationInfoBikeAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_bikeAvailability);
         mStationInfoParkingAvailView = (TextView) inflatedView.findViewById(R.id.stationInfo_parkingAvailability);
         // Update Bar
-        mLastUpdatedTextView = (TextView) inflatedView.findViewById(R.id.lastUpdated_textView);
-        mLastUpdatedTextView.setTextColor(Color.LTGRAY);
+        mUpdateTextView = (TextView) inflatedView.findViewById(R.id.update_textView);
+        mUpdateTextView.setTextColor(Color.LTGRAY);
         mUpdateProgressBar = (ProgressBar) inflatedView.findViewById(R.id.refreshDatabase_progressbar);
         mUpdateProgressBar.setVisibility(View.INVISIBLE);
         mRefreshButton = (ImageView) inflatedView.findViewById(R.id.refreshDatabase_button);
@@ -232,7 +311,7 @@ public class NearbyFragment extends Fragment
         mStationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                replaceListViewByInfoView(mStationsNetwork.stations.get(position),false);
+                replaceListViewByInfoView(mStationsNetwork.stations.get(position), false);
                 //mStationListViewAdapter.setItemSelected(position);
             }
         });
@@ -400,7 +479,7 @@ public class NearbyFragment extends Fragment
         mDownloadBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isDownloadCurrentlyExecuting) {
+                if (mDownloadWebTask == null) {
                     mDownloadWebTask = new DownloadWebTask();
                     mDownloadWebTask.execute();
                 }
@@ -514,7 +593,6 @@ public class NearbyFragment extends Fragment
     public class DownloadWebTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            isDownloadCurrentlyExecuting = true;
             bixiApiInstance = new BixiAPI(mContext);
             //A Task that launches an other task, ok I want it to show the progress in the user interface
             //I finally advised gainst cvhanging anything, instead I'll add a setting to display Database toast, and OFF by default
@@ -528,7 +606,7 @@ public class NearbyFragment extends Fragment
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mLastUpdatedTextView.setText(getString(R.string.updating));
+            mUpdateTextView.setText(getString(R.string.updating));
             mUpdateProgressBar.setVisibility(View.VISIBLE);
             mRefreshButton.setVisibility(View.INVISIBLE);
         }
@@ -559,9 +637,11 @@ public class NearbyFragment extends Fragment
             mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);*/
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
             sp.edit().putLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, Calendar.getInstance().getTimeInMillis()).apply();
-            isDownloadCurrentlyExecuting = false;
             isMarkersUpdated = false;
             setupUI();
+
+            //must be done last
+            mDownloadWebTask = null;
         }
     }
 }
