@@ -8,6 +8,12 @@
         android:layout_height="fill_parent"
         android:orientation="vertical">
 
+        <include
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            layout="@layout/budgetinfolist_item"
+            android:id="@+id/budgettrackdetails_row_view"/>
+
         <fragment
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:name="com.google.android.gms.maps.MapFragment"
@@ -16,15 +22,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
-        <include
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            layout="@layout/budgetinfolist_item"
-            android:id="@+id/budgettrackdetails_row_view"/>
-
         </LinearLayout>
-
-
 
     <RelativeLayout
         android:layout_width="fill_parent"

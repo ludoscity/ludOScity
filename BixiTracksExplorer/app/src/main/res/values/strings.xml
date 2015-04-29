@@ -25,14 +25,14 @@
     <string name="budgetoverview_loading_costs">Calculating cost\n</string>
     <string name="budgetoverview_loading_tracks">Downloading trip\n</string>
     <string name="generic_please_wait">Please wait…</string>
-    <string name="lastUpdated">Updated from citibik.es</string>
-    <string name="momentsAgo">moments ago.</string>
-    <string name="minsAgo">min ago.</string>
+    <string name="fromCitibik_es">from citibik.es.</string>
+    <string name="momentsAgo">Moments ago</string>
+    <string name="minsAgo">min ago</string>
     <string name="bikesAvailability">Bikes available:</string>
-    <string name="bikeAvailable_sing">bike available.</string>
-    <string name="bikesAvailable_plur">bikes available.</string>
-    <string name="parkingAvailable_sing">parking space.</string>
-    <string name="parkingsAvailable_plur">parking spaces.</string>
+    <string name="bikeAvailable_sing">bike available</string>
+    <string name="bikesAvailable_plur">bikes available</string>
+    <string name="parkingAvailable_sing">parking space</string>
+    <string name="parkingsAvailable_plur">parking spaces</string>
     <string name="stationIsLocked">Locked</string>
     <string name="removedFromFavorites">Favorite removed</string>
     <string name="addedToFavorites">Favorite added</string>
@@ -40,7 +40,6 @@
     <string name="setting_auto_update">Update nearby automatically</string>
     <string name="setting_fabrice">Update budget automatically</string>
     <string name="findAParking">Find a parking</string>
-    <string name="findAParkings">Find a parking</string>
     <string name="distance">Distance</string>
     <string name="station">Station</string>
     <string name="bikes">Bikes</string>
@@ -49,4 +48,7 @@
     <string name="parkings">Parkings</string>
     <string name="nearbyfragment_default_never_web_updated">No data: tap to update from citibik.es</string>
     <string name="noFavorite">No favorites</string>
+    <string name="updating">Updating...</string>
+    <string name="nextUpdate">Next update</string>
+    <string name="minuteAbbreviated" translatable="false">min</string>
 </resources>

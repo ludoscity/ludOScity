@@ -280,7 +280,7 @@ public class BudgetInfoFragment extends ListFragment {
             viewCapture = Bitmap.createBitmap(v.getDrawingCache());
             v.setDrawingCacheEnabled(false);
 
-            Pair<Integer,Integer> targetAbsoluteXY = calculateRowAnimTarget(v);
+            Pair<Integer,Integer> targetAbsoluteXY = calculateRowAnimTarget();
 
             mAnimatedrowBitmapHolderImageView.setImageBitmap(viewCapture);
 
@@ -315,7 +315,7 @@ public class BudgetInfoFragment extends ListFragment {
     }
 
     //Return X and Y of row line View target position on screen
-    private Pair<Integer, Integer> calculateRowAnimTarget(View rowView){
+    private Pair<Integer, Integer> calculateRowAnimTarget(){
 
         //calculate the position of the row as well as the target animation position (at bottom of screen)
         //matching the next fragment layout
@@ -326,10 +326,11 @@ public class BudgetInfoFragment extends ListFragment {
         //int rowTop = rowView.getTop() + getListView().getTop();
         //int rowLeft = rowView.getLeft() + getListView().getLeft();
 
-        int listViewBottom = getListView().getBottom();
+        //int listViewBottom = getListView().getBottom();
+        int listViewTop = getListView().getTop();
         int listViewRight = getListView().getRight();
 
-        int YTarget = listViewBottom - rowView.getHeight() + getActivity().findViewById(R.id.toolbar_main).getHeight();
+        int YTarget = listViewTop /*+ rowView.getHeight()*/ + getActivity().findViewById(R.id.toolbar_main).getHeight();//listViewBottom - rowView.getHeight() + getActivity().findViewById(R.id.toolbar_main).getHeight();
 
 
         // First figure out if we're on a one of two fragments configuration

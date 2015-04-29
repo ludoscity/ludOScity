@@ -280,4 +280,8 @@ public class DBHelper {
                 addRow(station);
         }*/
     }
+
+    public static void closeDatabase() {
+        BixiStationDatabase.getInstance(context).close();
+    }
 }

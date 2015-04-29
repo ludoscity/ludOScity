@@ -49,11 +49,18 @@ public class MainActivity extends ActionBarActivity
     private static final String TAG_SETTINGS_FRAGMENT = "settings_fragment";
     private Map<Integer, Fragment> mFragmentPerSectionPos = new HashMap<>();
 
+    private static final int DRAWER_POS_NEARBY_FRAGMENT = 0;
+    private static final int DRAWER_POS_FAVORITES_FRAGMENT = 1;
+    private static final int DRAWER_POS_BUDGET_FRAGMENT = 2;
+    private static final int DRAWER_POS_SETTINGS_FRAGMENT = 3;
+
     //Not a section fragment, just keeping track for back navigation handling
     private static final String TAG_BUDGETINFO_FRAGMENT = "budgetinfo_fragment";
 
     private DrawerLayout mDrawerLayout;
     public static Resources resources;
+
+    public NearbyFragment mNearbyFragment;
 
     private CharSequence mTitle;
     private CharSequence mSubtitle;
@@ -107,15 +114,39 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("lastSelected", mPositionLastItemSelected);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        mPositionLastItemSelected = savedInstanceState.getInt("lastSelected");
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        DBHelper.closeDatabase();
+    }
+
+    @Override
     public void onNavigationDrawerItemSelected(int position) {
         //TODO Do it better: don't replace fragment if its the same as current
         if (position == mPositionLastItemSelected)
             return;
         mPositionLastItemSelected = position;
+        setupFragmentsForPos(mPositionLastItemSelected);
+    }
 
+    private void setupFragmentsForPos(int position) {
         /////////////////////////////////////////////////////////////////////////////
         //TODO : Sort out this spaghetti monster in formation
-        if (position == 0){
+        if (position == DRAWER_POS_NEARBY_FRAGMENT){
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             Fragment frag =  fragmentManager.findFragmentByTag(TAG_NEARBY_FRAGMENT);
@@ -124,7 +155,7 @@ public class MainActivity extends ActionBarActivity
             if (frag == null) {
             //if (!mFragmentPerSectionPos.containsKey(position)){
                 frag = NearbyFragment.newInstance(position + 1);
-
+                mNearbyFragment = (NearbyFragment) frag;
                 //Can't be optimised in if : need to be called right before visibilitySwitch
                 mFragmentPerSectionPos.put(position, frag);
                 switchFragmentVisibility(fragmentManager.beginTransaction().add(R.id.start_fragment_container, frag, TAG_NEARBY_FRAGMENT), position).commit();
@@ -133,7 +164,7 @@ public class MainActivity extends ActionBarActivity
                 switchFragmentVisibility(fragmentManager.beginTransaction(), position).commit();
             }
         }
-        else if (position == 2){
+        else if (position == DRAWER_POS_BUDGET_FRAGMENT){
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             Fragment frag =  fragmentManager.findFragmentByTag(TAG_BUDGET_FRAGMENT);
@@ -152,7 +183,7 @@ public class MainActivity extends ActionBarActivity
                 switchFragmentVisibility(fragmentManager.beginTransaction(), position).commit();
             }
         }
-        else if (position == 3){
+        else if (position == DRAWER_POS_SETTINGS_FRAGMENT){
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             Fragment frag =  fragmentManager.findFragmentByTag(TAG_SETTINGS_FRAGMENT);
@@ -172,7 +203,7 @@ public class MainActivity extends ActionBarActivity
             }
 
         }
-        else if (position == 1){
+        else if (position == DRAWER_POS_FAVORITES_FRAGMENT){
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             Fragment frag =  fragmentManager.findFragmentByTag(TAG_FAVORITES_FRAGMENT);
@@ -192,18 +223,18 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
-    private FragmentTransaction switchFragmentVisibility(FragmentTransaction _inTrans, int _posToShow){
+    private FragmentTransaction switchFragmentVisibility(FragmentTransaction _inOutTrans, int _posToShow){
 
         for (int pos : mFragmentPerSectionPos.keySet()){
             if (pos == _posToShow){
-                _inTrans.show(mFragmentPerSectionPos.get(pos));
+                _inOutTrans.show(mFragmentPerSectionPos.get(pos));
             }
             else{
-                _inTrans.hide(mFragmentPerSectionPos.get(pos));
+                _inOutTrans.hide(mFragmentPerSectionPos.get(pos));
             }
         }
 
-        return _inTrans;
+        return _inOutTrans;
     }
 
     public void onSectionAttached(int number) {
@@ -314,7 +345,8 @@ public class MainActivity extends ActionBarActivity
             //Unlocking swipe gesture
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
-            switchFragmentVisibility(getSupportFragmentManager().beginTransaction(), 2).commit();
+            if (mPositionLastItemSelected == DRAWER_POS_BUDGET_FRAGMENT)
+                switchFragmentVisibility(getSupportFragmentManager().beginTransaction(), DRAWER_POS_BUDGET_FRAGMENT).commit();
         }
         else if(uri.getPath().equalsIgnoreCase("/" + BudgetOverviewFragment.BUDGETOVERVIEW_INFO_CLICK_PATH))
         {
@@ -415,8 +447,12 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    public void onFavoritesFragmentInteraction() {
-
+    public void onFavoritesFragmentInteraction(StationItem stationToShow) {
+        //mPositionLastItemSelected = -1;
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.addToBackStack("favorite section");
+        switchFragmentVisibility(ft,0).commit();
+        mNearbyFragment.showStationInfoFromOutside(stationToShow);
     }
 
     @Override
