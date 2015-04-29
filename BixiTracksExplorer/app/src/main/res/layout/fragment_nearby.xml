@@ -7,15 +7,6 @@
     tools:context="com.udem.ift2906.bixitracksexplorer.NearbyFragment"
     android:id="@+id/nearbyFragmentLayout">
 
-    <!-- MAP -->
-    <fragment
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:name="com.google.android.gms.maps.MapFragment"
-        android:id="@+id/mapNearby"
-        android:layout_width="fill_parent"
-        android:layout_height="0px"
-        android:layout_weight="6"/>
-
     <!-- VIEW HOLDER FOR STATION LIST AND STATION INFO -->
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -81,7 +72,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:id="@+id/stationListView"/>
-         </LinearLayout>
+        </LinearLayout>
 
         <!-- STATION INFO -->
         <LinearLayout
@@ -173,6 +164,15 @@
         </LinearLayout>
 
     </RelativeLayout>
+
+    <!-- MAP -->
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:id="@+id/mapNearby"
+        android:layout_width="fill_parent"
+        android:layout_height="0px"
+        android:layout_weight="6"/>
 
     <!-- LAST UPDATED -->
     <LinearLayout
