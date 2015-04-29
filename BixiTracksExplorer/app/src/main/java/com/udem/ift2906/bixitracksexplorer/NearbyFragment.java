@@ -179,8 +179,6 @@ public class NearbyFragment extends Fragment
 
                                 // formatted will be HH:MM:SS or MM:SS
                                 updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
-
-                                updateTextBuilder.append(" ").append(getString(R.string.minuteAbbreviated));
                             }
 
                             mUpdateTextView.setText(updateTextBuilder.toString());
