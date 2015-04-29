@@ -22,6 +22,8 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 //import android.widget.Toast;
 
@@ -86,7 +88,11 @@ public class BixiAPI{
     public class addNetworkDatabase extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            DBHelper.addNetwork(stationsNetwork);
+            try {
+                DBHelper.addNetwork(stationsNetwork);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return null;
         }
 

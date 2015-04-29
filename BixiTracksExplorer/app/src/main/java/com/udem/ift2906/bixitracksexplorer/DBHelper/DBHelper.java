@@ -23,7 +23,9 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -188,7 +190,7 @@ public class DBHelper {
         return items;
     }
 
-    /*public static StationItem getStationItem(long id) {
+    public static StationItem getStationItem(long id) {
         Cursor cursor = BixiStationDatabase.getInstance(context).getStation(id);
 
         cursor.moveToFirst();
@@ -197,7 +199,7 @@ public class DBHelper {
         }
 
         return null;
-    }*/
+    }
 
     public static boolean isExist(long id) {
         return BixiStationDatabase.getInstance(context).isExist(id);
@@ -251,12 +253,31 @@ public class DBHelper {
         return true;
     }
 
-    public static void addNetwork(StationsNetwork stationsNetwork) {
+    public static void addNetwork(StationsNetwork stationsNetwork) throws Exception {
+        LinkedHashMap<Long, StationItem> map = new LinkedHashMap<>();
+
+        for (StationItem station : stationsNetwork.stations) {
+            if (map.containsKey(station.getUid())) {
+                throw new Exception("Erreur de duplication dans la DB. Des stations pourraient être manquantent");
+            }
+            map.put(station.getUid(), station);
+        }
+
+        for(Map.Entry<Long, StationItem> entry : map.entrySet()) {
+            if (isExist(entry.getKey())) {
+                updateRow(entry.getValue(), entry.getKey());
+            } else {
+                addRow(entry.getValue());
+            }
+        }
+
+        String s = "Ajout réussi";
+/*
         for (StationItem station : stationsNetwork.stations) {
             if (isExist(station.getUid()))
                 updateRow(station, station.getUid());
             else
                 addRow(station);
-        }
+        }*/
     }
 }

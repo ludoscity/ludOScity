@@ -7,15 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiNetwork;
-import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiStation;
-
 /**
  * Created by Looney on 06-04-15.
  */
 public class BixiStationDatabase extends SQLiteOpenHelper {
     static final String DB_NAME = "bixi.db";
-    static final int DB_VERSION = 4;
+    static final int DB_VERSION = 13;
 
     //Stations TABLE
     static final String TABLE_NAME = "Stations";
@@ -70,7 +67,7 @@ public class BixiStationDatabase extends SQLiteOpenHelper {
     }
     public Cursor getStations(){
         String sql = "select * from " + TABLE_NAME
-                +" order by " + COLUMN_NAME + " asc";
+                +" order by " + COLUMN_ID + " asc";
         Cursor c = getWritableDatabase().rawQuery(sql, null);
         return c;
     }
