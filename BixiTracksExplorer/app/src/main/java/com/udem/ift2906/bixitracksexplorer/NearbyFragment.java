@@ -125,10 +125,10 @@ public class NearbyFragment extends Fragment
                 //BEWARE THE INLINE NON TRIVIAL CLASS DECLARATION !!
                 mUpdateRefreshRunnableCode = new Runnable() {
 
-                    private final long startTime = System.currentTimeMillis();
+                    /*private final long startTime = System.currentTimeMillis();
                     private long lastRunTime;
                     private long lastUpdateTime = System.currentTimeMillis();   //Update should be run automatically ?
-
+                    */
                     @Override
                     public void run() {
 
@@ -241,7 +241,7 @@ public class NearbyFragment extends Fragment
 
             ((MainActivity) getActivity()).onSectionHiddenChanged(
                     getArguments().getInt(ARG_SECTION_NUMBER));
-            if (isStationInfoVisible) replaceInfoViewByListView();
+            if (isStationInfoVisible && !mIsFromFavoriteSection) replaceInfoViewByListView();
 
         }
         else{
@@ -352,7 +352,15 @@ public class NearbyFragment extends Fragment
         inflater.inflate(R.menu.menu_nearby,menu);
         mFavoriteStar = menu.findItem(R.id.favoriteStar);
         mParkingSwitch = menu.findItem(R.id.showParkingAvailability);
-        mFavoriteStar.setVisible(false);
+        mFavoriteStar.setVisible(isStationInfoVisible);
+        if (mCurrentInfoStation != null){
+            if (mCurrentInfoStation.isFavorite()) {
+                mFavoriteStar.setIcon(mIconStarOn);
+            }else{
+                mFavoriteStar.setIcon(mIconStarOff);
+            }
+        }
+        mParkingSwitch.setVisible(!isStationInfoVisible);
         Log.d("onCreateOptionsMenu","menu created");
     }
 
@@ -378,13 +386,7 @@ public class NearbyFragment extends Fragment
         } else {
             mCurrentInfoStation = stationItem;
         }
-        // Manage star button
-        mFavoriteStar.setVisible(true);
-        if (mCurrentInfoStation.isFavorite()) {
-            mFavoriteStar.setIcon(mIconStarOn);
-        }else{
-            mFavoriteStar.setIcon(mIconStarOff);
-        }
+        getActivity().invalidateOptionsMenu();
         // Switch views
         mStationListViewHolder.setVisibility(View.GONE);
         mStationInfoViewHolder.setVisibility(View.VISIBLE);
@@ -454,8 +456,7 @@ public class NearbyFragment extends Fragment
             station.getGroundOverlay().setVisible(true);
         mCurrentInfoStation.getMarker().hideInfoWindow();
         mCurrentInfoStation = null;
-        // Hide the star in menu
-        mFavoriteStar.setVisible(false);
+        getActivity().invalidateOptionsMenu();
     }
 
     @Override
@@ -466,6 +467,7 @@ public class NearbyFragment extends Fragment
                 if (mIsFromFavoriteSection){
                     getFragmentManager().popBackStackImmediate();
                     mListener.onNearbyFragmentInteraction(getString(R.string.title_section_favorites), true);
+                    mIsFromFavoriteSection = false;
                 }else {
                     replaceInfoViewByListView();
                 }
@@ -626,6 +628,7 @@ public class NearbyFragment extends Fragment
     }
 
     public void showStationInfoFromFavoriteSection(StationItem stationToShow) {
+        mParkingSwitch.setVisible(false);
         replaceListViewByInfoView(stationToShow, true);
     }
 
