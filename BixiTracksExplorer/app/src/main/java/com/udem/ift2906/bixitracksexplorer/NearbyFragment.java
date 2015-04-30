@@ -174,7 +174,7 @@ public class NearbyFragment extends Fragment
                                     mDownloadWebTask.execute();
 
 
-                                    lastUpdateTime = now;
+                                    //lastUpdateTime = now;
                                 } else {
 
                                     updateTextBuilder.append(" ").append(getString(R.string.nextUpdate)).append(" ");
@@ -196,7 +196,7 @@ public class NearbyFragment extends Fragment
                             mUpdateTextView.setText(updateTextBuilder.toString());
                         }
 
-                        lastRunTime = now;
+                        //lastRunTime = now;
 
                         //Update UI will be refreshed every second
                         mUpdateRefreshHandler.postDelayed(mUpdateRefreshRunnableCode, 1000);
