@@ -35,7 +35,7 @@
                     android:layout_gravity="center"
                     android:padding="5dp"
                     android:text="@string/distance"
-                    android:layout_weight="0.18"
+                    android:layout_weight="0.19"
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textStyle="bold"
@@ -61,7 +61,7 @@
                     android:textSize="16sp"
                     android:gravity="center"
                     android:text="@string/bikes"
-                    android:layout_weight="0.18"
+                    android:layout_weight="0.19"
                     android:textStyle="bold"
                     android:textColor="@color/primary_text_default_material_dark"
                     />
