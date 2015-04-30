@@ -67,10 +67,14 @@ public class StationListViewAdapter extends BaseAdapter {
     public void setItemSelected(int pos){
         if (mCurrentItemSelected != -1)
             mStationList.get(mCurrentItemSelected).setSelected(false);
-        mStationList.get(pos).setSelected(true);
+        if (pos !=-1)
+            mStationList.get(pos).setSelected(true);
+
         mCurrentItemSelected = pos;
         notifyDataSetChanged();
     }
+
+    public int getCurrentItemSelected(){return mCurrentItemSelected;}
 
     public void sortStationListByClosest(){
         if (mCurrentUserLatLng != null) {

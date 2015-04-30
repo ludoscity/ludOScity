@@ -84,6 +84,7 @@ public class NearbyFragment extends Fragment
     private boolean isStationInfoVisible;
     private boolean isAlreadyZoomedToUser;
     private boolean isMarkersUpdated;
+    private boolean mIsFromFavoriteSection;
 
 
     public static NearbyFragment newInstance(int sectionNumber) {
@@ -106,6 +107,7 @@ public class NearbyFragment extends Fragment
         }
         else{   //Having a timestamp means some data exists in the db, as both task are intimately linked
             mStationsNetwork = DBHelper.getStationsNetwork();
+            Log.d("nearbyFragment", mStationsNetwork.stations.size()+" stations loaded from DB");
         }
     }
 
@@ -201,8 +203,16 @@ public class NearbyFragment extends Fragment
                     mStationsNetwork.addMarkersToMap(nearbyMap);
                     isMarkersUpdated = true;
                 }
-                mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng, mIsLookingForBikes);
-                mStationListView.setAdapter(mStationListViewAdapter);
+                int listPosition = mStationListView.getFirstVisiblePosition();
+                int itemSelected = -1;
+                if (mStationListViewAdapter != null)
+                    itemSelected = mStationListViewAdapter.getCurrentItemSelected();
+                if (mStationsNetwork != null) {
+                    mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng, mIsLookingForBikes);
+                    mStationListViewAdapter.setItemSelected(itemSelected);
+                    mStationListView.setAdapter(mStationListViewAdapter);
+                    mStationListView.setSelectionFromTop(listPosition, 0);
+                }
             }
 
         } else{
@@ -221,6 +231,7 @@ public class NearbyFragment extends Fragment
 
             ((MainActivity) getActivity()).onSectionHiddenChanged(
                     getArguments().getInt(ARG_SECTION_NUMBER));
+            if (isStationInfoVisible) replaceInfoViewByListView();
 
         }
         else{
@@ -333,12 +344,15 @@ public class NearbyFragment extends Fragment
         });
     }
 
-    private void replaceListViewByInfoView(StationItem stationItem, final boolean isFromOutsideNearby) {
+    private void replaceListViewByInfoView(StationItem stationItem, boolean isFromOutsideNearby) {
+        mIsFromFavoriteSection = isFromOutsideNearby;
         isStationInfoVisible = true;
         if (isFromOutsideNearby){
             for (StationItem station: mStationsNetwork.stations)
-                if (station.getPosition().equals(stationItem.getPosition()))
+                if (station.getPosition().equals(stationItem.getPosition())) {
                     mCurrentInfoStation = station;
+                    break;
+                }
         } else {
             mCurrentInfoStation = stationItem;
         }
@@ -353,7 +367,7 @@ public class NearbyFragment extends Fragment
         mStationListViewHolder.setVisibility(View.GONE);
         mStationInfoViewHolder.setVisibility(View.VISIBLE);
         if(mListener != null)
-            mListener.onNearbyFragmentInteraction(stationItem.getName(), false);
+            mListener.onNearbyFragmentInteraction(getString(R.string.stationDetails), false);
         //Remember the current cameraPosition
         mBackCameraPosition = nearbyMap.getCameraPosition();
         // Hide all ground overlays
@@ -364,16 +378,13 @@ public class NearbyFragment extends Fragment
         // Show only current one
         mCurrentInfoStation.getGroundOverlay().setVisible(true);
         mCurrentInfoStation.getMarker().showInfoWindow();
-        // Show InfoWindow only if the station would appear small on the map
-        if(mCurrentUserLatLng != null && stationItem.getMeterFromLatLng(mCurrentUserLatLng)>1000)
-            mCurrentInfoStation.getMarker().showInfoWindow();
 
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-        boundsBuilder.include(stationItem.getPosition());
+        boundsBuilder.include(mCurrentInfoStation.getPosition());
         // Direction arrow and distance only available if user location is known
         if(mCurrentUserLatLng != null) {
             boundsBuilder.include(mCurrentUserLatLng);
-            mDirectionArrow.setRotation((float) stationItem.getBearingFromLatLng(mCurrentUserLatLng));
+            mDirectionArrow.setRotation((float) mCurrentInfoStation.getBearingFromLatLng(mCurrentUserLatLng));
             mStationInfoDistanceView.setText(mCurrentInfoStation.getDistanceStringFromLatLng(mCurrentUserLatLng));
             mDirectionArrow.setVisibility(View.VISIBLE);
             mStationInfoDistanceView.setVisibility(View.VISIBLE);
@@ -401,7 +412,7 @@ public class NearbyFragment extends Fragment
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && isStationInfoVisible) {
                     replaceInfoViewByListView();
-                    if (isFromOutsideNearby){
+                    if (mIsFromFavoriteSection){
                         return false;
                     }
                     return true;
@@ -433,8 +444,12 @@ public class NearbyFragment extends Fragment
         // Get item selected and deal with it
         switch (item.getItemId()) {
             case android.R.id.home:
-                //called when the up affordance/carat in actionbar is pressed
-                replaceInfoViewByListView();
+                if (mIsFromFavoriteSection){
+                    getFragmentManager().popBackStackImmediate();
+                    mListener.onNearbyFragmentInteraction(getString(R.string.title_section_favorites), true);
+                }else {
+                    replaceInfoViewByListView();
+                }
                 return true;
             case R.id.favoriteStar:
                 if(isStationInfoVisible)
@@ -491,7 +506,6 @@ public class NearbyFragment extends Fragment
     }
 
     private void setRefreshButtonListener() {
-        // TODO maybe not a good idea, the whole view is clickable to start a download
         mDownloadBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -509,7 +523,7 @@ public class NearbyFragment extends Fragment
         mStationListViewAdapter.setItemSelected(i);
         Log.d("onMarkerClick", "Scroll view to " + i);
         if (i != -1) {
-            mStationListView.smoothScrollToPosition(i);
+            mStationListView.smoothScrollToPositionFromTop(i, 0, 300);
         }
         return false;
     }
@@ -592,8 +606,7 @@ public class NearbyFragment extends Fragment
         }
     }
 
-    public void showStationInfoFromOutside(StationItem stationToShow) {
-        mParkingSwitch.setVisible(true);
+    public void showStationInfoFromFavoriteSection(StationItem stationToShow) {
         replaceListViewByInfoView(stationToShow, true);
     }
 
@@ -655,10 +668,11 @@ public class NearbyFragment extends Fragment
             sp.edit().putLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, Calendar.getInstance().getTimeInMillis()).apply();
             isMarkersUpdated = false;
             setupUI();
+            Log.d("nearbyFragment",mStationsNetwork.stations.size()+" stations downloaded from citibik.es");
 
             //must be done last
             mDownloadWebTask = null;
-        }
+            }
     }
 }
 

@@ -452,7 +452,8 @@ public class MainActivity extends ActionBarActivity
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.addToBackStack("favorite section");
         switchFragmentVisibility(ft,0).commit();
-        mNearbyFragment.showStationInfoFromOutside(stationToShow);
+        mNearbyFragment.showStationInfoFromFavoriteSection(stationToShow);
+        invalidateOptionsMenu();
     }
 
     @Override
