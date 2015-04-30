@@ -235,10 +235,14 @@ public class NearbyFragment extends Fragment
 
         }
         else{
-            mUpdateRefreshHandler.removeCallbacks(mUpdateRefreshRunnableCode);
-            mUpdateRefreshRunnableCode = null;
-            mUpdateRefreshHandler = null;
+            stopUIRefresh();
         }
+    }
+
+    private void stopUIRefresh() {
+        mUpdateRefreshHandler.removeCallbacks(mUpdateRefreshRunnableCode);
+        mUpdateRefreshRunnableCode = null;
+        mUpdateRefreshHandler = null;
     }
 
     @Override
@@ -272,9 +276,7 @@ public class NearbyFragment extends Fragment
 
         mListener = null;
 
-        mUpdateRefreshHandler.removeCallbacks(mUpdateRefreshRunnableCode);
-        mUpdateRefreshRunnableCode = null;
-        mUpdateRefreshHandler = null;
+        stopUIRefresh();
 
     }
 
@@ -284,6 +286,13 @@ public class NearbyFragment extends Fragment
 
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
+    }
+
+    @Override
+    public void onPause() {
+        stopUIRefresh();
+
+        super.onPause();
     }
 
     @Override
@@ -412,10 +421,7 @@ public class NearbyFragment extends Fragment
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && isStationInfoVisible) {
                     replaceInfoViewByListView();
-                    if (mIsFromFavoriteSection){
-                        return false;
-                    }
-                    return true;
+                    return !mIsFromFavoriteSection;
                 }
                 return false;
             }
