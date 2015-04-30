@@ -38,6 +38,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.udem.ift2906.bixitracksexplorer.BixiAPI.BixiAPI;
 import com.udem.ift2906.bixitracksexplorer.DBHelper.DBHelper;
+import com.udem.ift2906.bixitracksexplorer.Utils.Utils;
 
 import java.util.Calendar;
 
@@ -100,7 +101,7 @@ public class NearbyFragment extends Fragment
     public void onStart() {
         super.onStart();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0) == 0) { //Means ask never successfully completed
+        if (Utils.Connectivity.isConnected(getContext()) && sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0) == 0) { //Means ask never successfully completed
             //Because webtask launches DB task, we know that a value there means actual data in the DB
             mDownloadWebTask = new DownloadWebTask();
             mDownloadWebTask.execute();
@@ -157,30 +158,38 @@ public class NearbyFragment extends Fragment
                             //String formatted = DateUtils.formatElapsedTime(differenceInSeconds);
 
                             //... then about next update
-                            //Should come from something keeping tabs on time, maybe this runnable itself
-                            long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60 ;  //comes from Prefs
+                            if (Utils.Connectivity.isConnected(getContext())) {
+                                //Should come from something keeping tabs on time, maybe this runnable itself
+                                long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60;  //comes from Prefs
 
-                            if (now >= wishedUpdateTime) {
+                                if (now >= wishedUpdateTime) {
 
-                                //Put a string same length as the other one ?
-                                updateTextBuilder.append(" ").append(getString(R.string.updating));
+                                    //Put a string same length as the other one ?
+                                    updateTextBuilder.append(" ").append(getString(R.string.updating));
 
-                                //Run update
+                                    //Run update
 
-                                mDownloadWebTask = new DownloadWebTask();
-                                mDownloadWebTask.execute();
-
-
-                                lastUpdateTime = now;
-                            } else {
-
-                                updateTextBuilder.append(" ").append(getString(R.string.nextUpdate)).append(" ");
+                                    mDownloadWebTask = new DownloadWebTask();
+                                    mDownloadWebTask.execute();
 
 
-                                long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
+                                    lastUpdateTime = now;
+                                } else {
 
-                                // formatted will be HH:MM:SS or MM:SS
-                                updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
+                                    updateTextBuilder.append(" ").append(getString(R.string.nextUpdate)).append(" ");
+
+
+                                    long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
+
+                                    // formatted will be HH:MM:SS or MM:SS
+                                    updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
+
+                                    mRefreshButton.setVisibility(View.VISIBLE);
+                                }
+                            }
+                            else{
+                                updateTextBuilder.append( " ").append(getString(R.string.no_connectivity));
+                                mRefreshButton.setVisibility(View.GONE);
                             }
 
                             mUpdateTextView.setText(updateTextBuilder.toString());
@@ -515,7 +524,7 @@ public class NearbyFragment extends Fragment
         mDownloadBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mDownloadWebTask == null) {
+                if (Utils.Connectivity.isConnected(getContext()) && mDownloadWebTask == null) {
                     mDownloadWebTask = new DownloadWebTask();
                     mDownloadWebTask.execute();
                 }
