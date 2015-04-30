@@ -249,9 +249,11 @@ public class NearbyFragment extends Fragment
     }
 
     private void stopUIRefresh() {
-        mUpdateRefreshHandler.removeCallbacks(mUpdateRefreshRunnableCode);
-        mUpdateRefreshRunnableCode = null;
-        mUpdateRefreshHandler = null;
+        if (mUpdateRefreshHandler != null) {
+            mUpdateRefreshHandler.removeCallbacks(mUpdateRefreshRunnableCode);
+            mUpdateRefreshRunnableCode = null;
+            mUpdateRefreshHandler = null;
+        }
     }
 
     @Override
