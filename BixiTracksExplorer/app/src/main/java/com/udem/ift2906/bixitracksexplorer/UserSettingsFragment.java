@@ -18,7 +18,6 @@ public class UserSettingsFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private CheckBox autoUpdate_nearby;
-    private CheckBox autoupdate_budget;
 
     public interface OnFragmentInteractionListener {
         public void onSettingsFragmentInteraction();
@@ -68,18 +67,6 @@ public class UserSettingsFragment extends Fragment {
         View inflatedView = layoutInflater.inflate(R.layout.fragment_settings, container, false);
 
         autoUpdate_nearby = (CheckBox) inflatedView.findViewById(R.id.checkBox_setting_auto_update);
-        autoupdate_budget = (CheckBox) inflatedView.findViewById(R.id.checkBox_setting_fabrice);
-
-        autoupdate_budget.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("setting.auto_update.budget", autoupdate_budget.isChecked());
-                editor.apply();
-            }
-        });
-
         autoUpdate_nearby.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -93,7 +80,6 @@ public class UserSettingsFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         autoUpdate_nearby.setChecked(sharedPref.getBoolean("setting.auto_update.nearby", true));
-        autoupdate_budget.setChecked(sharedPref.getBoolean("setting.auto_update.budget", false));
 
         return inflatedView;
     }

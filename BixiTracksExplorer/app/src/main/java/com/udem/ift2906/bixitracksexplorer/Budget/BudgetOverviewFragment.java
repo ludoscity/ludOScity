@@ -88,9 +88,6 @@ public class BudgetOverviewFragment extends Fragment {
     private static final float m61to90minCost = 3.5f;
     private static final float mEach30minAfter90 = 7.f;
 
-    //TODO: have this configurable through app settings
-    private static boolean RELOAD_BUDGET_DATA_FROM_WEB_ALWAYS = false;
-
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -191,22 +188,11 @@ public class BudgetOverviewFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
 
-        if (RELOAD_BUDGET_DATA_FROM_WEB_ALWAYS){
 
-            try {
-                DBHelper.deleteDB();
-            } catch (CouchbaseLiteException e) {
-                e.printStackTrace();
-            }
-
-            mDataLoaded = false;
-        }
-        else{
-            try {
-                mDataLoaded = DBHelper.gotTracks();
-            } catch (CouchbaseLiteException e) {
-                e.printStackTrace();
-            }
+        try {
+            mDataLoaded = DBHelper.gotTracks();
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
         }
 
         if (!mDataLoaded) {

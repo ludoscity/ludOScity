@@ -23,7 +23,6 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,10 +49,10 @@ public class DBHelper {
         mGotTracks = !getAllTracks().isEmpty();
     }
 
-    public static void deleteDB() throws CouchbaseLiteException {
+    /*public static void deleteDB() throws CouchbaseLiteException {
         //If it crashes here because getDatabase returns null, uninstall and reinstall the app
         mManager.getDatabase(mDbName).delete();
-    }
+    }*/
 
     public static boolean gotTracks() throws CouchbaseLiteException {
         return mGotTracks;
