@@ -1,6 +1,7 @@
 package com.udem.ift2906.bixitracksexplorer;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -137,11 +138,17 @@ public class StationListViewAdapter extends BaseAdapter {
             holder.availability.setText(String.valueOf(currentStation.getEmpty_slots()));
 
         // Color change between selected and not selected
+        //TODO : remove selection tracking from adapter : listView is designed for that
+        //TODO : have selection behave like the one in BudgetInfoFragment
         if (currentStation.isSelected()){
             holder.name.setTextColor(Color.LTGRAY);
             holder.availability.setTextColor(Color.LTGRAY);
             holder.distance.setTextColor(Color.LTGRAY);
-            convertView.setBackgroundColor(mContext.getResources().getColor(R.color.material_blue_grey_800));
+            //convertView.setBackgroundColor(mContext.getResources().getColor(R.color.material_blue_grey_800));
+            int[] styleAttr = {R.attr.colorAccent};
+            @SuppressWarnings("ResourceType") TypedArray ta = mContext.obtainStyledAttributes(R.style.BixiTracksExplorerTheme, styleAttr);
+            convertView.setBackgroundColor(ta.getColor(0, R.color.material_blue_grey_800));
+            ta.recycle();
         } else {
             holder.name.setTextColor(Color.DKGRAY);
             holder.availability.setTextColor(Color.DKGRAY);

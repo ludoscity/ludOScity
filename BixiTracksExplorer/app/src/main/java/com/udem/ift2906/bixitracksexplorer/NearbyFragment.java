@@ -21,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -322,6 +323,7 @@ public class NearbyFragment extends Fragment
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
         // List view
         mStationListView = (ListView) inflatedView.findViewById(R.id.stationListView);
+        mStationListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
         setOnClickItemListenerStationListView();
         mStationListViewHolder = inflatedView.findViewById(R.id.stationList);
         mBikesOrParkingColumn = (TextView) inflatedView.findViewById(R.id.bikesOrParkingColumn);
