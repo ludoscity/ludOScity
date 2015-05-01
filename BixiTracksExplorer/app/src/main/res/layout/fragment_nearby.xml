@@ -165,6 +165,12 @@
 
     </RelativeLayout>
 
+    <View
+        android:background="#1976D2"
+        android:layout_width="match_parent"
+        android:layout_height="2dp">
+
+    </View>
     <!-- MAP -->
     <fragment
         xmlns:android="http://schemas.android.com/apk/res/android"
