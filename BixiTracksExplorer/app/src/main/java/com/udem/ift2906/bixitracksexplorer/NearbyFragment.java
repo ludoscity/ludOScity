@@ -177,7 +177,7 @@ public class NearbyFragment extends Fragment
                                     //lastUpdateTime = now;
                                 } else {
 
-                                    updateTextBuilder.append(" ").append(getString(R.string.nextUpdate)).append(" ");
+                                    updateTextBuilder.append(" - ").append(getString(R.string.nextUpdate)).append(" ");
 
 
                                     long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
