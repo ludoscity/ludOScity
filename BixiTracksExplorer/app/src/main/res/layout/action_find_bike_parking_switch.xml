@@ -21,7 +21,7 @@
         android:src="@drawable/ic_action_find_bike"
         />
 
-    <Switch
+    <android.support.v7.widget.SwitchCompat
         android:id="@+id/action_bar_find_bike_parking_switch"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"

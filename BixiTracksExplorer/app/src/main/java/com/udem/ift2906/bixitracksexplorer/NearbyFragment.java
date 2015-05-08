@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SwitchCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -27,7 +28,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -352,7 +352,7 @@ public class NearbyFragment extends Fragment
         mParkingSwitch = menu.findItem(R.id.findBikeParkingSwitchMenuItem);
 
         setOnClickFindSwitchListener();
-        ((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setChecked(true);
+        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setChecked(true);
         mParkingSwitch.setVisible(!isStationInfoVisible);
 
         mFavoriteStar.setVisible(isStationInfoVisible);
@@ -368,7 +368,7 @@ public class NearbyFragment extends Fragment
     }
 
     private void setOnClickFindSwitchListener() {
-        ((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 lookingForBikes(isChecked);
