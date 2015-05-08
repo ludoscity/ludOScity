@@ -371,7 +371,9 @@ public class NearbyFragment extends Fragment
         ((SwitchCompat)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                lookingForBikes(isChecked);
+                if(mStationListViewAdapter != null) {
+                    lookingForBikes(isChecked);
+                }
             }
         });
     }
