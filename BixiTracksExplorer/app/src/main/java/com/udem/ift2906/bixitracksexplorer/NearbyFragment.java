@@ -23,9 +23,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -82,7 +84,6 @@ public class NearbyFragment extends Fragment
     private int mIconStarOn = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
     private int mIconStarOff = R.drawable.abc_btn_rating_star_off_mtrl_alpha;
 
-    private boolean mIsLookingForBikes;
     private boolean isStationInfoVisible;
     private boolean isAlreadyZoomedToUser;
     private boolean isMarkersUpdated;
@@ -218,7 +219,7 @@ public class NearbyFragment extends Fragment
                 if (mStationListViewAdapter != null)
                     itemSelected = mStationListViewAdapter.getCurrentItemSelected();
                 if (mStationsNetwork != null) {
-                    mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng, mIsLookingForBikes);
+                    mStationListViewAdapter = new StationListViewAdapter(mContext, mStationsNetwork, mCurrentUserLatLng, true);//mParkingSwitch.isChecked());
                     mStationListViewAdapter.setItemSelected(itemSelected);
                     mStationListView.setAdapter(mStationListViewAdapter);
                     mStationListView.setSelectionFromTop(listPosition, 0);
@@ -272,9 +273,6 @@ public class NearbyFragment extends Fragment
 
         mUpdateRefreshHandler = new Handler();
 
-
-        //TODO move this affectation
-        mIsLookingForBikes = true;
     }
 
     @Override
@@ -351,7 +349,12 @@ public class NearbyFragment extends Fragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_nearby,menu);
         mFavoriteStar = menu.findItem(R.id.favoriteStar);
-        mParkingSwitch = menu.findItem(R.id.showParkingAvailability);
+        mParkingSwitch = menu.findItem(R.id.findBikeParkingSwitchMenuItem);
+
+        setOnClickFindSwitchListener();
+        ((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setChecked(true);
+        mParkingSwitch.setVisible(!isStationInfoVisible);
+
         mFavoriteStar.setVisible(isStationInfoVisible);
         if (mCurrentInfoStation != null){
             if (mCurrentInfoStation.isFavorite()) {
@@ -360,8 +363,17 @@ public class NearbyFragment extends Fragment
                 mFavoriteStar.setIcon(mIconStarOff);
             }
         }
-        mParkingSwitch.setVisible(!isStationInfoVisible);
+
         Log.d("onCreateOptionsMenu","menu created");
+    }
+
+    private void setOnClickFindSwitchListener() {
+        ((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                lookingForBikes(isChecked);
+            }
+        });
     }
 
     private void setOnClickItemListenerStationListView() {
@@ -476,10 +488,12 @@ public class NearbyFragment extends Fragment
                 if(isStationInfoVisible)
                     changeFavoriteValue(mCurrentInfoStation.isFavorite());
                 return true;
-            case R.id.showParkingAvailability:
-                mIsLookingForBikes = !mIsLookingForBikes;
-                lookingForBikes(mIsLookingForBikes);
-                return true;
+            //////////////
+            //Because it's a switch, this calbback don't get invoked, we register a clicklistener directly
+            /*case R.id.findBikeParkingSwitchMenuItem:
+                //mIsLookingForBikes = !mIsLookingForBikes;
+                lookingForBikes(mParkingSwitch.isChecked());
+                return true;*/
         }
         return false;
     }
@@ -593,12 +607,18 @@ public class NearbyFragment extends Fragment
         mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
         if(isLookingForBikes) {
             mBikesOrParkingColumn.setText(R.string.bikes);
-            mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
+            //Some icons tests
+            //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setThumbResource(R.drawable.ic_action_find_bike);
+            //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setTrackResource(R.drawable.ic_action_find_bike);
+            //mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
             toastText = getString(R.string.findABikes);
             icon = getResources().getDrawable(R.drawable.bike_icon_toast);
         } else {
             mBikesOrParkingColumn.setText(R.string.parking);
-            mParkingSwitch.setIcon(R.drawable.ic_action_find_dock);
+            //Some icons tests
+            //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setThumbResource(R.drawable.ic_action_find_dock);
+            //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setTrackResource(R.drawable.ic_action_find_dock);
+            //mParkingSwitch.setIcon(R.drawable.ic_action_find_dock);
             toastText = getString(R.string.findAParking);
             icon = getResources().getDrawable(R.drawable.parking_icon_toast);
         }
@@ -634,7 +654,7 @@ public class NearbyFragment extends Fragment
 
     //Pour interaction avec mainActivity
     public interface OnFragmentInteractionListener {
-        public void onNearbyFragmentInteraction(String title,boolean isNavDrawerEnabled);
+        void onNearbyFragmentInteraction(String title, boolean isNavDrawerEnabled);
     }
 
     public Context getContext() {

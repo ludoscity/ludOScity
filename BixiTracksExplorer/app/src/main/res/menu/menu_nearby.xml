@@ -9,7 +9,9 @@
         app:showAsAction="always"
         android:icon="@android:drawable/btn_star_big_on"/>
     <item
-        android:id="@+id/showParkingAvailability"
+        android:id="@+id/findBikeParkingSwitchMenuItem"
+        android:title=""
         app:showAsAction="always"
-        android:icon="@drawable/ic_action_find_bike"/>
+        app:actionLayout="@layout/action_find_bike_parking_switch"
+        />
 </menu>
