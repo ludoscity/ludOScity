@@ -110,7 +110,7 @@ public class NearbyFragment extends Fragment
         }
         else{   //Having a timestamp means some data exists in the db, as both task are intimately linked
             mStationsNetwork = DBHelper.getStationsNetwork();
-            Log.d("nearbyFragment", mStationsNetwork.stations.size()+" stations loaded from DB");
+            Log.d("nearbyFragment", mStationsNetwork.stations.size() + " stations loaded from DB");
         }
     }
 
@@ -278,16 +278,20 @@ public class NearbyFragment extends Fragment
     @Override
     public void onDetach() {
         super.onDetach();
-        if (mDownloadWebTask != null && !mDownloadWebTask.isCancelled())
-        {
-            mDownloadWebTask.cancel(false);
-            mDownloadWebTask = null;
-        }
+        cancelDownloadWebTask();
 
         mListener = null;
 
         stopUIRefresh();
 
+    }
+
+    private void cancelDownloadWebTask() {
+        if (mDownloadWebTask != null && !mDownloadWebTask.isCancelled())
+        {
+            mDownloadWebTask.cancel(false);
+            mDownloadWebTask = null;
+        }
     }
 
     @Override
@@ -300,6 +304,8 @@ public class NearbyFragment extends Fragment
 
     @Override
     public void onPause() {
+
+        cancelDownloadWebTask();
         stopUIRefresh();
 
         super.onPause();
