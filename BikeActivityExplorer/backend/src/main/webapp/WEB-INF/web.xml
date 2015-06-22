@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
     <listener>
-        <listener-class>com.udem.ift2906.bixitracksexplorer.backend.WarmupRequestListerner</listener-class>
+        <listener-class>com.ludoscity.ift2906.bikeactivityexplorer.backend.WarmupRequestListerner</listener-class>
     </listener>
     <servlet>
         <servlet-name>SystemServiceServlet</servlet-name>
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>com.udem.ift2906.bixitracksexplorer.backend.BixiTracksExplorerEndpoint</param-value>
+            <param-value>com.ludoscity.ift2906.bikeactivityexplorer.backend.BixiTracksExplorerEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.udem.ift2906.bixitracksexplorer" >
+    package="com.ludoscity.bikeactivityexplorer" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -13,9 +13,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/BixiTracksExplorerTheme">
+        android:theme="@style/BikeActivityExplorerTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="com.ludoscity.bikeactivityexplorer.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +25,7 @@
         </activity>
 
         <receiver
-            android:name=".Utils.Utils$Connectivity"
+            android:name="com.ludoscity.bikeactivityexplorer.Utils.Utils$Connectivity"
             android:enabled="false" >
 
             <intent-filter>
