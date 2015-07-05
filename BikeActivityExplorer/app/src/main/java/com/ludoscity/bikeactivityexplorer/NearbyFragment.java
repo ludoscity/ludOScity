@@ -31,6 +31,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -109,7 +110,11 @@ public class NearbyFragment extends Fragment
             mDownloadWebTask.execute();
         }
         else{   //Having a timestamp means some data exists in the db, as both task are intimately linked
-            mStationsNetwork = DBHelper.getStationsNetwork();
+            //try {
+                mStationsNetwork = DBHelper.getStationsNetwork();
+            //} catch (CouchbaseLiteException e) {
+            //    e.printStackTrace();
+            //}
             Log.d("nearbyFragment", mStationsNetwork.stations.size() + " stations loaded from DB");
         }
     }
@@ -211,6 +216,7 @@ public class NearbyFragment extends Fragment
             if(nearbyMap != null) {
                 if (mStationsNetwork != null && !isMarkersUpdated) {
                     nearbyMap.clear();
+                    //Here the code will figure out the markers from each station item data
                     mStationsNetwork.addMarkersToMap(nearbyMap);
                     isMarkersUpdated = true;
                 }
@@ -415,13 +421,13 @@ public class NearbyFragment extends Fragment
         //Remember the current cameraPosition
         mBackCameraPosition = nearbyMap.getCameraPosition();
         // Hide all ground overlays
-        for (StationItem station: mStationsNetwork.stations) {
+        /*for (StationItem station: mStationsNetwork.stations) {
             station.getGroundOverlay().setVisible(false);
             station.getMarker().hideInfoWindow();
-        }
+        }*/
         // Show only current one
-        mCurrentInfoStation.getGroundOverlay().setVisible(true);
-        mCurrentInfoStation.getMarker().showInfoWindow();
+        //mCurrentInfoStation.getGroundOverlay().setVisible(true);
+        //mCurrentInfoStation.getMarker().showInfoWindow();
 
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
         boundsBuilder.include(mCurrentInfoStation.getPosition());
@@ -472,9 +478,9 @@ public class NearbyFragment extends Fragment
             mListener.onNearbyFragmentInteraction(getString(com.ludoscity.bikeactivityexplorer.R.string.title_section_nearby), true);
         nearbyMap.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
         // Restore map
-        for (StationItem station: mStationsNetwork.stations)
-            station.getGroundOverlay().setVisible(true);
-        mCurrentInfoStation.getMarker().hideInfoWindow();
+        //for (StationItem station: mStationsNetwork.stations)
+        //    station.getGroundOverlay().setVisible(true);
+        //mCurrentInfoStation.getMarker().hideInfoWindow();
         mCurrentInfoStation = null;
         getActivity().invalidateOptionsMenu();
     }
