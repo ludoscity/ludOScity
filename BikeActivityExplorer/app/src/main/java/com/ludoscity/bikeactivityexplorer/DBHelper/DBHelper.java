@@ -1,9 +1,7 @@
 package com.ludoscity.bikeactivityexplorer.DBHelper;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
@@ -37,7 +35,8 @@ import java.util.Map;
 public class DBHelper {
 
     private static Manager mManager = null;
-    private static final String mDbName = "appdb";
+    private static final String mTRACKS_DB_NAME = "tracksdb";
+    private static final String mSTATIONS_DB_NAME = "stationsdb";
     private static Context context;
     private static boolean mGotTracks;
 
@@ -51,7 +50,7 @@ public class DBHelper {
 
     /*public static void deleteDB() throws CouchbaseLiteException {
         //If it crashes here because getDatabase returns null, uninstall and reinstall the app
-        mManager.getDatabase(mDbName).delete();
+        mManager.getDatabase(mTRACKS_DB_NAME).delete();
     }*/
 
     public static boolean gotTracks() throws CouchbaseLiteException {
@@ -63,29 +62,46 @@ public class DBHelper {
     }*/
 
     public static void saveTrack(Track toSave) throws CouchbaseLiteException, JSONException {
-        Document doc = mManager.getDatabase(mDbName).getDocument(toSave.getKeyTimeUTC());
+        Document doc = mManager.getDatabase(mTRACKS_DB_NAME).getDocument(toSave.getKeyTimeUTC());
         doc.putProperties(new Gson().<Map<String, Object>>fromJson(toSave.toString(), new TypeToken<HashMap<String, Object>>() {
         }.getType()));
         mGotTracks = true; // mGotTracks = !getAllTracks().isEmpty(); in init()
     }
 
+    public static void saveStation(StationItem toSave) throws CouchbaseLiteException, JSONException {
+        Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getDocument(String.valueOf(toSave.getUid()));
+
+        //new Gson().toJson(toSave);
+
+        doc.putProperties(new Gson().<Map<String, Object>>fromJson(new Gson().toJson(toSave), new TypeToken<HashMap<String, Object>>() {
+        }.getType()));
+        //mGotTracks = true; // mGotTracks = !getAllTracks().isEmpty(); in init()
+    }
+
     public static List<QueryRow> getAllTracks() throws CouchbaseLiteException {
         Map<String, Object> allDocs;
-        allDocs = mManager.getDatabase(mDbName).getAllDocs(new QueryOptions());
+        allDocs = mManager.getDatabase(mTRACKS_DB_NAME).getAllDocs(new QueryOptions());
+
+        return (List<QueryRow>) allDocs.get("rows");
+    }
+
+    private static List<QueryRow> getAllStations() throws CouchbaseLiteException{
+        Map<String, Object> allDocs;
+        allDocs = mManager.getDatabase(mSTATIONS_DB_NAME).getAllDocs(new QueryOptions());
 
         return (List<QueryRow>) allDocs.get("rows");
     }
 
     //Not used because only potential client (so far) BudgetTrackDetails duplicates this data
     /*public static boolean isTrackPointDataCached(String trackID) throws CouchbaseLiteException {
-        Document doc = mManager.getDatabase(mDbName).getExistingDocument(trackID);
+        Document doc = mManager.getDatabase(mTRACKS_DB_NAME).getExistingDocument(trackID);
 
         return doc.getProperties().containsKey("points");
     }*/
 
     //Used to add a new entry in corresponding Couchbase Document, only if not already present
     public static void putNewTrackPropertyAndSave(String _trackID, final String _newPropertyKey, final Object _newPropertyObject ) throws CouchbaseLiteException {
-        Document doc = mManager.getDatabase(mDbName).getExistingDocument(_trackID);
+        Document doc = mManager.getDatabase(mTRACKS_DB_NAME).getExistingDocument(_trackID);
 
         if (!doc.getProperties().containsKey(_newPropertyKey))
         {
@@ -108,7 +124,7 @@ public class DBHelper {
      * because processed data like cost is added to documents and wouldn't map to model fields.
      */
     public static Map<String,Object> retrieveTrack(String trackID) throws CouchbaseLiteException {
-        Document doc = mManager.getDatabase(mDbName).getExistingDocument(trackID);
+        Document doc = mManager.getDatabase(mTRACKS_DB_NAME).getExistingDocument(trackID);
 
         if (doc != null){
             return doc.getCurrentRevision().getProperties();
@@ -145,111 +161,82 @@ public class DBHelper {
         END of failed attempts*/
     }
 
-    private static StationItem createStation(Cursor cursor) {
+    private static StationItem createStationItem(Document d){
 
-        long uid = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_ID));
-        String name = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NAME));
-        double latitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LATITUDE));
-        double longitude = cursor.getDouble(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LONGITUDE));
-        int free_bikes = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NB_BIKES_AVAILABLE));
-        int empty_slots = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_NB_DOCKS_AVAILABLE));
-        String timestamp = cursor.getString(cursor.getColumnIndex(BixiStationDatabase.COLUMN_LAST_UPDATE));
-        boolean locked = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_IS_LOCKED)) > 0;
-        boolean isFavorite = cursor.getInt(cursor.getColumnIndex(BixiStationDatabase.COLUMN_FAVORITE)) > 0;
+        Map<String, Object> properties = d.getProperties();
+
+        long uid = ((Double) properties.get("uid")).longValue();
+        String name = (String)properties.get("name");
+        double latitude = (Double) properties.get("latitude");
+        double longitude = (Double) properties.get("longitude");
+        int free_bikes = ((Double) properties.get("free_bikes")).intValue();
+        int empty_slots = ((Double) properties.get("empty_slots")).intValue();
+        String timestamp = (String) properties.get("timestamp");
+        boolean locked = (Boolean) properties.get("locked");
+        boolean isFavorite = (Boolean) properties.get("isFavorite");
 
         LatLng position = new LatLng(latitude,longitude);
+
         return new StationItem(uid,name,position,free_bikes,empty_slots,timestamp,locked,isFavorite);
+
     }
 
-    public static StationsNetwork getStationsNetwork(){
+    public static StationsNetwork getStationsNetwork() throws CouchbaseLiteException {
         StationsNetwork stationsNetwork = new StationsNetwork();
-        Cursor cursor = BixiStationDatabase.getInstance(context).getStations();
 
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            stationsNetwork.stations.add(createStation(cursor));
-            cursor.moveToNext();
+        List<QueryRow> allStations = getAllStations();
+
+        for (QueryRow qr : allStations)
+        {
+            Document d = qr.getDocument();
+
+            stationsNetwork.stations.add(createStationItem(d));
         }
-        cursor.close();
 
         return stationsNetwork;
     }
 
-    public static ArrayList<StationItem> getFavoriteStations(){
+    public static ArrayList<StationItem> getFavoriteStations() throws CouchbaseLiteException {
         ArrayList<StationItem> items = new ArrayList<>();
-        Cursor cursor = BixiStationDatabase.getInstance(context).getFavoriteStations();
 
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            items.add(createStation(cursor));
-            cursor.moveToNext();
+        List<QueryRow> allStations = getAllStations();
+
+        for (QueryRow qr : allStations) {
+            Document d = qr.getDocument();
+
+            Map<String, Object> properties = d.getProperties();
+
+            if((Boolean) properties.get("isFavorite"))
+            {
+                items.add(createStationItem(d));
+            }
         }
-        cursor.close();
 
         return items;
     }
 
-    public static StationItem getStationItem(long id) {
-        Cursor cursor = BixiStationDatabase.getInstance(context).getStation(id);
+    public static boolean isFavoriteCB(long id) throws CouchbaseLiteException {
 
-        cursor.moveToFirst();
-        if (!cursor.isAfterLast()) {
-            return createStation(cursor);
-        }
+        Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getExistingDocument(String.valueOf(id));
 
-        return null;
+        Map<String, Object> properties = doc.getProperties();
+
+        return (Boolean) properties.get("isFavorite");
     }
 
-    public static boolean isExist(long id) {
-        return BixiStationDatabase.getInstance(context).isExist(id);
-    }
+    public static void updateFavoriteCB(final Boolean isFavorite, long id) throws CouchbaseLiteException {
 
-    public static boolean isFavorite(long id) {
-        return BixiStationDatabase.getInstance(context).isFavorite(id);
-    }
+        Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getExistingDocument(String.valueOf(id));
 
-    public static void addRow(StationItem station) {
-        ContentValues cv = new ContentValues();
 
-        cv.put(BixiStationDatabase.COLUMN_ID, station.getUid());
-        cv.put(BixiStationDatabase.COLUMN_LATITUDE, station.getPosition().latitude);
-        cv.put(BixiStationDatabase.COLUMN_LONGITUDE, station.getPosition().longitude);
-        cv.put(BixiStationDatabase.COLUMN_NAME, station.getName());
-        cv.put(BixiStationDatabase.COLUMN_LAST_UPDATE, station.getTimestamp());
-        cv.put(BixiStationDatabase.COLUMN_FAVORITE, 0);
-        cv.put(BixiStationDatabase.COLUMN_IS_LOCKED, station.isLocked() ? 1 : 0);
-        cv.put(BixiStationDatabase.COLUMN_NB_BIKES_AVAILABLE, station.getFree_bikes());
-        cv.put(BixiStationDatabase.COLUMN_NB_DOCKS_AVAILABLE, station.getEmpty_slots());
+        doc.update(new Document.DocumentUpdater() {
+            @Override
+            public boolean update(UnsavedRevision newRevision) {
+                newRevision.getProperties().put("isFavorite", isFavorite);
+                return true;
+            }
+        });
 
-        BixiStationDatabase.getInstance(context).addRow(cv);
-    }
-
-    public static boolean updateRow(StationItem station, long id) {
-        ContentValues cv = new ContentValues();
-
-        cv.put(BixiStationDatabase.COLUMN_ID, id);
-        cv.put(BixiStationDatabase.COLUMN_LATITUDE, station.getPosition().latitude);
-        cv.put(BixiStationDatabase.COLUMN_LONGITUDE, station.getPosition().longitude);
-        cv.put(BixiStationDatabase.COLUMN_NAME, station.getName());
-        cv.put(BixiStationDatabase.COLUMN_LAST_UPDATE, station.getTimestamp());
-        cv.put(BixiStationDatabase.COLUMN_IS_LOCKED, station.isLocked() ? 1 : 0);
-        cv.put(BixiStationDatabase.COLUMN_NB_BIKES_AVAILABLE, station.getFree_bikes());
-        cv.put(BixiStationDatabase.COLUMN_NB_DOCKS_AVAILABLE, station.getEmpty_slots());
-
-        BixiStationDatabase.getInstance(context).updateRow(cv, id);
-
-        return true;
-    }
-
-    public static boolean updateFavorite(Boolean isFavorite, long id) {
-        ContentValues cv = new ContentValues();
-
-        cv.put(BixiStationDatabase.COLUMN_ID, id);
-        cv.put(BixiStationDatabase.COLUMN_FAVORITE, isFavorite ? 1 : 0);
-
-        BixiStationDatabase.getInstance(context).updateRow(cv, id);
-
-        return true;
     }
 
     public static void addNetwork(StationsNetwork stationsNetwork) throws Exception {
@@ -263,21 +250,9 @@ public class DBHelper {
         }
 
         for(Map.Entry<Long, StationItem> entry : map.entrySet()) {
-            if (isExist(entry.getKey())) {
-                updateRow(entry.getValue(), entry.getKey());
-            } else {
-                addRow(entry.getValue());
-            }
-        }
 
-        String s = "Ajout réussi";
-/*
-        for (StationItem station : stationsNetwork.stations) {
-            if (isExist(station.getUid()))
-                updateRow(station, station.getUid());
-            else
-                addRow(station);
-        }*/
+            saveStation(entry.getValue());
+        }
     }
 
     public static void closeDatabase() {

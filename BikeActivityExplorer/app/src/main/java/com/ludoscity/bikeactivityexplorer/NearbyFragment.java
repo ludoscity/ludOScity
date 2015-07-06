@@ -110,11 +110,11 @@ public class NearbyFragment extends Fragment
             mDownloadWebTask.execute();
         }
         else{   //Having a timestamp means some data exists in the db, as both task are intimately linked
-            //try {
+            try {
                 mStationsNetwork = DBHelper.getStationsNetwork();
-            //} catch (CouchbaseLiteException e) {
-            //    e.printStackTrace();
-            //}
+            } catch (CouchbaseLiteException e) {
+                e.printStackTrace();
+            }
             Log.d("nearbyFragment", mStationsNetwork.stations.size() + " stations loaded from DB");
         }
     }

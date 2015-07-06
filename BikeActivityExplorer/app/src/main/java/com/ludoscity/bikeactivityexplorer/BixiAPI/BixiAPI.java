@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
@@ -56,13 +57,15 @@ public class BixiAPI{
                 String dateNow = simpleDateFormat.format(new Date());
 
                 for (BixiStation station : bixiNetwork.network.stations) {
-                    StationItem stationItem = new StationItem(station, DBHelper.isFavorite(station.extra.uid), dateNow);
+                    StationItem stationItem = new StationItem(station, DBHelper.isFavoriteCB(station.extra.uid), dateNow);
                     stationsNetwork.stations.add(stationItem);
                 }
             //}
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
         }
 
         new addNetworkDatabase().execute();
