@@ -254,8 +254,4 @@ public class DBHelper {
             saveStation(entry.getValue());
         }
     }
-
-    public static void closeDatabase() {
-        BixiStationDatabase.getInstance(context).close();
-    }
 }
