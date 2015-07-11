@@ -3,6 +3,7 @@ package com.ludoscity.bikeactivityexplorer;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -147,7 +148,11 @@ public class StationItem implements Parcelable, ClusterItem {
 
     public void setFavorite(Boolean b){
         isFavorite = b;
-        DBHelper.updateFavorite(b,uid);
+        try {
+            DBHelper.updateFavoriteCB(b, uid);
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isLocked() {
