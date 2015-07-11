@@ -217,11 +217,17 @@ public class DBHelper {
 
     public static boolean isFavoriteCB(long id) throws CouchbaseLiteException {
 
+        boolean toReturn = false;
+
         Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getExistingDocument(String.valueOf(id));
 
-        Map<String, Object> properties = doc.getProperties();
+        if (doc != null)
+        {
+            Map<String, Object> properties = doc.getProperties();
+            toReturn = (Boolean) properties.get("isFavorite");
+        }
 
-        return (Boolean) properties.get("isFavorite");
+        return toReturn;
     }
 
     public static void updateFavoriteCB(final Boolean isFavorite, long id) throws CouchbaseLiteException {
