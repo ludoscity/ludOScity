@@ -215,7 +215,7 @@ public class DBHelper {
         return items;
     }
 
-    public static boolean isFavoriteCB(long id) throws CouchbaseLiteException {
+    public static boolean isFavorite(long id) throws CouchbaseLiteException {
 
         boolean toReturn = false;
 
@@ -230,7 +230,7 @@ public class DBHelper {
         return toReturn;
     }
 
-    public static void updateFavoriteCB(final Boolean isFavorite, long id) throws CouchbaseLiteException {
+    public static void updateFavorite(final Boolean isFavorite, long id) throws CouchbaseLiteException {
 
         Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getExistingDocument(String.valueOf(id));
 

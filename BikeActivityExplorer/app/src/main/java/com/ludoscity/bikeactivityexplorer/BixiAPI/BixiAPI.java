@@ -57,7 +57,7 @@ public class BixiAPI{
                 String dateNow = simpleDateFormat.format(new Date());
 
                 for (BixiStation station : bixiNetwork.network.stations) {
-                    StationItem stationItem = new StationItem(station, DBHelper.isFavoriteCB(station.extra.uid), dateNow);
+                    StationItem stationItem = new StationItem(station, DBHelper.isFavorite(station.extra.uid), dateNow);
                     stationsNetwork.stations.add(stationItem);
                 }
             //}
