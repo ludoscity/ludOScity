@@ -189,17 +189,6 @@ public class DBHelper {
         return items;
     }
 
-    public static StationItem getStationItem(long id) {
-        Cursor cursor = BixiStationDatabase.getInstance(context).getStation(id);
-
-        cursor.moveToFirst();
-        if (!cursor.isAfterLast()) {
-            return createStation(cursor);
-        }
-
-        return null;
-    }
-
     public static boolean isExist(long id) {
         return BixiStationDatabase.getInstance(context).isExist(id);
     }

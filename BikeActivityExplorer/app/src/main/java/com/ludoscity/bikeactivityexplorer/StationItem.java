@@ -33,17 +33,6 @@ public class StationItem implements Parcelable, ClusterItem {
 
     private boolean isSelected;
 
-    private MarkerOptions markerOptions;
-    private GroundOverlayOptions groundOverlayOptions;
-
-    private Marker marker;
-    private GroundOverlay groundOverlay;
-
-    private static final BitmapDescriptor redIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_red);
-    private static final BitmapDescriptor greyIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_grey);
-    private static final BitmapDescriptor greenIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_green);
-    private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_yellow);
-
     public StationItem(long uid, String name, LatLng position, int free_bikes, int empty_slots, String timestamp, boolean locked, boolean isFavorite) {
         this.uid = uid;
         this.name = name;
@@ -53,7 +42,6 @@ public class StationItem implements Parcelable, ClusterItem {
         this.position = position;
         this.isFavorite = isFavorite;
         this.timestamp = timestamp;
-        setUpMarker();
     }
 
     // Constructor to be used ONLY when parsing the json file since it trims the name
@@ -68,7 +56,6 @@ public class StationItem implements Parcelable, ClusterItem {
         this.position = new LatLng(_station.latitude, _station.longitude);
         this.isFavorite = isFavorite;
         this.timestamp = date;
-        setUpMarker();
     }
 
     public StationItem(Parcel in){
@@ -80,41 +67,9 @@ public class StationItem implements Parcelable, ClusterItem {
         position = in.readParcelable(LatLng.class.getClassLoader());
         isFavorite = in.readByte() != 0;
         timestamp = in.readString();
-        setUpMarker();
     }
 
-    public void setUpMarker(){
-        //TODO isLookingForBike?
-        markerOptions = new MarkerOptions()
-                .position(position)
-                .title(name)
-                .alpha(0)
-                .anchor(0.5f,0.5f)
-                .infoWindowAnchor(0.5f,0.5f);
-        if (!locked) {
-            String parkings;
-            String bikes;
-            if(empty_slots < 2) parkings = MainActivity.resources.getString(R.string.parking) +": ";
-            else parkings = MainActivity.resources.getString(R.string.parkings)+": ";
-            if (free_bikes < 2) bikes = MainActivity.resources.getString(R.string.bike)+": ";
-            else bikes = MainActivity.resources.getString(R.string.bikes)+": ";
-            markerOptions.snippet(bikes + free_bikes + "   " + parkings + empty_slots);
-        }
-        else
-            markerOptions.snippet(MainActivity.resources.getString(R.string.stationIsLocked));
-        // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
-        groundOverlayOptions = new GroundOverlayOptions()
-                .position(position, 50)
-                .transparency(0.1f);
-        if (locked)
-            groundOverlayOptions.image(greyIcon);
-        else if (free_bikes == 0)
-            groundOverlayOptions.image(redIcon);
-        else if (free_bikes < 3)
-            groundOverlayOptions.image(yellowIcon);
-        else
-            groundOverlayOptions.image(greenIcon);
-    }
+
 
     public long getUid() {
         return uid;
@@ -137,12 +92,6 @@ public class StationItem implements Parcelable, ClusterItem {
         return SphericalUtil.computeHeading(userLocation,position);}
 
     public LatLng getPosition() {return position;}
-
-    public Marker getMarker() {return marker;}
-
-    public GroundOverlay getGroundOverlay() {
-        return groundOverlay;
-    }
 
     public boolean isFavorite() {
         return isFavorite;
@@ -190,30 +139,5 @@ public class StationItem implements Parcelable, ClusterItem {
         return String.format("%d.3",distance) + " km";
     }
 
-    public void addMarkerToMap(GoogleMap map){
-        marker = map.addMarker(markerOptions);
-        groundOverlay = map.addGroundOverlay(groundOverlayOptions);
-    }
 
-    public void updateMarker(boolean isLookingForBikes) {
-        if (isLookingForBikes){
-            if (free_bikes == 0)
-                groundOverlay.setImage(redIcon);
-            else if (free_bikes < 3)
-                groundOverlay.setImage(yellowIcon);
-            // check if the overlay is not already green
-            else if (empty_slots < 3)
-                // overlay isn't green yet
-                groundOverlay.setImage(greenIcon);
-        } else {
-            if (empty_slots == 0)
-                groundOverlay.setImage(redIcon);
-            else if (empty_slots < 3)
-                groundOverlay.setImage(yellowIcon);
-            // check if the overlay is not already green
-            else if (free_bikes < 3)
-                // overlay isn't green yet
-                groundOverlay.setImage(greenIcon);
-        }
-    }
 }

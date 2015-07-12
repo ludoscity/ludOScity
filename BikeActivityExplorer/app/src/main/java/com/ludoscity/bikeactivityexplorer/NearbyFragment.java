@@ -43,6 +43,7 @@ import com.ludoscity.bikeactivityexplorer.BixiAPI.BixiAPI;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 import com.ludoscity.bikeactivityexplorer.Utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class NearbyFragment extends Fragment
@@ -67,6 +68,7 @@ public class NearbyFragment extends Fragment
     private View mStationInfoViewHolder;
     private View mStationListViewHolder;
     private StationsNetwork mStationsNetwork;
+    private ArrayList<StationMapGfx> mMapMarkersGfxData = new ArrayList<>();
     private StationListViewAdapter mStationListViewAdapter;
     private TextView mBikesOrParkingColumn;
     private ListView mStationListView;
@@ -86,7 +88,7 @@ public class NearbyFragment extends Fragment
 
     private boolean isStationInfoVisible;
     private boolean isAlreadyZoomedToUser;
-    private boolean isMarkersUpdated;
+    private boolean refreshMarkers = true;
     private boolean mIsFromFavoriteSection;
 
 
@@ -111,6 +113,11 @@ public class NearbyFragment extends Fragment
         else{   //Having a timestamp means some data exists in the db, as both task are intimately linked
             mStationsNetwork = DBHelper.getStationsNetwork();
             Log.d("nearbyFragment", mStationsNetwork.stations.size() + " stations loaded from DB");
+
+            //Create map marker gfx data
+            for (StationItem item : mStationsNetwork.stations){
+                mMapMarkersGfxData.add(new StationMapGfx(item));
+            }
         }
     }
 
@@ -209,10 +216,23 @@ public class NearbyFragment extends Fragment
 
 
             if(nearbyMap != null) {
-                if (mStationsNetwork != null && !isMarkersUpdated) {
+                if (mStationsNetwork != null && refreshMarkers) {
+
+                    //Gfx data not available yet
+                    if(mMapMarkersGfxData.isEmpty())
+                    {
+                        //SETUP MARKERS DATA
+                        for (StationItem item : mStationsNetwork.stations){
+                            mMapMarkersGfxData.add(new StationMapGfx(item));
+                        }
+                    }
+
                     nearbyMap.clear();
-                    mStationsNetwork.addMarkersToMap(nearbyMap);
-                    isMarkersUpdated = true;
+
+                    for (StationMapGfx markerData : mMapMarkersGfxData){
+                        markerData.addMarkerToMap(nearbyMap);
+                    }
+                     refreshMarkers = false;
                 }
                 int listPosition = mStationListView.getFirstVisiblePosition();
                 int itemSelected = -1;
@@ -314,7 +334,7 @@ public class NearbyFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-        isMarkersUpdated = false;
+        refreshMarkers = true;
         if(mUpdateRefreshHandler == null)
             mUpdateRefreshHandler = new Handler();
         setupUI();
@@ -415,13 +435,14 @@ public class NearbyFragment extends Fragment
         //Remember the current cameraPosition
         mBackCameraPosition = nearbyMap.getCameraPosition();
         // Hide all ground overlays
-        for (StationItem station: mStationsNetwork.stations) {
-            station.getGroundOverlay().setVisible(false);
-            station.getMarker().hideInfoWindow();
+        for (StationMapGfx markerData : mMapMarkersGfxData){
+            markerData.setGroundOverlayVisible(false);
+            markerData.setInfoWindowVisible(false);
         }
         // Show only current one
-        mCurrentInfoStation.getGroundOverlay().setVisible(true);
-        mCurrentInfoStation.getMarker().showInfoWindow();
+        //TODO : REFACTOR INFO WINDOW ND LIST WITH FRAGMENTS
+        //mCurrentInfoStation.getGroundOverlay().setVisible(true);
+        //mCurrentInfoStation.getMarker().showInfoWindow();
 
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
         boundsBuilder.include(mCurrentInfoStation.getPosition());
@@ -472,9 +493,11 @@ public class NearbyFragment extends Fragment
             mListener.onNearbyFragmentInteraction(getString(com.ludoscity.bikeactivityexplorer.R.string.title_section_nearby), true);
         nearbyMap.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
         // Restore map
-        for (StationItem station: mStationsNetwork.stations)
-            station.getGroundOverlay().setVisible(true);
-        mCurrentInfoStation.getMarker().hideInfoWindow();
+        for (StationMapGfx markerData : mMapMarkersGfxData){
+            markerData.setGroundOverlayVisible(true);
+            markerData.setInfoWindowVisible(false);
+        }
+
         mCurrentInfoStation = null;
         getActivity().invalidateOptionsMenu();
     }
@@ -537,7 +560,7 @@ public class NearbyFragment extends Fragment
     @Override
     public void onMapReady(GoogleMap googleMap) {
         isAlreadyZoomedToUser = false;
-        isMarkersUpdated = false;
+        refreshMarkers = true;
         nearbyMap = googleMap;
         nearbyMap.setMyLocationEnabled(true);
         nearbyMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
@@ -635,23 +658,23 @@ public class NearbyFragment extends Fragment
         TextView toastView = new TextView(mContext);
         toastView.setAlpha(0.25f);
         toastView.setBackgroundColor(getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark));
-        toastView.setShadowLayer(2.75f,0,0, com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark);
+        toastView.setShadowLayer(2.75f, 0, 0, com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark);
         toastView.setText(toastText);
         toastView.setTextSize(24f);
         toastView.setTextColor(getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.primary_text_default_material_dark));
         toastView.setGravity(Gravity.CENTER);
-        icon.setBounds(0,0,64,64);
-        toastView.setCompoundDrawables(icon,null,null,null);
+        icon.setBounds(0, 0, 64, 64);
+        toastView.setCompoundDrawables(icon, null, null, null);
         toastView.setCompoundDrawablePadding(16);
-        toastView.setPadding(5,5,5,5);
+        toastView.setPadding(5, 5, 5, 5);
         Toast toast = new Toast(mContext);
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.setView(toastView);
-        toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL,0,0);
+        toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL, 0, 0);
         toast.show();
 
-        for(StationItem station: mStationsNetwork.stations){
-            station.updateMarker(isLookingForBikes);
+        for (StationMapGfx markerData : mMapMarkersGfxData){
+            markerData.updateMarker(isLookingForBikes);
         }
     }
 
@@ -697,6 +720,11 @@ public class NearbyFragment extends Fragment
             //scrapped each time. Might be usefull in the future.
             mUpdateProgressBar.setVisibility(View.INVISIBLE);
             mRefreshButton.setVisibility(View.VISIBLE);
+
+            //SETUP MARKERS DATA
+            for (StationItem item : mStationsNetwork.stations){
+                mMapMarkersGfxData.add(new StationMapGfx(item));
+            }
         }
 
         @Override
@@ -716,7 +744,7 @@ public class NearbyFragment extends Fragment
             mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);*/
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
             sp.edit().putLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, Calendar.getInstance().getTimeInMillis()).apply();
-            isMarkersUpdated = false;
+            refreshMarkers = true;
             setupUI();
             Log.d("nearbyFragment",mStationsNetwork.stations.size()+" stations downloaded from citibik.es");
 

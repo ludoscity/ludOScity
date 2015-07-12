@@ -1,7 +1,5 @@
 package com.ludoscity.bikeactivityexplorer;
 
-import com.google.android.gms.maps.GoogleMap;
-
 import java.util.ArrayList;
 
 /**
@@ -12,10 +10,5 @@ public class StationsNetwork {
 
     public StationsNetwork() {
         stations = new ArrayList<>();
-    }
-
-    public void addMarkersToMap(GoogleMap map) {
-        for (StationItem item: stations)
-            item.addMarkerToMap(map);
     }
 }
