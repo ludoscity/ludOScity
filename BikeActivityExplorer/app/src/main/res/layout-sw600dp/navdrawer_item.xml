@@ -36,8 +36,7 @@
         android:layout_gravity="start|center_vertical"
         android:gravity="start|center_vertical"
         android:fontFamily="@string/font_fontFamily_medium"
-        android:textStyle="@integer/font_textStyle_medium"
         android:textSize="14sp"
         android:text="@string/placeholder_lorem_ipsum" />
-
+        <!--android:textStyle="@integer/font_textStyle_medium"-->
 </LinearLayout>
