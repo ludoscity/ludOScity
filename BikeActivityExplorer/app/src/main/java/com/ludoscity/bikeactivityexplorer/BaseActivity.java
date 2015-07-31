@@ -3,16 +3,15 @@ package com.ludoscity.bikeactivityexplorer;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -31,12 +30,20 @@ import java.util.ArrayList;
  */
 public abstract class BaseActivity extends ActionBarActivity {
 
+    /**
+     * Helper component that ties the action bar to the navigation drawer.
+     */
+    private ActionBarDrawerToggle mDrawerToggle;
+
     // Navigation drawer:
     private DrawerLayout mDrawerLayout;
 
     private ObjectAnimator mStatusBarColorAnimator;
     private ViewGroup mDrawerItemsListContainer;
     private Handler mHandler;
+
+    protected CharSequence mTitle;
+    protected CharSequence mSubtitle;
 
     // symbols for navdrawer items (indices must correspond to array below). This is
     // not a list of items that are necessarily *present* in the Nav Drawer; rather,
@@ -111,6 +118,14 @@ public abstract class BaseActivity extends ActionBarActivity {
         //mNormalStatusBarColor = mThemedStatusBarColor;
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Forward the new configuration the drawer toggle component.
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
     /**
      * Returns the navigation drawer item that corresponds to this Activity. Subclasses
      * of BaseActivity override this to indicate what nav drawer item corresponds to them
@@ -148,14 +163,28 @@ public abstract class BaseActivity extends ActionBarActivity {
             mActionBarToolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mDrawerLayout.openDrawer(Gravity.START);
+
+                    if (isNavDrawerOpen())
+                        mDrawerLayout.closeDrawer(Gravity.START);
+                    else
+                        mDrawerLayout.openDrawer(Gravity.START);
                 }
             });
+
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
         }
 
-        mDrawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,
+                com.ludoscity.bikeactivityexplorer.R.string.navigation_drawer_open,  /* "open drawer" description for accessibility */
+                com.ludoscity.bikeactivityexplorer.R.string.navigation_drawer_close  /* "close drawer" description for accessibility */
+                ) {
             @Override
             public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
                 // run deferred action, if we have one
                 if (mDeferredOnDrawerClosedRunnable != null) {
                     mDeferredOnDrawerClosedRunnable.run();
@@ -167,19 +196,33 @@ public abstract class BaseActivity extends ActionBarActivity {
 
             @Override
             public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
                 onNavDrawerStateChanged(true, false);
             }
 
             @Override
             public void onDrawerStateChanged(int newState) {
+                super.onDrawerStateChanged(newState);
                 onNavDrawerStateChanged(isNavDrawerOpen(), newState != DrawerLayout.STATE_IDLE);
             }
 
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
                 onNavDrawerSlide(slideOffset);
             }
+
+        };
+
+        // Defer code dependent on restoration of previous instance state.
+        mDrawerLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mDrawerToggle.syncState();
+            }
         });
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
 
@@ -198,6 +241,11 @@ public abstract class BaseActivity extends ActionBarActivity {
         //if (mActionBarAutoHideEnabled && isOpen) {
         //    autoShowOrHideActionBar(true);
         //}
+
+        if (isOpen)
+        {
+            supportInvalidateOptionsMenu();
+        }
     }
 
     protected void onNavDrawerSlide(float offset) {}
@@ -230,6 +278,14 @@ public abstract class BaseActivity extends ActionBarActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    protected void restoreActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(mTitle);
+        actionBar.setSubtitle(mSubtitle);
     }
 
     private void createNavDrawerItems() {
@@ -331,8 +387,8 @@ public abstract class BaseActivity extends ActionBarActivity {
                 signInOrCreateAnAccount();
                 break;*/
             case NAVDRAWER_ITEM_SETTINGS:
-                intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
+                //intent = new Intent(this, SettingsActivity.class);
+                //startActivity(intent);
                 break;
             /*case NAVDRAWER_ITEM_VIDEO_LIBRARY:
                 intent = new Intent(this, VideoLibraryActivity.class);
@@ -468,7 +524,7 @@ public abstract class BaseActivity extends ActionBarActivity {
 
     protected Toolbar getActionBarToolbar() {
         if (mActionBarToolbar == null) {
-            mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
+            mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_main);
             if (mActionBarToolbar != null) {
                 setSupportActionBar(mActionBarToolbar);
             }
@@ -534,7 +590,7 @@ public abstract class BaseActivity extends ActionBarActivity {
             return;
         }
 
-        ImageView iconView = (ImageView) view.findViewById(R.id.icon);
+        //ImageView iconView = (ImageView) view.findViewById(R.id.icon);
         TextView titleView = (TextView) view.findViewById(R.id.title);
 
         if (selected) {
@@ -545,9 +601,9 @@ public abstract class BaseActivity extends ActionBarActivity {
         titleView.setTextColor(selected ?
                 getResources().getColor(R.color.navdrawer_text_color_selected) :
                 getResources().getColor(R.color.navdrawer_text_color));
-        iconView.setColorFilter(selected ?
-                getResources().getColor(R.color.navdrawer_icon_tint_selected) :
-                getResources().getColor(R.color.navdrawer_icon_tint));
+        //iconView.setColorFilter(selected ?
+        //        getResources().getColor(R.color.navdrawer_icon_tint_selected) :
+        //        getResources().getColor(R.color.navdrawer_icon_tint));
     }
 
     @Override
