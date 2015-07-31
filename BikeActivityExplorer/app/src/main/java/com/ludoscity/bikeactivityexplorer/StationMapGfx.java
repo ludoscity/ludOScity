@@ -41,14 +41,15 @@ public class StationMapGfx {
         if (!item.isLocked()) {
             String parkings;
             String bikes;
-            if(item.getEmpty_slots() < 2) parkings = MainActivity.resources.getString(R.string.parking) +": ";
-            else parkings = MainActivity.resources.getString(R.string.parkings)+": ";
-            if (item.getFree_bikes() < 2) bikes = MainActivity.resources.getString(R.string.bike)+": ";
-            else bikes = MainActivity.resources.getString(R.string.bikes)+": ";
+            if(item.getEmpty_slots() < 2) parkings = NearbyActivity.resources.getString(R.string.parking) +": ";
+            //TODO : RETRIEVE THE STRING THROUGH OTHER MEAN
+            else parkings = NearbyActivity.resources.getString(R.string.parkings)+": "; //EURK !!
+            if (item.getFree_bikes() < 2) bikes = NearbyActivity.resources.getString(R.string.bike)+": ";
+            else bikes = NearbyActivity.resources.getString(R.string.bikes)+": ";
             markerOptions.snippet(bikes + item.getFree_bikes() + "   " + parkings + item.getEmpty_slots());
         }
         else
-            markerOptions.snippet(MainActivity.resources.getString(R.string.stationIsLocked));
+            markerOptions.snippet(NearbyActivity.resources.getString(R.string.stationIsLocked));
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
         groundOverlayOptions = new GroundOverlayOptions()
                 .position(item.getPosition(), 50)

@@ -13,15 +13,15 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:background="?android:selectableItemBackground"
     android:gravity="start|center_vertical"
-    android:paddingLeft="@dimen/keyline_1"
-    android:paddingRight="@dimen/keyline_1"
+
     android:layout_width="match_parent"
     android:layout_height="48dp">
+    <!--android:paddingLeft="@dimen/keyline_1"
+    android:paddingRight="@dimen/keyline_1" -->
 
     <ImageView
         android:id="@+id/icon"
@@ -38,5 +38,5 @@
         android:fontFamily="@string/font_fontFamily_medium"
         android:textSize="14sp"
         android:text="@string/placeholder_lorem_ipsum" />
-        <!--android:textStyle="@integer/font_textStyle_medium"-->
+
 </LinearLayout>

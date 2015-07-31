@@ -13,9 +13,15 @@
         android:layout_width="match_parent" android:layout_height="match_parent"
         android:layout_below="@id/toolbar_main">
 
-            <FrameLayout android:id="@+id/start_fragment_container" android:layout_width="fill_parent"
-                android:layout_height="match_parent" >
-            </FrameLayout>
+        <FrameLayout android:id="@+id/main_content" android:layout_width="fill_parent"
+            android:layout_height="match_parent" >
+
+            <fragment android:name="com.ludoscity.bikeactivityexplorer.NearbyFragment"
+                android:id="@+id/nearby_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout="@layout/fragment_nearby" />
+        </FrameLayout>
         <!-- android:layout_gravity="start" tells DrawerLayout to treat
              this as a sliding drawer on the left side for left-to-right
              languages and on the right side for right-to-left languages.
@@ -26,12 +32,4 @@
 
         <include layout="@layout/navdrawer" />
     </android.support.v4.widget.DrawerLayout>
-
-    <!-- this is for budget fragment UI animations, it holds a bitmap representing a view -->
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/animatedrow_bitmap_holder_imageview"
-        android:visibility="invisible"
-        android:scaleType="matrix"/>
 </RelativeLayout>
