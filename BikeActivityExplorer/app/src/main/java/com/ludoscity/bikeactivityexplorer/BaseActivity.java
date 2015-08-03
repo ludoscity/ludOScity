@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     /**
      * Helper component that ties the action bar to the navigation drawer.
      */
-    private ActionBarDrawerToggle mDrawerToggle;
+    protected ActionBarDrawerToggle mDrawerToggle;
 
     // Navigation drawer:
     private DrawerLayout mDrawerLayout;
@@ -164,12 +165,21 @@ public abstract class BaseActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View view) {
 
-                    if (isNavDrawerOpen())
-                        mDrawerLayout.closeDrawer(Gravity.START);
-                    else
-                        mDrawerLayout.openDrawer(Gravity.START);
+                    if (mDrawerToggle.isDrawerIndicatorEnabled()) {
+
+                        if (isNavDrawerOpen())
+                            mDrawerLayout.closeDrawer(Gravity.START);
+                        else
+                            mDrawerLayout.openDrawer(Gravity.START);
+                    }
+                    //else{
+                        //onBackPressed();
+                        //TODO: fix nearby station details back navigation as onOptionsItemSelected is not called anymore
+                    //}
                 }
             });
+
+
 
             ActionBar actionBar = getSupportActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -213,6 +223,15 @@ public abstract class BaseActivity extends ActionBarActivity {
             }
 
         };
+
+        /*mDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!mDrawerToggle.isDrawerIndicatorEnabled()) {
+                    onBackPressed();
+                }
+            }
+        });*/
 
         // Defer code dependent on restoration of previous instance state.
         mDrawerLayout.post(new Runnable() {
@@ -279,6 +298,20 @@ public abstract class BaseActivity extends ActionBarActivity {
             super.onBackPressed();
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (!isNavDrawerOpen()) {
+            // Only show items in the action bar relevant to this screen
+            // if the drawer is not showing. Otherwise, let the drawer
+            // decide what to show in the action bar.
+            getMenuInflater().inflate(R.menu.main, menu);
+            restoreActionBar();
+            return true;
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
 
     protected void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
@@ -623,6 +656,14 @@ public abstract class BaseActivity extends ActionBarActivity {
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         sp.unregisterOnSharedPreferenceChangeListener(this);*/
+    }
+
+    public void setActivityTitle(CharSequence mTitle) {
+        this.mTitle = mTitle;
+    }
+
+    public void setActivitySubtitle(CharSequence mSubtitle) {
+        this.mSubtitle = mSubtitle;
     }
 
 

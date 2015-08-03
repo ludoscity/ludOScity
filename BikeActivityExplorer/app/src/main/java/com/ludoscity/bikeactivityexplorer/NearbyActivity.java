@@ -1,6 +1,5 @@
 package com.ludoscity.bikeactivityexplorer;
 
-import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -27,10 +26,10 @@ public class NearbyActivity extends BaseActivity
     }
 
     @Override
-    public void onNearbyFragmentInteraction(String title, boolean isNavDrawerEnabled) {
+    public void onNearbyFragmentInteraction(String title, boolean isDrawerIndicatorEnabled) {
         setActivityTitle(title);
 
-        //mNavigationDrawerFragment.getToggle().setDrawerIndicatorEnabled(isDrawerIndicatorEnabled);
+        mDrawerToggle.setDrawerIndicatorEnabled(isDrawerIndicatorEnabled);
         restoreActionBar();
 
     }
@@ -73,32 +72,16 @@ public class NearbyActivity extends BaseActivity
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
+        setActivityTitle(getString(R.string.title_section_nearby));
 
         mNearbyFragment = (NearbyFragment)getSupportFragmentManager().findFragmentById(
                 R.id.nearby_fragment);
+        mNearbyFragment.setHasOptionsMenu(true);
 
 
         //if (mNearbyFragment != null && savedInstanceState == null) {
         //    Bundle args = intentToFragmentArguments(getIntent());
         //    mNearbyFragment.reloadFromArguments(args);
         //}
-    }
-
-
-
-
-
-
-
-
-
-
-
-    public void setActivityTitle(CharSequence mTitle) {
-        this.mTitle = mTitle;
-    }
-
-    public void setActivitySubtitle(CharSequence mSubtitle) {
-        this.mSubtitle = mSubtitle;
     }
 }
