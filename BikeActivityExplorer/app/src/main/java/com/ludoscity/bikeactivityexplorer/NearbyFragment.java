@@ -727,6 +727,11 @@ public class NearbyFragment extends Fragment
             mRefreshButton.setVisibility(View.VISIBLE);
 
             //SETUP MARKERS DATA
+            //TODO Seen null callstack on weird network conditions
+            //08-04 21:52:01.693    2108-2108/? E/AndroidRuntime? FATAL EXCEPTION: main
+            //Process: com.ludoscity.bikeactivityexplorer, PID: 2108
+            //java.lang.NullPointerException: Attempt to read from field 'java.util.ArrayList com.ludoscity.bikeactivityexplorer.StationsNetwork.stations' on a null object reference
+            //at com.ludoscity.bikeactivityexplorer.NearbyFragment$DownloadWebTask.onCancelled(NearbyFragment.java:730)
             for (StationItem item : mStationsNetwork.stations){
                 mMapMarkersGfxData.add(new StationMapGfx(item));
             }
