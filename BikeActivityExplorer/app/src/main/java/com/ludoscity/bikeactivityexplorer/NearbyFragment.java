@@ -256,25 +256,6 @@ public class NearbyFragment extends Fragment
         }
     }
 
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-
-        if (!hidden){
-            //Recreate handler to maintain update TextView String
-            mUpdateRefreshHandler = new Handler();
-            setupUI();
-
-            ((MainActivity) getActivity()).onSectionHiddenChanged(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-            if (isStationInfoVisible && !mIsFromFavoriteSection) replaceInfoViewByListView();
-
-        }
-        else{
-            stopUIRefresh();
-        }
-    }
-
     private void stopUIRefresh() {
         if (mUpdateRefreshHandler != null) {
             mUpdateRefreshHandler.removeCallbacks(mUpdateRefreshRunnableCode);
@@ -324,7 +305,7 @@ public class NearbyFragment extends Fragment
         super.onCreate(savedInstanceState);
 
         // Retain this fragment across configuration changes.
-        setRetainInstance(true);
+        //setRetainInstance(true);
     }
 
     @Override

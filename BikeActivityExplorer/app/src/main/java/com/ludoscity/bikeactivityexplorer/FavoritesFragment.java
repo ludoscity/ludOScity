@@ -47,16 +47,6 @@ public class FavoritesFragment extends Fragment {
     }
 
     @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        if (!hidden){
-            ((MainActivity) getActivity()).onSectionHiddenChanged(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-            setUpUI();
-        }
-    }
-
-    @Override
     public void onAttach(Activity activity) {   //Only happening on orientation change now
         super.onAttach(activity);
         mContext = activity;
@@ -74,7 +64,7 @@ public class FavoritesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Retain this fragment across configuration changes.
-        setRetainInstance(true);
+        //setRetainInstance(true);
     }
 
     @Override

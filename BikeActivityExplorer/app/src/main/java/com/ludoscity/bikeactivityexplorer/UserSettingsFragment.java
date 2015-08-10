@@ -23,25 +23,14 @@ public class UserSettingsFragment extends Fragment {
         void onSettingsFragmentInteraction();
     }
 
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-
-        if (!hidden){
-            ((MainActivity) getActivity()).onSectionHiddenChanged(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-
-        }
-    }
-
-    @Override
+   @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
         try {
             OnFragmentInteractionListener mListener = (OnFragmentInteractionListener) activity;
             super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+            //((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");

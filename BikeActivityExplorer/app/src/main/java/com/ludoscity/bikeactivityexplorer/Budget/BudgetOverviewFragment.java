@@ -23,7 +23,6 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.QueryRow;
 import com.ludoscity.bikeactivityexplorer.BixiTracksExplorerAPIHelper;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
-import com.ludoscity.bikeactivityexplorer.MainActivity;
 import com.ludoscity.bikeactivityexplorer.R;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.ListTracksResponse;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
@@ -106,7 +105,7 @@ public class BudgetOverviewFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // Retain this fragment across configuration changes.
-        setRetainInstance(true);
+        //setRetainInstance(true);
     }
 
     @Override
@@ -166,23 +165,12 @@ public class BudgetOverviewFragment extends Fragment {
     }
 
     @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-
-        if (!hidden){
-            ((MainActivity) getActivity()).onSectionHiddenChanged(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-
-        }
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (OnFragmentInteractionListener) activity;
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
+            //((MainActivity) activity).onSectionAttached(
+              //      getArguments().getInt(ARG_SECTION_NUMBER));
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -371,7 +359,7 @@ public class BudgetOverviewFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onBudgetOverviewFragmentInteraction(Uri uri, ArrayList<BudgetInfoItem> _budgetInfoItemList);
+        void onBudgetOverviewFragmentInteraction(Uri uri, ArrayList<BudgetInfoItem> _budgetInfoItemList);
     }
 
     public class RetrieveTrackDataAndProcessCostTask extends AsyncTask<Void, String, Void> {
