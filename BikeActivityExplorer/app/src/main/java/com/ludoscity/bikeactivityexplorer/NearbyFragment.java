@@ -639,7 +639,8 @@ public class NearbyFragment extends Fragment
             //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setThumbResource(R.drawable.ic_action_find_bike);
             //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setTrackResource(R.drawable.ic_action_find_bike);
             //mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
-            toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findABikes);
+            //Hackfix, the UX REALLY is improved by a toast like graphical element, though it seems bugged by recent changes (mea culpa)
+            //toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findABikes);
             icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.bike_icon_toast);
         } else {
             mBikesOrParkingColumn.setText(com.ludoscity.bikeactivityexplorer.R.string.parking);
