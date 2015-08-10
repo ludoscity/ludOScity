@@ -66,10 +66,10 @@ public class StationListViewAdapter extends BaseAdapter {
     }
 
     public void setItemSelected(int pos){
-        if (mCurrentItemSelected != -1)
+        /*if (mCurrentItemSelected != -1)
             mStationList.get(mCurrentItemSelected).setSelected(false);
         if (pos !=-1)
-            mStationList.get(pos).setSelected(true);
+            mStationList.get(pos).setSelected(true);*/
 
         mCurrentItemSelected = pos;
         notifyDataSetChanged();
@@ -140,7 +140,7 @@ public class StationListViewAdapter extends BaseAdapter {
         // Color change between selected and not selected
         //TODO : remove selection tracking from adapter : listView is designed for that
         //TODO : have selection behave like the one in BudgetInfoFragment
-        if (currentStation.isSelected()){
+        /*if (currentStation.isSelected()){
             holder.name.setTextColor(Color.LTGRAY);
             holder.availability.setTextColor(Color.LTGRAY);
             holder.distance.setTextColor(Color.LTGRAY);
@@ -149,12 +149,12 @@ public class StationListViewAdapter extends BaseAdapter {
             @SuppressWarnings("ResourceType") TypedArray ta = mContext.obtainStyledAttributes(com.ludoscity.bikeactivityexplorer.R.style.BikeActivityExplorerTheme, styleAttr);
             convertView.setBackgroundColor(ta.getColor(0, com.ludoscity.bikeactivityexplorer.R.color.material_blue_grey_800));
             ta.recycle();
-        } else {
+        } else {*/
             holder.name.setTextColor(Color.DKGRAY);
             holder.availability.setTextColor(Color.DKGRAY);
             holder.distance.setTextColor(Color.DKGRAY);
             convertView.setBackgroundColor(mContext.getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.background_material_light));
-        }
+        //}
         return convertView;
     }
 }

@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
@@ -63,6 +64,8 @@ public class BixiAPI{
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
         }
 
         new addNetworkDatabase().execute();

@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 
@@ -88,7 +89,11 @@ public class FavoritesFragment extends Fragment {
     }
 
     public void setUpUI(){
-        mStationsFavorites = DBHelper.getFavoriteStations();
+        try {
+            mStationsFavorites = DBHelper.getFavoriteStations();
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
         mFavoritesStationListViewAdapter = new FavoritesListViewAdapter(mContext,mStationsFavorites,mCurrentUserLatLng);
         mFavoritesList.setAdapter(mFavoritesStationListViewAdapter);
         setOnClickItemListenerStationListView();
