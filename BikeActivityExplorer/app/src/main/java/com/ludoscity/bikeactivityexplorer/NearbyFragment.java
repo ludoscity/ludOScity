@@ -641,19 +641,19 @@ public class NearbyFragment extends Fragment
             //mParkingSwitch.setIcon(R.drawable.ic_action_find_bike);
             //Hackfix, the UX REALLY is improved by a toast like graphical element, though it seems bugged by recent changes (mea culpa)
             //toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findABikes);
-            icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.bike_icon_toast);
+            //icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.bike_icon_toast);
         } else {
             mBikesOrParkingColumn.setText(com.ludoscity.bikeactivityexplorer.R.string.parking);
             //Some icons tests
             //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setThumbResource(R.drawable.ic_action_find_dock);
             //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setTrackResource(R.drawable.ic_action_find_dock);
             //mParkingSwitch.setIcon(R.drawable.ic_action_find_dock);
-            toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findAParking);
-            icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.parking_icon_toast);
+            //toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findAParking);
+            //icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.parking_icon_toast);
         }
         // Create a toast with icon and text
         //Todo create this as XML layout
-        TextView toastView = new TextView(mContext);
+        /*TextView toastView = new TextView(mContext);
         toastView.setAlpha(0.25f);
         toastView.setBackgroundColor(getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark));
         toastView.setShadowLayer(2.75f, 0, 0, com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark);
@@ -669,7 +669,7 @@ public class NearbyFragment extends Fragment
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.setView(toastView);
         toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL, 0, 0);
-        toast.show();
+        toast.show();*/
 
         for (StationMapGfx markerData : mMapMarkersGfxData){
             markerData.updateMarker(isLookingForBikes);
