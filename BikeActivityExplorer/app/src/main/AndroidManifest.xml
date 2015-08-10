@@ -24,6 +24,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".FavoritesActivity"/>
+        <activity android:name=".SettingsActivity"/>
 
         <receiver
             android:name="com.ludoscity.bikeactivityexplorer.Utils.Utils$Connectivity"

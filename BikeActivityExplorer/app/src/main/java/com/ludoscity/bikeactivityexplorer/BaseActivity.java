@@ -285,6 +285,7 @@ public abstract class BaseActivity extends ActionBarActivity {
         mNavDrawerItems.add(NAVDRAWER_ITEM_NEARBY);
         mNavDrawerItems.add(NAVDRAWER_ITEM_FAVORITES);
         //mNavDrawerItems.add(NAVDRAWER_ITEM_BUDGET);
+        mNavDrawerItems.add(NAVDRAWER_ITEM_SEPARATOR);
         mNavDrawerItems.add(NAVDRAWER_ITEM_SETTINGS);
 
         createNavDrawerItems();
@@ -429,8 +430,9 @@ public abstract class BaseActivity extends ActionBarActivity {
                 signInOrCreateAnAccount();
                 break;*/
             case NAVDRAWER_ITEM_SETTINGS:
-                //intent = new Intent(this, SettingsActivity.class);
-                //startActivity(intent);
+                intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                overridePendingTransition(0, 0);
                 break;
             /*case NAVDRAWER_ITEM_VIDEO_LIBRARY:
                 intent = new Intent(this, VideoLibraryActivity.class);

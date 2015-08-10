@@ -13,11 +13,14 @@ import android.widget.CompoundButton;
 
 /**
  * Created by Looney on 19-04-15.
+ * Used to handle the Settings section
  */
 public class UserSettingsFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
+    public static final String PREF_NEARBY_AUTO_UPDATE = "setting.auto_update.nearby";
 
     private CheckBox autoUpdate_nearby;
+    private CheckBox mLockScreenOrientation;
 
     public interface OnFragmentInteractionListener {
         void onSettingsFragmentInteraction();
@@ -37,19 +40,6 @@ public class UserSettingsFragment extends Fragment {
         }
     }
 
-
-
-
-
-    public static UserSettingsFragment newInstance(int sectionNumber) {
-            UserSettingsFragment fragment = new UserSettingsFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            fragment.setHasOptionsMenu(true);
-            return fragment;
-    }
-
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,14 +51,14 @@ public class UserSettingsFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("setting.auto_update.nearby", autoUpdate_nearby.isChecked());
+                editor.putBoolean(PREF_NEARBY_AUTO_UPDATE, autoUpdate_nearby.isChecked());
                 editor.apply();
             }
         });
 
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        autoUpdate_nearby.setChecked(sharedPref.getBoolean("setting.auto_update.nearby", true));
+        autoUpdate_nearby.setChecked(sharedPref.getBoolean(PREF_NEARBY_AUTO_UPDATE, true));
 
         return inflatedView;
     }
