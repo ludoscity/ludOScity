@@ -51,8 +51,8 @@ public abstract class BaseActivity extends ActionBarActivity {
     // it's a list of all possible items.
     protected static final int NAVDRAWER_ITEM_NEARBY = 0;
     protected static final int NAVDRAWER_ITEM_FAVORITES = 1;
-    protected static final int NAVDRAWER_ITEM_BUDGET = 2;
-    protected static final int NAVDRAWER_ITEM_SETTINGS = 3;
+    //protected static final int NAVDRAWER_ITEM_BUDGET = 2;
+    protected static final int NAVDRAWER_ITEM_SETTINGS = 2;
     protected static final int NAVDRAWER_ITEM_INVALID = -1;
     protected static final int NAVDRAWER_ITEM_SEPARATOR = -2;
     protected static final int NAVDRAWER_ITEM_SEPARATOR_SPECIAL = -3;
@@ -61,7 +61,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     private static final int[] NAVDRAWER_TITLE_RES_ID = new int[]{
             R.string.title_section_nearby,
             R.string.title_section_favorites,
-            R.string.title_section_budget,
+            //R.string.title_section_budget,
             R.string.title_section_settings,
     };
 
@@ -284,7 +284,7 @@ public abstract class BaseActivity extends ActionBarActivity {
 
         mNavDrawerItems.add(NAVDRAWER_ITEM_NEARBY);
         mNavDrawerItems.add(NAVDRAWER_ITEM_FAVORITES);
-        mNavDrawerItems.add(NAVDRAWER_ITEM_BUDGET);
+        //mNavDrawerItems.add(NAVDRAWER_ITEM_BUDGET);
         mNavDrawerItems.add(NAVDRAWER_ITEM_SETTINGS);
 
         createNavDrawerItems();
@@ -389,12 +389,16 @@ public abstract class BaseActivity extends ActionBarActivity {
             case NAVDRAWER_ITEM_NEARBY:
                 intent = new Intent(this, NearbyActivity.class);
                 startActivity(intent);
+                overridePendingTransition(0, 0);
                 finish();
+                overridePendingTransition(0, 0);
                 break;
             case NAVDRAWER_ITEM_FAVORITES:
                 intent = new Intent(this, FavoritesActivity.class);
                 startActivity(intent);
+                overridePendingTransition(0, 0);
                 finish();
+                overridePendingTransition(0, 0);
                 break;
             /*case NAVDRAWER_ITEM_EXPLORE:
                 intent = new Intent(this, BrowseSessionsActivity.class);
