@@ -16,11 +16,11 @@
         <FrameLayout android:id="@+id/main_content" android:layout_width="fill_parent"
             android:layout_height="match_parent" >
 
-            <fragment android:name="com.ludoscity.bikeactivityexplorer.NearbyFragment"
-                android:id="@+id/nearby_fragment"
+            <fragment android:name="com.ludoscity.bikeactivityexplorer.FavoritesFragment"
+                android:id="@+id/favorites_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:layout="@layout/fragment_nearby" />
+                tools:layout="@layout/fragment_favoris" />
         </FrameLayout>
         <!-- android:layout_gravity="start" tells DrawerLayout to treat
              this as a sliding drawer on the left side for left-to-right

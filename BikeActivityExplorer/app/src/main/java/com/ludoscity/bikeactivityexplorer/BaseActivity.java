@@ -391,6 +391,11 @@ public abstract class BaseActivity extends ActionBarActivity {
                 startActivity(intent);
                 finish();
                 break;
+            case NAVDRAWER_ITEM_FAVORITES:
+                intent = new Intent(this, FavoritesActivity.class);
+                startActivity(intent);
+                finish();
+                break;
             /*case NAVDRAWER_ITEM_EXPLORE:
                 intent = new Intent(this, BrowseSessionsActivity.class);
                 startActivity(intent);

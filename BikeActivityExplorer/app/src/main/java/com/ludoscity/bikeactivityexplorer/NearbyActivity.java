@@ -59,6 +59,7 @@ public class NearbyActivity extends BaseActivity
         setActivitySubtitle("");
 
         //Initialize couchbase database
+        //TODO: now we have multiple activities, this should not be done here
         try {
             DBHelper.init(this, this);
             BixiTracksExplorerAPIHelper.init();
