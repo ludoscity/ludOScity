@@ -173,32 +173,43 @@ public class NearbyFragment extends Fragment
 
                             //... then about next update
                             if (Utils.Connectivity.isConnected(getContext())) {
-                                //Should come from something keeping tabs on time, maybe this runnable itself
-                                long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60;  //comes from Prefs
 
-                                if (now >= wishedUpdateTime) {
+                                boolean autoUpdate = sp.getBoolean(UserSettingsFragment.PREF_NEARBY_AUTO_UPDATE, true);
 
-                                    //Put a string same length as the other one ?
-                                    updateTextBuilder.append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.updating));
-
-                                    //Run update
-
-                                    mDownloadWebTask = new DownloadWebTask();
-                                    mDownloadWebTask.execute();
-
-
-                                    //lastUpdateTime = now;
-                                } else {
-
-                                    updateTextBuilder.append(" - ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.nextUpdate)).append(" ");
-
-
-                                    long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
-
-                                    // formatted will be HH:MM:SS or MM:SS
-                                    updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
+                                if (!autoUpdate){
+                                    updateTextBuilder.append(" - ").append(getString(R.string.nearbyfragment_no_auto_update));
 
                                     mRefreshButton.setVisibility(View.VISIBLE);
+                                }
+                                else {
+
+                                    //Should come from something keeping tabs on time, maybe this runnable itself
+                                    long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60;  //comes from Prefs
+
+                                    if (now >= wishedUpdateTime) {
+
+                                        //Put a string same length as the other one ?
+                                        updateTextBuilder.append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.updating));
+
+                                        //Run update
+
+                                        mDownloadWebTask = new DownloadWebTask();
+                                        mDownloadWebTask.execute();
+
+
+                                        //lastUpdateTime = now;
+                                    } else {
+
+                                        updateTextBuilder.append(" - ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.nextUpdate)).append(" ");
+
+
+                                        long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
+
+                                        // formatted will be HH:MM:SS or MM:SS
+                                        updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
+
+                                        mRefreshButton.setVisibility(View.VISIBLE);
+                                    }
                                 }
                             }
                             else{
