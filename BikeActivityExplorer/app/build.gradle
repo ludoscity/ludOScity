@@ -16,8 +16,8 @@ android {
         applicationId "com.ludoscity.bikeactivityexplorer"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 2
-        versionName "alpha01"
+        versionCode 3
+        versionName "beta00"
     }
     signingConfigs {
         release {
