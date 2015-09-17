@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 22
+    buildToolsVersion "23.0.1"
 
     // workaround for "duplicate files during packaging of APK" issue
     // see https://groups.google.com/d/msg/adt-dev/bl5Rc4Szpzg/wC8cylTWuIEJ
@@ -15,9 +15,9 @@ android {
     defaultConfig {
         applicationId "com.ludoscity.bikeactivityexplorer"
         minSdkVersion 16
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 3
-        versionName "beta00"
+        versionName "alpha02"
     }
     signingConfigs {
         release {
