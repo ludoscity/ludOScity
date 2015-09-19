@@ -32,9 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.couchbase.lite.CouchbaseLiteException;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -59,10 +57,10 @@ public class NearbyFragment extends Fragment
     private Handler mUpdateRefreshHandler = null;
     private Runnable mUpdateRefreshRunnableCode = null;
 
-    private GoogleMap nearbyMap = null;
-    private LatLng mCurrentUserLatLng;
+    //private GoogleMap nearbyMap = null;
+    private LatLng mCurrentUserLatLng = new LatLng(45.5290807503689,-73.58135472983122);
     private CameraPosition mBackCameraPosition;
-    private float mMaxZoom = 16f;
+    //private float mMaxZoom = 16f;
 
     private MenuItem mFavoriteStar;
     private MenuItem mParkingSwitch;
@@ -231,7 +229,7 @@ public class NearbyFragment extends Fragment
             }
 
 
-            if(nearbyMap != null) {
+            //if(nearbyMap != null) {
                 if (mStationsNetwork != null && refreshMarkers) {
 
                     //Gfx data not available yet
@@ -243,11 +241,11 @@ public class NearbyFragment extends Fragment
                         }
                     }
 
-                    nearbyMap.clear();
+                    //nearbyMap.clear();
 
-                    for (StationMapGfx markerData : mMapMarkersGfxData){
-                        markerData.addMarkerToMap(nearbyMap);
-                    }
+                    //for (StationMapGfx markerData : mMapMarkersGfxData){
+                    //    markerData.addMarkerToMap(nearbyMap);
+                    //}
                      refreshMarkers = false;
                 }
                 int listPosition = mStationListView.getFirstVisiblePosition();
@@ -260,7 +258,7 @@ public class NearbyFragment extends Fragment
                     mStationListView.setAdapter(mStationListViewAdapter);
                     mStationListView.setSelectionFromTop(listPosition, 0);
                 }
-            }
+            //}
 
         } else{
             mUpdateTextView.setText(getString(com.ludoscity.bikeactivityexplorer.R.string.nearbyfragment_default_never_web_updated));
@@ -340,8 +338,6 @@ public class NearbyFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         View inflatedView = layoutInflater.inflate(com.ludoscity.bikeactivityexplorer.R.layout.fragment_nearby, viewGroup, false);
-        if(nearbyMap == null)
-            ((MapFragment) getActivity().getFragmentManager().findFragmentById(com.ludoscity.bikeactivityexplorer.R.id.mapNearby)).getMapAsync(this);
         // List view
         mStationListView = (ListView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationListView);
         mStationListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
@@ -394,7 +390,7 @@ public class NearbyFragment extends Fragment
         ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(mStationListViewAdapter != null) {
+                if (mStationListViewAdapter != null) {
                     lookingForBikes(isChecked);
                 }
             }
@@ -430,7 +426,9 @@ public class NearbyFragment extends Fragment
         if(mListener != null)
             mListener.onNearbyFragmentInteraction(getString(com.ludoscity.bikeactivityexplorer.R.string.stationDetails), false);
         //Remember the current cameraPosition
-        mBackCameraPosition = nearbyMap.getCameraPosition();
+        //////////////////////////////////////////////////////
+        //mBackCameraPosition = nearbyMap.getCameraPosition();
+        ////////////////////////////////////////////////////////////
         // Hide all ground overlays
         for (StationMapGfx markerData : mMapMarkersGfxData){
             markerData.setGroundOverlayVisible(false);
@@ -466,7 +464,9 @@ public class NearbyFragment extends Fragment
         else
             mStationInfoParkingAvailView.setText(mCurrentInfoStation.getEmpty_slots()+" "+ getString(com.ludoscity.bikeactivityexplorer.R.string.parkingsAvailable_plur));
         // Move map camera to focus station and user
-        nearbyMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100));
+        /////////////////////////////////////////////////////////////////////
+        //nearbyMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100));
+        ////////////////////////////////////////////////
         // Set back button to return to normal nearby view with list
         this.getView().setFocusableInTouchMode(true);
         this.getView().setOnKeyListener(new View.OnKeyListener() {
@@ -488,7 +488,9 @@ public class NearbyFragment extends Fragment
         // Put 'nearby' as title in the action bar and reset access to drawer
         if (mListener != null)
             mListener.onNearbyFragmentInteraction(getString(com.ludoscity.bikeactivityexplorer.R.string.title_section_nearby), true);
-        nearbyMap.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
+        ////////////////////////////////////////////////////////////////////////////////////
+        //nearbyMap.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
+        /////////////////////////////////////////////////////////////////////////////////////
         // Restore map
         for (StationMapGfx markerData : mMapMarkersGfxData){
             markerData.setGroundOverlayVisible(true);
@@ -543,7 +545,7 @@ public class NearbyFragment extends Fragment
         toast.show();
     }
 
-    @Override
+    /*@Override
     public void onDestroyView() {
         super.onDestroyView();
         MapFragment f = (MapFragment) getActivity().getFragmentManager()
@@ -552,11 +554,11 @@ public class NearbyFragment extends Fragment
             getActivity().getFragmentManager().beginTransaction().remove(f).commit();
             nearbyMap = null;
         }
-    }
+    }*/
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        isAlreadyZoomedToUser = false;
+        /*isAlreadyZoomedToUser = false;
         refreshMarkers = true;
         nearbyMap = googleMap;
         nearbyMap.setMyLocationEnabled(true);
@@ -565,7 +567,7 @@ public class NearbyFragment extends Fragment
         nearbyMap.setOnInfoWindowClickListener(this);
         nearbyMap.setOnMyLocationChangeListener(this);
         nearbyMap.setOnCameraChangeListener(this);
-        setupUI();
+        setupUI();*/
     }
 
     private void setRefreshButtonListener() {
@@ -582,51 +584,47 @@ public class NearbyFragment extends Fragment
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        int i = mStationListViewAdapter.getPositionInList(marker);
+        /*int i = mStationListViewAdapter.getPositionInList(marker);
         mStationListViewAdapter.setItemSelected(i);
         Log.d("onMarkerClick", "Scroll view to " + i);
         if (i != -1) {
             mStationListView.smoothScrollToPositionFromTop(i, 0, 300);
-        }
+        }*/
         return false;
     }
 
     @Override
     public void onMyLocationChange(Location location) {
-        if(location != null) {
+        /*if(location != null) {
             Log.d("onMyLocationChange", "new location " + location.toString());
             mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             if (mStationListViewAdapter != null)
                 mStationListViewAdapter.setCurrentUserLatLng(mCurrentUserLatLng);
-            if (!isAlreadyZoomedToUser && nearbyMap != null) {
-                Log.d("onMyLocationChange","isAlreadyZoomedToUser = "+isAlreadyZoomedToUser);
-                nearbyMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
-                isAlreadyZoomedToUser = true;
-            }
+
             if (mCurrentInfoStation != null){
                 mStationInfoDistanceView.setText(String.valueOf(mCurrentInfoStation.getDistanceStringFromLatLng(mCurrentUserLatLng)));
             }
-        }
+        }*/
     }
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        Log.d("CameraZoomLevel", Float.toString(cameraPosition.zoom));
+        /*Log.d("CameraZoomLevel", Float.toString(cameraPosition.zoom));
         if (cameraPosition.zoom > mMaxZoom){
             nearbyMap.animateCamera(CameraUpdateFactory.zoomTo(mMaxZoom));
-        }
+        }*/
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        if(!isStationInfoVisible) {
+        /*if(!isStationInfoVisible) {
             for (StationItem station : mStationsNetwork.stations) {
                 if (station.getPosition().equals(marker.getPosition())) {
                     replaceListViewByInfoView(station, false);
                     return;
                 }
             }
-        }
+        }*/
     }
 
     public void lookingForBikes(boolean isLookingForBikes){

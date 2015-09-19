@@ -172,13 +172,18 @@
 
     </View>
     <!-- MAP -->
-    <fragment
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:name="com.google.android.gms.maps.MapFragment"
-        android:id="@+id/mapNearby"
+    <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="0px"
-        android:layout_weight="6"/>
+        android:layout_weight="6">
+    <fragment
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:name="com.ludoscity.bikeactivityexplorer.StationMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/station_map_fragment"
+        />
+    </FrameLayout>
 
     <!-- LAST UPDATED -->
     <LinearLayout

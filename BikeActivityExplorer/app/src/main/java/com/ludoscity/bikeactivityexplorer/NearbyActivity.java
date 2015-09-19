@@ -1,6 +1,7 @@
 package com.ludoscity.bikeactivityexplorer;
 
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
@@ -14,11 +15,16 @@ import java.io.IOException;
  * Activity used to display the nearby section
  */
 public class NearbyActivity extends BaseActivity
-        implements NearbyFragment.OnFragmentInteractionListener {
+        implements NearbyFragment.OnFragmentInteractionListener,
+        StationMapFragment.OnStationMapFragmentInteractionListener{
 
     public static Resources resources;
 
     private NearbyFragment mNearbyFragment = null;
+
+    private StationMapFragment mStationMapFragment = null;
+
+    public static final String SETUP_UI_PATH = "setup_ui";
 
     @Override
     protected int getSelfNavDrawerItem() {
@@ -79,10 +85,62 @@ public class NearbyActivity extends BaseActivity
                 R.id.nearby_fragment);
         mNearbyFragment.setHasOptionsMenu(true);
 
+        mStationMapFragment = (StationMapFragment)getSupportFragmentManager().findFragmentById(
+                R.id.station_map_fragment);
+
 
         //if (mNearbyFragment != null && savedInstanceState == null) {
         //    Bundle args = intentToFragmentArguments(getIntent());
         //    mNearbyFragment.reloadFromArguments(args);
         //}
+    }
+
+    @Override
+    public void onStationMapFragmentInteraction(Uri uri) {
+        //Will be warned of station details click, will make info fragment to replace list fragment
+
+
+
+
+        /*@Override
+    public void onInfoWindowClick(Marker marker) {
+        if(!isStationInfoVisible) {
+            for (StationItem station : mStationsNetwork.stations) {
+                if (station.getPosition().equals(marker.getPosition())) {
+                    replaceListViewByInfoView(station, false);
+                    return;
+                }
+            }
+        }
+    }*/
+
+
+        /*@Override
+    public boolean onMarkerClick(Marker marker) {
+        int i = mStationListViewAdapter.getPositionInList(marker);
+        mStationListViewAdapter.setItemSelected(i);
+        Log.d("onMarkerClick", "Scroll view to " + i);
+        if (i != -1) {
+            mStationListView.smoothScrollToPositionFromTop(i, 0, 300);
+        }
+
+    }*/
+
+        /*@Override
+    public void onMyLocationChange(Location location) {
+        if(location != null) {
+            Log.d("onMyLocationChange", "new location " + location.toString());
+            mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+            if (mStationListViewAdapter != null)
+                mStationListViewAdapter.setCurrentUserLatLng(mCurrentUserLatLng);
+
+            if (mCurrentInfoStation != null){
+                mStationInfoDistanceView.setText(String.valueOf(mCurrentInfoStation.getDistanceStringFromLatLng(mCurrentUserLatLng)));
+            }
+        }
+    }*/
+
+
+
     }
 }
