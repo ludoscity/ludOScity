@@ -14,20 +14,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 
 public class NearbyFragment extends Fragment
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener, GoogleMap.OnCameraChangeListener, GoogleMap.OnInfoWindowClickListener {
@@ -52,9 +48,9 @@ public class NearbyFragment extends Fragment
     private View mStationListViewHolder;
     //private StationsNetwork mStationsNetwork;
     //private ArrayList<StationMapGfx> mMapMarkersGfxData = new ArrayList<>();
-    private StationListViewAdapter mStationListViewAdapter;
-    private TextView mBikesOrParkingColumn;
-    private ListView mStationListView;
+    //private StationListViewAdapter mStationListViewAdapter;
+    //private TextView mBikesOrParkingColumn;
+    //private ListView mStationListView;
     private StationItem mCurrentInfoStation;
     private TextView mStationInfoNameView;
     private TextView mStationInfoBikeAvailView;
@@ -113,7 +109,7 @@ public class NearbyFragment extends Fragment
     //Safely updates everything based on checking the last update timestamp
     private void setupUI(){
 
-        int listPosition = mStationListView.getFirstVisiblePosition();
+        /*int listPosition = mStationListView.getFirstVisiblePosition();
         int itemSelected = -1;
         if (mStationListViewAdapter != null)
             itemSelected = mStationListViewAdapter.getCurrentItemSelected();
@@ -132,7 +128,7 @@ public class NearbyFragment extends Fragment
 
         } catch (CouchbaseLiteException e) {
             Log.d("nearbyActivity", "Exception ! :(",e );
-        }
+        }*/
 
 
     }
@@ -199,11 +195,11 @@ public class NearbyFragment extends Fragment
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         View inflatedView = layoutInflater.inflate(com.ludoscity.bikeactivityexplorer.R.layout.fragment_nearby, viewGroup, false);
         // List view
-        mStationListView = (ListView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationListView);
-        mStationListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        //mStationListView = (ListView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationListView);
+        //mStationListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
         //setOnClickItemListenerStationListView();
         mStationListViewHolder = inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationList);
-        mBikesOrParkingColumn = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.bikesOrParkingColumn);
+        //mBikesOrParkingColumn = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.bikesOrParkingColumn);
         // Station Info
         mStationInfoViewHolder = inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo);
         mDirectionArrow = (ImageView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.arrowImage);
@@ -244,9 +240,9 @@ public class NearbyFragment extends Fragment
         ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mStationListViewAdapter != null) {
-                    lookingForBikes(isChecked);
-                }
+                //if (mStationListViewAdapter != null) {
+                //    lookingForBikes(isChecked);
+                //}
             }
         });
     }
@@ -474,9 +470,9 @@ public class NearbyFragment extends Fragment
     public void lookingForBikes(boolean isLookingForBikes){
         String toastText;
         Drawable icon;
-        mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
+        //mStationListViewAdapter.lookingForBikesNotify(isLookingForBikes);
         if(isLookingForBikes) {
-            mBikesOrParkingColumn.setText(com.ludoscity.bikeactivityexplorer.R.string.bikes);
+            //mBikesOrParkingColumn.setText(com.ludoscity.bikeactivityexplorer.R.string.bikes);
             //Some icons tests
             //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setThumbResource(R.drawable.ic_action_find_bike);
             //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setTrackResource(R.drawable.ic_action_find_bike);
@@ -485,7 +481,7 @@ public class NearbyFragment extends Fragment
             //toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findABikes);
             //icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.bike_icon_toast);
         } else {
-            mBikesOrParkingColumn.setText(com.ludoscity.bikeactivityexplorer.R.string.parking);
+            //mBikesOrParkingColumn.setText(com.ludoscity.bikeactivityexplorer.R.string.parking);
             //Some icons tests
             //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setThumbResource(R.drawable.ic_action_find_dock);
             //((Switch)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setTrackResource(R.drawable.ic_action_find_dock);

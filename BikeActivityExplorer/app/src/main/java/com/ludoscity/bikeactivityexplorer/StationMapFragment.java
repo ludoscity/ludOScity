@@ -44,8 +44,11 @@ public class StationMapFragment extends Fragment
     ///////////////////////////////////////33
     public static final String INFOWINDOW_CLICK_PATH = "infowindow_click";
     public static final String MARKER_CLICK_PATH = "marker_click";
-    public static final String LOCATION_CHANGED_PATH = "marker_click";
+    public static final String LOCATION_CHANGED_PATH = "location_changed";
     public static final String MAP_READY_PATH = "map_ready";
+
+    public static final String LOCATION_CHANGED_LATITUDE_PARAM = "location_changed_lat";
+    public static final String LOCATION_CHANGED_LONGITUDE_PARAM = "location_changed_lng";
 
 
     private boolean mIsAlreadyZoomedToUser;
@@ -216,7 +219,8 @@ public class StationMapFragment extends Fragment
             Uri.Builder builder = new Uri.Builder();
             builder.appendPath(LOCATION_CHANGED_PATH);
 
-            //builder.appendQueryParameter(SORT_CHANGED_SUBTITLE_PARAM, subtitle);
+            builder.appendQueryParameter(LOCATION_CHANGED_LATITUDE_PARAM, String.valueOf(location.getLatitude()));
+            builder.appendQueryParameter(LOCATION_CHANGED_LONGITUDE_PARAM, String.valueOf(location.getLongitude()));
 
             if (mListener != null){
                 mListener.onStationMapFragmentInteraction(builder.build());

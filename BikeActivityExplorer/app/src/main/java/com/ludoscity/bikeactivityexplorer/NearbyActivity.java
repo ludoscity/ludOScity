@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.bikeactivityexplorer.BixiAPI.BixiAPI;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 import com.ludoscity.bikeactivityexplorer.Utils.Utils;
@@ -32,13 +33,16 @@ import java.util.Calendar;
  */
 public class NearbyActivity extends BaseActivity
         implements NearbyFragment.OnFragmentInteractionListener,
-        StationMapFragment.OnStationMapFragmentInteractionListener{
+        StationMapFragment.OnStationMapFragmentInteractionListener,
+        StationListFragment.OnStationListFragmentInteractionListener{
 
     public static Resources resources;
 
     private NearbyFragment mNearbyFragment = null;
 
     private StationMapFragment mStationMapFragment = null;
+
+    private StationListFragment mStationListFragment = null;
 
 
     private static final String PREF_WEBTASK_LAST_TIMESTAMP_MS = "last_refresh_timestamp";
@@ -53,7 +57,7 @@ public class NearbyActivity extends BaseActivity
 
     private StationsNetwork mStationsNetwork;
 
-
+    private LatLng mCurrentUserLatLng;
 
 
     private TextView mUpdateTextView;
@@ -193,6 +197,11 @@ public class NearbyActivity extends BaseActivity
 
         mStationMapFragment = (StationMapFragment)getSupportFragmentManager().findFragmentById(
                 R.id.station_map_fragment);
+
+        mStationListFragment = (StationListFragment)getSupportFragmentManager().findFragmentById(
+                R.id.station_list_fragment);
+
+
 
 
         //if (mNearbyFragment != null && savedInstanceState == null) {
@@ -335,6 +344,8 @@ public class NearbyActivity extends BaseActivity
                     mRefreshMarkers = false;
                 }
 
+                mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng);
+
                 /*int listPosition = mStationListView.getFirstVisiblePosition();
                 int itemSelected = -1;
                 if (mStationListViewAdapter != null)
@@ -374,8 +385,15 @@ public class NearbyActivity extends BaseActivity
         {
             setupUI();
         }
+        else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.LOCATION_CHANGED_PATH))
+        {
+            mCurrentUserLatLng = new LatLng(Double.valueOf(uri.getQueryParameter(StationMapFragment.LOCATION_CHANGED_LATITUDE_PARAM)),
+                    Double.valueOf(uri.getQueryParameter(StationMapFragment.LOCATION_CHANGED_LONGITUDE_PARAM)));
 
-        //IF SETUP UI SETUP UI
+            mStationListFragment.setCurrentUserLatLng(mCurrentUserLatLng);
+        }
+
+
 
 
         /*@Override
@@ -424,6 +442,11 @@ public class NearbyActivity extends BaseActivity
             mDownloadWebTask.cancel(false);
             mDownloadWebTask = null;
         }
+    }
+
+    @Override
+    public void onStationListFragmentInteraction(Uri uri) {
+
     }
 
     public class DownloadWebTask extends AsyncTask<Context, Void, Void> {
