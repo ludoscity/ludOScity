@@ -20,6 +20,7 @@
 
             <FrameLayout android:id="@+id/main_content"
                 android:layout_width="fill_parent"
+                android:visibility="gone"
                 android:layout_height="0px"
                 android:layout_weight="4" >
 
@@ -30,18 +31,19 @@
                     tools:layout="@layout/fragment_nearby" />
             </FrameLayout>
 
-            <!-- STATION LIST -->
+            <!-- Container for StationListFragment/StationInfoFragment -->
             <FrameLayout
                 android:layout_width="fill_parent"
                 android:layout_height="0px"
-                android:layout_weight="4">
-                <fragment
+                android:layout_weight="4"
+                android:id="@+id/station_list_or_info_container">
+                <!--<fragment
                     xmlns:android="http://schemas.android.com/apk/res/android"
                     android:name="com.ludoscity.bikeactivityexplorer.StationListFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/station_list_fragment"
-                    />
+                    />-->
             </FrameLayout>
 
             <View

@@ -1,17 +1,19 @@
 package com.ludoscity.bikeactivityexplorer;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link StationInfoFragment.OnFragmentInteractionListener} interface
+ * {@link OnStationInfoFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link StationInfoFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -26,7 +28,17 @@ public class StationInfoFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+
+
+    ///////////////////////////////////////////////////3
+    private TextView mStationInfoNameView;
+    private TextView mStationInfoBikeAvailView;
+    private TextView mStationInfoParkingAvailView;
+    private TextView mStationInfoDistanceView;
+    private ImageView mDirectionArrow;
+
+
+    private OnStationInfoFragmentInteractionListener mListener;
 
     /**
      * Use this factory method to create a new instance of
@@ -63,13 +75,19 @@ public class StationInfoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_station_info, container, false);
+        View inflatedView =  inflater.inflate(R.layout.fragment_station_info, container, false);
+        mDirectionArrow = (ImageView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.arrowImage);
+        mStationInfoNameView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_name);
+        mStationInfoDistanceView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_distance);
+        mStationInfoBikeAvailView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_bikeAvailability);
+        mStationInfoParkingAvailView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_parkingAvailability);
+        return inflatedView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onStationInfoFragmentInteraction(uri);
         }
     }
 
@@ -77,7 +95,7 @@ public class StationInfoFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnStationInfoFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -100,9 +118,9 @@ public class StationInfoFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnStationInfoFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void onStationInfoFragmentInteraction(Uri uri);
     }
 
 }

@@ -15,14 +15,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 public class NearbyFragment extends Fragment
@@ -38,7 +35,7 @@ public class NearbyFragment extends Fragment
     //private Runnable mUpdateRefreshRunnableCode = null;
 
     //private GoogleMap nearbyMap = null;
-    private LatLng mCurrentUserLatLng = new LatLng(45.5290807503689,-73.58135472983122);
+    //private LatLng mCurrentUserLatLng = new LatLng(45.5290807503689,-73.58135472983122);
     //private CameraPosition mBackCameraPosition;
     //private float mMaxZoom = 16f;
 
@@ -52,11 +49,11 @@ public class NearbyFragment extends Fragment
     //private TextView mBikesOrParkingColumn;
     //private ListView mStationListView;
     private StationItem mCurrentInfoStation;
-    private TextView mStationInfoNameView;
-    private TextView mStationInfoBikeAvailView;
-    private TextView mStationInfoParkingAvailView;
-    private TextView mStationInfoDistanceView;
-    private ImageView mDirectionArrow;
+    //private TextView mStationInfoNameView;
+    //private TextView mStationInfoBikeAvailView;
+    //private TextView mStationInfoParkingAvailView;
+    //private TextView mStationInfoDistanceView;
+    //private ImageView mDirectionArrow;
     //private TextView mUpdateTextView;
     //private ProgressBar mUpdateProgressBar;
     //private ImageView mRefreshButton;
@@ -202,11 +199,11 @@ public class NearbyFragment extends Fragment
         //mBikesOrParkingColumn = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.bikesOrParkingColumn);
         // Station Info
         mStationInfoViewHolder = inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo);
-        mDirectionArrow = (ImageView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.arrowImage);
-        mStationInfoNameView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_name);
-        mStationInfoDistanceView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_distance);
-        mStationInfoBikeAvailView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_bikeAvailability);
-        mStationInfoParkingAvailView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_parkingAvailability);
+        //mDirectionArrow = (ImageView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.arrowImage);
+        //mStationInfoNameView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_name);
+        //mStationInfoDistanceView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_distance);
+        //mStationInfoBikeAvailView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_bikeAvailability);
+        //mStationInfoParkingAvailView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_parkingAvailability);
 
 
 

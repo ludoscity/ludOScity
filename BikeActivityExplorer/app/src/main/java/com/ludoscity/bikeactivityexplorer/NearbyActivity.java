@@ -34,7 +34,8 @@ import java.util.Calendar;
 public class NearbyActivity extends BaseActivity
         implements NearbyFragment.OnFragmentInteractionListener,
         StationMapFragment.OnStationMapFragmentInteractionListener,
-        StationListFragment.OnStationListFragmentInteractionListener{
+        StationListFragment.OnStationListFragmentInteractionListener,
+        StationInfoFragment.OnStationInfoFragmentInteractionListener{
 
     public static Resources resources;
 
@@ -43,6 +44,8 @@ public class NearbyActivity extends BaseActivity
     private StationMapFragment mStationMapFragment = null;
 
     private StationListFragment mStationListFragment = null;
+
+    private StationInfoFragment mStationInfoFragment = null;
 
 
     private static final String PREF_WEBTASK_LAST_TIMESTAMP_MS = "last_refresh_timestamp";
@@ -181,7 +184,22 @@ public class NearbyActivity extends BaseActivity
         mDownloadBar = findViewById(com.ludoscity.bikeactivityexplorer.R.id.downloadBar);
         setRefreshButtonListener();
 
-        //COUCHBASE INIT
+
+        //if (savedInstanceState == null){
+
+            //Create fragments programatically
+            //Parameters could come from an Intent ?
+            mStationListFragment = StationListFragment.newInstance("bidon", "bidon");
+            mStationInfoFragment = StationInfoFragment.newInstance("bidon", "bidon");
+
+            // Add the fragment to the 'fragment_container' FrameLayout
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.station_list_or_info_container, mStationListFragment).commit();
+
+        //}
+
+
+
     }
 
 
@@ -198,8 +216,8 @@ public class NearbyActivity extends BaseActivity
         mStationMapFragment = (StationMapFragment)getSupportFragmentManager().findFragmentById(
                 R.id.station_map_fragment);
 
-        mStationListFragment = (StationListFragment)getSupportFragmentManager().findFragmentById(
-                R.id.station_list_fragment);
+        //mStationListFragment = (StationListFragment)getSupportFragmentManager().findFragmentById(
+        //        R.id.station_list_fragment);
 
 
 
@@ -446,6 +464,11 @@ public class NearbyActivity extends BaseActivity
 
     @Override
     public void onStationListFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onStationInfoFragmentInteraction(Uri uri) {
 
     }
 
