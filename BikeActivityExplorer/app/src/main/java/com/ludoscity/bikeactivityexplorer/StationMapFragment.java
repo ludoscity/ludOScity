@@ -18,6 +18,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.ArrayList;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,6 +45,7 @@ public class StationMapFragment extends Fragment
     public static final String INFOWINDOW_CLICK_PATH = "infowindow_click";
     public static final String MARKER_CLICK_PATH = "marker_click";
     public static final String LOCATION_CHANGED_PATH = "marker_click";
+    public static final String MAP_READY_PATH = "map_ready";
 
 
     private boolean mIsAlreadyZoomedToUser;
@@ -50,6 +53,8 @@ public class StationMapFragment extends Fragment
     private GoogleMap mGoogleMap = null;
 
     private float mMaxZoom = 16f;
+
+    private ArrayList<StationMapGfx> mMapMarkersGfxData = new ArrayList<>();
 
 
 
@@ -171,7 +176,7 @@ public class StationMapFragment extends Fragment
         mGoogleMap.setOnCameraChangeListener(this);
 
         Uri.Builder builder = new Uri.Builder();
-        builder.appendPath(NearbyActivity.SETUP_UI_PATH);
+        builder.appendPath(MAP_READY_PATH);
 
         //builder.appendQueryParameter(SORT_CHANGED_SUBTITLE_PARAM, subtitle);
 
@@ -223,6 +228,29 @@ public class StationMapFragment extends Fragment
     public boolean isMapReady(){return !(mGoogleMap==null);}
 
     public void clearMap(){mGoogleMap.clear();}
+
+    public void addMarkerForStationItem(StationItem item) {
+        mMapMarkersGfxData.add(new StationMapGfx(item));
+    }
+
+    public boolean isMarkerListEmpty() {
+        return mMapMarkersGfxData.isEmpty();
+    }
+
+    public void redrawMarkers() {
+
+        mGoogleMap.clear();
+
+        for (StationMapGfx markerData : mMapMarkersGfxData){
+            markerData.addMarkerToMap(mGoogleMap);
+        }
+    }
+
+    public void updateMarkers(boolean isLookingForBike) {
+        for (StationMapGfx markerData : mMapMarkersGfxData){
+                markerData.updateMarker(isLookingForBike);
+            }
+    }
 
     //public void add
 
