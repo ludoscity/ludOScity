@@ -78,6 +78,8 @@ public class StationInfoFragment extends Fragment {
             mStationItem = getArguments().getParcelable(ARG_STATION_ITEM);
             mUserLatLng = getArguments().getParcelable(ARG_USER_LATLNG);
         }
+
+        ((BaseActivity)getActivity()).setActivityTitle(getString(R.string.stationDetails));
     }
 
     @Override

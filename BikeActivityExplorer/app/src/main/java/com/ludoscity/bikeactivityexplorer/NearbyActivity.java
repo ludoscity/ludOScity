@@ -444,6 +444,8 @@ public class NearbyActivity extends BaseActivity
 
                         mStationInfoFragment = StationInfoFragment.newInstance(station, mCurrentUserLatLng);
 
+                        mDrawerToggle.setDrawerIndicatorEnabled(false);
+
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
                         // Replace whatever is in the fragment_container view with this fragment,
@@ -512,6 +514,8 @@ public class NearbyActivity extends BaseActivity
 
         if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_FRAG_ONRESUME_PATH))
         {
+            mDrawerToggle.setDrawerIndicatorEnabled(true);
+            setActivityTitle(getString(R.string.title_section_nearby));
             setupUI();
         }
 
