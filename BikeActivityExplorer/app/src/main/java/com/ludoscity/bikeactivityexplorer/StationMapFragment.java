@@ -301,6 +301,13 @@ public class StationMapFragment extends Fragment
         mGoogleMap.animateCamera(cameraUpdate);
     }
 
+    public void lookingForBikes(boolean lookingForBike) {
+
+        for (StationMapGfx markerData : mMapMarkersGfxData){
+                markerData.updateMarker(lookingForBike);
+            }
+    }
+
     //public void add
 
     /**

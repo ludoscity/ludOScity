@@ -254,9 +254,38 @@ public class NearbyActivity extends BaseActivity
         ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                //if (mStationListViewAdapter != null) {
-                //    lookingForBikes(isChecked);
+
+                mStationListFragment.lookingForBikes(isChecked);
+                mStationMapFragment.lookingForBikes(isChecked);
+                //if(isChecked){
+                //Hackfix, the UX REALLY is improved by a toast like graphical element, though it seems bugged by recent changes (mea culpa)
+                //toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findABikes);
+                //icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.bike_icon_toast);
                 //}
+                //else{
+                //toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findAParking);
+                //icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.parking_icon_toast);
+                //}
+
+                // Create a toast with icon and text
+                //TODO: create this as XML layout
+                /*TextView toastView = new TextView(mContext);
+                toastView.setAlpha(0.25f);
+                toastView.setBackgroundColor(getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark));
+                toastView.setShadowLayer(2.75f, 0, 0, com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark);
+                toastView.setText(toastText);
+                toastView.setTextSize(24f);
+                toastView.setTextColor(getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.primary_text_default_material_dark));
+                toastView.setGravity(Gravity.CENTER);
+                icon.setBounds(0, 0, 64, 64);
+                toastView.setCompoundDrawables(icon, null, null, null);
+                toastView.setCompoundDrawablePadding(16);
+                toastView.setPadding(5, 5, 5, 5);
+                Toast toast = new Toast(mContext);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                toast.setView(toastView);
+                toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL, 0, 0);
+                toast.show();*/
             }
         });
     }
@@ -488,45 +517,6 @@ public class NearbyActivity extends BaseActivity
                 }
             }
         }
-
-        /*@Override
-    public void onInfoWindowClick(Marker marker) {
-        if(!isStationInfoVisible) {
-            for (StationItem station : mStationsNetwork.stations) {
-                if (station.getPosition().equals(marker.getPosition())) {
-                    replaceListViewByInfoView(station, false);
-                    return;
-                }
-            }
-        }
-    }*/
-
-
-        /*@Override
-    public boolean onMarkerClick(Marker marker) {
-        int i = mStationListViewAdapter.getPositionInList(marker);
-        mStationListViewAdapter.setItemSelected(i);
-        Log.d("onMarkerClick", "Scroll view to " + i);
-        if (i != -1) {
-            mStationListView.smoothScrollToPositionFromTop(i, 0, 300);
-        }
-
-    }*/
-
-        /*@Override
-    public void onMyLocationChange(Location location) {
-        if(location != null) {
-            Log.d("onMyLocationChange", "new location " + location.toString());
-            mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-            if (mStationListViewAdapter != null)
-                mStationListViewAdapter.setCurrentUserLatLng(mCurrentUserLatLng);
-
-            if (mCurrentInfoStation != null){
-                mStationInfoDistanceView.setText(String.valueOf(mCurrentInfoStation.getDistanceStringFromLatLng(mCurrentUserLatLng)));
-            }
-        }
-    }*/
-
     }
 
     private void cancelDownloadWebTask() {

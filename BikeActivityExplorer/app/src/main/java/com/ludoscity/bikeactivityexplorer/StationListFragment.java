@@ -161,6 +161,16 @@ public class StationListFragment extends Fragment {
 
     }
 
+    public void lookingForBikes(boolean lookingForBike) {
+
+        mStationListViewAdapter.lookingForBikesNotify(lookingForBike);
+
+        if (lookingForBike)
+            mBikesOrParkingColumn.setText(R.string.bikes);
+        else
+            mBikesOrParkingColumn.setText(R.string.parking);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

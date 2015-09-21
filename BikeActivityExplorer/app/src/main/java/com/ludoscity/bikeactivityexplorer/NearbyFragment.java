@@ -481,25 +481,7 @@ public class NearbyFragment extends Fragment
             //toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findAParking);
             //icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.parking_icon_toast);
         }
-        // Create a toast with icon and text
-        //Todo create this as XML layout
-        /*TextView toastView = new TextView(mContext);
-        toastView.setAlpha(0.25f);
-        toastView.setBackgroundColor(getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark));
-        toastView.setShadowLayer(2.75f, 0, 0, com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark);
-        toastView.setText(toastText);
-        toastView.setTextSize(24f);
-        toastView.setTextColor(getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.primary_text_default_material_dark));
-        toastView.setGravity(Gravity.CENTER);
-        icon.setBounds(0, 0, 64, 64);
-        toastView.setCompoundDrawables(icon, null, null, null);
-        toastView.setCompoundDrawablePadding(16);
-        toastView.setPadding(5, 5, 5, 5);
-        Toast toast = new Toast(mContext);
-        toast.setDuration(Toast.LENGTH_SHORT);
-        toast.setView(toastView);
-        toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL, 0, 0);
-        toast.show();*/
+
 
         //for (StationMapGfx markerData : mMapMarkersGfxData){
         //    markerData.updateMarker(isLookingForBikes);
