@@ -147,7 +147,8 @@ public class StationListFragment extends Fragment {
     }
 
     public void setCurrentUserLatLng(LatLng currentUserLatLng) {
-        mStationListViewAdapter.setCurrentUserLatLng(currentUserLatLng);
+        if (null != mStationListViewAdapter)
+            mStationListViewAdapter.setCurrentUserLatLng(currentUserLatLng);
     }
 
     /**
