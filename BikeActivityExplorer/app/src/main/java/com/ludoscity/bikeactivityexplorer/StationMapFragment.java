@@ -107,8 +107,6 @@ public class StationMapFragment extends Fragment
         if(mGoogleMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(com.ludoscity.bikeactivityexplorer.R.id.mapNearby)).getMapAsync(this);
 
-
-
         return inflatedView;
     }
 
@@ -120,13 +118,6 @@ public class StationMapFragment extends Fragment
         if (f != null) {
             getActivity().getFragmentManager().beginTransaction().remove(f).commit();
             mGoogleMap = null;
-        }
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onStationMapFragmentInteraction(uri);
         }
     }
 
@@ -207,9 +198,6 @@ public class StationMapFragment extends Fragment
         if (mListener != null){
             mListener.onStationMapFragmentInteraction(builder.build());
         }
-
-
-
         return false;
     }
 
@@ -239,14 +227,8 @@ public class StationMapFragment extends Fragment
 
     public boolean isMapReady(){return !(mGoogleMap==null);}
 
-    public void clearMap(){mGoogleMap.clear();}
-
     public void addMarkerForStationItem(StationItem item) {
         mMapMarkersGfxData.add(new StationMapGfx(item));
-    }
-
-    public boolean isMarkerListEmpty() {
-        return mMapMarkersGfxData.isEmpty();
     }
 
     public void redrawMarkers() {
@@ -256,12 +238,6 @@ public class StationMapFragment extends Fragment
         for (StationMapGfx markerData : mMapMarkersGfxData){
             markerData.addMarkerToMap(mGoogleMap);
         }
-    }
-
-    public void updateMarkers(boolean isLookingForBike) {
-        for (StationMapGfx markerData : mMapMarkersGfxData){
-                markerData.updateMarker(isLookingForBike);
-            }
     }
 
     public void clearMarkerGfxData() {
@@ -308,7 +284,6 @@ public class StationMapFragment extends Fragment
             }
     }
 
-    //public void add
 
     /**
      * This interface must be implemented by activities that contain this

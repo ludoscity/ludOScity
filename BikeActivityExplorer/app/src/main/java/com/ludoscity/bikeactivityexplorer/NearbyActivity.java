@@ -41,14 +41,11 @@ import java.util.Calendar;
  * Activity used to display the nearby section
  */
 public class NearbyActivity extends BaseActivity
-        implements NearbyFragment.OnFragmentInteractionListener,
-        StationMapFragment.OnStationMapFragmentInteractionListener,
+        implements StationMapFragment.OnStationMapFragmentInteractionListener,
         StationListFragment.OnStationListFragmentInteractionListener,
         StationInfoFragment.OnStationInfoFragmentInteractionListener{
 
     public static Resources resources;
-
-    //private NearbyFragment mNearbyFragment = null;
 
     private StationMapFragment mStationMapFragment = null;
 
@@ -77,18 +74,9 @@ public class NearbyActivity extends BaseActivity
     private ImageView mRefreshButton;
     private View mDownloadBar;
 
-    private boolean mIsAlreadyZoomedToUser;
     private boolean mRefreshMarkers = true;
 
-
     private MenuItem mParkingSwitch;
-
-
-
-
-
-
-
     private CameraPosition mBackCameraPosition;
 
     @Override
@@ -97,19 +85,8 @@ public class NearbyActivity extends BaseActivity
     }
 
     @Override
-    public void onNearbyFragmentInteraction(String title, boolean isDrawerIndicatorEnabled) {
-        setActivityTitle(title);
-
-        disableDrawer();
-        restoreActionBar();
-
-    }
-
-    @Override
     public void onStart(){
         super.onStart();
-
-
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         if (Utils.Connectivity.isConnected(getApplicationContext()) && sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0) == 0) { //Means ask never successfully completed
@@ -124,8 +101,6 @@ public class NearbyActivity extends BaseActivity
                 Log.d("nearbyActivity", "Exception ! :(",e );
             }
             Log.d("nearbyActivity", mStationsNetwork.stations.size() + " stations loaded from DB");
-
-
         }
     }
 
@@ -135,14 +110,8 @@ public class NearbyActivity extends BaseActivity
         super.onResume();
 
         mRefreshMarkers = true;
-
-
-
         mUpdateRefreshHandler = new Handler();
-
         setupUI();
-
-
     }
 
     @Override
@@ -153,8 +122,6 @@ public class NearbyActivity extends BaseActivity
 
         super.onPause();
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,11 +177,7 @@ public class NearbyActivity extends BaseActivity
                     .add(R.id.station_list_or_info_container, mStationListFragment).commit();
 
         //}
-
-
-
     }
-
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -246,7 +209,6 @@ public class NearbyActivity extends BaseActivity
         setOnClickFindSwitchListener();
         ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setChecked(true);
 
-        //restoreActionBar();
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -455,10 +417,12 @@ public class NearbyActivity extends BaseActivity
     public void onStationMapFragmentInteraction(Uri uri) {
         //Will be warned of station details click, will make info fragment to replace list fragment
 
+        //Map ready
         if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MAP_READY_PATH))
         {
             setupUI();
         }
+        //User loc changed
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.LOCATION_CHANGED_PATH))
         {
             mCurrentUserLatLng = new LatLng(Double.valueOf(uri.getQueryParameter(StationMapFragment.LOCATION_CHANGED_LATITUDE_PARAM)),
@@ -470,11 +434,13 @@ public class NearbyActivity extends BaseActivity
                 mStationInfoFragment.updateUserLatLng(mCurrentUserLatLng);
             }
         }
+        //Marker click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
 
             mStationListFragment.highlightStationFromName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
 
         }
+        //InfoWindow click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.INFOWINDOW_CLICK_PATH)){
 
             Fragment frag = getSupportFragmentManager().findFragmentById(R.id.station_list_or_info_container);
@@ -536,7 +502,6 @@ public class NearbyActivity extends BaseActivity
             setActivityTitle(getString(R.string.title_section_nearby));
             setupUI();
         }
-
     }
 
     @Override
@@ -567,24 +532,9 @@ public class NearbyActivity extends BaseActivity
         @Override
         protected void onCancelled (Void aVoid){
             super.onCancelled(aVoid);
-            //Set interface back -- Not even nescessary right now as fragment is completely
-            //scrapped each time. Might be usefull in the future.
+            //Set interface back
             mUpdateProgressBar.setVisibility(View.INVISIBLE);
             mRefreshButton.setVisibility(View.VISIBLE);
-
-            //SETUP MARKERS DATA
-            //TODO Seen null callstack on weird network conditions
-            //08-04 21:52:01.693    2108-2108/? E/AndroidRuntime? FATAL EXCEPTION: main
-            //Process: com.ludoscity.bikeactivityexplorer, PID: 2108
-            //java.lang.NullPointerException: Attempt to read from field 'java.util.ArrayList com.ludoscity.bikeactivityexplorer.StationsNetwork.stations' on a null object reference
-            //at com.ludoscity.bikeactivityexplorer.NearbyFragment$DownloadWebTask.onCancelled(NearbyFragment.java:730)
-
-
-            //This was done cause task cancelattion replaces onPostExecute call by this onCancelled one
-            //it was a way of profitting things were done anyway
-            //for (StationItem item : mStationsNetwork.stations){
-            //    mMapMarkersGfxData.add(new StationMapGfx(item));
-            //}
         }
 
         @Override

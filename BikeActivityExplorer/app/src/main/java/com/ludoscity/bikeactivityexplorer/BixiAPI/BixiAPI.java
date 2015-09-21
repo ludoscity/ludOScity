@@ -44,6 +44,7 @@ public class BixiAPI{
     public StationsNetwork downloadBixiNetwork() {
         try {
             //TODO Remove: comments on isWifiConnected, Emulator don't have wifi but still have internet
+            //TODO Refactor : use retrofit httpclient library
             //if (isWifiConnected()) {
                 String data = EntityUtils.toString(getHttp(url), HTTP.UTF_8);
 
@@ -68,6 +69,8 @@ public class BixiAPI{
             e.printStackTrace();
         }
 
+        //TODO : This seems somewhat eyebrow raising : this function is called in a task, and does .execute itself,
+        //launching an other task
         new addNetworkDatabase().execute();
 
         return stationsNetwork;
@@ -79,6 +82,7 @@ public class BixiAPI{
         return mWifi.isConnected();
     }
 
+    //TODO Refactor : use retrofit httpclient library
     public HttpEntity getHttp(String url) throws IOException {
         HttpClient httpClient = new DefaultHttpClient();
         HttpGet http = new HttpGet(url);

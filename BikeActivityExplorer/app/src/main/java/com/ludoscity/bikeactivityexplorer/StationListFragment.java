@@ -134,15 +134,9 @@ public class StationListFragment extends Fragment {
 
     public void setupUI(StationsNetwork stationsNetwork, LatLng currentUserLatLng) {
 
-        //int listPosition = mStationListView.getFirstVisiblePosition();
-        //int itemSelected = -1;
-        //if (mStationListViewAdapter != null)
-        //    itemSelected = mStationListViewAdapter.getCurrentItemSelected();
         if (stationsNetwork != null) {
             mStationListViewAdapter = new StationListViewAdapter(getActivity().getApplicationContext(), stationsNetwork, currentUserLatLng, true);
-            //mStationListViewAdapter.setItemSelected(itemSelected);
             mStationListView.setAdapter(mStationListViewAdapter);
-            //mStationListView.setSelectionFromTop(listPosition, 0);
         }
     }
 

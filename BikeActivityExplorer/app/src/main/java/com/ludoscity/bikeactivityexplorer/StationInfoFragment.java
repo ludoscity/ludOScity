@@ -26,15 +26,9 @@ import com.google.android.gms.maps.model.LatLng;
  * create an instance of this fragment.
  */
 public class StationInfoFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     private static final String ARG_STATION_ITEM = "station_item";
     private static final String ARG_USER_LATLNG = "user_latlng";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
 
 
     ///////////////////////////////////////////////////3
@@ -54,7 +48,6 @@ public class StationInfoFragment extends Fragment {
     private OnStationInfoFragmentInteractionListener mListener;
 
 
-    // TODO: Rename and change types and number of parameters
     public static StationInfoFragment newInstance(StationItem station, LatLng userLatLng) {
         StationInfoFragment fragment = new StationInfoFragment();
         Bundle args = new Bundle();
@@ -209,7 +202,7 @@ public class StationInfoFragment extends Fragment {
      */
     public interface OnStationInfoFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onStationInfoFragmentInteraction(Uri uri);
+        void onStationInfoFragmentInteraction(Uri uri);
     }
 
 }
