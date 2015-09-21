@@ -53,6 +53,8 @@ public class StationMapFragment extends Fragment
     public static final String LOCATION_CHANGED_LONGITUDE_PARAM = "location_changed_lng";
     public static final String INFOWINDOW_CLICK_MARKER_POS_LAT_PARAM = "infowindow_click_marker_lat";
     public static final String INFOWINDOW_CLICK_MARKER_POS_LNG_PARAM = "infowindow_click_marker_lng";
+    public static final String MARKER_CLICK_TITLE_PARAM = "marker_click_title";
+
 
     private boolean mIsAlreadyZoomedToUser;
     private GoogleMap mGoogleMap = null;
@@ -197,6 +199,8 @@ public class StationMapFragment extends Fragment
 
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(MARKER_CLICK_PATH);
+
+        builder.appendQueryParameter(MARKER_CLICK_TITLE_PARAM, marker.getTitle());
 
         //builder.appendQueryParameter(SORT_CHANGED_SUBTITLE_PARAM, subtitle);
 

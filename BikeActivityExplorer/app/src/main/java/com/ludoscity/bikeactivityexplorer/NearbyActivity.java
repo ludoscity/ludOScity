@@ -441,6 +441,11 @@ public class NearbyActivity extends BaseActivity
                 mStationInfoFragment.updateUserLatLng(mCurrentUserLatLng);
             }
         }
+        else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
+
+            mStationListFragment.highlightStationFromName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
+
+        }
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.INFOWINDOW_CLICK_PATH)){
 
             Fragment frag = getSupportFragmentManager().findFragmentById(R.id.station_list_or_info_container);

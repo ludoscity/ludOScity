@@ -1,7 +1,6 @@
 package com.ludoscity.bikeactivityexplorer;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,12 +46,12 @@ public class StationListViewAdapter extends BaseAdapter {
         }
     }
 
-    public int getPositionInList(Marker marker){
+    public int getPositionInList(String stationName){
         int i = 0;
         for (StationItem stationItem: mStationList){
-            if (stationItem.getName().equals(marker.getTitle()))
+            if (stationItem.getName().equals(stationName))
                 return i;
-            i++;
+            ++i;
         }
         return -1;
     }

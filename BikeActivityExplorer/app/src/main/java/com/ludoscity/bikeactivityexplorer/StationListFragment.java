@@ -134,21 +134,31 @@ public class StationListFragment extends Fragment {
 
     public void setupUI(StationsNetwork stationsNetwork, LatLng currentUserLatLng) {
 
-        int listPosition = mStationListView.getFirstVisiblePosition();
-        int itemSelected = -1;
-        if (mStationListViewAdapter != null)
-            itemSelected = mStationListViewAdapter.getCurrentItemSelected();
+        //int listPosition = mStationListView.getFirstVisiblePosition();
+        //int itemSelected = -1;
+        //if (mStationListViewAdapter != null)
+        //    itemSelected = mStationListViewAdapter.getCurrentItemSelected();
         if (stationsNetwork != null) {
             mStationListViewAdapter = new StationListViewAdapter(getActivity().getApplicationContext(), stationsNetwork, currentUserLatLng, true);
-            mStationListViewAdapter.setItemSelected(itemSelected);
+            //mStationListViewAdapter.setItemSelected(itemSelected);
             mStationListView.setAdapter(mStationListViewAdapter);
-            mStationListView.setSelectionFromTop(listPosition, 0);
+            //mStationListView.setSelectionFromTop(listPosition, 0);
         }
     }
 
     public void setCurrentUserLatLng(LatLng currentUserLatLng) {
         if (null != mStationListViewAdapter)
             mStationListViewAdapter.setCurrentUserLatLng(currentUserLatLng);
+    }
+
+    public void highlightStationFromName(String stationName) {
+
+        int i = mStationListViewAdapter.getPositionInList(stationName);
+        //mStationListView.setItemChecked(i,true);
+        if (i != -1) {
+            mStationListView.smoothScrollToPositionFromTop(i, 0, 300);
+        }
+
     }
 
     /**
