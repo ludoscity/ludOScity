@@ -25,8 +25,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.couchbase.lite.CouchbaseLiteException;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.ludoscity.bikeactivityexplorer.BixiAPI.BixiAPI;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 import com.ludoscity.bikeactivityexplorer.Utils.Utils;
@@ -299,6 +301,13 @@ public class NearbyActivity extends BaseActivity
                 }
 
                 mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng);
+
+                if (null != mBackCameraPosition){
+                    mStationMapFragment.showAllMarkers();
+                    mStationMapFragment.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
+
+                    mBackCameraPosition = null;
+                }
             }
 
         } else{
@@ -441,6 +450,20 @@ public class NearbyActivity extends BaseActivity
 
                 for (StationItem station : mStationsNetwork.stations) {
                     if (station.getPosition().equals(clickedMarkerPos)) {
+
+                        mBackCameraPosition = mStationMapFragment.getCameraPosition();
+
+                        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+                        boundsBuilder.include(station.getPosition());
+
+                        if (mCurrentUserLatLng != null)
+                            boundsBuilder.include(mCurrentUserLatLng);
+
+                        mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100));
+
+                        mStationMapFragment.hideAllMarkers();
+                        mStationMapFragment.showMarkerForStationUid(station.getUid());
 
                         mStationInfoFragment = StationInfoFragment.newInstance(station, mCurrentUserLatLng);
 

@@ -83,6 +83,10 @@ public class StationMapGfx {
         groundOverlay = map.addGroundOverlay(groundOverlayOptions);
     }
 
+    public long getStationUid(){
+        return mItem.getUid();
+    }
+
     public void updateMarker(boolean isLookingForBikes) {
         if (isLookingForBikes){
             if (mItem.getFree_bikes() == 0)

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -159,6 +160,8 @@ public class StationMapFragment extends Fragment
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(INFOWINDOW_CLICK_PATH);
 
+        marker.hideInfoWindow();
+
         builder.appendQueryParameter(INFOWINDOW_CLICK_MARKER_POS_LAT_PARAM, String.valueOf(marker.getPosition().latitude));
         builder.appendQueryParameter(INFOWINDOW_CLICK_MARKER_POS_LNG_PARAM, String.valueOf(marker.getPosition().longitude));
 
@@ -261,6 +264,39 @@ public class StationMapFragment extends Fragment
         mMapMarkersGfxData.clear();
     }
 
+    public CameraPosition getCameraPosition() {
+        return mGoogleMap.getCameraPosition();
+    }
+
+    public void hideAllMarkers() {
+        setMarkersVisibility(false);
+    }
+
+    public void showMarkerForStationUid(long stationUid) {
+        for(StationMapGfx markerData : mMapMarkersGfxData){
+            if (markerData.getStationUid() == stationUid){
+                markerData.setGroundOverlayVisible(true);
+                //markerData.setInfoWindowVisible(true);
+            }
+        }
+    }
+
+    public void showAllMarkers() {
+        setMarkersVisibility(true);
+
+    }
+
+    private void setMarkersVisibility(boolean newVisibility){
+        for(StationMapGfx markerData : mMapMarkersGfxData) {
+            markerData.setGroundOverlayVisible(newVisibility);
+        }
+
+    }
+
+    public void animateCamera(CameraUpdate cameraUpdate) {
+        mGoogleMap.animateCamera(cameraUpdate);
+    }
+
     //public void add
 
     /**
@@ -275,7 +311,7 @@ public class StationMapFragment extends Fragment
      */
     public interface OnStationMapFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onStationMapFragmentInteraction(Uri uri);
+        void onStationMapFragmentInteraction(Uri uri);
     }
 
 }
