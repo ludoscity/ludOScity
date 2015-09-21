@@ -136,6 +136,16 @@ public abstract class BaseActivity extends ActionBarActivity {
         return NAVDRAWER_ITEM_INVALID;
     }
 
+    protected void disableDrawer(){
+        mDrawerToggle.setDrawerIndicatorEnabled(false);
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    }
+
+    protected void enableDrawer(){
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+    }
+
     private void setupNavDrawer() {
         // What nav drawer item should be selected?
         int selfItem = getSelfNavDrawerItem();

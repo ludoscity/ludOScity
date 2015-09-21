@@ -100,7 +100,7 @@ public class NearbyActivity extends BaseActivity
     public void onNearbyFragmentInteraction(String title, boolean isDrawerIndicatorEnabled) {
         setActivityTitle(title);
 
-        mDrawerToggle.setDrawerIndicatorEnabled(isDrawerIndicatorEnabled);
+        disableDrawer();
         restoreActionBar();
 
     }
@@ -472,7 +472,7 @@ public class NearbyActivity extends BaseActivity
 
                         mStationInfoFragment = StationInfoFragment.newInstance(station, mCurrentUserLatLng);
 
-                        mDrawerToggle.setDrawerIndicatorEnabled(false);
+                        disableDrawer();
 
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -542,7 +542,7 @@ public class NearbyActivity extends BaseActivity
 
         if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_FRAG_ONRESUME_PATH))
         {
-            mDrawerToggle.setDrawerIndicatorEnabled(true);
+            enableDrawer();
             setActivityTitle(getString(R.string.title_section_nearby));
             setupUI();
         }

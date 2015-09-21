@@ -173,7 +173,7 @@ public class StationListFragment extends Fragment {
      */
     public interface OnStationListFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onStationListFragmentInteraction(Uri uri);
+        void onStationListFragmentInteraction(Uri uri);
     }
 
 }
