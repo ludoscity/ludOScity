@@ -9,10 +9,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -39,7 +46,7 @@ public class NearbyActivity extends BaseActivity
 
     public static Resources resources;
 
-    private NearbyFragment mNearbyFragment = null;
+    //private NearbyFragment mNearbyFragment = null;
 
     private StationMapFragment mStationMapFragment = null;
 
@@ -60,7 +67,7 @@ public class NearbyActivity extends BaseActivity
 
     private StationsNetwork mStationsNetwork;
 
-    private LatLng mCurrentUserLatLng;
+    private LatLng mCurrentUserLatLng = null;
 
 
     private TextView mUpdateTextView;
@@ -70,6 +77,11 @@ public class NearbyActivity extends BaseActivity
 
     private boolean mIsAlreadyZoomedToUser;
     private boolean mRefreshMarkers = true;
+
+
+    private MenuItem mParkingSwitch;
+
+
 
 
 
@@ -190,7 +202,6 @@ public class NearbyActivity extends BaseActivity
             //Create fragments programatically
             //Parameters could come from an Intent ?
             mStationListFragment = StationListFragment.newInstance("bidon", "bidon");
-            mStationInfoFragment = StationInfoFragment.newInstance("bidon", "bidon");
 
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
@@ -209,23 +220,43 @@ public class NearbyActivity extends BaseActivity
 
         setActivityTitle(getString(R.string.title_section_nearby));
 
-        mNearbyFragment = (NearbyFragment)getSupportFragmentManager().findFragmentById(
-                R.id.nearby_fragment);
-        mNearbyFragment.setHasOptionsMenu(true);
-
         mStationMapFragment = (StationMapFragment)getSupportFragmentManager().findFragmentById(
                 R.id.station_map_fragment);
-
-        //mStationListFragment = (StationListFragment)getSupportFragmentManager().findFragmentById(
-        //        R.id.station_list_fragment);
-
-
 
 
         //if (mNearbyFragment != null && savedInstanceState == null) {
         //    Bundle args = intentToFragmentArguments(getIntent());
         //    mNearbyFragment.reloadFromArguments(args);
         //}
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_nearby, menu);
+
+        mParkingSwitch = menu.findItem(com.ludoscity.bikeactivityexplorer.R.id.findBikeParkingSwitchMenuItem);
+
+        Fragment frag = getSupportFragmentManager().findFragmentById(R.id.station_list_or_info_container);
+
+        mParkingSwitch.setVisible(frag instanceof  StationListFragment);
+
+        setOnClickFindSwitchListener();
+        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setChecked(true);
+
+        //restoreActionBar();
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void setOnClickFindSwitchListener() {
+        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                //if (mStationListViewAdapter != null) {
+                //    lookingForBikes(isChecked);
+                //}
+            }
+        });
     }
 
     private void stopUIRefresh() {
@@ -245,140 +276,127 @@ public class NearbyActivity extends BaseActivity
         if (lastRefreshTimestamp != 0){
 
             if (mUpdateRefreshRunnableCode == null) {
-                //BEWARE THE INLINE NON TRIVIAL CLASS DECLARATION !!
-                mUpdateRefreshRunnableCode = new Runnable() {
 
-                    /*private final long startTime = System.currentTimeMillis();
-                    private long lastRunTime;
-                    private long lastUpdateTime = System.currentTimeMillis();   //Update should be run automatically ?
-                    */
-                    @Override
-                    public void run() {
-
-                        long now = System.currentTimeMillis();
-
-                        //Update not already in progress
-                        if (mDownloadWebTask == null) {
-
-                            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                            long runnableLastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
-
-                            long difference = now - runnableLastRefreshTimestamp;
-
-                            StringBuilder updateTextBuilder = new StringBuilder();
-
-                            //First taking care of past time...
-                            if (difference < DateUtils.MINUTE_IN_MILLIS)
-                                updateTextBuilder.append(getString(com.ludoscity.bikeactivityexplorer.R.string.momentsAgo)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.fromCitibik_es));//mUpdateTextView.setText();
-                            else
-                                updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.minsAgo)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.fromCitibik_es));
-                            //mUpdateTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
-
-                            //long differenceInMinutes = difference / DateUtils.MINUTE_IN_MILLIS;
-
-                            //from : http://stackoverflow.com/questions/25355611/how-to-get-time-difference-between-two-dates-in-android-app
-                            //long differenceInSeconds = difference / DateUtils.SECOND_IN_MILLIS;
-// formatted will be HH:MM:SS or MM:SS
-                            //String formatted = DateUtils.formatElapsedTime(differenceInSeconds);
-
-                            //... then about next update
-                            if (Utils.Connectivity.isConnected(getApplicationContext())) {
-
-                                boolean autoUpdate = sp.getBoolean(UserSettingsFragment.PREF_NEARBY_AUTO_UPDATE, true);
-
-                                if (!autoUpdate){
-                                    updateTextBuilder.append(" - ").append(getString(R.string.nearbyfragment_no_auto_update));
-
-                                    mRefreshButton.setVisibility(View.VISIBLE);
-                                }
-                                else {
-
-                                    //Should come from something keeping tabs on time, maybe this runnable itself
-                                    long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60;  //comes from Prefs
-
-                                    if (now >= wishedUpdateTime) {
-
-                                        //Put a string same length as the other one ?
-                                        updateTextBuilder.append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.updating));
-
-                                        //Run update
-
-                                        mDownloadWebTask = new DownloadWebTask();
-                                        mDownloadWebTask.execute(getApplicationContext());
-
-
-                                        //lastUpdateTime = now;
-                                    } else {
-
-                                        updateTextBuilder.append(" - ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.nextUpdate)).append(" ");
-
-
-                                        long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
-
-                                        // formatted will be HH:MM:SS or MM:SS
-                                        updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
-
-                                        mRefreshButton.setVisibility(View.VISIBLE);
-                                    }
-                                }
-                            }
-                            else{
-                                updateTextBuilder.append( " ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.no_connectivity));
-                                mRefreshButton.setVisibility(View.GONE);
-                            }
-
-                            mUpdateTextView.setText(updateTextBuilder.toString());
-                        }
-
-                        //lastRunTime = now;
-
-                        //Update UI will be refreshed every second
-                        mUpdateRefreshHandler.postDelayed(mUpdateRefreshRunnableCode, 1000);
-                    }
-                };
+                mUpdateRefreshRunnableCode = createUpdateRefreshRunnableCode();
 
                 mUpdateRefreshHandler.post(mUpdateRefreshRunnableCode);
             }
 
-
             if(mStationMapFragment.isMapReady()) {
                 if (mStationsNetwork != null && mRefreshMarkers) {
 
-                    //Gfx data not available yet
-                    //if(mMapMarkersGfxData.isEmpty())
-                    if(mStationMapFragment.isMarkerListEmpty())
-                    {
-                        //SETUP MARKERS DATA
-                        for (StationItem item : mStationsNetwork.stations){
-                            mStationMapFragment.addMarkerForStationItem(item);
-                        }
+                    mStationMapFragment.clearMarkerGfxData();
+
+                    //SETUP MARKERS DATA
+                    for (StationItem item : mStationsNetwork.stations){
+                        mStationMapFragment.addMarkerForStationItem(item);
                     }
 
+
                     mStationMapFragment.redrawMarkers();
-
-                    //mStationMapFragment.clearMap();
-
 
                     mRefreshMarkers = false;
                 }
 
                 mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng);
-
-                /*int listPosition = mStationListView.getFirstVisiblePosition();
-                int itemSelected = -1;
-                if (mStationListViewAdapter != null)
-                    itemSelected = mStationListViewAdapter.getCurrentItemSelected();
-                if (mStationsNetwork != null) {
-                    mStationListViewAdapter = new StationListViewAdapter(getApplicationContext(), mStationsNetwork, mCurrentUserLatLng, true);//mParkingSwitch.isChecked());
-                    mStationListViewAdapter.setItemSelected(itemSelected);
-                    mStationListView.setAdapter(mStationListViewAdapter);
-                    mStationListView.setSelectionFromTop(listPosition, 0);
-                }*/
             }
 
         } else{
             mUpdateTextView.setText(getString(com.ludoscity.bikeactivityexplorer.R.string.nearbyfragment_default_never_web_updated));
         }
+    }
+
+    private Runnable createUpdateRefreshRunnableCode(){
+        return new Runnable() {
+
+            /*private final long startTime = System.currentTimeMillis();
+            private long lastRunTime;
+            private long lastUpdateTime = System.currentTimeMillis();   //Update should be run automatically ?
+            */
+            @Override
+            public void run() {
+
+                long now = System.currentTimeMillis();
+
+                //Update not already in progress
+                if (mDownloadWebTask == null) {
+
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    long runnableLastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
+
+                    long difference = now - runnableLastRefreshTimestamp;
+
+                    StringBuilder updateTextBuilder = new StringBuilder();
+
+                    //First taking care of past time...
+                    if (difference < DateUtils.MINUTE_IN_MILLIS)
+                        updateTextBuilder.append(getString(com.ludoscity.bikeactivityexplorer.R.string.momentsAgo)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.fromCitibik_es));//mUpdateTextView.setText();
+                    else
+                        updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.minsAgo)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.fromCitibik_es));
+                    //mUpdateTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
+
+                    //long differenceInMinutes = difference / DateUtils.MINUTE_IN_MILLIS;
+
+                    //from : http://stackoverflow.com/questions/25355611/how-to-get-time-difference-between-two-dates-in-android-app
+                    //long differenceInSeconds = difference / DateUtils.SECOND_IN_MILLIS;
+// formatted will be HH:MM:SS or MM:SS
+                    //String formatted = DateUtils.formatElapsedTime(differenceInSeconds);
+
+                    //... then about next update
+                    if (Utils.Connectivity.isConnected(getApplicationContext())) {
+
+                        boolean autoUpdate = sp.getBoolean(UserSettingsFragment.PREF_NEARBY_AUTO_UPDATE, true);
+
+                        if (!autoUpdate){
+                            updateTextBuilder.append(" - ").append(getString(R.string.nearbyfragment_no_auto_update));
+
+                            mRefreshButton.setVisibility(View.VISIBLE);
+                        }
+                        else {
+
+                            //Should come from something keeping tabs on time, maybe this runnable itself
+                            long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60;  //comes from Prefs
+
+                            if (now >= wishedUpdateTime) {
+
+                                //Put a string same length as the other one ?
+                                updateTextBuilder.append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.updating));
+
+                                //Run update
+
+                                mDownloadWebTask = new DownloadWebTask();
+                                mDownloadWebTask.execute(getApplicationContext());
+
+
+                                //lastUpdateTime = now;
+                            } else {
+
+                                updateTextBuilder.append(" - ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.nextUpdate)).append(" ");
+
+
+                                long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
+
+                                // formatted will be HH:MM:SS or MM:SS
+                                updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
+
+                                mRefreshButton.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                    else{
+                        updateTextBuilder.append( " ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.no_connectivity));
+                        mRefreshButton.setVisibility(View.GONE);
+                    }
+
+                    mUpdateTextView.setText(updateTextBuilder.toString());
+                }
+
+                //lastRunTime = now;
+
+                //UI will be refreshed every second
+                mUpdateRefreshHandler.postDelayed(mUpdateRefreshRunnableCode, 1000);
+            }
+        };
     }
 
     private void setRefreshButtonListener() {
@@ -409,10 +427,37 @@ public class NearbyActivity extends BaseActivity
                     Double.valueOf(uri.getQueryParameter(StationMapFragment.LOCATION_CHANGED_LONGITUDE_PARAM)));
 
             mStationListFragment.setCurrentUserLatLng(mCurrentUserLatLng);
+
+            if (mStationInfoFragment != null){
+                mStationInfoFragment.updateUserLatLng(mCurrentUserLatLng);
+            }
         }
+        else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.INFOWINDOW_CLICK_PATH)){
 
+            Fragment frag = getSupportFragmentManager().findFragmentById(R.id.station_list_or_info_container);
+            if (frag instanceof StationListFragment){
+                LatLng clickedMarkerPos = new LatLng(Double.valueOf(uri.getQueryParameter(StationMapFragment.INFOWINDOW_CLICK_MARKER_POS_LAT_PARAM)),
+                        Double.valueOf(uri.getQueryParameter(StationMapFragment.INFOWINDOW_CLICK_MARKER_POS_LNG_PARAM)));
 
+                for (StationItem station : mStationsNetwork.stations) {
+                    if (station.getPosition().equals(clickedMarkerPos)) {
 
+                        mStationInfoFragment = StationInfoFragment.newInstance(station, mCurrentUserLatLng);
+
+                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+                        // Replace whatever is in the fragment_container view with this fragment,
+                        // and add the transaction to the back stack so the user can navigate back
+                        transaction.replace(R.id.station_list_or_info_container, mStationInfoFragment);
+                        transaction.addToBackStack(null);
+
+                        // Commit the transaction
+                        transaction.commit();
+                        break;
+                    }
+                }
+            }
+        }
 
         /*@Override
     public void onInfoWindowClick(Marker marker) {
@@ -464,6 +509,11 @@ public class NearbyActivity extends BaseActivity
 
     @Override
     public void onStationListFragmentInteraction(Uri uri) {
+
+        if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_FRAG_ONRESUME_PATH))
+        {
+            setupUI();
+        }
 
     }
 

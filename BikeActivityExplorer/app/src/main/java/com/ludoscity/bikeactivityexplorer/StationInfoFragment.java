@@ -4,11 +4,18 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,8 +28,8 @@ import android.widget.TextView;
 public class StationInfoFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_STATION_ITEM = "station_item";
+    private static final String ARG_USER_LATLNG = "user_latlng";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -37,24 +44,26 @@ public class StationInfoFragment extends Fragment {
     private TextView mStationInfoDistanceView;
     private ImageView mDirectionArrow;
 
+    private LatLng mUserLatLng;
+    private StationItem mStationItem;
+    private MenuItem mFavoriteStar;
+
+    private int mIconStarOn = com.ludoscity.bikeactivityexplorer.R.drawable.abc_btn_rating_star_on_mtrl_alpha;
+    private int mIconStarOff = com.ludoscity.bikeactivityexplorer.R.drawable.abc_btn_rating_star_off_mtrl_alpha;
 
     private OnStationInfoFragmentInteractionListener mListener;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment StationInfoFragment.
-     */
+
     // TODO: Rename and change types and number of parameters
-    public static StationInfoFragment newInstance(String param1, String param2) {
+    public static StationInfoFragment newInstance(StationItem station, LatLng userLatLng) {
         StationInfoFragment fragment = new StationInfoFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+
+        args.putParcelable(ARG_STATION_ITEM, station);
+        args.putParcelable(ARG_USER_LATLNG, userLatLng);
+
         fragment.setArguments(args);
+        fragment.setHasOptionsMenu(true);
         return fragment;
     }
 
@@ -66,8 +75,8 @@ public class StationInfoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mStationItem = getArguments().getParcelable(ARG_STATION_ITEM);
+            mUserLatLng = getArguments().getParcelable(ARG_USER_LATLNG);
         }
     }
 
@@ -81,15 +90,60 @@ public class StationInfoFragment extends Fragment {
         mStationInfoDistanceView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_distance);
         mStationInfoBikeAvailView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_bikeAvailability);
         mStationInfoParkingAvailView = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.stationInfo_parkingAvailability);
+
+        setupUI();
+
         return inflatedView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onStationInfoFragmentInteraction(uri);
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.menu_station_info, menu);
+
+        mFavoriteStar = menu.findItem(com.ludoscity.bikeactivityexplorer.R.id.favoriteStar);
+
+        if (mStationItem.isFavorite()){
+            mFavoriteStar.setIcon(mIconStarOn);
         }
+        else{
+            mFavoriteStar.setIcon(mIconStarOff);
+        }
+
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.favoriteStar:
+                switchFavoriteState();
+                return true;
+        }
+
+        return false;
+    }
+
+    private void switchFavoriteState(){
+        Toast toast;
+
+        boolean newState = !mStationItem.isFavorite();
+
+        mStationItem.setFavorite(newState);
+
+        if (newState){
+            mFavoriteStar.setIcon(mIconStarOn);
+            toast = Toast.makeText(getActivity().getApplicationContext(),getString(com.ludoscity.bikeactivityexplorer.R.string.addedToFavorites),Toast.LENGTH_SHORT);
+        }
+        else{
+            mFavoriteStar.setIcon(mIconStarOff);
+            toast = Toast.makeText(getActivity().getApplicationContext(),getString(com.ludoscity.bikeactivityexplorer.R.string.removedFromFavorites),Toast.LENGTH_SHORT);
+        }
+
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+
+    }
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -106,6 +160,39 @@ public class StationInfoFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public void updateUserLatLng(LatLng userLatLng){
+        mUserLatLng = userLatLng;
+
+        if (isAdded()){
+            setupUI();
+        }
+    }
+
+    public void setupUI() {
+
+        if(mUserLatLng != null) {
+            mDirectionArrow.setRotation((float) mStationItem.getBearingFromLatLng(mUserLatLng));
+            mStationInfoDistanceView.setText(mStationItem.getDistanceStringFromLatLng(mUserLatLng));
+            mDirectionArrow.setVisibility(View.VISIBLE);
+            mStationInfoDistanceView.setVisibility(View.VISIBLE);
+        }else {
+            mDirectionArrow.setVisibility(View.INVISIBLE);
+            mStationInfoDistanceView.setVisibility(View.INVISIBLE);
+        }
+
+        mStationInfoNameView.setText(mStationItem.getName());
+
+        if (mStationItem.getFree_bikes() < 2)
+            mStationInfoBikeAvailView.setText(mStationItem.getFree_bikes() +" "+ getString(com.ludoscity.bikeactivityexplorer.R.string.bikeAvailable_sing));
+        else
+            mStationInfoBikeAvailView.setText(mStationItem.getFree_bikes() +" "+ getString(com.ludoscity.bikeactivityexplorer.R.string.bikesAvailable_plur));
+
+        if (mStationItem.getEmpty_slots() < 2)
+            mStationInfoParkingAvailView.setText(mStationItem.getEmpty_slots()+" "+ getString(com.ludoscity.bikeactivityexplorer.R.string.parkingAvailable_sing));
+        else
+            mStationInfoParkingAvailView.setText(mStationItem.getEmpty_slots()+" "+ getString(com.ludoscity.bikeactivityexplorer.R.string.parkingsAvailable_plur));
     }
 
     /**

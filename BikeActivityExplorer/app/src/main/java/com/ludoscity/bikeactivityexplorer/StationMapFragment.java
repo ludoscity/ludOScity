@@ -36,6 +36,7 @@ public class StationMapFragment extends Fragment
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -49,10 +50,10 @@ public class StationMapFragment extends Fragment
 
     public static final String LOCATION_CHANGED_LATITUDE_PARAM = "location_changed_lat";
     public static final String LOCATION_CHANGED_LONGITUDE_PARAM = "location_changed_lng";
-
+    public static final String INFOWINDOW_CLICK_MARKER_POS_LAT_PARAM = "infowindow_click_marker_lat";
+    public static final String INFOWINDOW_CLICK_MARKER_POS_LNG_PARAM = "infowindow_click_marker_lng";
 
     private boolean mIsAlreadyZoomedToUser;
-    private boolean mRefreshMarkers = true;
     private GoogleMap mGoogleMap = null;
 
     private float mMaxZoom = 16f;
@@ -158,7 +159,8 @@ public class StationMapFragment extends Fragment
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(INFOWINDOW_CLICK_PATH);
 
-        //builder.appendQueryParameter(SORT_CHANGED_SUBTITLE_PARAM, subtitle);
+        builder.appendQueryParameter(INFOWINDOW_CLICK_MARKER_POS_LAT_PARAM, String.valueOf(marker.getPosition().latitude));
+        builder.appendQueryParameter(INFOWINDOW_CLICK_MARKER_POS_LNG_PARAM, String.valueOf(marker.getPosition().longitude));
 
         if (mListener != null){
             mListener.onStationMapFragmentInteraction(builder.build());
@@ -169,7 +171,6 @@ public class StationMapFragment extends Fragment
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mIsAlreadyZoomedToUser = false;
-        mRefreshMarkers = true;
         mGoogleMap = googleMap;
         mGoogleMap.setMyLocationEnabled(true);
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
@@ -254,6 +255,10 @@ public class StationMapFragment extends Fragment
         for (StationMapGfx markerData : mMapMarkersGfxData){
                 markerData.updateMarker(isLookingForBike);
             }
+    }
+
+    public void clearMarkerGfxData() {
+        mMapMarkersGfxData.clear();
     }
 
     //public void add

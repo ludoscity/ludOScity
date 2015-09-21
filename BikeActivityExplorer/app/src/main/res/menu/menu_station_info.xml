@@ -4,11 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     tools:context="com.ludoscity.bikeactivityexplorer.NearbyFragment">
 
-
     <item
-        android:id="@+id/findBikeParkingSwitchMenuItem"
-        android:title=""
+        android:id="@+id/favoriteStar"
         app:showAsAction="always"
-        app:actionLayout="@layout/action_find_bike_parking_switch"
-        />
+        android:title=""
+        android:icon="@android:drawable/btn_star_big_on"/>
 </menu>

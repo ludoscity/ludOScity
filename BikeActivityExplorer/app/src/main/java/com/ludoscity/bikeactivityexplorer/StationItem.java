@@ -4,14 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.couchbase.lite.CouchbaseLiteException;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.GroundOverlay;
-import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterItem;
 import com.ludoscity.bikeactivityexplorer.BixiAPI.BixiStation;
@@ -146,6 +139,19 @@ public class StationItem implements Parcelable, ClusterItem {
         distance = distance/1000;
         return String.format("%d.3",distance) + " km";
     }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator(){
+
+        @Override
+        public StationItem createFromParcel(Parcel source) {
+            return new StationItem(source);
+        }
+
+        @Override
+        public StationItem[] newArray(int size) {
+            return new StationItem[size];
+        }
+    };
 
 
 }

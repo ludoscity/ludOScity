@@ -4,7 +4,6 @@
     tools:context="com.ludoscity.bikeactivityexplorer.StationInfoFragment">
 
     <LinearLayout
-        android:visibility="gone"
         android:id="@+id/stationInfo"
         android:orientation="vertical"
         android:layout_width="fill_parent"

@@ -5,17 +5,12 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,8 +34,8 @@ public class NearbyFragment extends Fragment
     //private CameraPosition mBackCameraPosition;
     //private float mMaxZoom = 16f;
 
-    private MenuItem mFavoriteStar;
-    private MenuItem mParkingSwitch;
+    //private MenuItem mFavoriteStar;
+    //private MenuItem mParkingSwitch;
     private View mStationInfoViewHolder;
     private View mStationListViewHolder;
     //private StationsNetwork mStationsNetwork;
@@ -59,8 +54,8 @@ public class NearbyFragment extends Fragment
     //private ImageView mRefreshButton;
     //private View mDownloadBar;
 
-    private int mIconStarOn = com.ludoscity.bikeactivityexplorer.R.drawable.abc_btn_rating_star_on_mtrl_alpha;
-    private int mIconStarOff = com.ludoscity.bikeactivityexplorer.R.drawable.abc_btn_rating_star_off_mtrl_alpha;
+    //private int mIconStarOn = com.ludoscity.bikeactivityexplorer.R.drawable.abc_btn_rating_star_on_mtrl_alpha;
+    //private int mIconStarOff = com.ludoscity.bikeactivityexplorer.R.drawable.abc_btn_rating_star_off_mtrl_alpha;
 
     private boolean isStationInfoVisible;
     //private boolean isAlreadyZoomedToUser;
@@ -72,7 +67,7 @@ public class NearbyFragment extends Fragment
         NearbyFragment fragment = new NearbyFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-        fragment.setHasOptionsMenu(true);
+        //fragment.setHasOptionsMenu(true);
         fragment.setArguments(args);
         return fragment;
     }
@@ -214,34 +209,34 @@ public class NearbyFragment extends Fragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(com.ludoscity.bikeactivityexplorer.R.menu.menu_nearby,menu);
-        mFavoriteStar = menu.findItem(com.ludoscity.bikeactivityexplorer.R.id.favoriteStar);
-        mParkingSwitch = menu.findItem(com.ludoscity.bikeactivityexplorer.R.id.findBikeParkingSwitchMenuItem);
+        //mFavoriteStar = menu.findItem(com.ludoscity.bikeactivityexplorer.R.id.favoriteStar);
+        //mParkingSwitch = menu.findItem(com.ludoscity.bikeactivityexplorer.R.id.findBikeParkingSwitchMenuItem);
 
         setOnClickFindSwitchListener();
-        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setChecked(true);
-        mParkingSwitch.setVisible(!isStationInfoVisible);
+        //((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setChecked(true);
+        //mParkingSwitch.setVisible(!isStationInfoVisible);
 
-        mFavoriteStar.setVisible(isStationInfoVisible);
+        /*mFavoriteStar.setVisible(isStationInfoVisible);
         if (mCurrentInfoStation != null){
             if (mCurrentInfoStation.isFavorite()) {
                 mFavoriteStar.setIcon(mIconStarOn);
             }else{
                 mFavoriteStar.setIcon(mIconStarOff);
             }
-        }
+        }*/
 
         Log.d("onCreateOptionsMenu","menu created");
     }
 
     private void setOnClickFindSwitchListener() {
-        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        //((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        //    @Override
+        //    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 //if (mStationListViewAdapter != null) {
                 //    lookingForBikes(isChecked);
                 //}
-            }
-        });
+          //  }
+        //});
     }
 
     /*private void setOnClickItemListenerStationListView() {
@@ -348,34 +343,34 @@ public class NearbyFragment extends Fragment
 //        getActivity().invalidateOptionsMenu();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    //@Override
+    //public boolean onOptionsItemSelected(MenuItem item) {
         // Get item selected and deal with it
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                if (mIsFromFavoriteSection){
-                    getFragmentManager().popBackStackImmediate();
-                    mListener.onNearbyFragmentInteraction(getString(com.ludoscity.bikeactivityexplorer.R.string.title_section_favorites), true);
-                    mIsFromFavoriteSection = false;
-                }else {
-                    replaceInfoViewByListView();
-                }
-                return true;
-            case com.ludoscity.bikeactivityexplorer.R.id.favoriteStar:
-                if(isStationInfoVisible)
-                    changeFavoriteValue(mCurrentInfoStation.isFavorite());
-                return true;
+    //    switch (item.getItemId()) {
+    //        case android.R.id.home:
+    //            if (mIsFromFavoriteSection){
+    //                getFragmentManager().popBackStackImmediate();
+    //                mListener.onNearbyFragmentInteraction(getString(com.ludoscity.bikeactivityexplorer.R.string.title_section_favorites), true);
+    //                mIsFromFavoriteSection = false;
+    //            }else {
+    //                replaceInfoViewByListView();
+    //            }
+    //            return true;
+    //        case com.ludoscity.bikeactivityexplorer.R.id.favoriteStar:
+    //            if(isStationInfoVisible)
+    //                changeFavoriteValue(mCurrentInfoStation.isFavorite());
+    //            return true;
             //////////////
             //Because it's a switch, this calbback don't get invoked, we register a clicklistener directly
             /*case R.id.findBikeParkingSwitchMenuItem:
                 //mIsLookingForBikes = !mIsLookingForBikes;
                 lookingForBikes(mParkingSwitch.isChecked());
                 return true;*/
-        }
-        return false;
-    }
+    //    }
+    //    return false;
+    //}
 
-    private void changeFavoriteValue(boolean isFavorite) {
+    /*private void changeFavoriteValue(boolean isFavorite) {
         Toast toast;
         if (!isStationInfoVisible)
             return;
@@ -390,7 +385,7 @@ public class NearbyFragment extends Fragment
         }
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
-    }
+    }*/
 
     /*@Override
     public void onDestroyView() {
@@ -511,10 +506,10 @@ public class NearbyFragment extends Fragment
         //}
     }
 
-    public void showStationInfoFromFavoriteSection(StationItem stationToShow) {
-        mParkingSwitch.setVisible(false);
-        replaceListViewByInfoView(stationToShow, true);
-    }
+    //public void showStationInfoFromFavoriteSection(StationItem stationToShow) {
+    //    mParkingSwitch.setVisible(false);
+    //    replaceListViewByInfoView(stationToShow, true);
+    //}
 
     //Pour interaction avec mainActivity
     public interface OnFragmentInteractionListener {

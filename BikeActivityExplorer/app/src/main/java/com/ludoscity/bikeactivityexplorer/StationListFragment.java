@@ -30,7 +30,8 @@ public class StationListFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
 
-    private static final String STATION_LIST_ITEM_CLICK_PATH = "station_list_item_click";
+    public static final String STATION_LIST_ITEM_CLICK_PATH = "station_list_item_click";
+    public static final String STATION_LIST_FRAG_ONRESUME_PATH = "station_list_frag_onresume";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -98,6 +99,20 @@ public class StationListFragment extends Fragment {
         mBikesOrParkingColumn = (TextView) inflatedView.findViewById(com.ludoscity.bikeactivityexplorer.R.id.bikesOrParkingColumn);
 
         return inflatedView;
+    }
+
+    @Override
+    public void onResume(){
+
+        super.onResume();
+
+        Uri.Builder builder = new Uri.Builder();
+        builder.appendPath(STATION_LIST_FRAG_ONRESUME_PATH);
+
+        if (mListener != null){
+            mListener.onStationListFragmentInteraction(builder.build());
+        }
+
     }
 
     @Override
