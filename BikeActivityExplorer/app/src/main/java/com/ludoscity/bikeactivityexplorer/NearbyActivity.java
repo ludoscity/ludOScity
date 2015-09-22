@@ -60,9 +60,6 @@ public class NearbyActivity extends BaseActivity
     private Runnable mUpdateRefreshRunnableCode = null;
 
     private DownloadWebTask mDownloadWebTask = null;
-    //TODO : investigate having an Application class providing APIs like as done there
-    //https://github.com/f8full/DirectionsOnMapv2WithRetrofit/blob/master/app/src/main/java/com/f8full/sample/directionsonmapv2withretrofit/RootApplication.java
-    private BixiAPI mBixiApiInstance;
 
     private StationsNetwork mStationsNetwork;
 
@@ -204,10 +201,11 @@ public class NearbyActivity extends BaseActivity
 
         Fragment frag = getSupportFragmentManager().findFragmentById(R.id.station_list_or_info_container);
 
-        mParkingSwitch.setVisible(frag instanceof  StationListFragment);
+        mParkingSwitch.setVisible(frag instanceof StationListFragment);
+
+        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setChecked(true);
 
         setOnClickFindSwitchListener();
-        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setChecked(true);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -278,17 +276,9 @@ public class NearbyActivity extends BaseActivity
             if(mStationMapFragment.isMapReady()) {
                 if (mStationsNetwork != null && mRefreshMarkers) {
 
-                    mStationMapFragment.clearMarkerGfxData();
-
-                    //SETUP MARKERS DATA
-                    for (StationItem item : mStationsNetwork.stations){
-                        mStationMapFragment.addMarkerForStationItem(item);
-                    }
-
-
-                    mStationMapFragment.redrawMarkers();
-
                     mRefreshMarkers = false;
+
+                    new RedrawMarkersTask().execute();
                 }
 
                 mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng);
@@ -509,15 +499,49 @@ public class NearbyActivity extends BaseActivity
 
     }
 
+    public class RedrawMarkersTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            mStationMapFragment.clearMarkerGfxData();
+
+            //SETUP MARKERS DATA
+            for (StationItem item : mStationsNetwork.stations){
+                mStationMapFragment.addMarkerForStationItem(item);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onCancelled (Void aVoid) {
+            super.onCancelled(aVoid);
+
+            mRefreshMarkers = true;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            mStationMapFragment.redrawMarkers();
+        }
+
+
+    }
+
     public class DownloadWebTask extends AsyncTask<Context, Void, Void> {
         @Override
         protected Void doInBackground(Context... params) {
-            mBixiApiInstance = new BixiAPI(params[0]);
+            //TODO : investigate having an Application class providing APIs like as done there
+            //https://github.com/f8full/DirectionsOnMapv2WithRetrofit/blob/master/app/src/main/java/com/f8full/sample/directionsonmapv2withretrofit/RootApplication.java
+            BixiAPI bixiApi = new BixiAPI(params[0]);
             //A Task that launches an other task, ok I want it to show the progress in the user interface
             //I finally advised against changing anything, instead I'll add a setting to display Database toast, and OFF by default
             //I do that because it seems it's not blocking / crashing if we try to navigate the interface anyway
             //Let the user choose when to update.
-            mStationsNetwork = mBixiApiInstance.downloadBixiNetwork();
+            mStationsNetwork = bixiApi.downloadBixiNetwork();
             return null;
         }
 
@@ -535,6 +559,9 @@ public class NearbyActivity extends BaseActivity
             //Set interface back
             mUpdateProgressBar.setVisibility(View.INVISIBLE);
             mRefreshButton.setVisibility(View.VISIBLE);
+
+            //must be done last
+            mDownloadWebTask = null;
         }
 
         @Override
