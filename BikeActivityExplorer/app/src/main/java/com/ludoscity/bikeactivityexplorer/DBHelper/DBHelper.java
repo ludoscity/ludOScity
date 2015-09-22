@@ -68,13 +68,29 @@ public class DBHelper {
         mGotTracks = true; // mGotTracks = !getAllTracks().isEmpty(); in init()
     }
 
-    public static void saveStation(StationItem toSave) throws CouchbaseLiteException, JSONException {
+    public static void saveStation(final StationItem toSave) throws CouchbaseLiteException, JSONException {
         Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getDocument(String.valueOf(toSave.getUid()));
 
-        //new Gson().toJson(toSave);
+        doc.update(new Document.DocumentUpdater() {
+            @Override
+            public boolean update(UnsavedRevision newRevision) {
+                Map<String, Object> properties = newRevision.getUserProperties();
+                properties.put("uid", toSave.getUid());
+                properties.put("name", toSave.getName());
+                properties.put("locked", toSave.isLocked());
+                properties.put("empty_slots", toSave.getEmpty_slots());
+                properties.put("free_bikes", toSave.getFree_bikes());
+                properties.put("latitude", toSave.getPosition().latitude);
+                properties.put("longitude", toSave.getPosition().longitude);
+                properties.put("isFavorite", toSave.isFavorite());
+                properties.put("timestamp", toSave.getTimestamp());
+                newRevision.setUserProperties(properties);
+                return true;
+            }
+        });
 
-        doc.putProperties(new Gson().<Map<String, Object>>fromJson(new Gson().toJson(toSave), new TypeToken<HashMap<String, Object>>() {
-        }.getType()));
+        //doc.putProperties(new Gson().<Map<String, Object>>fromJson(new Gson().toJson(toSave), new TypeToken<HashMap<String, Object>>() {
+        //}.getType()));
         //mGotTracks = true; // mGotTracks = !getAllTracks().isEmpty(); in init()
     }
 
@@ -165,12 +181,12 @@ public class DBHelper {
 
         Map<String, Object> properties = d.getProperties();
 
-        long uid = ((Double) properties.get("uid")).longValue();
+        long uid = ((Number) properties.get("uid")).longValue();
         String name = (String)properties.get("name");
         double latitude = (Double) properties.get("latitude");
         double longitude = (Double) properties.get("longitude");
-        int free_bikes = ((Double) properties.get("free_bikes")).intValue();
-        int empty_slots = ((Double) properties.get("empty_slots")).intValue();
+        int free_bikes = ((Number) properties.get("free_bikes")).intValue();
+        int empty_slots = ((Number) properties.get("empty_slots")).intValue();
         String timestamp = (String) properties.get("timestamp");
         boolean locked = (Boolean) properties.get("locked");
         boolean isFavorite = (Boolean) properties.get("isFavorite");

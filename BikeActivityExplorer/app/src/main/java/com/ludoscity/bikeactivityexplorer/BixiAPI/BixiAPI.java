@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.gson.Gson;
@@ -96,7 +97,7 @@ public class BixiAPI{
             try {
                 DBHelper.addNetwork(stationsNetwork);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.d("BixiAPI", "Error saving network", e );
             }
             return null;
         }
