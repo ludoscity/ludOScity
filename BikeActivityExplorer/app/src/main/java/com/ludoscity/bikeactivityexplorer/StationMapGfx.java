@@ -1,5 +1,7 @@
 package com.ludoscity.bikeactivityexplorer;
 
+import android.content.Context;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -27,7 +29,7 @@ public class StationMapGfx {
     private static final BitmapDescriptor greenIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_green);
     private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_yellow);
 
-    public StationMapGfx(StationItem item){
+    public StationMapGfx(StationItem item, Context context){
 
         mItem = item;
 
@@ -41,15 +43,14 @@ public class StationMapGfx {
         if (!item.isLocked()) {
             String parkings;
             String bikes;
-            if(item.getEmpty_slots() < 2) parkings = NearbyActivity.resources.getString(R.string.parking) +": ";
-            //TODO : RETRIEVE THE STRING THROUGH OTHER MEAN
-            else parkings = NearbyActivity.resources.getString(R.string.parkings)+": "; //EURK !!
-            if (item.getFree_bikes() < 2) bikes = NearbyActivity.resources.getString(R.string.bike)+": ";
-            else bikes = NearbyActivity.resources.getString(R.string.bikes)+": ";
+            if(item.getEmpty_slots() < 2) parkings = context.getString(R.string.parking) +": ";
+            else parkings = context.getString(R.string.parkings)+": ";
+            if (item.getFree_bikes() < 2) bikes = context.getString(R.string.bike)+": ";
+            else bikes = context.getString(R.string.bikes)+": ";
             markerOptions.snippet(bikes + item.getFree_bikes() + "   " + parkings + item.getEmpty_slots());
         }
         else
-            markerOptions.snippet(NearbyActivity.resources.getString(R.string.stationIsLocked));
+            markerOptions.snippet(context.getString(R.string.stationIsLocked));
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
         groundOverlayOptions = new GroundOverlayOptions()
                 .position(item.getPosition(), 50)

@@ -2,7 +2,6 @@ package com.ludoscity.bikeactivityexplorer;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -44,8 +43,6 @@ public class NearbyActivity extends BaseActivity
         implements StationMapFragment.OnStationMapFragmentInteractionListener,
         StationListFragment.OnStationListFragmentInteractionListener,
         StationInfoFragment.OnStationInfoFragmentInteractionListener{
-
-    public static Resources resources;
 
     private StationMapFragment mStationMapFragment = null;
 
@@ -123,8 +120,6 @@ public class NearbyActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        resources = getResources();
 
         //Read app params and apply them
         /*if (getResources().getBoolean(R.bool.allow_portrait)) {

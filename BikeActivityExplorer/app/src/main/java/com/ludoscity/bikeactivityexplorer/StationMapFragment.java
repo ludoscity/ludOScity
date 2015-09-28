@@ -228,7 +228,7 @@ public class StationMapFragment extends Fragment
     public boolean isMapReady(){return !(mGoogleMap==null);}
 
     public void addMarkerForStationItem(StationItem item) {
-        mMapMarkersGfxData.add(new StationMapGfx(item));
+        mMapMarkersGfxData.add(new StationMapGfx(item, getActivity().getApplicationContext()));
     }
 
     public void redrawMarkers() {
