@@ -532,7 +532,7 @@ public class NearbyActivity extends BaseActivity
             super.onPostExecute(aVoid);
 
             mStationMapFragment.redrawMarkers();
-            mStationMapFragment.lookingForBikes(mParkingSwitch.isChecked());
+            mStationMapFragment.lookingForBikes(!mParkingSwitch.isChecked());
         }
 
 
