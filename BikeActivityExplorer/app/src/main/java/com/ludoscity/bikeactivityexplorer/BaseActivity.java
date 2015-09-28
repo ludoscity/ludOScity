@@ -182,10 +182,9 @@ public abstract class BaseActivity extends ActionBarActivity {
                         else
                             mDrawerLayout.openDrawer(Gravity.START);
                     }
-                    //else{
-                        //onBackPressed();
-                        //TODO: fix nearby station details back navigation as onOptionsItemSelected is not called anymore
-                    //}
+                    else{
+                        onBackPressed();
+                    }
                 }
             });
 
