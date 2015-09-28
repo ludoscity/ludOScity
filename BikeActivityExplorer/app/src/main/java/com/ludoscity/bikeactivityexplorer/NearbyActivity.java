@@ -276,7 +276,12 @@ public class NearbyActivity extends BaseActivity
                     new RedrawMarkersTask().execute();
                 }
 
-                mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng);
+                if (null != mStationListFragment) {
+                    if (null == mParkingSwitch)
+                        mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, true);
+                    else
+                        mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, !mParkingSwitch.isChecked());
+                }
 
                 if (null != mBackCameraPosition){
                     mStationMapFragment.showAllMarkers();
@@ -521,6 +526,7 @@ public class NearbyActivity extends BaseActivity
             super.onPostExecute(aVoid);
 
             mStationMapFragment.redrawMarkers();
+            mStationMapFragment.lookingForBikes(mParkingSwitch.isChecked());
         }
 
 

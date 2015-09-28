@@ -132,11 +132,12 @@ public class StationListFragment extends Fragment {
         mListener = null;
     }
 
-    public void setupUI(StationsNetwork stationsNetwork, LatLng currentUserLatLng) {
+    public void setupUI(StationsNetwork stationsNetwork, LatLng currentUserLatLng, boolean lookingForBike) {
 
         if (stationsNetwork != null) {
             mStationListViewAdapter = new StationListViewAdapter(getActivity().getApplicationContext(), stationsNetwork, currentUserLatLng, true);
             mStationListView.setAdapter(mStationListViewAdapter);
+            lookingForBikes(lookingForBike);
         }
     }
 
