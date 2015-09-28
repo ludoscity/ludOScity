@@ -205,6 +205,12 @@ public class NearbyActivity extends BaseActivity
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    protected void onNavDrawerStateChanged(boolean isOpen, boolean isAnimating) {
+        if (null != mParkingSwitch)
+            mParkingSwitch.setVisible(!isOpen);
+    }
+
     private void setOnClickFindSwitchListener() {
         ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
