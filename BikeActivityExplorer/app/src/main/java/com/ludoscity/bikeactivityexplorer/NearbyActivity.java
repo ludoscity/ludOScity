@@ -32,7 +32,6 @@ import com.ludoscity.bikeactivityexplorer.BixiAPI.BixiAPI;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 import com.ludoscity.bikeactivityexplorer.Utils.Utils;
 
-import java.io.IOException;
 import java.util.Calendar;
 
 /**
@@ -131,16 +130,6 @@ public class NearbyActivity extends BaseActivity
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             }
         }*/
-
-        //Initialize couchbase database
-        //TODO: now we have multiple activities, this should not be done here
-        try {
-            DBHelper.init(this, this);
-            BixiTracksExplorerAPIHelper.init();
-        } catch (IOException | CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-
 
         setContentView(R.layout.activity_nearby);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
