@@ -88,6 +88,10 @@ public class StationMapGfx {
         return mItem.getUid();
     }
 
+    public void invalidateMarker(){
+        groundOverlay.setImage(greyIcon);
+    }
+
     public void updateMarker(boolean isLookingForBikes) {
         if (isLookingForBikes){
             if (mItem.getFree_bikes() == 0)

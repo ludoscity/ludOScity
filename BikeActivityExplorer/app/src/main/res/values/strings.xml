@@ -47,11 +47,12 @@
     <string name="parkings">Parkings</string>
     <string name="nearbyfragment_default_never_web_updated">No data: tap to update from citibik.es</string>
     <string name="noFavorite">No favorites</string>
-    <string name="updating">Updating...</string>
+    <string name="downloading">Downloading data…</string>
     <string name="nextUpdate">Next update</string>
     <string name="minuteAbbreviated" translatable="false">min</string>
     <string name="stationDetails">Station details</string>
     <string name="no_connectivity">No connectivity</string>
     <string name="placeholder_lorem_ipsum" translatable="false">lorem ipsum</string>
     <string name="nearbyfragment_no_auto_update">Tap to refresh</string>
+    <string name="refreshing">Refreshing map…</string>
 </resources>

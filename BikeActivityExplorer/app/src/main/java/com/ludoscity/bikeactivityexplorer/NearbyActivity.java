@@ -57,6 +57,7 @@ public class NearbyActivity extends BaseActivity
     private Runnable mUpdateRefreshRunnableCode = null;
 
     private DownloadWebTask mDownloadWebTask = null;
+    private RedrawMarkersTask mRedrawMarkersTask = null;
 
     private StationsNetwork mStationsNetwork;
 
@@ -279,14 +280,16 @@ public class NearbyActivity extends BaseActivity
 
                     mRefreshMarkers = false;
 
-                    new RedrawMarkersTask().execute();
+                    mRedrawMarkersTask = new RedrawMarkersTask();
+                    mRedrawMarkersTask.execute();
                 }
 
                 if (null != mStationListFragment) {
                     if (null == mParkingSwitch)
                         mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, true);
                     else
-                        mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, !mParkingSwitch.isChecked());
+                        mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng,
+                                ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).isChecked());
                 }
 
                 if (null != mBackCameraPosition){
@@ -315,7 +318,7 @@ public class NearbyActivity extends BaseActivity
                 long now = System.currentTimeMillis();
 
                 //Update not already in progress
-                if (mDownloadWebTask == null) {
+                if (mDownloadWebTask == null && mRedrawMarkersTask == null) {
 
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     long runnableLastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
@@ -356,7 +359,7 @@ public class NearbyActivity extends BaseActivity
                             if (now >= wishedUpdateTime) {
 
                                 //Put a string same length as the other one ?
-                                updateTextBuilder.append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.updating));
+                                updateTextBuilder.append(" ").append(getString(R.string.downloading));
 
                                 //Run update
 
@@ -508,6 +511,16 @@ public class NearbyActivity extends BaseActivity
     public class RedrawMarkersTask extends AsyncTask<Void, Void, Void> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mStationMapFragment.invalidateAllMarker();
+
+            mUpdateTextView.setText(getString(R.string.refreshing));
+            mUpdateProgressBar.setVisibility(View.VISIBLE);
+            mRefreshButton.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
         protected Void doInBackground(Void... voids) {
 
             mStationMapFragment.clearMarkerGfxData();
@@ -525,14 +538,21 @@ public class NearbyActivity extends BaseActivity
             super.onCancelled(aVoid);
 
             mRefreshMarkers = true;
+
+            mRedrawMarkersTask = null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+            mUpdateProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshButton.setVisibility(View.VISIBLE);
+
             mStationMapFragment.redrawMarkers();
-            mStationMapFragment.lookingForBikes(!mParkingSwitch.isChecked());
+            mStationMapFragment.lookingForBikes(((SwitchCompat) mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).isChecked());
+
+            mRedrawMarkersTask = null;
         }
 
 
@@ -555,7 +575,7 @@ public class NearbyActivity extends BaseActivity
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mUpdateTextView.setText(getString(com.ludoscity.bikeactivityexplorer.R.string.updating));
+            mUpdateTextView.setText(getString(R.string.downloading));
             mUpdateProgressBar.setVisibility(View.VISIBLE);
             mRefreshButton.setVisibility(View.INVISIBLE);
         }
