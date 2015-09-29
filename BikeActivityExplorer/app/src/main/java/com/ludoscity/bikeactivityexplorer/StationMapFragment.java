@@ -240,6 +240,14 @@ public class StationMapFragment extends Fragment
         }
     }
 
+    public void invalidateAllMarker(){
+
+        for(StationMapGfx markerData : mMapMarkersGfxData) {
+            markerData.invalidateMarker();
+        }
+
+    }
+
     public void clearMarkerGfxData() {
         mMapMarkersGfxData.clear();
     }
