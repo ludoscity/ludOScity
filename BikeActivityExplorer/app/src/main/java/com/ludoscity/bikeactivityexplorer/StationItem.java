@@ -7,7 +7,7 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterItem;
-import com.ludoscity.bikeactivityexplorer.BixiAPI.BixiStation;
+import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.Station;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 
 /**
@@ -41,7 +41,7 @@ public class StationItem implements Parcelable, ClusterItem {
     }
 
     // Constructor to be used ONLY when parsing the json file since it trims the name
-    public StationItem(BixiStation _station, boolean isFavorite, String date) {
+    public StationItem(Station _station, boolean isFavorite, String date) {
         this.uid = _station.extra.uid;
         // 'Hacky' remove first 7 characters which are a station code
         // ex: "6156 - Marie-Anne / de la Roche"

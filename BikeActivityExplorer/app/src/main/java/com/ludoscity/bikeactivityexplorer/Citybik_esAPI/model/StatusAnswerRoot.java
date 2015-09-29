@@ -1,4 +1,4 @@
-package com.ludoscity.bikeactivityexplorer.BixiAPI;
+package com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model;
 
 /**
  * Created by Gevrai on 15-03-30.
@@ -8,8 +8,8 @@ package com.ludoscity.bikeactivityexplorer.BixiAPI;
  */
 
 
-public class BixiNetwork {
-    public Network network;
+public class StatusAnswerRoot {
+    public NetworkStatus network;
 
 }
 

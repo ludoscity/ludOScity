@@ -28,11 +28,21 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.ludoscity.bikeactivityexplorer.BixiAPI.BixiAPI;
+import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.Citybik_esAPI;
+import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.Station;
+import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.StatusAnswerRoot;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 import com.ludoscity.bikeactivityexplorer.Utils.Utils;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import retrofit.Call;
+import retrofit.Response;
 
 /**
  * Created by F8Full on 2015-07-26.
@@ -547,17 +557,60 @@ public class NearbyActivity extends BaseActivity
 
     }
 
+    public class addNetworkDatabase extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                DBHelper.addNetwork(mStationsNetwork);
+            } catch (Exception e) {
+                Log.d("BixiAPI", "Error saving network", e );
+            }
+            return null;
+        }
+
+        //Should happen or not on settings fragment/prefs ?
+        /*@Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            Toast.makeText(context, "DatabaseUpdate Successful!", Toast.LENGTH_LONG).show();
+        }*/
+    }
+
     public class DownloadWebTask extends AsyncTask<Context, Void, Void> {
         @Override
         protected Void doInBackground(Context... params) {
-            //TODO : investigate having an Application class providing APIs like as done there
-            //https://github.com/f8full/DirectionsOnMapv2WithRetrofit/blob/master/app/src/main/java/com/f8full/sample/directionsonmapv2withretrofit/RootApplication.java
-            BixiAPI bixiApi = new BixiAPI(params[0]);
-            //A Task that launches an other task, ok I want it to show the progress in the user interface
-            //I finally advised against changing anything, instead I'll add a setting to display Database toast, and OFF by default
-            //I do that because it seems it's not blocking / crashing if we try to navigate the interface anyway
-            //Let the user choose when to update.
-            mStationsNetwork = bixiApi.downloadBixiNetwork();
+
+            Map<String, String> UrlParams = new HashMap<>();
+            UrlParams.put("fields", "stations");
+
+            Citybik_esAPI api = ((RootApplication) getApplication()).getCitybik_esApi();
+
+            final Call<StatusAnswerRoot> call = api.getStatusForNetwork("/v2/networks/bixi-montreal", UrlParams);
+
+            Response<StatusAnswerRoot> statusAnswer;
+
+            try {
+                statusAnswer = call.execute();
+
+                //bixiNetwork = gson.fromJson(data, StatusAnswerRoot.class);
+
+                mStationsNetwork = new StationsNetwork();
+
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
+                String dateNow = simpleDateFormat.format(new Date());
+
+                for (Station station : statusAnswer.body().network.stations) {
+                    StationItem stationItem = new StationItem(station, DBHelper.isFavorite(station.extra.uid), dateNow);
+                    mStationsNetwork.stations.add(stationItem);
+                }
+            } catch (IOException | CouchbaseLiteException e) {
+                Log.d("TAG", "oops", e);
+            }
+
+
+
+
             return null;
         }
 
@@ -600,6 +653,8 @@ public class NearbyActivity extends BaseActivity
             mRefreshMarkers = true;
             setupUI();
             Log.d("nearbyFragment", mStationsNetwork.stations.size() + " stations downloaded from citibik.es");
+
+            new addNetworkDatabase().execute();
 
             //must be done last
             mDownloadWebTask = null;

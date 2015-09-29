@@ -4,9 +4,13 @@ import android.app.Application;
 import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
+import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.Citybik_esAPI;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 
 import java.io.IOException;
+
+import retrofit.GsonConverterFactory;
+import retrofit.Retrofit;
 
 /**
  * Created by F8Full on 2015-09-28.
@@ -16,6 +20,10 @@ import java.io.IOException;
 public class RootApplication extends Application {
 
     private static final String TAG = "RootApplication";
+
+    static final String ENDPOINT = "http://api.citybik.es";
+
+    Citybik_esAPI mCitybik_esAPI;
 
 
     @Override
@@ -28,6 +36,8 @@ public class RootApplication extends Application {
             Log.d(TAG, "Error initializing database", e);
         }
 
+        mCitybik_esAPI = buildCitybik_esAPI();
+
 
 
         //BixiTracksExplorerAPIHelper.init();
@@ -35,5 +45,19 @@ public class RootApplication extends Application {
 
         //googleMapsDirectionsApi = buildGMapsDirectionsApi();
         //accessToken = PreferencesUtils.retrieveAccessToken(this);
+    }
+
+    private Citybik_esAPI buildCitybik_esAPI() {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ENDPOINT)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        return retrofit.create(Citybik_esAPI.class);
+    }
+
+    public Citybik_esAPI getCitybik_esApi() {
+        return mCitybik_esAPI;
     }
 }

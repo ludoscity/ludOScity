@@ -1,4 +1,4 @@
-package com.ludoscity.bikeactivityexplorer.BixiAPI;
+package com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model;
 
 public class Extra{
     public String installDate;
@@ -9,5 +9,5 @@ public class Extra{
     public String removalDate;
     public Boolean temporary;
     public String terminalName;
-    public long uid;
+    public Long uid;
 }
