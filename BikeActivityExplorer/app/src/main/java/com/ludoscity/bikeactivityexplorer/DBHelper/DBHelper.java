@@ -1,6 +1,5 @@
 package com.ludoscity.bikeactivityexplorer.DBHelper;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -37,14 +36,12 @@ public class DBHelper {
     private static Manager mManager = null;
     private static final String mTRACKS_DB_NAME = "tracksdb";
     private static final String mSTATIONS_DB_NAME = "stationsdb";
-    private static Context context;
     private static boolean mGotTracks;
 
     private DBHelper() {}
 
-    public static void init(Activity activity, Context c) throws IOException, CouchbaseLiteException {
-        mManager = new Manager(new AndroidContext(activity), Manager.DEFAULT_OPTIONS);
-        context = c;
+    public static void init(Context context) throws IOException, CouchbaseLiteException {
+        mManager = new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS);
         mGotTracks = !getAllTracks().isEmpty();
     }
 
