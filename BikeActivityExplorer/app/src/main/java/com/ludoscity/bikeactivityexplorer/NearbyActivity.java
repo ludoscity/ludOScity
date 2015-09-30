@@ -1,6 +1,5 @@
 package com.ludoscity.bikeactivityexplorer;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
@@ -95,7 +94,7 @@ public class NearbyActivity extends BaseActivity
         if (Utils.Connectivity.isConnected(getApplicationContext()) && sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0) == 0) { //Means ask never successfully completed
             //Because webtask launches DB task, we know that a value there means actual data in the DB
             mDownloadWebTask = new DownloadWebTask();
-            mDownloadWebTask.execute(getApplicationContext());
+            mDownloadWebTask.execute();
         }
         else{   //Having a timestamp means some data exists in the db, as both task are intimately linked
             try {
@@ -369,7 +368,7 @@ public class NearbyActivity extends BaseActivity
                                 //Run update
 
                                 mDownloadWebTask = new DownloadWebTask();
-                                mDownloadWebTask.execute(getApplicationContext());
+                                mDownloadWebTask.execute();
 
 
                                 //lastUpdateTime = now;
@@ -409,7 +408,7 @@ public class NearbyActivity extends BaseActivity
             public void onClick(View v) {
                 if (Utils.Connectivity.isConnected(getApplicationContext()) && mDownloadWebTask == null) {
                     mDownloadWebTask = new DownloadWebTask();
-                    mDownloadWebTask.execute(getApplicationContext());
+                    mDownloadWebTask.execute();
                 }
             }
         });
@@ -533,9 +532,9 @@ public class NearbyActivity extends BaseActivity
         }*/
     }
 
-    public class DownloadWebTask extends AsyncTask<Context, Void, Void> {
+    public class DownloadWebTask extends AsyncTask<Void, Void, Void> {
         @Override
-        protected Void doInBackground(Context... params) {
+        protected Void doInBackground(Void... aVoid) {
 
             Map<String, String> UrlParams = new HashMap<>();
             UrlParams.put("fields", "stations");
