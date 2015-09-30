@@ -57,7 +57,6 @@ public class NearbyActivity extends BaseActivity
     private Runnable mUpdateRefreshRunnableCode = null;
 
     private DownloadWebTask mDownloadWebTask = null;
-    private RedrawMarkersTask mRedrawMarkersTask = null;
 
     private StationsNetwork mStationsNetwork;
 
@@ -278,10 +277,17 @@ public class NearbyActivity extends BaseActivity
             if(mStationMapFragment.isMapReady()) {
                 if (mStationsNetwork != null && mRefreshMarkers) {
 
+                    mStationMapFragment.clearMarkerGfxData();
+
+                    //SETUP MARKERS DATA
+                    for (StationItem item : mStationsNetwork.stations){
+                        mStationMapFragment.addMarkerForStationItem(item);
+                    }
+
+                    mStationMapFragment.redrawMarkers();
+
                     mRefreshMarkers = false;
 
-                    mRedrawMarkersTask = new RedrawMarkersTask();
-                    mRedrawMarkersTask.execute();
                 }
 
                 if (null != mStationListFragment) {
@@ -318,7 +324,7 @@ public class NearbyActivity extends BaseActivity
                 long now = System.currentTimeMillis();
 
                 //Update not already in progress
-                if (mDownloadWebTask == null && mRedrawMarkersTask == null) {
+                if (mDownloadWebTask == null) {
 
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     long runnableLastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
@@ -505,56 +511,6 @@ public class NearbyActivity extends BaseActivity
 
     @Override
     public void onStationInfoFragmentInteraction(Uri uri) {
-
-    }
-
-    public class RedrawMarkersTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mStationMapFragment.invalidateAllMarker();
-
-            mUpdateTextView.setText(getString(R.string.refreshing));
-            mUpdateProgressBar.setVisibility(View.VISIBLE);
-            mRefreshButton.setVisibility(View.INVISIBLE);
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            mStationMapFragment.clearMarkerGfxData();
-
-            //SETUP MARKERS DATA
-            for (StationItem item : mStationsNetwork.stations){
-                mStationMapFragment.addMarkerForStationItem(item);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onCancelled (Void aVoid) {
-            super.onCancelled(aVoid);
-
-            mRefreshMarkers = true;
-
-            mRedrawMarkersTask = null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            mUpdateProgressBar.setVisibility(View.INVISIBLE);
-            mRefreshButton.setVisibility(View.VISIBLE);
-
-            mStationMapFragment.redrawMarkers();
-            mStationMapFragment.lookingForBikes(((SwitchCompat) mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).isChecked());
-
-            mRedrawMarkersTask = null;
-        }
-
 
     }
 
