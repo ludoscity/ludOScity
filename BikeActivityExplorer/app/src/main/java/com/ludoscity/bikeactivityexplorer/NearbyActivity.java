@@ -279,7 +279,7 @@ public class NearbyActivity extends BaseActivity
 
                     //SETUP MARKERS DATA
                     for (StationItem item : mStationsNetwork.stations){
-                        mStationMapFragment.addMarkerForStationItem(item);
+                        mStationMapFragment.addMarkerForStationItem(item, isLookingForBike());
                     }
 
                     mStationMapFragment.redrawMarkers();
@@ -288,12 +288,8 @@ public class NearbyActivity extends BaseActivity
 
                 }
 
-                if (null != mStationListFragment) {
-                    if (null == mParkingSwitch)
-                        mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, true);
-                    else
-                        mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng,
-                                ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).isChecked());
+                if (null != mStationListFragment){
+                    mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, isLookingForBike());
                 }
 
                 if (null != mBackCameraPosition){
@@ -307,6 +303,10 @@ public class NearbyActivity extends BaseActivity
         } else{
             mUpdateTextView.setText(getString(com.ludoscity.bikeactivityexplorer.R.string.nearbyfragment_default_never_web_updated));
         }
+    }
+
+    private boolean isLookingForBike() {
+        return null == mParkingSwitch || ((SwitchCompat) mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).isChecked();
     }
 
     private Runnable createUpdateRefreshRunnableCode(){

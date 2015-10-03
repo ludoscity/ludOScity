@@ -29,7 +29,7 @@ public class StationMapGfx {
     private static final BitmapDescriptor greenIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_green);
     private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_yellow);
 
-    public StationMapGfx(StationItem item, Context context){
+    public StationMapGfx(StationItem item, boolean lookingForBike, Context context){
 
         mItem = item;
 
@@ -57,15 +57,24 @@ public class StationMapGfx {
                 .transparency(0.1f);
         if (item.isLocked())
             groundOverlayOptions.image(greyIcon);
-        else if (item.getFree_bikes() == 0)
-            groundOverlayOptions.image(redIcon);
-        else if (item.getFree_bikes() < 3)
-            groundOverlayOptions.image(yellowIcon);
-        else
-            groundOverlayOptions.image(greenIcon);
-
-        //end of marker setup
-
+        else{
+            if (lookingForBike){
+                if (item.getFree_bikes() == 0)
+                    groundOverlayOptions.image(redIcon);
+                else if (item.getFree_bikes() < 3)
+                    groundOverlayOptions.image(yellowIcon);
+                else
+                    groundOverlayOptions.image(greenIcon);
+            }
+            else{
+                if (item.getEmpty_slots() == 0)
+                    groundOverlayOptions.image(redIcon);
+                else if (item.getEmpty_slots() < 3)
+                    groundOverlayOptions.image(yellowIcon);
+                else
+                    groundOverlayOptions.image(greenIcon);
+            }
+        }
     }
 
     public void setInfoWindowVisible(boolean toSet){
