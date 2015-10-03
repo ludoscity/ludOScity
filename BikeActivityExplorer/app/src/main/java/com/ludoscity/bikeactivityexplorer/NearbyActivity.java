@@ -13,6 +13,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -559,12 +561,18 @@ public class NearbyActivity extends BaseActivity
                     StationItem stationItem = new StationItem(station, DBHelper.isFavorite(station.extra.uid), dateNow);
                     mStationsNetwork.stations.add(stationItem);
                 }
-            } catch (IOException | CouchbaseLiteException e) {
-                Log.d("TAG", "oops", e);
+            } catch (CouchbaseLiteException e) {
+                Log.d("TAG", "Problem with the database", e);
+            } catch (IOException e) {
+                Toast toast;
+
+                toast = Toast.makeText(getApplicationContext(),getString(R.string.download_failed),Toast.LENGTH_LONG);
+
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+
+                cancel(false); //No need to try to interrupt the thread
             }
-
-
-
 
             return null;
         }
