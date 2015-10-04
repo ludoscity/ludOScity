@@ -67,6 +67,7 @@ public class NearbyActivity extends BaseActivity
     private Runnable mUpdateRefreshRunnableCode = null;
 
     private DownloadWebTask mDownloadWebTask = null;
+    private RedrawMarkersTask mRedrawMarkersTask = null;
 
     private StationsNetwork mStationsNetwork;
 
@@ -275,16 +276,12 @@ public class NearbyActivity extends BaseActivity
             }
 
             if(mStationMapFragment.isMapReady()) {
-                if (mStationsNetwork != null && mRefreshMarkers) {
+                if (mStationsNetwork != null && mRefreshMarkers && mRedrawMarkersTask == null) {
 
-                    mStationMapFragment.clearMarkerGfxData();
 
-                    //SETUP MARKERS DATA
-                    for (StationItem item : mStationsNetwork.stations){
-                        mStationMapFragment.addMarkerForStationItem(item, isLookingForBike());
-                    }
+                    mRedrawMarkersTask = new RedrawMarkersTask();
+                    mRedrawMarkersTask.execute();
 
-                    mStationMapFragment.redrawMarkers();
 
                     mRefreshMarkers = false;
 
@@ -324,7 +321,7 @@ public class NearbyActivity extends BaseActivity
                 long now = System.currentTimeMillis();
 
                 //Update not already in progress
-                if (mDownloadWebTask == null) {
+                if (mDownloadWebTask == null && mRedrawMarkersTask == null) {
 
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     long runnableLastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
@@ -512,6 +509,62 @@ public class NearbyActivity extends BaseActivity
     @Override
     public void onStationInfoFragmentInteraction(Uri uri) {
 
+    }
+
+    public class RedrawMarkersTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //mStationMapFragment.invalidateAllMarker();
+
+            mStationMapFragment.clearMarkerGfxData();
+
+            mUpdateTextView.setText(getString(R.string.refreshing));
+            mUpdateProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshButton.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            //The ugliest part of this app. After numerous tests, it became evident that I cannot
+            //manipulate GroundOverlays from a background thread AND that for some reason I also
+            //can't clear and recreate them too rapidly. Hence this.
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onCancelled (Void aVoid) {
+            super.onCancelled(aVoid);
+
+            mRefreshMarkers = true;
+
+            mRedrawMarkersTask = null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            mUpdateProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshButton.setVisibility(View.VISIBLE);
+
+            //SETUP MARKERS DATA
+            for (StationItem item : mStationsNetwork.stations){
+                mStationMapFragment.addMarkerForStationItem(item, isLookingForBike());
+            }
+
+            mStationMapFragment.redrawMarkers();
+
+            mRedrawMarkersTask = null;
+        }
     }
 
     public class addNetworkDatabase extends AsyncTask<Void, Void, Void> {
