@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="body_text_1">#de000000</color>
-    <color name="theme_primary">#3f51b5</color>
+    <color name="theme_primary">#2196F3</color>
+    <color name="theme_primary_dark">#1976D2</color>
+    <color name="theme_accent">#FF4081</color>
     <color name="navdrawer_background">#ffffffff</color>
     <color name="navdrawer_text_color">@color/body_text_1</color>
     <color name="navdrawer_text_color_selected">@color/theme_primary</color>

@@ -27,7 +27,6 @@ public class StationListViewAdapter extends BaseAdapter {
     private LatLng mCurrentUserLatLng;
 
     private boolean mIsLookingForBikes;
-    private int mCurrentItemSelected;
 
     StationListViewAdapter(Context _context, StationsNetwork _stationsNetwork, LatLng _currentUserLatLng,boolean isLookingForBikes){
         mContext = _context;
@@ -62,18 +61,6 @@ public class StationListViewAdapter extends BaseAdapter {
             notifyDataSetChanged();
         }
     }
-
-    public void setItemSelected(int pos){
-        /*if (mCurrentItemSelected != -1)
-            mStationList.get(mCurrentItemSelected).setSelected(false);
-        if (pos !=-1)
-            mStationList.get(pos).setSelected(true);*/
-
-        mCurrentItemSelected = pos;
-        notifyDataSetChanged();
-    }
-
-    public int getCurrentItemSelected(){return mCurrentItemSelected;}
 
     public void sortStationListByClosest(){
         if (mCurrentUserLatLng != null) {
@@ -151,7 +138,7 @@ public class StationListViewAdapter extends BaseAdapter {
             holder.name.setTextColor(Color.DKGRAY);
             holder.availability.setTextColor(Color.DKGRAY);
             holder.distance.setTextColor(Color.DKGRAY);
-            convertView.setBackgroundColor(mContext.getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.background_material_light));
+            //convertView.setBackgroundColor(mContext.getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.background_material_light));
         //}
         return convertView;
     }

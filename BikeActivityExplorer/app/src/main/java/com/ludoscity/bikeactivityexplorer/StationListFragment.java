@@ -149,7 +149,7 @@ public class StationListFragment extends Fragment {
     public void highlightStationFromName(String stationName) {
 
         int i = mStationListViewAdapter.getPositionInList(stationName);
-        //mStationListView.setItemChecked(i,true);
+        mStationListView.setItemChecked(i,true);
         if (i != -1) {
             mStationListView.smoothScrollToPositionFromTop(i, 0, 300);
         }
