@@ -36,9 +36,7 @@ import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 import com.ludoscity.bikeactivityexplorer.Utils.Utils;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -603,15 +601,10 @@ public class NearbyActivity extends BaseActivity
             try {
                 statusAnswer = call.execute();
 
-                //bixiNetwork = gson.fromJson(data, StatusAnswerRoot.class);
-
                 mStationsNetwork = new StationsNetwork();
 
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd'T'HH:mm:ss");
-                String dateNow = simpleDateFormat.format(new Date());
-
                 for (Station station : statusAnswer.body().network.stations) {
-                    StationItem stationItem = new StationItem(station, DBHelper.isFavorite(station.extra.uid), dateNow);
+                    StationItem stationItem = new StationItem(station, DBHelper.isFavorite(station.extra.uid));
                     mStationsNetwork.stations.add(stationItem);
                 }
             } catch (CouchbaseLiteException e) {

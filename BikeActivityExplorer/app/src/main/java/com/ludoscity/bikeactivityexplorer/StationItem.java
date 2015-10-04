@@ -10,6 +10,8 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.Station;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Created by Gevrai on 2015-04-03.
  *
@@ -41,19 +43,34 @@ public class StationItem implements Parcelable, ClusterItem {
     }
 
     // Constructor to be used ONLY when parsing the json file since it trims the name
-    public StationItem(Station _station, boolean isFavorite, String date) {
+    public StationItem(Station _station, boolean isFavorite) {
         this.uid = _station.extra.uid;
-        // 'Hacky' remove first 7 characters which are a station code
-        // ex: "6156 - Marie-Anne / de la Roche"
-        this.name = _station.name.substring(7);
-        this.locked = _station.extra.locked;
+
+        if (null != _station.extra.name) {
+            try {
+                this.name = new String(_station.extra.name.getBytes("ISO-8859-1"), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            try {
+                this.name = new String(_station.name.getBytes("ISO-8859-1"), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (null != _station.extra.locked)
+            this.locked = _station.extra.locked;
+
         this.empty_slots = _station.empty_slots;
         this.free_bikes = _station.free_bikes;
         this.latitude = _station.latitude;
         this.longitude = _station.longitude;
         //this.position = new LatLng(_station.latitude, _station.longitude);
         this.isFavorite = isFavorite;
-        this.timestamp = date;
+        this.timestamp = _station.timestamp;
     }
 
     public StationItem(Parcel in){
