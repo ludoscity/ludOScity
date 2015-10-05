@@ -15,7 +15,7 @@
         android:layout_gravity="center"
         android:padding="5dp"
         android:id="@+id/station_distance"
-        android:layout_weight="0.19"
+        android:layout_weight="@dimen/station_list_distance_column_weight"
         android:ellipsize="end"
         android:gravity="center"
         android:singleLine="true"
@@ -30,7 +30,7 @@
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
         android:id="@+id/station_name"
-        android:layout_weight="0.66"
+        android:layout_weight="@dimen/station_list_name_column_weight"
         android:ellipsize="end"
         />
 
@@ -40,7 +40,7 @@
         android:textSize="16sp"
         android:gravity="center"
         android:id="@+id/station_availability"
-        android:layout_weight="0.14"
+        android:layout_weight="@dimen/station_list_availability_column_weight"
         android:textStyle="bold"
         />
 
