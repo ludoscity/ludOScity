@@ -31,12 +31,22 @@
                     android:id="@+id/station_list_or_info_container">
                 </FrameLayout>
 
-                <View
-                    android:background="#1976D2"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp">
+                <!-- LAST UPDATED -->
+                <LinearLayout
+                    android:id="@+id/downloadBar"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0px"
+                    android:layout_weight="0.5"
+                    android:orientation="horizontal"
+                    android:background="@color/background_material_dark">
+                    <TextView
+                        android:id="@+id/update_textView"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/fromCitibik_es"/>
 
-                </View>
+                </LinearLayout>
                 <!-- MAP -->
                 <FrameLayout
                     android:layout_width="fill_parent"
@@ -48,52 +58,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:id="@+id/station_map_fragment"
-                        />
+                        tools:layout="@layout/fragment_station_map" />
                 </FrameLayout>
 
-                <!-- LAST UPDATED -->
-                <LinearLayout
-                    android:id="@+id/downloadBar"
-                    android:layout_width="fill_parent"
-                    android:layout_height="0px"
-                    android:layout_weight="0.5"
-                    android:background="@color/background_material_dark">
-                    <TextView
-                        android:id="@+id/update_textView"
-                        android:layout_width="0px"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="10"
-                        android:gravity="center"
-                        android:text="@string/fromCitibik_es"/>
 
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="3dp">
-
-                        <ProgressBar
-                            android:layout_width="wrap_content"
-                            android:layout_height="fill_parent"
-                            android:id="@+id/refreshDatabase_progressbar"
-                            style="?android:attr/progressBarStyleSmallInverse"
-                            android:layout_centerInParent="true"
-                            />
-
-                        <ImageView
-                            android:id="@+id/refreshDatabase_button"
-                            android:src="@drawable/ic_action_refresh"
-                            android:layout_width="wrap_content"
-                            android:layout_height="fill_parent"
-                            android:adjustViewBounds="true"
-                            android:scaleType="centerInside"
-                            android:padding="1px"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="right"
-                            />
-                        <!-- android:layout_gravity="end" not possible in ImageButton ? -->
-                    </RelativeLayout>
-
-                </LinearLayout>
 
             </LinearLayout>
 

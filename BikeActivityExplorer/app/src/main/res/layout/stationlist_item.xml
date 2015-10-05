@@ -15,8 +15,9 @@
         android:layout_gravity="center"
         android:padding="5dp"
         android:id="@+id/station_distance"
-        android:layout_weight="0.18"
+        android:layout_weight="0.19"
         android:ellipsize="end"
+        android:gravity="center"
         android:singleLine="true"
         android:textStyle="bold"
 
@@ -31,8 +32,6 @@
         android:id="@+id/station_name"
         android:layout_weight="0.66"
         android:ellipsize="end"
-        android:singleLine="true"
-
         />
 
     <TextView
@@ -41,7 +40,7 @@
         android:textSize="16sp"
         android:gravity="center"
         android:id="@+id/station_availability"
-        android:layout_weight="0.15"
+        android:layout_weight="0.14"
         android:textStyle="bold"
         />
 

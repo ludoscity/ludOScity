@@ -19,8 +19,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,13 +71,13 @@ public class NearbyActivity extends BaseActivity
 
 
     private TextView mUpdateTextView;
-    private ProgressBar mUpdateProgressBar;
-    private ImageView mRefreshButton;
+
     private View mDownloadBar;
 
     private boolean mRefreshMarkers = true;
 
     private MenuItem mParkingSwitch;
+    private MenuItem mRefreshMenuItem;
     private CameraPosition mBackCameraPosition;
 
     @Override
@@ -150,9 +148,6 @@ public class NearbyActivity extends BaseActivity
         // Update Bar
         mUpdateTextView = (TextView) findViewById(com.ludoscity.bikeactivityexplorer.R.id.update_textView);
         mUpdateTextView.setTextColor(Color.LTGRAY);
-        mUpdateProgressBar = (ProgressBar) findViewById(com.ludoscity.bikeactivityexplorer.R.id.refreshDatabase_progressbar);
-        mUpdateProgressBar.setVisibility(View.INVISIBLE);
-        mRefreshButton = (ImageView) findViewById(com.ludoscity.bikeactivityexplorer.R.id.refreshDatabase_button);
         mDownloadBar = findViewById(com.ludoscity.bikeactivityexplorer.R.id.downloadBar);
         setRefreshButtonListener();
 
@@ -201,7 +196,24 @@ public class NearbyActivity extends BaseActivity
 
         setOnClickFindSwitchListener();
 
+        mRefreshMenuItem = menu.findItem(R.id.refreshMenuItem);
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case R.id.refreshMenuItem:
+
+                if (Utils.Connectivity.isConnected(getApplicationContext()) && mDownloadWebTask == null) {
+                    mDownloadWebTask = new DownloadWebTask();
+                    mDownloadWebTask.execute();
+                }
+
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -345,12 +357,15 @@ public class NearbyActivity extends BaseActivity
                     //... then about next update
                     if (Utils.Connectivity.isConnected(getApplicationContext())) {
 
+                        if (!mRefreshMenuItem.isVisible())
+                            mRefreshMenuItem.setVisible(true);
+
                         boolean autoUpdate = sp.getBoolean(UserSettingsFragment.PREF_NEARBY_AUTO_UPDATE, true);
 
                         if (!autoUpdate){
-                            updateTextBuilder.append(" - ").append(getString(R.string.nearbyfragment_no_auto_update));
+                            //updateTextBuilder.append(" - ").append(getString(R.string.nearbyfragment_no_auto_update));
 
-                            mRefreshButton.setVisibility(View.VISIBLE);
+                            setRefreshActionButtonState(false);
                         }
                         else {
 
@@ -379,13 +394,15 @@ public class NearbyActivity extends BaseActivity
                                 // formatted will be HH:MM:SS or MM:SS
                                 updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
 
-                                mRefreshButton.setVisibility(View.VISIBLE);
+                                setRefreshActionButtonState(false);
                             }
                         }
                     }
                     else{
-                        updateTextBuilder.append( " ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.no_connectivity));
-                        mRefreshButton.setVisibility(View.GONE);
+                        updateTextBuilder.append(" - ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.no_connectivity));
+
+                        setRefreshActionButtonState(false);
+                        mRefreshMenuItem.setVisible(false);
                     }
 
                     mUpdateTextView.setText(updateTextBuilder.toString());
@@ -411,7 +428,21 @@ public class NearbyActivity extends BaseActivity
         });
     }
 
+    private void setRefreshActionButtonState(final boolean refreshing) {
+        if (mRefreshMenuItem != null) {
 
+            if (null == mRefreshMenuItem.getActionView())
+            {
+                if (refreshing)
+                    mRefreshMenuItem.setActionView(R.layout.action_refresh_progress);
+            }
+            else
+            {
+                if (!refreshing)
+                    mRefreshMenuItem.setActionView(null);
+            }
+        }
+    }
 
     @Override
     public void onStationMapFragmentInteraction(Uri uri) {
@@ -518,7 +549,7 @@ public class NearbyActivity extends BaseActivity
             if (mCurrentUserLatLng != null)
                 boundsBuilder.include(mCurrentUserLatLng);
 
-            mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 300));
+            mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200));
         }
     }
 
@@ -537,8 +568,7 @@ public class NearbyActivity extends BaseActivity
             mStationMapFragment.clearMarkerGfxData();
 
             mUpdateTextView.setText(getString(R.string.refreshing));
-            mUpdateProgressBar.setVisibility(View.INVISIBLE);
-            mRefreshButton.setVisibility(View.INVISIBLE);
+            setRefreshActionButtonState(true);
         }
 
         @Override
@@ -569,8 +599,7 @@ public class NearbyActivity extends BaseActivity
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            mUpdateProgressBar.setVisibility(View.INVISIBLE);
-            mRefreshButton.setVisibility(View.VISIBLE);
+            setRefreshActionButtonState(false);
 
             //SETUP MARKERS DATA
             for (StationItem item : mStationsNetwork.stations){
@@ -645,16 +674,14 @@ public class NearbyActivity extends BaseActivity
         protected void onPreExecute() {
             super.onPreExecute();
             mUpdateTextView.setText(getString(R.string.downloading));
-            mUpdateProgressBar.setVisibility(View.VISIBLE);
-            mRefreshButton.setVisibility(View.INVISIBLE);
+            setRefreshActionButtonState(true);
         }
 
         @Override
         protected void onCancelled (Void aVoid){
             super.onCancelled(aVoid);
             //Set interface back
-            mUpdateProgressBar.setVisibility(View.INVISIBLE);
-            mRefreshButton.setVisibility(View.VISIBLE);
+            setRefreshActionButtonState(false);
 
             //must be done last
             mDownloadWebTask = null;
@@ -665,8 +692,8 @@ public class NearbyActivity extends BaseActivity
             super.onPostExecute(aVoid);
 
             //switch progressbar view visibility
-            mUpdateProgressBar.setVisibility(View.INVISIBLE);
-            mRefreshButton.setVisibility(View.VISIBLE);
+
+            setRefreshActionButtonState(false);
 
             //Removed this Toast as progressBar AND updated textView with time in minutes already convey the idea
             //Maybe have a toat if it was NOT a success

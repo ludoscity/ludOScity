@@ -53,6 +53,8 @@
                 android:text="@string/bikes"
                 android:layout_weight="0.19"
                 android:textStyle="bold"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:textColor="@color/primary_text_default_material_dark"
                 />
         </LinearLayout>
