@@ -196,7 +196,9 @@ public class StationMapFragment extends Fragment
         if (mListener != null){
             mListener.onStationMapFragmentInteraction(builder.build());
         }
-        return false;
+
+        //So that info window will not be showed
+        return true;
     }
 
     @Override

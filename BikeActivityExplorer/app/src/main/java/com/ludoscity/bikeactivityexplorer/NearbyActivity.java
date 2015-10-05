@@ -470,6 +470,7 @@ public class NearbyActivity extends BaseActivity
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
 
             mStationListFragment.highlightStationFromName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
+            mStationMapFragment.resizeMarkerForStationName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
 
         }
         //InfoWindow click
