@@ -1,5 +1,6 @@
 package com.ludoscity.bikeactivityexplorer;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
@@ -420,9 +421,9 @@ public class NearbyActivity extends BaseActivity
         mDownloadBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Utils.Connectivity.isConnected(getApplicationContext()) && mDownloadWebTask == null) {
-                    mDownloadWebTask = new DownloadWebTask();
-                    mDownloadWebTask.execute();
+                if (Utils.Connectivity.isConnected(getApplicationContext())) {
+                    Intent implicit = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.citybik.es"));
+                    startActivity(implicit);
                 }
             }
         });
