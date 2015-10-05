@@ -29,6 +29,8 @@ public class StationMapGfx {
     private static final BitmapDescriptor greenIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_green);
     private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_yellow);
 
+    private static final float OVERLAY_SIZE_BASE = 50;
+
     public StationMapGfx(StationItem item, boolean lookingForBike, Context context){
 
         mItem = item;
@@ -53,7 +55,7 @@ public class StationMapGfx {
             markerOptions.snippet(context.getString(R.string.stationIsLocked));
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
         groundOverlayOptions = new GroundOverlayOptions()
-                .position(item.getPosition(), 50)
+                .position(item.getPosition(), OVERLAY_SIZE_BASE)
                 .transparency(0.1f);
         if (item.isLocked())
             groundOverlayOptions.image(greyIcon);
@@ -84,6 +86,13 @@ public class StationMapGfx {
             marker.hideInfoWindow();
     }
 
+    public void setBigOverlay(boolean toSet){
+        if (toSet)
+            groundOverlay.setDimensions(2.0f*OVERLAY_SIZE_BASE);
+        else
+            groundOverlay.setDimensions(OVERLAY_SIZE_BASE);
+    }
+
     public void setGroundOverlayVisible(boolean toSet){
         groundOverlay.setVisible(toSet);
     }
@@ -92,6 +101,8 @@ public class StationMapGfx {
         marker = map.addMarker(markerOptions);
         groundOverlay = map.addGroundOverlay(groundOverlayOptions);
     }
+
+    public String getMarkerTitle(){ return marker.getTitle(); }
 
     public long getStationUid(){
         return mItem.getUid();

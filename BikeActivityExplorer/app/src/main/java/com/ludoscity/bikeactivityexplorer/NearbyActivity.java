@@ -464,6 +464,7 @@ public class NearbyActivity extends BaseActivity
 
                         mStationMapFragment.hideAllMarkers();
                         mStationMapFragment.showMarkerForStationUid(station.getUid());
+                        mStationMapFragment.setEnforceMaxZoom(true);
 
                         mStationInfoFragment = StationInfoFragment.newInstance(station, mCurrentUserLatLng);
 
@@ -500,7 +501,24 @@ public class NearbyActivity extends BaseActivity
         {
             enableDrawer();
             setActivityTitle(getString(R.string.title_section_nearby));
+            mStationMapFragment.setEnforceMaxZoom(false);
             setupUI();
+        }
+        else if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
+        {
+            mStationMapFragment.resizeMarkerForStationName(uri.getQueryParameter(StationListFragment.STATION_LIST_ITEM_CLICK_STATION_NAME_PARAM));
+
+            LatLng clickedStationPos = new LatLng(Double.valueOf(uri.getQueryParameter(StationListFragment.STATION_LIST_ITEM_CLICK_STATION_POS_LAT_PARAM)),
+                    Double.valueOf(uri.getQueryParameter(StationListFragment.STATION_LIST_ITEM_CLICK_STATION_POS_LNG_PARAM)));
+
+            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+            boundsBuilder.include(clickedStationPos);
+
+            if (mCurrentUserLatLng != null)
+                boundsBuilder.include(mCurrentUserLatLng);
+
+            mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 300));
         }
     }
 

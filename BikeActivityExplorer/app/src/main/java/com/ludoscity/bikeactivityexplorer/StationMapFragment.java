@@ -57,13 +57,12 @@ public class StationMapFragment extends Fragment
 
 
     private boolean mIsAlreadyZoomedToUser;
+    private boolean mEnforceMaxZoom = false;
     private GoogleMap mGoogleMap = null;
 
     private float mMaxZoom = 16f;
 
     private ArrayList<StationMapGfx> mMapMarkersGfxData = new ArrayList<>();
-
-
 
     private OnStationMapFragmentInteractionListener mListener;
 
@@ -141,10 +140,9 @@ public class StationMapFragment extends Fragment
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         //Log.d("CameraZoomLevel", Float.toString(cameraPosition.zoom));
-        if (cameraPosition.zoom > mMaxZoom){
+        if (mEnforceMaxZoom && cameraPosition.zoom > mMaxZoom){
             mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(mMaxZoom));
         }
-
     }
 
     @Override
@@ -240,6 +238,10 @@ public class StationMapFragment extends Fragment
         }
     }
 
+    public void setEnforceMaxZoom(boolean toSet){
+        mEnforceMaxZoom = toSet;
+    }
+
     public void invalidateAllMarker(){
 
         for(StationMapGfx markerData : mMapMarkersGfxData) {
@@ -290,6 +292,13 @@ public class StationMapFragment extends Fragment
         for (StationMapGfx markerData : mMapMarkersGfxData){
                 markerData.updateMarker(lookingForBike);
             }
+    }
+
+    public void resizeMarkerForStationName(String stationName){
+
+        for (StationMapGfx markerData : mMapMarkersGfxData){
+            markerData.setBigOverlay(markerData.getMarkerTitle().equalsIgnoreCase(stationName));
+        }
     }
 
 

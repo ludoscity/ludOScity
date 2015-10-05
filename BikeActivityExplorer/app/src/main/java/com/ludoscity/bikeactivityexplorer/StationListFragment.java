@@ -31,6 +31,10 @@ public class StationListFragment extends Fragment {
 
 
     public static final String STATION_LIST_ITEM_CLICK_PATH = "station_list_item_click";
+    public static final String STATION_LIST_ITEM_CLICK_STATION_NAME_PARAM = "station_list_item_click_station_name_param";
+    public static final String STATION_LIST_ITEM_CLICK_STATION_POS_LAT_PARAM = "station_list_item_click_station_pos_lat_param";
+    public static final String STATION_LIST_ITEM_CLICK_STATION_POS_LNG_PARAM = "station_list_item_click_station_pos_lng_param";
+
     public static final String STATION_LIST_FRAG_ONRESUME_PATH = "station_list_frag_onresume";
 
     // TODO: Rename and change types of parameters
@@ -89,6 +93,16 @@ public class StationListFragment extends Fragment {
                 Uri.Builder builder = new Uri.Builder();
 
                 builder.appendPath(STATION_LIST_ITEM_CLICK_PATH);
+
+                StationItem station = ((StationItem)adapterView.getAdapter().getItem(i));
+
+                builder.appendQueryParameter(STATION_LIST_ITEM_CLICK_STATION_NAME_PARAM,
+                        station.getName());
+
+                builder.appendQueryParameter(STATION_LIST_ITEM_CLICK_STATION_POS_LAT_PARAM,
+                        String.valueOf(station.getPosition().latitude));
+                builder.appendQueryParameter(STATION_LIST_ITEM_CLICK_STATION_POS_LNG_PARAM,
+                        String.valueOf(station.getPosition().longitude));
 
                 if (mListener != null){
                     mListener.onStationListFragmentInteraction(builder.build());
