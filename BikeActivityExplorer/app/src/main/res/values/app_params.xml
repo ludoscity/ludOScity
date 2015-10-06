@@ -3,6 +3,6 @@
     <bool name="allow_portrait">true</bool>
     <bool name="allow_landscape">false</bool>
     <item name="station_list_distance_column_weight" format="float" type="dimen">0.19</item>
-    <item name="station_list_name_column_weight" format="float" type="dimen">0.65</item>
-    <item name="station_list_availability_column_weight" format="float" type="dimen">0.15</item>
+    <item name="station_list_name_column_weight" format="float" type="dimen">0.63</item>
+    <item name="station_list_availability_column_weight" format="float" type="dimen">0.17</item>
 </resources>

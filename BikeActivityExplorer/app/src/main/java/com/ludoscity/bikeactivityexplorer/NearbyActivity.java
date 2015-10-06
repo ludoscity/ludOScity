@@ -79,6 +79,8 @@ public class NearbyActivity extends BaseActivity
 
     private MenuItem mParkingSwitch;
     private MenuItem mRefreshMenuItem;
+    private MenuItem mFavoriteMenuItem;
+
     private CameraPosition mBackCameraPosition;
 
     @Override
@@ -187,7 +189,7 @@ public class NearbyActivity extends BaseActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_nearby, menu);
 
-        mParkingSwitch = menu.findItem(com.ludoscity.bikeactivityexplorer.R.id.findBikeParkingSwitchMenuItem);
+        mParkingSwitch = menu.findItem(com.ludoscity.bikeactivityexplorer.R.id.bike_parking_switch_menu_item);
 
         Fragment frag = getSupportFragmentManager().findFragmentById(R.id.station_list_or_info_container);
 
@@ -197,7 +199,10 @@ public class NearbyActivity extends BaseActivity
 
         setOnClickFindSwitchListener();
 
-        mRefreshMenuItem = menu.findItem(R.id.refreshMenuItem);
+        mRefreshMenuItem = menu.findItem(R.id.refresh_menu_item);
+
+        mFavoriteMenuItem = menu.findItem(R.id.favorite_menu_item);
+        mFavoriteMenuItem.setVisible(false);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -205,12 +210,27 @@ public class NearbyActivity extends BaseActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
-            case R.id.refreshMenuItem:
+            case R.id.refresh_menu_item:
 
                 if (Utils.Connectivity.isConnected(getApplicationContext()) && mDownloadWebTask == null) {
                     mDownloadWebTask = new DownloadWebTask();
                     mDownloadWebTask.execute();
                 }
+
+                return true;
+
+            case R.id.favorite_menu_item:
+
+                StationItem station = mStationListFragment.getHighligthedStation();
+
+                boolean newState = !station.isFavorite();
+
+                station.setFavorite(newState);
+
+                if (newState)
+                    mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
+                else
+                    mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite_outline);
 
                 return true;
         }
@@ -470,6 +490,7 @@ public class NearbyActivity extends BaseActivity
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
 
             mStationListFragment.highlightStationFromName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
+            setupFavoriteActionIcon(mStationListFragment.getHighligthedStation());
             mStationMapFragment.resizeMarkerForStationName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
 
         }
@@ -539,6 +560,9 @@ public class NearbyActivity extends BaseActivity
         }
         else if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
         {
+
+            setupFavoriteActionIcon(mStationListFragment.getHighligthedStation());
+
             mStationMapFragment.resizeMarkerForStationName(uri.getQueryParameter(StationListFragment.STATION_LIST_ITEM_CLICK_STATION_NAME_PARAM));
 
             LatLng clickedStationPos = new LatLng(Double.valueOf(uri.getQueryParameter(StationListFragment.STATION_LIST_ITEM_CLICK_STATION_POS_LAT_PARAM)),
@@ -553,6 +577,15 @@ public class NearbyActivity extends BaseActivity
 
             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200));
         }
+    }
+
+    private void setupFavoriteActionIcon(StationItem station) {
+        if (station.isFavorite())
+            mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
+        else
+            mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite_outline);
+
+        mFavoriteMenuItem.setVisible(true);
     }
 
     @Override

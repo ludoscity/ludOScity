@@ -94,7 +94,7 @@ public class StationListFragment extends Fragment {
 
                 builder.appendPath(STATION_LIST_ITEM_CLICK_PATH);
 
-                StationItem station = ((StationItem)adapterView.getAdapter().getItem(i));
+                StationItem station = ((StationItem) adapterView.getAdapter().getItem(i));
 
                 builder.appendQueryParameter(STATION_LIST_ITEM_CLICK_STATION_NAME_PARAM,
                         station.getName());
@@ -104,7 +104,7 @@ public class StationListFragment extends Fragment {
                 builder.appendQueryParameter(STATION_LIST_ITEM_CLICK_STATION_POS_LNG_PARAM,
                         String.valueOf(station.getPosition().longitude));
 
-                if (mListener != null){
+                if (mListener != null) {
                     mListener.onStationListFragmentInteraction(builder.build());
                 }
             }
@@ -163,11 +163,20 @@ public class StationListFragment extends Fragment {
     public void highlightStationFromName(String stationName) {
 
         int i = mStationListViewAdapter.getPositionInList(stationName);
-        mStationListView.setItemChecked(i,true);
-        if (i != -1) {
-            mStationListView.smoothScrollToPositionFromTop(i, 0, 300);
+        mStationListView.setItemChecked(i, true);
+
+        mStationListView.smoothScrollToPositionFromTop(i, 0, 300);
+    }
+
+    public StationItem getHighligthedStation(){
+
+        StationItem toReturn = null;
+
+        if (mStationListView.getCheckedItemPosition() != AdapterView.INVALID_POSITION){
+            toReturn = (StationItem) mStationListViewAdapter.getItem(mStationListView.getCheckedItemPosition());
         }
 
+        return toReturn;
     }
 
     public void lookingForBikes(boolean lookingForBike) {

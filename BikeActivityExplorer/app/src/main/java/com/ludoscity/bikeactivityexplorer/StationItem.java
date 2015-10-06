@@ -116,7 +116,7 @@ public class StationItem implements Parcelable, ClusterItem {
     public void setFavorite(Boolean b){
         isFavorite = b;
         try {
-            DBHelper.updateFavorite(b, uid);
+            DBHelper.updateFavorite(isFavorite, uid);
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }
