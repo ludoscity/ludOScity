@@ -221,7 +221,7 @@ public class NearbyActivity extends BaseActivity
 
             case R.id.favorite_menu_item:
 
-                StationItem station = mStationListFragment.getHighligthedStation();
+                StationItem station = mStationListFragment.getHighlightedStation();
 
                 boolean newState = !station.isFavorite();
 
@@ -322,12 +322,12 @@ public class NearbyActivity extends BaseActivity
                     mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, isLookingForBike());
                 }
 
-                if (null != mBackCameraPosition){
+                /*if (null != mBackCameraPosition){
                     mStationMapFragment.showAllMarkers();
                     mStationMapFragment.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
 
                     mBackCameraPosition = null;
-                }
+                }*/
             }
 
         } else{
@@ -490,8 +490,21 @@ public class NearbyActivity extends BaseActivity
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
 
             mStationListFragment.highlightStationFromName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
-            setupFavoriteActionIcon(mStationListFragment.getHighligthedStation());
-            mStationMapFragment.resizeMarkerForStationName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
+            setupFavoriteActionIcon(mStationListFragment.getHighlightedStation());
+            mStationMapFragment.oversizeMarkerUniqueForStationName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
+
+        }
+        //Map click
+        else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MAP_CLICK_PATH)){
+
+            StationItem highlightedStation = mStationListFragment.getHighlightedStation();
+
+            if (null != highlightedStation){
+
+                mFavoriteMenuItem.setVisible(false);
+                mStationListFragment.removeStationHighlight();
+                mStationMapFragment.resetMarkerSizeAll();
+            }
 
         }
         //InfoWindow click
@@ -551,31 +564,41 @@ public class NearbyActivity extends BaseActivity
     @Override
     public void onStationListFragmentInteraction(Uri uri) {
 
-        if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_FRAG_ONRESUME_PATH))
+        /*if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_FRAG_ONRESUME_PATH))
         {
             enableDrawer();
             setActivityTitle(getString(R.string.title_section_nearby));
             mStationMapFragment.setEnforceMaxZoom(false);
             setupUI();
         }
-        else if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
+        else*/ if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
         {
+            //if null, means the station was clicked twice, hence unchecked
+            StationItem clickedStation = mStationListFragment.getHighlightedStation();
+            if (null == clickedStation){
 
-            setupFavoriteActionIcon(mStationListFragment.getHighligthedStation());
+                mFavoriteMenuItem.setVisible(false);
+                mStationMapFragment.resetMarkerSizeAll();
+                mStationMapFragment.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
 
-            mStationMapFragment.resizeMarkerForStationName(uri.getQueryParameter(StationListFragment.STATION_LIST_ITEM_CLICK_STATION_NAME_PARAM));
+            }
+            else {
 
-            LatLng clickedStationPos = new LatLng(Double.valueOf(uri.getQueryParameter(StationListFragment.STATION_LIST_ITEM_CLICK_STATION_POS_LAT_PARAM)),
-                    Double.valueOf(uri.getQueryParameter(StationListFragment.STATION_LIST_ITEM_CLICK_STATION_POS_LNG_PARAM)));
+                setupFavoriteActionIcon(clickedStation);
 
-            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+                mStationMapFragment.oversizeMarkerUniqueForStationName(clickedStation.getName());
 
-            boundsBuilder.include(clickedStationPos);
+                LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
-            if (mCurrentUserLatLng != null)
-                boundsBuilder.include(mCurrentUserLatLng);
+                boundsBuilder.include(clickedStation.getPosition());
 
-            mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200));
+                if (mCurrentUserLatLng != null)
+                    boundsBuilder.include(mCurrentUserLatLng);
+
+                mBackCameraPosition = mStationMapFragment.getCameraPosition();
+
+                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200));
+            }
         }
     }
 

@@ -31,11 +31,6 @@ public class StationListFragment extends Fragment {
 
 
     public static final String STATION_LIST_ITEM_CLICK_PATH = "station_list_item_click";
-    public static final String STATION_LIST_ITEM_CLICK_STATION_NAME_PARAM = "station_list_item_click_station_name_param";
-    public static final String STATION_LIST_ITEM_CLICK_STATION_POS_LAT_PARAM = "station_list_item_click_station_pos_lat_param";
-    public static final String STATION_LIST_ITEM_CLICK_STATION_POS_LNG_PARAM = "station_list_item_click_station_pos_lng_param";
-
-    public static final String STATION_LIST_FRAG_ONRESUME_PATH = "station_list_frag_onresume";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -48,6 +43,8 @@ public class StationListFragment extends Fragment {
     private ListView mStationListView;
 
     private OnStationListFragmentInteractionListener mListener;
+
+    private int mLastCheckedPos = -1;
 
     /**
      * Use this factory method to create a new instance of
@@ -94,15 +91,12 @@ public class StationListFragment extends Fragment {
 
                 builder.appendPath(STATION_LIST_ITEM_CLICK_PATH);
 
-                StationItem station = ((StationItem) adapterView.getAdapter().getItem(i));
-
-                builder.appendQueryParameter(STATION_LIST_ITEM_CLICK_STATION_NAME_PARAM,
-                        station.getName());
-
-                builder.appendQueryParameter(STATION_LIST_ITEM_CLICK_STATION_POS_LAT_PARAM,
-                        String.valueOf(station.getPosition().latitude));
-                builder.appendQueryParameter(STATION_LIST_ITEM_CLICK_STATION_POS_LNG_PARAM,
-                        String.valueOf(station.getPosition().longitude));
+                if (mLastCheckedPos == i) {
+                    mStationListView.setItemChecked(i, false);
+                    mLastCheckedPos = -1;
+                } else {
+                    mLastCheckedPos = i;
+                }
 
                 if (mListener != null) {
                     mListener.onStationListFragmentInteraction(builder.build());
@@ -120,12 +114,12 @@ public class StationListFragment extends Fragment {
 
         super.onResume();
 
-        Uri.Builder builder = new Uri.Builder();
-        builder.appendPath(STATION_LIST_FRAG_ONRESUME_PATH);
+        //Uri.Builder builder = new Uri.Builder();
+        //builder.appendPath(STATION_LIST_FRAG_ONRESUME_PATH);
 
-        if (mListener != null){
-            mListener.onStationListFragmentInteraction(builder.build());
-        }
+        //if (mListener != null){
+        //    mListener.onStationListFragmentInteraction(builder.build());
+        //}
 
     }
 
@@ -164,11 +158,12 @@ public class StationListFragment extends Fragment {
 
         int i = mStationListViewAdapter.getPositionInList(stationName);
         mStationListView.setItemChecked(i, true);
+        mLastCheckedPos = i;
 
         mStationListView.smoothScrollToPositionFromTop(i, 0, 300);
     }
 
-    public StationItem getHighligthedStation(){
+    public StationItem getHighlightedStation(){
 
         StationItem toReturn = null;
 
@@ -177,6 +172,11 @@ public class StationListFragment extends Fragment {
         }
 
         return toReturn;
+    }
+
+    public void removeStationHighlight(){
+        mStationListView.setItemChecked(mStationListView.getCheckedItemPosition(), false);
+        mLastCheckedPos = -1;
     }
 
     public void lookingForBikes(boolean lookingForBike) {

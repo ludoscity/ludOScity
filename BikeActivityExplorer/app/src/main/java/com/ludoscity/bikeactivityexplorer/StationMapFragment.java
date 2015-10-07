@@ -31,7 +31,12 @@ import java.util.ArrayList;
  * create an instance of this fragment.
  */
 public class StationMapFragment extends Fragment
-        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationChangeListener, GoogleMap.OnCameraChangeListener, GoogleMap.OnInfoWindowClickListener {
+        implements OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener,
+        GoogleMap.OnMyLocationChangeListener,
+        GoogleMap.OnCameraChangeListener,
+        GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnMapClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -48,6 +53,7 @@ public class StationMapFragment extends Fragment
     public static final String MARKER_CLICK_PATH = "marker_click";
     public static final String LOCATION_CHANGED_PATH = "location_changed";
     public static final String MAP_READY_PATH = "map_ready";
+    public static final String MAP_CLICK_PATH = "map_click";
 
     public static final String LOCATION_CHANGED_LATITUDE_PARAM = "location_changed_lat";
     public static final String LOCATION_CHANGED_LONGITUDE_PARAM = "location_changed_lng";
@@ -172,6 +178,7 @@ public class StationMapFragment extends Fragment
         mGoogleMap.setOnInfoWindowClickListener(this);
         mGoogleMap.setOnMyLocationChangeListener(this);
         mGoogleMap.setOnCameraChangeListener(this);
+        mGoogleMap.setOnMapClickListener(this);
 
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(MAP_READY_PATH);
@@ -296,13 +303,30 @@ public class StationMapFragment extends Fragment
             }
     }
 
-    public void resizeMarkerForStationName(String stationName){
+    public void resetMarkerSizeAll(){
+        for (StationMapGfx markerData : mMapMarkersGfxData){
+            markerData.setBigOverlay(false);
+        }
+    }
+
+    public void oversizeMarkerUniqueForStationName(String stationName){
 
         for (StationMapGfx markerData : mMapMarkersGfxData){
             markerData.setBigOverlay(markerData.getMarkerTitle().equalsIgnoreCase(stationName));
         }
     }
 
+    @Override
+    public void onMapClick(LatLng latLng) {
+
+        Uri.Builder builder = new Uri.Builder();
+        builder.appendPath(MAP_CLICK_PATH);
+
+        if (mListener != null){
+            mListener.onStationMapFragmentInteraction(builder.build());
+        }
+
+    }
 
     /**
      * This interface must be implemented by activities that contain this
