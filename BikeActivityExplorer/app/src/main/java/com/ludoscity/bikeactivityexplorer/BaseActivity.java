@@ -442,6 +442,8 @@ public abstract class BaseActivity extends ActionBarActivity {
                 intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 overridePendingTransition(0, 0);
+                finish();
+                overridePendingTransition(0, 0);
                 break;
             /*case NAVDRAWER_ITEM_VIDEO_LIBRARY:
                 intent = new Intent(this, VideoLibraryActivity.class);
@@ -587,7 +589,7 @@ public abstract class BaseActivity extends ActionBarActivity {
 
     private View makeNavDrawerItem(final int itemId, ViewGroup container) {
         boolean selected = getSelfNavDrawerItem() == itemId;
-        int layoutToInflate = 0;
+        int layoutToInflate;
         if (itemId == NAVDRAWER_ITEM_SEPARATOR) {
             layoutToInflate = R.layout.navdrawer_separator;
         } else if (itemId == NAVDRAWER_ITEM_SEPARATOR_SPECIAL) {

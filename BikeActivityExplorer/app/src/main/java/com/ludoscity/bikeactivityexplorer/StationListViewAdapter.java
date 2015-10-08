@@ -28,7 +28,7 @@ public class StationListViewAdapter extends BaseAdapter {
 
     private boolean mIsLookingForBikes;
 
-    StationListViewAdapter(Context _context, StationsNetwork _stationsNetwork, LatLng _currentUserLatLng,boolean isLookingForBikes){
+    StationListViewAdapter(Context _context, StationsNetwork _stationsNetwork, LatLng _currentUserLatLng, boolean isLookingForBikes){
         mContext = _context;
         mStationList = _stationsNetwork.stations;
         mInflater = LayoutInflater.from(_context);
@@ -43,6 +43,10 @@ public class StationListViewAdapter extends BaseAdapter {
             sortStationListByClosest();
             notifyDataSetChanged();
         }
+    }
+
+    public LatLng getCurrentUserLatLng(){
+        return mCurrentUserLatLng;
     }
 
     public int getPositionInList(String stationName){

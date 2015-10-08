@@ -3,6 +3,7 @@ package com.ludoscity.bikeactivityexplorer;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,7 @@ public class StationListFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private Bundle mSavedInstanceState = null;
 
     ///////////////////////////////////////////////////
     private StationListViewAdapter mStationListViewAdapter;
@@ -140,12 +142,49 @@ public class StationListFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable("listview_state", mStationListView.onSaveInstanceState());
+        outState.putInt("lastchecked_pos", mLastCheckedPos);
+        outState.putParcelable("user_current_LatLng", mStationListViewAdapter.getCurrentUserLatLng());
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if (null != savedInstanceState) {
+            //We'll restore right after recreating adapter
+            mSavedInstanceState = savedInstanceState;
+        }
+    }
+
     public void setupUI(StationsNetwork stationsNetwork, LatLng currentUserLatLng, boolean lookingForBike) {
+
+        Parcelable savedListViewState = null;
+
+        if (null != mSavedInstanceState) {
+            mLastCheckedPos = mSavedInstanceState.getInt("lastchecked_pos");
+            savedListViewState = mSavedInstanceState.getParcelable("listview_state");
+
+            currentUserLatLng = mSavedInstanceState.getParcelable("user_current_LatLng");
+
+            mSavedInstanceState = null;
+        }
 
         if (stationsNetwork != null) {
             mStationListViewAdapter = new StationListViewAdapter(getActivity().getApplicationContext(), stationsNetwork, currentUserLatLng, true);
             mStationListView.setAdapter(mStationListViewAdapter);
             lookingForBikes(lookingForBike);
+        }
+
+        if (mLastCheckedPos != -1)
+            mStationListView.setItemChecked(mLastCheckedPos, true);
+
+        if (null != savedListViewState) {
+            mStationListView.onRestoreInstanceState(savedListViewState);
         }
     }
 

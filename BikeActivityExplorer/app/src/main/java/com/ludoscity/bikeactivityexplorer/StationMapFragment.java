@@ -62,7 +62,7 @@ public class StationMapFragment extends Fragment
     public static final String MARKER_CLICK_TITLE_PARAM = "marker_click_title";
 
 
-    private boolean mIsAlreadyZoomedToUser;
+    private boolean mInitialCameraSetupDone;
     private boolean mEnforceMaxZoom = false;
     private GoogleMap mGoogleMap = null;
 
@@ -170,7 +170,7 @@ public class StationMapFragment extends Fragment
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mIsAlreadyZoomedToUser = false;
+        mInitialCameraSetupDone = false;
         mGoogleMap = googleMap;
         mGoogleMap.setMyLocationEnabled(true);
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
@@ -212,10 +212,8 @@ public class StationMapFragment extends Fragment
     public void onMyLocationChange(Location location) {
         if (location != null) {
             Log.d("onMyLocationChange", "new location " + location.toString());
-            if (!mIsAlreadyZoomedToUser && mGoogleMap != null) {
-                //Log.d("onMyLocationChange","isAlreadyZoomedToUser = "+isAlreadyZoomedToUser);
-                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
-                mIsAlreadyZoomedToUser = true;
+            if (!mInitialCameraSetupDone && mGoogleMap != null) {
+                doInitialCameraSetup(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15), true);
             }
 
 
@@ -230,6 +228,15 @@ public class StationMapFragment extends Fragment
             }
 
         }
+    }
+
+    public void doInitialCameraSetup(CameraUpdate cameraUpdate, boolean animate){
+        if (animate)
+            mGoogleMap.animateCamera(cameraUpdate);
+        else
+            mGoogleMap.moveCamera(cameraUpdate);
+
+        mInitialCameraSetupDone = true;
     }
 
     public boolean isMapReady(){return !(mGoogleMap==null);}

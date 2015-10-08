@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
@@ -77,11 +76,13 @@ public class NearbyActivity extends BaseActivity
 
     private boolean mRefreshMarkers = true;
 
+    private boolean mLookingForBike = true;
     private MenuItem mParkingSwitch;
     private MenuItem mRefreshMenuItem;
     private MenuItem mFavoriteMenuItem;
 
-    private CameraPosition mBackCameraPosition;
+    private CameraPosition mUnselectStationCameraPosition;
+    private CameraPosition mSavedInstanceCameraPosition;
 
     @Override
     protected int getSelfNavDrawerItem() {
@@ -155,7 +156,7 @@ public class NearbyActivity extends BaseActivity
         setRefreshButtonListener();
 
 
-        //if (savedInstanceState == null){
+        if (savedInstanceState == null){
 
             //Create fragments programatically
             //Parameters could come from an Intent ?
@@ -163,9 +164,25 @@ public class NearbyActivity extends BaseActivity
 
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.station_list_or_info_container, mStationListFragment).commit();
+                    .add(R.id.station_list_or_info_container, mStationListFragment, "stationListFragTag").commit();
 
-        //}
+        }
+        else{
+            mStationListFragment = (StationListFragment)getSupportFragmentManager().findFragmentByTag("stationListFragTag");
+
+            mUnselectStationCameraPosition = savedInstanceState.getParcelable("back_camera_pos");
+            mSavedInstanceCameraPosition = savedInstanceState.getParcelable("saved_camera_pos");
+            mLookingForBike = savedInstanceState.getBoolean("looking_for_bike");
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable("back_camera_pos", mUnselectStationCameraPosition);
+        outState.putParcelable("saved_camera_pos", mStationMapFragment.getCameraPosition());
+        outState.putBoolean("looking_for_bike", mLookingForBike);
     }
 
     @Override
@@ -176,7 +193,6 @@ public class NearbyActivity extends BaseActivity
 
         mStationMapFragment = (StationMapFragment)getSupportFragmentManager().findFragmentById(
                 R.id.station_map_fragment);
-
 
         //if (mNearbyFragment != null && savedInstanceState == null) {
         //    Bundle args = intentToFragmentArguments(getIntent());
@@ -195,14 +211,22 @@ public class NearbyActivity extends BaseActivity
 
         mParkingSwitch.setVisible(frag instanceof StationListFragment);
 
-        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setChecked(true);
+        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setChecked(mLookingForBike);
 
         setOnClickFindSwitchListener();
 
         mRefreshMenuItem = menu.findItem(R.id.refresh_menu_item);
 
         mFavoriteMenuItem = menu.findItem(R.id.favorite_menu_item);
-        mFavoriteMenuItem.setVisible(false);
+
+        if (null != mStationListFragment) {
+
+            StationItem highlightedStation = mStationListFragment.getHighlightedStation();
+            if (null != highlightedStation)
+                setupFavoriteActionIcon(highlightedStation);
+            else
+                mFavoriteMenuItem.setVisible(false);
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -250,6 +274,7 @@ public class NearbyActivity extends BaseActivity
 
                 mStationListFragment.lookingForBikes(isChecked);
                 mStationMapFragment.lookingForBikes(isChecked);
+                mLookingForBike = isChecked;
                 //if(isChecked){
                 //Hackfix, the UX REALLY is improved by a toast like graphical element, though it seems bugged by recent changes (mea culpa)
                 //toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findABikes);
@@ -309,24 +334,26 @@ public class NearbyActivity extends BaseActivity
             if(mStationMapFragment.isMapReady()) {
                 if (mStationsNetwork != null && mRefreshMarkers && mRedrawMarkersTask == null) {
 
-
                     mRedrawMarkersTask = new RedrawMarkersTask();
                     mRedrawMarkersTask.execute();
 
-
                     mRefreshMarkers = false;
+                }
 
+                if (null != mSavedInstanceCameraPosition){
+                    mStationMapFragment.doInitialCameraSetup(CameraUpdateFactory.newCameraPosition(mSavedInstanceCameraPosition), false);
+                    mSavedInstanceCameraPosition = null;
                 }
 
                 if (null != mStationListFragment){
-                    mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, isLookingForBike());
+                    mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, mLookingForBike);
                 }
 
-                /*if (null != mBackCameraPosition){
+                /*if (null != mUnselectStationCameraPosition){
                     mStationMapFragment.showAllMarkers();
-                    mStationMapFragment.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
+                    mStationMapFragment.animateCamera(CameraUpdateFactory.newCameraPosition(mUnselectStationCameraPosition));
 
-                    mBackCameraPosition = null;
+                    mUnselectStationCameraPosition = null;
                 }*/
             }
 
@@ -508,7 +535,7 @@ public class NearbyActivity extends BaseActivity
 
         }
         //InfoWindow click
-        else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.INFOWINDOW_CLICK_PATH)){
+        /*else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.INFOWINDOW_CLICK_PATH)){
 
             Fragment frag = getSupportFragmentManager().findFragmentById(R.id.station_list_or_info_container);
             if (frag instanceof StationListFragment){
@@ -518,7 +545,7 @@ public class NearbyActivity extends BaseActivity
                 for (StationItem station : mStationsNetwork.stations) {
                     if (station.getPosition().equals(clickedMarkerPos)) {
 
-                        mBackCameraPosition = mStationMapFragment.getCameraPosition();
+                        mUnselectStationCameraPosition = mStationMapFragment.getCameraPosition();
 
                         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
@@ -550,7 +577,7 @@ public class NearbyActivity extends BaseActivity
                     }
                 }
             }
-        }
+        }*/
     }
 
     private void cancelDownloadWebTask() {
@@ -579,7 +606,7 @@ public class NearbyActivity extends BaseActivity
 
                 mFavoriteMenuItem.setVisible(false);
                 mStationMapFragment.resetMarkerSizeAll();
-                mStationMapFragment.animateCamera(CameraUpdateFactory.newCameraPosition(mBackCameraPosition));
+                mStationMapFragment.animateCamera(CameraUpdateFactory.newCameraPosition(mUnselectStationCameraPosition));
 
             }
             else {
@@ -595,7 +622,7 @@ public class NearbyActivity extends BaseActivity
                 if (mCurrentUserLatLng != null)
                     boundsBuilder.include(mCurrentUserLatLng);
 
-                mBackCameraPosition = mStationMapFragment.getCameraPosition();
+                mUnselectStationCameraPosition = mStationMapFragment.getCameraPosition();
 
                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200));
             }
@@ -661,10 +688,15 @@ public class NearbyActivity extends BaseActivity
 
             //SETUP MARKERS DATA
             for (StationItem item : mStationsNetwork.stations){
-                mStationMapFragment.addMarkerForStationItem(item, isLookingForBike());
+                mStationMapFragment.addMarkerForStationItem(item, mLookingForBike);
             }
 
             mStationMapFragment.redrawMarkers();
+
+            StationItem highlighted = mStationListFragment.getHighlightedStation();
+
+            if (null != highlighted)
+                mStationMapFragment.oversizeMarkerUniqueForStationName(highlighted.getName());
 
             mRedrawMarkersTask = null;
         }
