@@ -163,7 +163,8 @@ public class StationListFragment extends Fragment {
 
     public void setupUI(StationsNetwork stationsNetwork, LatLng currentUserLatLng, boolean lookingForBike) {
 
-        Parcelable savedListViewState = null;
+        //So that when data is refreshed, the list doesn't reset
+        Parcelable savedListViewState = mStationListView.onSaveInstanceState();
 
         if (null != mSavedInstanceState) {
             mLastCheckedPos = mSavedInstanceState.getInt("lastchecked_pos");
@@ -183,9 +184,9 @@ public class StationListFragment extends Fragment {
         if (mLastCheckedPos != -1)
             mStationListView.setItemChecked(mLastCheckedPos, true);
 
-        if (null != savedListViewState) {
-            mStationListView.onRestoreInstanceState(savedListViewState);
-        }
+
+        mStationListView.onRestoreInstanceState(savedListViewState);
+
     }
 
     public void setCurrentUserLatLng(LatLng currentUserLatLng) {

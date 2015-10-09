@@ -80,6 +80,7 @@ public class NearbyActivity extends BaseActivity
     private MenuItem mParkingSwitch;
     private MenuItem mRefreshMenuItem;
     private MenuItem mFavoriteMenuItem;
+    private MenuItem mDirectionsMenuItem;
 
     private CameraPosition mUnselectStationCameraPosition;
     private CameraPosition mSavedInstanceCameraPosition;
@@ -219,13 +220,20 @@ public class NearbyActivity extends BaseActivity
 
         mFavoriteMenuItem = menu.findItem(R.id.favorite_menu_item);
 
+        mDirectionsMenuItem = menu.findItem(R.id.directions_menu_item);
+
         if (null != mStationListFragment) {
 
             StationItem highlightedStation = mStationListFragment.getHighlightedStation();
-            if (null != highlightedStation)
+            if (null != highlightedStation) {
                 setupFavoriteActionIcon(highlightedStation);
-            else
+                mDirectionsMenuItem.setVisible(true);
+            }
+
+            else {
                 mFavoriteMenuItem.setVisible(false);
+                mDirectionsMenuItem.setVisible(false);
+            }
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -255,6 +263,37 @@ public class NearbyActivity extends BaseActivity
                     mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
                 else
                     mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite_outline);
+
+                return true;
+
+            case R.id.directions_menu_item:
+
+                StationItem targetStation = mStationListFragment.getHighlightedStation();
+
+                StringBuilder builder = new StringBuilder("http://maps.google.com/maps?&saddr=").
+                        append(mCurrentUserLatLng.latitude).
+                        append(",").
+                        append(mCurrentUserLatLng.longitude).
+                        append("&daddr=").
+                        append(targetStation.getPosition().latitude).
+                        append(",").
+                        append(targetStation.getPosition().longitude).
+                        append("&dirflg=");
+
+                if (mLookingForBike)
+                    builder.append("w");
+                else
+                    builder.append("b");
+
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(builder.toString()));
+                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                if (getPackageManager().queryIntentActivities(intent, 0).size() > 0) {
+                    startActivity(intent); // launch the map activity
+                } else {
+                    Toast.makeText(this, getString(R.string.google_maps_not_installed), Toast.LENGTH_LONG).show();
+
+                }
+
 
                 return true;
         }
@@ -518,6 +557,7 @@ public class NearbyActivity extends BaseActivity
 
             mStationListFragment.highlightStationFromName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
             setupFavoriteActionIcon(mStationListFragment.getHighlightedStation());
+            mDirectionsMenuItem.setVisible(true);
             mStationMapFragment.oversizeMarkerUniqueForStationName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
 
         }
@@ -529,6 +569,7 @@ public class NearbyActivity extends BaseActivity
             if (null != highlightedStation){
 
                 mFavoriteMenuItem.setVisible(false);
+                mDirectionsMenuItem.setVisible(false);
                 mStationListFragment.removeStationHighlight();
                 mStationMapFragment.resetMarkerSizeAll();
             }
@@ -605,6 +646,7 @@ public class NearbyActivity extends BaseActivity
             if (null == clickedStation){
 
                 mFavoriteMenuItem.setVisible(false);
+                mDirectionsMenuItem.setVisible(false);
                 mStationMapFragment.resetMarkerSizeAll();
                 mStationMapFragment.animateCamera(CameraUpdateFactory.newCameraPosition(mUnselectStationCameraPosition));
 
@@ -612,6 +654,7 @@ public class NearbyActivity extends BaseActivity
             else {
 
                 setupFavoriteActionIcon(clickedStation);
+                mDirectionsMenuItem.setVisible(true);
 
                 mStationMapFragment.oversizeMarkerUniqueForStationName(clickedStation.getName());
 
