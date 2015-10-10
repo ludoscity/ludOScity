@@ -97,8 +97,8 @@ public class NearbyActivity extends BaseActivity
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         if (Utils.Connectivity.isConnected(getApplicationContext()) && sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0) == 0) { //Means ask never successfully completed
             //Because webtask launches DB task, we know that a value there means actual data in the DB
-            mDownloadWebTask = new DownloadWebTask();
-            mDownloadWebTask.execute();
+
+            new FindNetworkTask().execute();
         }
         else{   //Having a timestamp means some data exists in the db, as both task are intimately linked
             try {
@@ -217,6 +217,13 @@ public class NearbyActivity extends BaseActivity
         setOnClickFindSwitchListener();
 
         mRefreshMenuItem = menu.findItem(R.id.refresh_menu_item);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+
+        //This is here instead of findNetworkTask because menu is created late
+        if (Utils.Connectivity.isConnected(getApplicationContext()) && sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0) == 0) { //Means ask never successfully completed
+            //Because webtask launches DB task, we know that a value there means actual data in the DB
+            setRefreshActionButtonState(true);
+        }
 
         mFavoriteMenuItem = menu.findItem(R.id.favorite_menu_item);
 
@@ -396,8 +403,6 @@ public class NearbyActivity extends BaseActivity
                 }*/
             }
 
-        } else{
-            mUpdateTextView.setText(getString(com.ludoscity.bikeactivityexplorer.R.string.nearbyfragment_default_never_web_updated));
         }
     }
 
@@ -745,6 +750,26 @@ public class NearbyActivity extends BaseActivity
         }
     }
 
+    public class FindNetworkTask extends AsyncTask<Void, Void, Void> {
+
+        //private final ProgressDialog mFindNetworkDialog = new ProgressDialog(NearbyActivity.this, R.style.BikeActivityExplorerTheme);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            mUpdateTextView.setText(getString(R.string.searching_bike_network));
+
+            //Can't do that because onCreateOptionsMenu is called late
+            //setRefreshActionButtonState(true);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+    }
+
     public class addNetworkDatabase extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -807,6 +832,7 @@ public class NearbyActivity extends BaseActivity
         protected void onPreExecute() {
             super.onPreExecute();
             mUpdateTextView.setText(getString(R.string.downloading));
+
             setRefreshActionButtonState(true);
         }
 

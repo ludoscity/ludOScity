@@ -148,7 +148,8 @@ public class StationListFragment extends Fragment {
 
         outState.putParcelable("listview_state", mStationListView.onSaveInstanceState());
         outState.putInt("lastchecked_pos", mLastCheckedPos);
-        outState.putParcelable("user_current_LatLng", mStationListViewAdapter.getCurrentUserLatLng());
+        if (null != mStationListViewAdapter)
+            outState.putParcelable("user_current_LatLng", mStationListViewAdapter.getCurrentUserLatLng());
     }
 
     @Override

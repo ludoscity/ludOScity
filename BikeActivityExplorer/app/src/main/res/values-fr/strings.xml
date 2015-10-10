@@ -37,7 +37,7 @@
     <string name="distance">Distance</string>
     <string name="findABikes">Trouver un vélo</string>
     <string name="findAParking">Trouver un parking</string>
-    <string name="fromCitibik_es">de citibik.es</string>
+    <string name="fromCitibik_es">de citybik.es</string>
     <string name="minsAgo">min</string>
     <string name="momentsAgo">À l\'instant</string>
     <string name="nearbyfragment_default_never_web_updated">Pas de données: cliquer pour rafraîchir depuis citibik.es</string>
@@ -58,4 +58,5 @@
     <string name="refreshing">Rafraîchissement carte…</string>
     <string name="download_failed">Téléchargement impossible !</string>
     <string name="google_maps_not_installed">Google Maps non installé !</string>
+    <string name="searching_bike_network">Recherche sur citybik.es du système le plus proche…</string>
 </resources>
