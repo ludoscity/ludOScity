@@ -271,7 +271,11 @@ public class StationMapFragment extends Fragment
     }
 
     public CameraPosition getCameraPosition() {
-        return mGoogleMap.getCameraPosition();
+        CameraPosition toReturn = null;
+        if (isMapReady())
+            toReturn = mGoogleMap.getCameraPosition();
+
+        return toReturn;
     }
 
     public void hideAllMarkers() {
