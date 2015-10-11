@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -223,9 +222,8 @@ public class NearbyActivity extends BaseActivity
 
         mParkingSwitch = menu.findItem(com.ludoscity.bikeactivityexplorer.R.id.bike_parking_switch_menu_item);
 
-        Fragment frag = getSupportFragmentManager().findFragmentById(R.id.station_list_or_info_container);
-
-        mParkingSwitch.setVisible(frag instanceof StationListFragment);
+        if (!mStationListFragment.isListReady())
+            mParkingSwitch.setVisible(false);
 
         ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.bikeactivityexplorer.R.id.action_bar_find_bike_parking_switch)).setChecked(mLookingForBike);
 
@@ -410,6 +408,9 @@ public class NearbyActivity extends BaseActivity
 
                 if (null != mStationListFragment){
                     mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, mLookingForBike);
+
+                    if (!mParkingSwitch.isVisible())
+                        mParkingSwitch.setVisible(true);
                 }
             }
         }
