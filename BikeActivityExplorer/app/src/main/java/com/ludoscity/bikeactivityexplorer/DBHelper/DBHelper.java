@@ -109,6 +109,10 @@ public class DBHelper {
         return (List<QueryRow>) allDocs.get("rows");
     }
 
+    public static void deleteAllStations() throws CouchbaseLiteException{
+        mManager.getDatabase(mSTATIONS_DB_NAME).delete();
+    }
+
     //Not used because only potential client (so far) BudgetTrackDetails duplicates this data
     /*public static boolean isTrackPointDataCached(String trackID) throws CouchbaseLiteException {
         Document doc = mManager.getDatabase(mTRACKS_DB_NAME).getExistingDocument(trackID);

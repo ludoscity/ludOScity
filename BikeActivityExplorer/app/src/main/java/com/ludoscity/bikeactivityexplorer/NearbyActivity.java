@@ -892,6 +892,8 @@ public class NearbyActivity extends BaseActivity
         @Override
         protected Void doInBackground(Void... params) {
             try {
+                DBHelper.deleteAllStations();
+
                 for (StationItem station : mStationsNetwork.stations){
                     DBHelper.saveStation(station);
                 }
