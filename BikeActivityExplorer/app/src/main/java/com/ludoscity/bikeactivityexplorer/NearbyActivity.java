@@ -87,8 +87,8 @@ public class NearbyActivity extends BaseActivity
     private View mDownloadBar;
 
     private boolean mRefreshMarkers = true;
-
     private boolean mLookingForBike = true;
+
     private MenuItem mParkingSwitch;
     private MenuItem mRefreshMenuItem;
     private MenuItem mFavoriteMenuItem;
@@ -422,7 +422,7 @@ public class NearbyActivity extends BaseActivity
                 if (null != mStationListFragment){
                     mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, mLookingForBike);
 
-                    if (null != mParkingSwitch && !mParkingSwitch.isVisible())
+                    if (null != mParkingSwitch && !mParkingSwitch.isVisible() && !isNavDrawerOpen())
                         mParkingSwitch.setVisible(true);
                 }
             }
