@@ -409,7 +409,7 @@ public class NearbyActivity extends BaseActivity
                 if (null != mStationListFragment){
                     mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, mLookingForBike);
 
-                    if (!mParkingSwitch.isVisible())
+                    if (null != mParkingSwitch && !mParkingSwitch.isVisible())
                         mParkingSwitch.setVisible(true);
                 }
             }
