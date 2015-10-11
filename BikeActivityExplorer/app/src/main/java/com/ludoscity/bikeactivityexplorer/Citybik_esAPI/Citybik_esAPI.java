@@ -1,6 +1,7 @@
 package com.ludoscity.bikeactivityexplorer.Citybik_esAPI;
 
-import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.StatusAnswerRoot;
+import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.ListNetworksAnswerRoot;
+import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.NetworkStatusAnswerRoot;
 
 import java.util.Map;
 
@@ -16,7 +17,9 @@ import retrofit.http.QueryMap;
 public interface Citybik_esAPI {
 
     @GET("{href}")
-    Call<StatusAnswerRoot> getStatusForNetwork(@Path("href") String href, @QueryMap Map<String, String> options);
+    Call<NetworkStatusAnswerRoot> getNetworkStatus(@Path("href") String href, @QueryMap Map<String, String> options);
+    @GET("/v2/networks")
+    Call<ListNetworksAnswerRoot> listNetworks();
 }
 
 //http://api.citybik.es

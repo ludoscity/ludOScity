@@ -8,7 +8,7 @@ package com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model;
  */
 
 
-public class StatusAnswerRoot {
+public class NetworkStatusAnswerRoot {
     public NetworkStatus network;
 
 }

@@ -1,5 +1,6 @@
 package com.ludoscity.bikeactivityexplorer;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -28,13 +30,18 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.Citybik_esAPI;
+import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.ListNetworksAnswerRoot;
+import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.NetworkDesc;
+import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.NetworkStatusAnswerRoot;
 import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.Station;
-import com.ludoscity.bikeactivityexplorer.Citybik_esAPI.model.StatusAnswerRoot;
 import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 import com.ludoscity.bikeactivityexplorer.Utils.Utils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,12 +65,18 @@ public class NearbyActivity extends BaseActivity
 
 
     private static final String PREF_WEBTASK_LAST_TIMESTAMP_MS = "last_refresh_timestamp";
+    private static final String PREF_NETWORK_NAME = "network_name";
+    private static final String PREF_NETWORK_ID = "network_id";
+    private static final String PREF_NETWORK_LATITUDE = "network_lat";
+    private static final String PREF_NETWORK_LONGITUDE = "network_lng";
+    private static final String PREF_NETWORK_HREF = "network_href";
 
     private Handler mUpdateRefreshHandler = null;
     private Runnable mUpdateRefreshRunnableCode = null;
 
     private DownloadWebTask mDownloadWebTask = null;
     private RedrawMarkersTask mRedrawMarkersTask = null;
+    private FindNetworkTask mFindNetworkTask = null;
 
     private StationsNetwork mStationsNetwork;
 
@@ -95,12 +108,12 @@ public class NearbyActivity extends BaseActivity
         super.onStart();
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        if (Utils.Connectivity.isConnected(getApplicationContext()) && sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0) == 0) { //Means ask never successfully completed
-            //Because webtask launches DB task, we know that a value there means actual data in the DB
+        if (Utils.Connectivity.isConnected(getApplicationContext()) && sp.getString(PREF_NETWORK_ID, "none").equalsIgnoreCase("none")) {
 
-            new FindNetworkTask().execute();
+            mFindNetworkTask = new FindNetworkTask();
+            mFindNetworkTask.execute();
         }
-        else{   //Having a timestamp means some data exists in the db, as both task are intimately linked
+        else{
             try {
                 mStationsNetwork = DBHelper.getStationsNetwork();
             } catch (CouchbaseLiteException e) {
@@ -147,14 +160,18 @@ public class NearbyActivity extends BaseActivity
         setContentView(R.layout.activity_nearby);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
 
-        setActivityTitle(getTitle());
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+
+        setActivityTitle(sp.getString(PREF_NETWORK_NAME, getTitle().toString()));
         setActivitySubtitle("");
+
+        restoreActionBar();
 
         // Update Bar
         mUpdateTextView = (TextView) findViewById(com.ludoscity.bikeactivityexplorer.R.id.update_textView);
         mUpdateTextView.setTextColor(Color.LTGRAY);
         mDownloadBar = findViewById(com.ludoscity.bikeactivityexplorer.R.id.downloadBar);
-        setRefreshButtonListener();
+        setDownloadBarListener();
 
 
         if (savedInstanceState == null){
@@ -190,8 +207,6 @@ public class NearbyActivity extends BaseActivity
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        setActivityTitle(getString(R.string.title_section_nearby));
-
         mStationMapFragment = (StationMapFragment)getSupportFragmentManager().findFragmentById(
                 R.id.station_map_fragment);
 
@@ -220,10 +235,11 @@ public class NearbyActivity extends BaseActivity
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 
         //This is here instead of findNetworkTask because menu is created late
-        if (Utils.Connectivity.isConnected(getApplicationContext()) && sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0) == 0) { //Means ask never successfully completed
-            //Because webtask launches DB task, we know that a value there means actual data in the DB
+        if (Utils.Connectivity.isConnected(getApplicationContext()) && sp.getString(PREF_NETWORK_ID, "none").equalsIgnoreCase("none")) {
             setRefreshActionButtonState(true);
         }
+        else if (!Utils.Connectivity.isConnected(getApplicationContext()))
+            mRefreshMenuItem.setVisible(false);
 
         mFavoriteMenuItem = menu.findItem(R.id.favorite_menu_item);
 
@@ -366,16 +382,17 @@ public class NearbyActivity extends BaseActivity
     //Takes care of map readyness check
     //Safely updates everything based on checking the last update timestamp
     private void setupUI(){
+
+        if (mUpdateRefreshRunnableCode == null) {
+
+            mUpdateRefreshRunnableCode = createUpdateRefreshRunnableCode();
+
+            mUpdateRefreshHandler.post(mUpdateRefreshRunnableCode);
+        }
+
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        long lastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
-        if (lastRefreshTimestamp != 0){
-
-            if (mUpdateRefreshRunnableCode == null) {
-
-                mUpdateRefreshRunnableCode = createUpdateRefreshRunnableCode();
-
-                mUpdateRefreshHandler.post(mUpdateRefreshRunnableCode);
-            }
+        String currNetworkId = sp.getString(PREF_NETWORK_ID, "none");
+        if (!currNetworkId.equalsIgnoreCase("none")){
 
             if(mStationMapFragment.isMapReady()) {
                 if (mStationsNetwork != null && mRefreshMarkers && mRedrawMarkersTask == null) {
@@ -394,20 +411,8 @@ public class NearbyActivity extends BaseActivity
                 if (null != mStationListFragment){
                     mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, mLookingForBike);
                 }
-
-                /*if (null != mUnselectStationCameraPosition){
-                    mStationMapFragment.showAllMarkers();
-                    mStationMapFragment.animateCamera(CameraUpdateFactory.newCameraPosition(mUnselectStationCameraPosition));
-
-                    mUnselectStationCameraPosition = null;
-                }*/
             }
-
         }
-    }
-
-    private boolean isLookingForBike() {
-        return null == mParkingSwitch || ((SwitchCompat) mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).isChecked();
     }
 
     private Runnable createUpdateRefreshRunnableCode(){
@@ -423,7 +428,7 @@ public class NearbyActivity extends BaseActivity
                 long now = System.currentTimeMillis();
 
                 //Update not already in progress
-                if (mDownloadWebTask == null && mRedrawMarkersTask == null) {
+                if (mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null) {
 
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                     long runnableLastRefreshTimestamp = sp.getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
@@ -432,11 +437,13 @@ public class NearbyActivity extends BaseActivity
 
                     StringBuilder updateTextBuilder = new StringBuilder();
 
-                    //First taking care of past time...
-                    if (difference < DateUtils.MINUTE_IN_MILLIS)
-                        updateTextBuilder.append(getString(com.ludoscity.bikeactivityexplorer.R.string.momentsAgo)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.fromCitibik_es));//mUpdateTextView.setText();
-                    else
-                        updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.minsAgo)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.fromCitibik_es));
+                    if (!sp.getString(PREF_NETWORK_ID, "none").equalsIgnoreCase("none")) {
+                        //First taking care of past time...
+                        if (difference < DateUtils.MINUTE_IN_MILLIS)
+                            updateTextBuilder.append(getString(com.ludoscity.bikeactivityexplorer.R.string.momentsAgo)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.fromCitibik_es));//mUpdateTextView.setText();
+                        else
+                            updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.minsAgo)).append(" ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.fromCitibik_es));
+                    }
                     //mUpdateTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
 
                     //long differenceInMinutes = difference / DateUtils.MINUTE_IN_MILLIS;
@@ -452,55 +459,60 @@ public class NearbyActivity extends BaseActivity
                         if (!mRefreshMenuItem.isVisible())
                             mRefreshMenuItem.setVisible(true);
 
-                        boolean autoUpdate = sp.getBoolean(UserSettingsFragment.PREF_NEARBY_AUTO_UPDATE, true);
+                        if (!sp.getString(PREF_NETWORK_ID, "none").equalsIgnoreCase("none")) {
 
-                        if (!autoUpdate){
-                            //updateTextBuilder.append(" - ").append(getString(R.string.nearbyfragment_no_auto_update));
+                            boolean autoUpdate = sp.getBoolean(UserSettingsFragment.PREF_NEARBY_AUTO_UPDATE, true);
 
-                            setRefreshActionButtonState(false);
-                        }
-                        else {
-
-                            //Should come from something keeping tabs on time, maybe this runnable itself
-                            long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60;  //comes from Prefs
-
-                            if (now >= wishedUpdateTime) {
-
-                                //Put a string same length as the other one ?
-                                updateTextBuilder.append(" ").append(getString(R.string.downloading));
-
-                                //Run update
-
-                                mDownloadWebTask = new DownloadWebTask();
-                                mDownloadWebTask.execute();
-
-
-                                //lastUpdateTime = now;
-                            } else {
-
-                                updateTextBuilder.append(" - ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.nextUpdate)).append(" ");
-
-
-                                long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
-
-                                // formatted will be HH:MM:SS or MM:SS
-                                updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
+                            if (!autoUpdate) {
+                                //updateTextBuilder.append(" - ").append(getString(R.string.nearbyfragment_no_auto_update));
 
                                 setRefreshActionButtonState(false);
+                            } else {
+
+                                //Should come from something keeping tabs on time, maybe this runnable itself
+                                long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60;  //comes from Prefs
+
+                                if (now >= wishedUpdateTime) {
+
+                                    //Put a string same length as the other one ?
+                                    updateTextBuilder.append(" ").append(getString(R.string.downloading));
+
+                                    //Run update
+
+                                    mDownloadWebTask = new DownloadWebTask();
+                                    mDownloadWebTask.execute();
+
+
+                                    //lastUpdateTime = now;
+                                } else {
+
+                                    updateTextBuilder.append(" - ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.nextUpdate)).append(" ");
+
+
+                                    long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
+
+                                    // formatted will be HH:MM:SS or MM:SS
+                                    updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
+
+                                    setRefreshActionButtonState(false);
+                                }
                             }
+                        }
+                        else{
+                            mFindNetworkTask = new FindNetworkTask();
+                            mFindNetworkTask.execute();
                         }
                     }
                     else{
                         updateTextBuilder.append(" - ").append(getString(com.ludoscity.bikeactivityexplorer.R.string.no_connectivity));
 
                         setRefreshActionButtonState(false);
-                        mRefreshMenuItem.setVisible(false);
+                        if (null != mRefreshMenuItem)
+                            mRefreshMenuItem.setVisible(false);
                     }
 
                     mUpdateTextView.setText(updateTextBuilder.toString());
                 }
-
-                //lastRunTime = now;
 
                 //UI will be refreshed every second
                 mUpdateRefreshHandler.postDelayed(mUpdateRefreshRunnableCode, 1000);
@@ -508,7 +520,7 @@ public class NearbyActivity extends BaseActivity
         };
     }
 
-    private void setRefreshButtonListener() {
+    private void setDownloadBarListener() {
         mDownloadBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -758,15 +770,107 @@ public class NearbyActivity extends BaseActivity
         protected void onPreExecute() {
             super.onPreExecute();
 
-            mUpdateTextView.setText(getString(R.string.searching_bike_network));
+            mUpdateTextView.setText(getString(R.string.searching_wait_location));
 
-            //Can't do that because onCreateOptionsMenu is called late
-            //setRefreshActionButtonState(true);
+            setRefreshActionButtonState(true);
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+            setRefreshActionButtonState(false);
+
+            mFindNetworkTask = null;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
+
+            //noinspection StatementWithEmptyBody
+            while (mCurrentUserLatLng == null)
+            {
+
+            }
+
+            publishProgress();
+
+            Citybik_esAPI api = ((RootApplication) getApplication()).getCitybik_esApi();
+
+            final Call<ListNetworksAnswerRoot> call = api.listNetworks();
+
+            Response<ListNetworksAnswerRoot> listAnswer;
+
+            try {
+                listAnswer = call.execute();
+
+                ArrayList<NetworkDesc> answerList = listAnswer.body().networks;
+
+                Collections.sort(answerList, new Comparator<NetworkDesc>() {
+                    @Override
+                    public int compare(NetworkDesc networkDesc, NetworkDesc t1) {
+
+                        return (int) (networkDesc.getMeterFromLatLng(mCurrentUserLatLng) - t1.getMeterFromLatLng(mCurrentUserLatLng));
+                    }
+                });
+
+                NetworkDesc closestNetwork = answerList.get(0);
+
+                //TODO: multiple networks
+
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(NearbyActivity.this);
+
+                SharedPreferences.Editor editor = sp.edit();
+
+                editor.putString(PREF_NETWORK_ID, closestNetwork.id);
+                editor.putString(PREF_NETWORK_NAME, closestNetwork.name);
+                editor.putString(PREF_NETWORK_HREF, closestNetwork.href);
+                editor.putLong(PREF_NETWORK_LATITUDE, Double.doubleToLongBits(closestNetwork.location.latitude));
+                editor.putLong(PREF_NETWORK_LONGITUDE, Double.doubleToLongBits(closestNetwork.location.longitude));
+
+                editor.apply();
+
+            } catch (IOException e) {
+                Toast toast;
+
+                toast = Toast.makeText(getApplicationContext(),getString(R.string.download_failed),Toast.LENGTH_LONG);
+
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+
+                cancel(false); //No need to try to interrupt the thread
+            }
+
             return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+
+            mUpdateTextView.setText(getString(R.string.searching_bike_network));
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(NearbyActivity.this);
+
+            setActivityTitle(sp.getString(PREF_NETWORK_NAME, getTitle().toString()));
+            restoreActionBar();
+
+            AlertDialog alertDialog = new AlertDialog.Builder(NearbyActivity.this).create();
+            //alertDialog.setTitle(getString(R.string.network_found_title));
+            alertDialog.setMessage(Html.fromHtml(String.format(getString(R.string.network_found), sp.getString(NearbyActivity.PREF_NETWORK_NAME, "Bixi"))));
+
+            alertDialog.show();
+
+            mDownloadWebTask = new DownloadWebTask();
+            mDownloadWebTask.execute();
+
+            mFindNetworkTask = null;
         }
     }
 
@@ -799,9 +903,10 @@ public class NearbyActivity extends BaseActivity
 
             Citybik_esAPI api = ((RootApplication) getApplication()).getCitybik_esApi();
 
-            final Call<StatusAnswerRoot> call = api.getStatusForNetwork("/v2/networks/bixi-montreal", UrlParams);
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(NearbyActivity.this);
+            final Call<NetworkStatusAnswerRoot> call = api.getNetworkStatus(sp.getString(NearbyActivity.PREF_NETWORK_HREF, "/v2/networks/bixi-montreal"), UrlParams);
 
-            Response<StatusAnswerRoot> statusAnswer;
+            Response<NetworkStatusAnswerRoot> statusAnswer;
 
             try {
                 statusAnswer = call.execute();
