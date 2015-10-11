@@ -282,9 +282,9 @@ public class StationMapFragment extends Fragment
         setMarkersVisibility(false);
     }
 
-    public void showMarkerForStationUid(long stationUid) {
+    public void showMarkerForStationId(String stationId) {
         for(StationMapGfx markerData : mMapMarkersGfxData){
-            if (markerData.getStationUid() == stationUid){
+            if (markerData.getStationId().equalsIgnoreCase(stationId)){
                 markerData.setGroundOverlayVisible(true);
                 //markerData.setInfoWindowVisible(true);
             }

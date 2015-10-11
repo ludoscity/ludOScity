@@ -98,7 +98,7 @@ public class StationInfoFragment extends Fragment {
 
         mFavoriteStar = menu.findItem(com.ludoscity.bikeactivityexplorer.R.id.favoriteStar);
 
-        if (mStationItem.isFavorite()){
+        if (mStationItem.isFavorite(getActivity())){
             mFavoriteStar.setIcon(mIconStarOn);
         }
         else{
@@ -121,17 +121,17 @@ public class StationInfoFragment extends Fragment {
     private void switchFavoriteState(){
         Toast toast;
 
-        boolean newState = !mStationItem.isFavorite();
+        boolean newState = !mStationItem.isFavorite(getActivity());
 
-        mStationItem.setFavorite(newState);
+        mStationItem.setFavorite(newState, getActivity());
 
         if (newState){
             mFavoriteStar.setIcon(mIconStarOn);
-            toast = Toast.makeText(getActivity().getApplicationContext(),getString(com.ludoscity.bikeactivityexplorer.R.string.addedToFavorites),Toast.LENGTH_SHORT);
+            toast = Toast.makeText(getActivity().getApplicationContext(),getString(com.ludoscity.bikeactivityexplorer.R.string.favorite_added),Toast.LENGTH_SHORT);
         }
         else{
             mFavoriteStar.setIcon(mIconStarOff);
-            toast = Toast.makeText(getActivity().getApplicationContext(),getString(com.ludoscity.bikeactivityexplorer.R.string.removedFromFavorites),Toast.LENGTH_SHORT);
+            toast = Toast.makeText(getActivity().getApplicationContext(),getString(com.ludoscity.bikeactivityexplorer.R.string.favorite_removed),Toast.LENGTH_SHORT);
         }
 
         toast.setGravity(Gravity.CENTER, 0, 0);

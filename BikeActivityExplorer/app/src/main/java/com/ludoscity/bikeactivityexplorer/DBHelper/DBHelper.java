@@ -1,6 +1,8 @@
 package com.ludoscity.bikeactivityexplorer.DBHelper;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
@@ -21,9 +23,10 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by F8Full on 2015-04-02.
@@ -37,6 +40,8 @@ public class DBHelper {
     private static final String mTRACKS_DB_NAME = "tracksdb";
     private static final String mSTATIONS_DB_NAME = "stationsdb";
     private static boolean mGotTracks;
+
+    private static final String PREF_FAVORITES_SET = "favorites";
 
     private DBHelper() {}
 
@@ -66,20 +71,19 @@ public class DBHelper {
     }
 
     public static void saveStation(final StationItem toSave) throws CouchbaseLiteException, JSONException {
-        Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getDocument(String.valueOf(toSave.getUid()));
+        Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getDocument(toSave.getId());
 
         doc.update(new Document.DocumentUpdater() {
             @Override
             public boolean update(UnsavedRevision newRevision) {
                 Map<String, Object> properties = newRevision.getUserProperties();
-                properties.put("uid", toSave.getUid());
+                properties.put("id", toSave.getId());
                 properties.put("name", toSave.getName());
                 properties.put("locked", toSave.isLocked());
                 properties.put("empty_slots", toSave.getEmpty_slots());
                 properties.put("free_bikes", toSave.getFree_bikes());
                 properties.put("latitude", toSave.getPosition().latitude);
                 properties.put("longitude", toSave.getPosition().longitude);
-                properties.put("isFavorite", toSave.isFavorite());
                 properties.put("timestamp", toSave.getTimestamp());
                 newRevision.setUserProperties(properties);
                 return true;
@@ -178,7 +182,7 @@ public class DBHelper {
 
         Map<String, Object> properties = d.getProperties();
 
-        long uid = ((Number) properties.get("uid")).longValue();
+        String id = (String) properties.get("id");
         String name = (String)properties.get("name");
         double latitude = (Double) properties.get("latitude");
         double longitude = (Double) properties.get("longitude");
@@ -186,11 +190,10 @@ public class DBHelper {
         int empty_slots = ((Number) properties.get("empty_slots")).intValue();
         String timestamp = (String) properties.get("timestamp");
         boolean locked = (Boolean) properties.get("locked");
-        boolean isFavorite = (Boolean) properties.get("isFavorite");
 
         LatLng position = new LatLng(latitude,longitude);
 
-        return new StationItem(uid,name,position,free_bikes,empty_slots,timestamp,locked,isFavorite);
+        return new StationItem(id,name,position,free_bikes,empty_slots,timestamp,locked);
 
     }
 
@@ -209,17 +212,22 @@ public class DBHelper {
         return stationsNetwork;
     }
 
-    public static ArrayList<StationItem> getFavoriteStations() throws CouchbaseLiteException {
+    public static ArrayList<StationItem> getFavoriteStations(Context ctx) throws CouchbaseLiteException {
         ArrayList<StationItem> items = new ArrayList<>();
 
         List<QueryRow> allStations = getAllStations();
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+
+        Set<String> favorites = sp.getStringSet(PREF_FAVORITES_SET, new HashSet<String>());
 
         for (QueryRow qr : allStations) {
             Document d = qr.getDocument();
 
             Map<String, Object> properties = d.getProperties();
 
-            if((Boolean) properties.get("isFavorite"))
+            //noinspection SuspiciousMethodCalls
+            if (favorites.contains(properties.get("id")))
             {
                 items.add(createStationItem(d));
             }
@@ -228,24 +236,42 @@ public class DBHelper {
         return items;
     }
 
-    public static boolean isFavorite(long id) throws CouchbaseLiteException {
+    public static boolean isFavorite(String id, Context ctx) {
 
         boolean toReturn = false;
 
-        Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getExistingDocument(String.valueOf(id));
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
 
-        if (doc != null)
-        {
-            Map<String, Object> properties = doc.getProperties();
-            toReturn = (Boolean) properties.get("isFavorite");
-        }
+        Set<String> favorites = sp.getStringSet(PREF_FAVORITES_SET, new HashSet<String>());
+
+
+        if (favorites.contains(id))
+            toReturn = true;
+
 
         return toReturn;
     }
 
-    public static void updateFavorite(final Boolean isFavorite, long id) throws CouchbaseLiteException {
+    public static void updateFavorite(final Boolean isFavorite, String id, Context ctx) {
 
-        Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getExistingDocument(String.valueOf(id));
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        Set<String> oldFavorites = sp.getStringSet(PREF_FAVORITES_SET, new HashSet<String>());
+
+        /*http://developer.android.com/reference/android/content/SharedPreferences.html#getStringSet(java.lang.String, java.util.Set)
+
+        Note that you must not modify the set instance returned by this call.
+        The consistency of the stored data is not guaranteed if you do, nor is your ability to modify the instance at all.*/
+
+        Set<String> newFavorites = new HashSet<>(oldFavorites);
+
+        if (isFavorite)
+            newFavorites.add(id);
+        else
+            newFavorites.remove(id);
+
+        sp.edit().putStringSet(PREF_FAVORITES_SET, newFavorites).apply();
+
+        /*Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getExistingDocument(id);
 
 
         doc.update(new Document.DocumentUpdater() {
@@ -254,23 +280,7 @@ public class DBHelper {
                 newRevision.getProperties().put("isFavorite", isFavorite);
                 return true;
             }
-        });
+        });*/
 
-    }
-
-    public static void addNetwork(StationsNetwork stationsNetwork) throws Exception {
-        LinkedHashMap<Long, StationItem> map = new LinkedHashMap<>();
-
-        for (StationItem station : stationsNetwork.stations) {
-            if (map.containsKey(station.getUid())) {
-                throw new Exception("Erreur de duplication dans la DB. Des stations pourraient être manquantent");
-            }
-            map.put(station.getUid(), station);
-        }
-
-        for(Map.Entry<Long, StationItem> entry : map.entrySet()) {
-
-            saveStation(entry.getValue());
-        }
     }
 }

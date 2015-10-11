@@ -1,9 +1,9 @@
 package com.ludoscity.bikeactivityexplorer;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterItem;
@@ -18,7 +18,7 @@ import java.io.UnsupportedEncodingException;
  * Simple item holding the data necessary for each stations to be shown in listViewAdapter
  */
 public class StationItem implements Parcelable, ClusterItem {
-    private long uid;
+    private String id;
     private String name;
     private boolean locked;
     private int empty_slots;
@@ -26,11 +26,10 @@ public class StationItem implements Parcelable, ClusterItem {
     private double latitude;
     private double longitude;
    // private LatLng position;
-    private boolean isFavorite;
     private String timestamp;
 
-    public StationItem(long uid, String name, LatLng position, int free_bikes, int empty_slots, String timestamp, boolean locked, boolean isFavorite) {
-        this.uid = uid;
+    public StationItem(String id, String name, LatLng position, int free_bikes, int empty_slots, String timestamp, boolean locked) {
+        this.id = id;
         this.name = name;
         this.locked = locked;
         this.empty_slots = empty_slots;
@@ -38,13 +37,12 @@ public class StationItem implements Parcelable, ClusterItem {
         this.latitude = position.latitude;
         this.longitude = position.longitude;
         //this.position = position;
-        this.isFavorite = isFavorite;
         this.timestamp = timestamp;
     }
 
-    // Constructor to be used ONLY when parsing the json file since it trims the name
-    public StationItem(Station _station, boolean isFavorite) {
-        this.uid = _station.extra.uid;
+    public StationItem(Station _station) {
+
+        this.id = _station.id;
 
         if (null != _station.extra.name) {
             try {
@@ -69,12 +67,11 @@ public class StationItem implements Parcelable, ClusterItem {
         this.latitude = _station.latitude;
         this.longitude = _station.longitude;
         //this.position = new LatLng(_station.latitude, _station.longitude);
-        this.isFavorite = isFavorite;
         this.timestamp = _station.timestamp;
     }
 
     public StationItem(Parcel in){
-        uid = in.readLong();
+        id = in.readString();
         name = in.readString();
         locked = in.readByte() != 0;
         empty_slots = in.readInt();
@@ -82,13 +79,12 @@ public class StationItem implements Parcelable, ClusterItem {
         latitude = in.readDouble();
         longitude = in.readDouble();
         //position = in.readParcelable(LatLng.class.getClassLoader());
-        isFavorite = in.readByte() != 0;
         timestamp = in.readString();
     }
 
 
-    public long getUid() {
-        return uid;
+    public String getId() {
+        return id;
     }
 
     public String getName() {
@@ -109,17 +105,12 @@ public class StationItem implements Parcelable, ClusterItem {
 
     public LatLng getPosition() {return new LatLng(latitude,longitude);}
 
-    public boolean isFavorite() {
-        return isFavorite;
+    public boolean isFavorite(Context ctx) {
+        return DBHelper.isFavorite(id, ctx);
     }
 
-    public void setFavorite(Boolean b){
-        isFavorite = b;
-        try {
-            DBHelper.updateFavorite(isFavorite, uid);
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
+    public void setFavorite(Boolean b, Context ctx){
+        DBHelper.updateFavorite(b, id, ctx);
     }
 
     public boolean isLocked() {
@@ -137,7 +128,7 @@ public class StationItem implements Parcelable, ClusterItem {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(uid);
+        dest.writeString(id);
         dest.writeString(name);
         dest.writeByte((byte) (locked ? 1 : 0));
         dest.writeInt(empty_slots);
@@ -145,7 +136,6 @@ public class StationItem implements Parcelable, ClusterItem {
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
         //dest.writeParcelable(position, flags);
-        dest.writeByte((byte) (isFavorite? 1:0));
         dest.writeString(timestamp);
     }
 

@@ -104,8 +104,8 @@ public class StationMapGfx {
 
     public String getMarkerTitle(){ return marker.getTitle(); }
 
-    public long getStationUid(){
-        return mItem.getUid();
+    public String getStationId(){
+        return mItem.getId();
     }
 
     public void invalidateMarker(){

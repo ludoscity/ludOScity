@@ -80,7 +80,7 @@ public class FavoritesFragment extends Fragment {
 
     public void setUpUI(){
         try {
-            mStationsFavorites = DBHelper.getFavoriteStations();
+            mStationsFavorites = DBHelper.getFavoriteStations(getActivity());
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }

@@ -95,7 +95,7 @@ public class StationListViewAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return mStationList.get(position).getUid();
+        return position;
     }
 
     @Override

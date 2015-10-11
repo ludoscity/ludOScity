@@ -276,14 +276,18 @@ public class NearbyActivity extends BaseActivity
 
                 StationItem station = mStationListFragment.getHighlightedStation();
 
-                boolean newState = !station.isFavorite();
+                boolean newState = !station.isFavorite(this);
 
-                station.setFavorite(newState);
+                station.setFavorite(newState, this);
 
-                if (newState)
+                if (newState) {
                     mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
-                else
+                    Toast.makeText(this, getString(R.string.favorite_added),Toast.LENGTH_SHORT).show();
+                }
+                else {
                     mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite_outline);
+                    Toast.makeText(this, getString(R.string.favorite_removed),Toast.LENGTH_SHORT).show();
+                }
 
                 return true;
 
@@ -625,7 +629,7 @@ public class NearbyActivity extends BaseActivity
                         mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100));
 
                         mStationMapFragment.hideAllMarkers();
-                        mStationMapFragment.showMarkerForStationUid(station.getUid());
+                        mStationMapFragment.showMarkerForStationId(station.getUid());
                         mStationMapFragment.setEnforceMaxZoom(true);
 
                         mStationInfoFragment = StationInfoFragment.newInstance(station, mCurrentUserLatLng);
@@ -700,7 +704,7 @@ public class NearbyActivity extends BaseActivity
     }
 
     private void setupFavoriteActionIcon(StationItem station) {
-        if (station.isFavorite())
+        if (station.isFavorite(this))
             mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
         else
             mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite_outline);
@@ -888,9 +892,11 @@ public class NearbyActivity extends BaseActivity
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                DBHelper.addNetwork(mStationsNetwork);
+                for (StationItem station : mStationsNetwork.stations){
+                    DBHelper.saveStation(station);
+                }
             } catch (Exception e) {
-                Log.d("BixiAPI", "Error saving network", e );
+                Log.d("NearbyActivity", "Error saving network", e );
             }
             return null;
         }
@@ -924,11 +930,9 @@ public class NearbyActivity extends BaseActivity
                 mStationsNetwork = new StationsNetwork();
 
                 for (Station station : statusAnswer.body().network.stations) {
-                    StationItem stationItem = new StationItem(station, DBHelper.isFavorite(station.extra.uid));
+                    StationItem stationItem = new StationItem(station);
                     mStationsNetwork.stations.add(stationItem);
                 }
-            } catch (CouchbaseLiteException e) {
-                Log.d("TAG", "Problem with the database", e);
             } catch (IOException e) {
                 Toast toast;
 
