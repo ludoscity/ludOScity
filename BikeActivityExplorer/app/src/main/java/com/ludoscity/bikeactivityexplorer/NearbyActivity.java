@@ -323,8 +323,17 @@ public class NearbyActivity extends BaseActivity
 
     @Override
     protected void onNavDrawerStateChanged(boolean isOpen, boolean isAnimating) {
+
         if (null != mParkingSwitch)
-            mParkingSwitch.setVisible(!isOpen);
+            mParkingSwitch.setVisible(!isOpen && !isAnimating);
+
+        if (null != mStationListFragment.getHighlightedStation())
+        {
+            if (null != mFavoriteMenuItem)
+                mFavoriteMenuItem.setVisible(!isOpen && !isAnimating);
+            if (null != mDirectionsMenuItem)
+                mDirectionsMenuItem.setVisible(!isOpen && !isAnimating);
+        }
     }
 
     private void setOnClickFindSwitchListener() {
