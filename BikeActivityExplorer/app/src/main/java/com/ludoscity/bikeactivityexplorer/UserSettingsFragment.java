@@ -1,15 +1,15 @@
 package com.ludoscity.bikeactivityexplorer;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+
+import com.ludoscity.bikeactivityexplorer.DBHelper.DBHelper;
 
 /**
  * Created by Looney on 19-04-15.
@@ -49,14 +49,11 @@ public class UserSettingsFragment extends Fragment {
         autoUpdate_nearby.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                sp.edit().putBoolean(PREF_NEARBY_AUTO_UPDATE, isChecked).apply();
+                DBHelper.setAutoUpdate(isChecked, getActivity());
             }
         });
 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        autoUpdate_nearby.setChecked(sp.getBoolean(PREF_NEARBY_AUTO_UPDATE, true));
+        autoUpdate_nearby.setChecked(DBHelper.getAutoUpdate(getActivity()));
 
         return inflatedView;
     }
