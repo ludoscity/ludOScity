@@ -949,7 +949,7 @@ public class NearbyActivity extends BaseActivity
                 mStationsNetwork = new StationsNetwork();
 
                 for (Station station : statusAnswer.body().network.stations) {
-                    StationItem stationItem = new StationItem(station);
+                    StationItem stationItem = new StationItem(station, NearbyActivity.this);
                     mStationsNetwork.stations.add(stationItem);
                 }
             } catch (IOException e) {

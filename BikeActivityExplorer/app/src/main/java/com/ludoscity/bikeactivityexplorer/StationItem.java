@@ -3,6 +3,7 @@ package com.ludoscity.bikeactivityexplorer;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
@@ -40,22 +41,27 @@ public class StationItem implements Parcelable, ClusterItem {
         this.timestamp = timestamp;
     }
 
-    public StationItem(Station _station) {
+    public StationItem(Station _station, Context ctx) {
 
         this.id = _station.id;
 
         if (null != _station.extra.name) {
             try {
-                this.name = new String(_station.extra.name.getBytes("ISO-8859-1"), "UTF-8");
+                //Ugly hack. Character encoding for the bixi system is weird.
+                if (DBHelper.isBixiNetwork(ctx))
+                    this.name = new String(_station.extra.name.getBytes("ISO-8859-1"), "UTF-8");
+                else
+                    this.name = new String(_station.extra.name.getBytes("UTF-8"), "UTF-8");
+                //
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                Log.d("StationItem constructor", "String trouble",e );
             }
         }
         else {
             try {
-                this.name = new String(_station.name.getBytes("ISO-8859-1"), "UTF-8");
+                this.name = new String(_station.name.getBytes("UTF-8"), "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                Log.d("StationItem constructor", "String trouble", e);
             }
         }
 
