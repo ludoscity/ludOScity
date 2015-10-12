@@ -819,17 +819,15 @@ public class NearbyActivity extends BaseActivity
                     }
                 });
 
-                int toGet = 0;
-
-                NetworkDesc closestNetwork = answerList.get(toGet);
+                NetworkDesc closestNetwork = answerList.get(0);
 
                 //It seems we don't have a better candidate than the one we're presently using
-                if (closestNetwork.name.equalsIgnoreCase(DBHelper.getBikeNetworkName(NearbyActivity.this))){
+                if (closestNetwork.id.equalsIgnoreCase(DBHelper.getBikeNetworkId(NearbyActivity.this))){
                     cancel(false);
                 }
                 else{
 
-                    String oldBikeNetworkIdToReturn = DBHelper.getBikeNetworkName(NearbyActivity.this);
+                    String oldBikeNetworkIdToReturn = DBHelper.getBikeNetworkId(NearbyActivity.this);
                     DBHelper.saveBikeNetworkDesc(closestNetwork, NearbyActivity.this);
 
                     return oldBikeNetworkIdToReturn;

@@ -156,7 +156,7 @@ public class DBHelper {
         return ctx.getSharedPreferences(getBikeNetworkId(ctx), Context.MODE_PRIVATE);
     }
 
-    private static String getBikeNetworkId(Context ctx){
+    public static String getBikeNetworkId(Context ctx){
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
 
