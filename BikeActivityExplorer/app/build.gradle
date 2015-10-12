@@ -13,7 +13,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.ludoscity.bikeactivityexplorer"
+        applicationId "com.ludoscity.findmybikes"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 3
