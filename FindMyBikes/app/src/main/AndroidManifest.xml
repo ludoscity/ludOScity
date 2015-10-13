@@ -12,7 +12,7 @@
         android:name="com.ludoscity.findmybikes.RootApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:backupAgent="Helpers.PrefsBackupAgent"
+        android:backupAgent="com.ludoscity.findmybikes.Helpers.PrefsBackupAgent"
         android:theme="@style/FindMyBikesTheme">
 
         <activity
