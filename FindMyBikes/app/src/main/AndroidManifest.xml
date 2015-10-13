@@ -17,7 +17,8 @@
         android:theme="@style/FindMyBikesTheme">
         <activity
             android:name="com.ludoscity.findmybikes.NearbyActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:backupAgent="PrefsBackupAgent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
