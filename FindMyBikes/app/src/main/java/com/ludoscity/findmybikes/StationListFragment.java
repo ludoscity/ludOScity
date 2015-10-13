@@ -210,7 +210,7 @@ public class StationListFragment extends Fragment {
 
         StationItem toReturn = null;
 
-        if (mStationListView.getCheckedItemPosition() != AdapterView.INVALID_POSITION){
+        if (mStationListView.getCheckedItemPosition() != AdapterView.INVALID_POSITION && mStationListViewAdapter != null){
             toReturn = (StationItem) mStationListViewAdapter.getItem(mStationListView.getCheckedItemPosition());
         }
 
