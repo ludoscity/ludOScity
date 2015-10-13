@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.model.LatLng;
-import com.ludoscity.findmybikes.DBHelper.DBHelper;
+import com.ludoscity.findmybikes.Helpers.DBHelper;
 
 import java.util.ArrayList;
 

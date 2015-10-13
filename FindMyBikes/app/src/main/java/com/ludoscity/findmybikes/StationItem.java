@@ -9,7 +9,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterItem;
 import com.ludoscity.findmybikes.Citybik_esAPI.model.Station;
-import com.ludoscity.findmybikes.DBHelper.DBHelper;
+import com.ludoscity.findmybikes.Helpers.DBHelper;
 
 import java.io.UnsupportedEncodingException;
 

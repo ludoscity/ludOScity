@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class NetworkLocation {
     public Double latitude;
     public Double longitude;
+    public String city;
 
     public LatLng getAsLatLng(){ return new LatLng(latitude, longitude); }
 }

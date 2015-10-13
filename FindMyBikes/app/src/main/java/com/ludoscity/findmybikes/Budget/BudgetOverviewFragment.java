@@ -22,7 +22,7 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.QueryRow;
 import com.ludoscity.findmybikes.BixiTracksExplorerAPIHelper;
-import com.ludoscity.findmybikes.DBHelper.DBHelper;
+import com.ludoscity.findmybikes.Helpers.DBHelper;
 import com.ludoscity.findmybikes.R;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.ListTracksResponse;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;

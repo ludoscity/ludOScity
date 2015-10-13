@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-import com.ludoscity.findmybikes.DBHelper.DBHelper;
+import com.ludoscity.findmybikes.Helpers.DBHelper;
 
 /**
  * Created by Looney on 19-04-15.

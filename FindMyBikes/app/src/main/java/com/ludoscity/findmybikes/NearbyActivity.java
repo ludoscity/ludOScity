@@ -32,7 +32,7 @@ import com.ludoscity.findmybikes.Citybik_esAPI.model.ListNetworksAnswerRoot;
 import com.ludoscity.findmybikes.Citybik_esAPI.model.NetworkDesc;
 import com.ludoscity.findmybikes.Citybik_esAPI.model.NetworkStatusAnswerRoot;
 import com.ludoscity.findmybikes.Citybik_esAPI.model.Station;
-import com.ludoscity.findmybikes.DBHelper.DBHelper;
+import com.ludoscity.findmybikes.Helpers.DBHelper;
 import com.ludoscity.findmybikes.Utils.Utils;
 
 import java.io.IOException;

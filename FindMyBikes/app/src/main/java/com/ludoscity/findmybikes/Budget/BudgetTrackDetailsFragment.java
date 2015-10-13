@@ -27,7 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.ludoscity.findmybikes.BixiTracksExplorerAPIHelper;
-import com.ludoscity.findmybikes.DBHelper.DBHelper;
+import com.ludoscity.findmybikes.Helpers.DBHelper;
 import com.ludoscity.findmybikes.R;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.GetTrackFromTimeUTCKeyStringResponse;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.TrackPoint;

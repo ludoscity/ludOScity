@@ -1,8 +1,7 @@
-package com.ludoscity.findmybikes.DBHelper;
+package com.ludoscity.findmybikes.Helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
@@ -36,8 +35,6 @@ import java.util.Set;
  * This file is part of BixiTrackExplorer
  * Helper class providing static method to save and retrieve data from storage
  * Internally, it uses both SharedPreferences and couchbase
- * For SharedPreferences, bike network specific data is saved in different files (one per network)
- * The id of the network currently in use is stored in default SharedPreferences fils
  */
 @SuppressWarnings("unchecked") //(List<QueryRow>) allDocs.get("rows");
 public class DBHelper {
@@ -47,17 +44,19 @@ public class DBHelper {
     private static final String mSTATIONS_DB_NAME = "stationsdb";
     private static boolean mGotTracks;
 
-    private static final String DEFAULT_REF_NEARBY_AUTO_UPDATE = "setting.auto_update.nearby";
-    private static final String DEFAULT_PREF_NETWORK_ID = "network_id";
+    public static final String SHARED_PREF_FILENAME = "FindMyBikes_prefs";
 
-    private static final String PREF_FAVORITES_SET = "favorites";
-    private static final String PREF_WEBTASK_LAST_TIMESTAMP_MS = "last_refresh_timestamp";
-    private static final String PREF_NETWORK_NAME = "network_name";
-    private static final String PREF_NETWORK_HREF = "network_href";
-    private static final String PREF_NETWORK_BOUNDS_SW_LATITUDE = "network_bounds_sw_lat";
-    private static final String PREF_NETWORK_BOUNDS_SW_LONGITUDE = "network_bounds_sw_lng";
-    private static final String PREF_NETWORK_BOUNDS_NE_LATITUDE = "network_bounds_ne_lat";
-    private static final String PREF_NETWORK_BOUNDS_NE_LONGITUDE = "network_bounds_ne_lng";
+    private static final String PREF_CURRENT_BIKE_NETWORK_ID = "current_bike_network_id";
+    private static final String PREF_NEARBY_AUTO_UPDATE = "setting.auto_update.nearby";
+
+    private static final String PREF_SUFFIX_FAVORITES_SET = "_favorites";
+    private static final String PREF_SUFFIX_WEBTASK_LAST_TIMESTAMP_MS = "_last_refresh_timestamp";
+    private static final String PREF_SUFFIX_NETWORK_NAME = "_network_name";
+    private static final String PREF_SUFFIX_NETWORK_HREF = "_network_href";
+    private static final String PREF_SUFFIX_NETWORK_BOUNDS_SW_LATITUDE = "_network_bounds_sw_lat";
+    private static final String PREF_SUFFIX_NETWORK_BOUNDS_SW_LONGITUDE = "_network_bounds_sw_lng";
+    private static final String PREF_SUFFIX_NETWORK_BOUNDS_NE_LATITUDE = "_network_bounds_ne_lat";
+    private static final String PREF_SUFFIX_NETWORK_BOUNDS_NE_LONGITUDE = "_network_bounds_ne_lng";
 
 
     private DBHelper() {}
@@ -68,27 +67,29 @@ public class DBHelper {
     }
 
     public static boolean getAutoUpdate(Context ctx){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        return sp.getBoolean(DEFAULT_REF_NEARBY_AUTO_UPDATE, true);
+        return sp.getBoolean(PREF_NEARBY_AUTO_UPDATE, true);
     }
 
     public static void setAutoUpdate(boolean toSet, Context ctx){
 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        sp.edit().putBoolean(DEFAULT_REF_NEARBY_AUTO_UPDATE, toSet).apply();
+        sp.edit().putBoolean(PREF_NEARBY_AUTO_UPDATE, toSet).apply();
     }
 
     public static long getLastUpdateTimestamp(Context ctx){
 
-        return getBikeNetworkSharedPreferences(ctx).getLong(PREF_WEBTASK_LAST_TIMESTAMP_MS, 0);
+        return ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE)
+                .getLong(buildNetworkSpecificKey(PREF_SUFFIX_WEBTASK_LAST_TIMESTAMP_MS, ctx), 0);
     }
 
     public static void saveLastUpdateTimestampAsNow(Context ctx){
 
-        getBikeNetworkSharedPreferences(ctx).edit().putLong(PREF_WEBTASK_LAST_TIMESTAMP_MS,
-                Calendar.getInstance().getTimeInMillis()).apply();
+        ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE).edit()
+                .putLong(buildNetworkSpecificKey(PREF_SUFFIX_WEBTASK_LAST_TIMESTAMP_MS, ctx),
+                        Calendar.getInstance().getTimeInMillis()).apply();
     }
 
     public static boolean isBikeNetworkIdAvailable(Context ctx){
@@ -98,27 +99,28 @@ public class DBHelper {
 
     public static String getBikeNetworkName(Context ctx){
 
-        return getBikeNetworkSharedPreferences(ctx).getString(PREF_NETWORK_NAME, "");
+        return ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE)
+                .getString(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_NAME, ctx), "");
     }
 
     public static String getBikeNetworkHRef(Context ctx){
 
-        return getBikeNetworkSharedPreferences(ctx).getString(PREF_NETWORK_HREF, "/v2/networks/bixi-montreal");
+        return ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE)
+                .getString(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_HREF, ctx), "/v2/networks/bixi-montreal");
     }
 
     public static void saveBikeNetworkDesc(NetworkDesc networkDesc, Context ctx){
 
-        //id in default sharedpref file
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor IdEditor = sp.edit();
 
-        sp.edit().putString(DEFAULT_PREF_NETWORK_ID, networkDesc.id).apply();
+        //Important to apply right away so that subsequent calls to buildNetworkSpecificKey work
+        IdEditor.putString(PREF_CURRENT_BIKE_NETWORK_ID, networkDesc.id).apply();
 
+        SharedPreferences.Editor editor = sp.edit();
 
-        //the rest in bike network specific file
-        SharedPreferences.Editor editor = getBikeNetworkSharedPreferences(ctx).edit();
-
-        editor.putString(PREF_NETWORK_NAME, networkDesc.name);
-        editor.putString(PREF_NETWORK_HREF, networkDesc.href);
+        editor.putString(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_NAME, ctx), networkDesc.name);
+        editor.putString(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_HREF, ctx), networkDesc.href);
 
         editor.apply();
     }
@@ -127,12 +129,16 @@ public class DBHelper {
 
         if (!bounds.equals(getBikeNetworkBounds(ctx))){
 
-            SharedPreferences.Editor editor = getBikeNetworkSharedPreferences(ctx).edit();
+            SharedPreferences.Editor editor = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE).edit();
 
-            editor.putLong(PREF_NETWORK_BOUNDS_SW_LATITUDE, Double.doubleToLongBits(bounds.southwest.latitude));
-            editor.putLong(PREF_NETWORK_BOUNDS_SW_LONGITUDE, Double.doubleToLongBits(bounds.southwest.longitude));
-            editor.putLong(PREF_NETWORK_BOUNDS_NE_LATITUDE, Double.doubleToLongBits(bounds.northeast.latitude));
-            editor.putLong(PREF_NETWORK_BOUNDS_NE_LONGITUDE, Double.doubleToLongBits(bounds.northeast.longitude));
+            editor.putLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_SW_LATITUDE, ctx),
+                    Double.doubleToLongBits(bounds.southwest.latitude));
+            editor.putLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_SW_LONGITUDE, ctx),
+                    Double.doubleToLongBits(bounds.southwest.longitude));
+            editor.putLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_NE_LATITUDE, ctx),
+                    Double.doubleToLongBits(bounds.northeast.latitude));
+            editor.putLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_NE_LONGITUDE, ctx),
+                    Double.doubleToLongBits(bounds.northeast.longitude));
 
             editor.apply();
         }
@@ -140,27 +146,30 @@ public class DBHelper {
 
     public static LatLngBounds getBikeNetworkBounds(Context ctx){
 
-        SharedPreferences sp = getBikeNetworkSharedPreferences(ctx);
+        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        LatLng southwest = new LatLng(Double.longBitsToDouble(sp.getLong(PREF_NETWORK_BOUNDS_SW_LATITUDE, 0)),
-                Double.longBitsToDouble(sp.getLong(PREF_NETWORK_BOUNDS_SW_LONGITUDE, 0)));
+        LatLng southwest = new LatLng(
+                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_SW_LATITUDE, ctx), 0)),
+                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_SW_LONGITUDE, ctx), 0))
+        );
 
-        LatLng northeast = new LatLng(Double.longBitsToDouble(sp.getLong(PREF_NETWORK_BOUNDS_NE_LATITUDE, 0)),
-                Double.longBitsToDouble(sp.getLong(PREF_NETWORK_BOUNDS_NE_LONGITUDE, 0)));
+        LatLng northeast = new LatLng(
+                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_NE_LATITUDE, ctx), 0)),
+                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_NE_LONGITUDE, ctx), 0))
+        );
 
         return new LatLngBounds(southwest, northeast);
     }
 
-    private static SharedPreferences getBikeNetworkSharedPreferences(Context ctx){
-
-        return ctx.getSharedPreferences(getBikeNetworkId(ctx), Context.MODE_PRIVATE);
+    private static String buildNetworkSpecificKey(String suffix, Context ctx){
+        return getBikeNetworkId(ctx) + suffix;
     }
 
     public static String getBikeNetworkId(Context ctx){
 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        return sp.getString(DEFAULT_PREF_NETWORK_ID, "");
+        return sp.getString(PREF_CURRENT_BIKE_NETWORK_ID, "");
     }
 
     //Helper function for ugly fix regarding accented characters
@@ -339,9 +348,9 @@ public class DBHelper {
 
         List<QueryRow> allStations = getAllStations();
 
-        SharedPreferences sp = getBikeNetworkSharedPreferences(ctx);
+        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        Set<String> favorites = sp.getStringSet(PREF_FAVORITES_SET, new HashSet<String>());
+        Set<String> favorites = sp.getStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), new HashSet<String>());
 
         for (QueryRow qr : allStations) {
             Document d = qr.getDocument();
@@ -362,10 +371,9 @@ public class DBHelper {
 
         boolean toReturn = false;
 
-        SharedPreferences sp = getBikeNetworkSharedPreferences(ctx);
+        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        Set<String> favorites = sp.getStringSet(PREF_FAVORITES_SET, new HashSet<String>());
-
+        Set<String> favorites = sp.getStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), new HashSet<String>());
 
         if (favorites.contains(id))
             toReturn = true;
@@ -376,9 +384,9 @@ public class DBHelper {
 
     public static void updateFavorite(final Boolean isFavorite, String id, Context ctx) {
 
-        SharedPreferences sp = getBikeNetworkSharedPreferences(ctx);
+        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        Set<String> oldFavorites = sp.getStringSet(PREF_FAVORITES_SET, new HashSet<String>());
+        Set<String> oldFavorites = sp.getStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), new HashSet<String>());
 
         /*http://developer.android.com/reference/android/content/SharedPreferences.html#getStringSet(java.lang.String, java.util.Set)
 
@@ -392,7 +400,7 @@ public class DBHelper {
         else
             newFavorites.remove(id);
 
-        sp.edit().putStringSet(PREF_FAVORITES_SET, newFavorites).apply();
+        sp.edit().putStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), newFavorites).apply();
 
         /*Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getExistingDocument(id);
 
