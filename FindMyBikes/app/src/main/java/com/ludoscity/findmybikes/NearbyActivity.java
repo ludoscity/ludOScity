@@ -2,7 +2,6 @@ package com.ludoscity.findmybikes;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -69,8 +68,8 @@ public class NearbyActivity extends BaseActivity
 
     private LatLng mCurrentUserLatLng = null;
 
-    private TextView mUpdateTextView;
-    private View mDownloadBar;
+    private TextView mStatusTextView;
+    private View mStatusBar;
 
     private boolean mRefreshMarkers = true;
     private boolean mLookingForBike = true;
@@ -153,10 +152,9 @@ public class NearbyActivity extends BaseActivity
         restoreActionBar();
 
         // Update Bar
-        mUpdateTextView = (TextView) findViewById(com.ludoscity.findmybikes.R.id.update_textView);
-        mUpdateTextView.setTextColor(Color.LTGRAY);
-        mDownloadBar = findViewById(com.ludoscity.findmybikes.R.id.downloadBar);
-        setDownloadBarListener();
+        mStatusTextView = (TextView) findViewById(com.ludoscity.findmybikes.R.id.status_textView);
+        mStatusBar = findViewById(com.ludoscity.findmybikes.R.id.statusBar);
+        setStatusBarListener();
 
 
         if (savedInstanceState == null){
@@ -447,11 +445,11 @@ public class NearbyActivity extends BaseActivity
                     if (DBHelper.isBikeNetworkIdAvailable(getApplicationContext())) {
                         //First taking care of past time...
                         if (difference < DateUtils.MINUTE_IN_MILLIS)
-                            updateTextBuilder.append(getString(com.ludoscity.findmybikes.R.string.momentsAgo)).append(" ").append(getString(com.ludoscity.findmybikes.R.string.fromCitibik_es));//mUpdateTextView.setText();
+                            updateTextBuilder.append(getString(com.ludoscity.findmybikes.R.string.momentsAgo)).append(" ").append(getString(com.ludoscity.findmybikes.R.string.fromCitibik_es));//mStatusTextView.setText();
                         else
                             updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(com.ludoscity.findmybikes.R.string.minsAgo)).append(" ").append(getString(com.ludoscity.findmybikes.R.string.fromCitibik_es));
                     }
-                    //mUpdateTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
+                    //mStatusTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
 
                     //long differenceInMinutes = difference / DateUtils.MINUTE_IN_MILLIS;
 
@@ -516,7 +514,7 @@ public class NearbyActivity extends BaseActivity
                             mRefreshMenuItem.setVisible(false);
                     }
 
-                    mUpdateTextView.setText(updateTextBuilder.toString());
+                    mStatusTextView.setText(updateTextBuilder.toString());
                 }
 
                 //UI will be refreshed every second
@@ -525,8 +523,8 @@ public class NearbyActivity extends BaseActivity
         };
     }
 
-    private void setDownloadBarListener() {
-        mDownloadBar.setOnClickListener(new View.OnClickListener() {
+    private void setStatusBarListener() {
+        mStatusBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (Utils.Connectivity.isConnected(getApplicationContext())) {
@@ -717,7 +715,7 @@ public class NearbyActivity extends BaseActivity
 
             mStationMapFragment.clearMarkerGfxData();
 
-            mUpdateTextView.setText(getString(R.string.refreshing));
+            mStatusTextView.setText(getString(R.string.refreshing));
             setRefreshActionButtonState(true);
         }
 
@@ -775,7 +773,7 @@ public class NearbyActivity extends BaseActivity
         protected void onPreExecute() {
             super.onPreExecute();
 
-            mUpdateTextView.setText(getString(R.string.searching_wait_location));
+            mStatusTextView.setText(getString(R.string.searching_wait_location));
 
             setRefreshActionButtonState(true);
         }
@@ -856,7 +854,7 @@ public class NearbyActivity extends BaseActivity
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
 
-            mUpdateTextView.setText(getString(R.string.searching_bike_network));
+            mStatusTextView.setText(getString(R.string.searching_bike_network));
 
         }
 
@@ -976,7 +974,7 @@ public class NearbyActivity extends BaseActivity
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mUpdateTextView.setText(getString(R.string.downloading));
+            mStatusTextView.setText(getString(R.string.downloading));
 
             setRefreshActionButtonState(true);
         }

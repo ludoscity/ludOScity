@@ -46,14 +46,14 @@
 
                         <!-- LAST UPDATED -->
                         <LinearLayout
-                            android:id="@+id/downloadBar"
+                            android:id="@+id/statusBar"
                             android:layout_height="0px"
                             android:layout_width="fill_parent"
                             android:layout_weight="1.5"
                             android:orientation="horizontal"
                             android:background="@color/background_material_dark">
                             <TextView
-                                android:id="@+id/update_textView"
+                                android:id="@+id/status_textView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
