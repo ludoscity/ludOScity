@@ -1,7 +1,5 @@
 package com.ludoscity.findmybikes;
 
-import android.content.Context;
-
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -31,7 +29,7 @@ public class StationMapGfx {
 
     private static final float OVERLAY_SIZE_BASE = 50;
 
-    public StationMapGfx(StationItem item, boolean lookingForBike, Context context){
+    public StationMapGfx(StationItem item, boolean lookingForBike){
 
         mItem = item;
 
@@ -42,17 +40,7 @@ public class StationMapGfx {
                 .alpha(0)
                 .anchor(0.5f,0.5f)
                 .infoWindowAnchor(0.5f,0.5f);
-        if (!item.isLocked()) {
-            String parkings;
-            String bikes;
-            if(item.getEmpty_slots() < 2) parkings = context.getString(R.string.parking) +": ";
-            else parkings = context.getString(R.string.parkings)+": ";
-            if (item.getFree_bikes() < 2) bikes = context.getString(R.string.bike)+": ";
-            else bikes = context.getString(R.string.bikes)+": ";
-            markerOptions.snippet(bikes + item.getFree_bikes() + "   " + parkings + item.getEmpty_slots());
-        }
-        else
-            markerOptions.snippet(context.getString(R.string.stationIsLocked));
+
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
         groundOverlayOptions = new GroundOverlayOptions()
                 .position(item.getPosition(), OVERLAY_SIZE_BASE)

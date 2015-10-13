@@ -390,7 +390,7 @@ public class NearbyActivity extends BaseActivity
     //Safely updates everything based on checking the last update timestamp
     private void setupUI(){
 
-        if (mUpdateRefreshRunnableCode == null) {
+        if (mUpdateRefreshRunnableCode == null && mUpdateRefreshHandler != null) {
 
             mUpdateRefreshRunnableCode = createUpdateRefreshRunnableCode();
 

@@ -242,7 +242,7 @@ public class StationMapFragment extends Fragment
     public boolean isMapReady(){return !(mGoogleMap==null);}
 
     public void addMarkerForStationItem(StationItem item, boolean lookingForBike) {
-        mMapMarkersGfxData.add(new StationMapGfx(item, lookingForBike, getActivity().getApplicationContext()));
+        mMapMarkersGfxData.add(new StationMapGfx(item, lookingForBike));
     }
 
     public void redrawMarkers() {
