@@ -59,8 +59,8 @@
     <string name="download_failed">Téléchargement impossible !</string>
     <string name="google_maps_not_installed">Google Maps non installé !</string>
     <string name="searching_bike_network">Recherche sur citybik.es du système le plus proche…</string>
-    <string name="bike_network_found_message">Système de vélos réglé sur &lt;b>%1$s&lt;/b> en rapport à votre position.&lt;br /&gt;Il sera automatiquement mis à jour si vous voyagez.</string>
+    <string name="bike_network_found_message">Système de vélos réglé sur &lt;b>%1$s, %2$s&lt;/b> en rapport à votre position.&lt;br /&gt;Il sera automatiquement mis à jour si vous voyagez.</string>
     <string name="searching_wait_location">En attente de localisation…</string>
     <string name="welcome">Bienvenue</string>
-    <string name="bike_network_change_message">Système de vélo changé pour &lt;b>%1$s&lt;/b> en rapport à votre position.&lt;br /&gt;Vos favoris ont été préservés.</string>
+    <string name="bike_network_change_message">Système de vélo changé pour &lt;b>%1$s, %2$s&lt;/b> en rapport à votre position.&lt;br /&gt;Vos favoris ont été préservés.</string>
 </resources>

@@ -767,7 +767,7 @@ public class NearbyActivity extends BaseActivity
         }
     }
 
-    public class FindNetworkTask extends AsyncTask<Void, Void, String> {
+    public class FindNetworkTask extends AsyncTask<Void, Void, Map<String,String>> {
 
         //private final ProgressDialog mFindNetworkDialog = new ProgressDialog(NearbyActivity.this, R.style.BikeActivityExplorerTheme);
 
@@ -790,7 +790,9 @@ public class NearbyActivity extends BaseActivity
         }
 
         @Override
-        protected String doInBackground(Void... voids) {
+        protected Map<String,String> doInBackground(Void... voids) {
+
+            Map<String,String> toReturn = new HashMap<>();
 
             //noinspection StatementWithEmptyBody
             while (mCurrentUserLatLng == null)
@@ -827,10 +829,13 @@ public class NearbyActivity extends BaseActivity
                 }
                 else{
 
-                    String oldBikeNetworkIdToReturn = DBHelper.getBikeNetworkId(NearbyActivity.this);
-                    DBHelper.saveBikeNetworkDesc(closestNetwork, NearbyActivity.this);
+                    if (DBHelper.isBikeNetworkIdAvailable(NearbyActivity.this)){
+                        toReturn.put("old_network_name", DBHelper.getBikeNetworkName(NearbyActivity.this));
+                    }
 
-                    return oldBikeNetworkIdToReturn;
+                    toReturn.put("new_network_city", closestNetwork.location.city);
+
+                    DBHelper.saveBikeNetworkDesc(closestNetwork, NearbyActivity.this);
                 }
 
             } catch (IOException e) {
@@ -844,7 +849,7 @@ public class NearbyActivity extends BaseActivity
                 cancel(false); //No need to try to interrupt the thread
             }
 
-            return "";
+            return toReturn;
         }
 
         @Override
@@ -856,21 +861,23 @@ public class NearbyActivity extends BaseActivity
         }
 
         @Override
-        protected void onPostExecute(String oldNetworkName) {
-            super.onPostExecute(oldNetworkName);
+        protected void onPostExecute(Map<String,String> backgroundResults) {
+            super.onPostExecute(backgroundResults);
 
             setActivityTitle(getActionbarTitle());
             restoreActionBar();
 
             AlertDialog alertDialog = new AlertDialog.Builder(NearbyActivity.this).create();
             //alertDialog.setTitle(getString(R.string.network_found_title));
-            if (oldNetworkName.isEmpty()) {
+            if (!backgroundResults.keySet().contains("old_network_name")) {
                 alertDialog.setTitle(R.string.welcome);
-                alertDialog.setMessage(Html.fromHtml(String.format(getString(R.string.bike_network_found_message), DBHelper.getBikeNetworkName(NearbyActivity.this))));
+                alertDialog.setMessage(Html.fromHtml(String.format(getString(R.string.bike_network_found_message),
+                        DBHelper.getBikeNetworkName(NearbyActivity.this), backgroundResults.get("new_network_city"))));
             }
             else{
                 //alertDialog.setTitle(R.string.bike_network_change_title);
-                alertDialog.setMessage(Html.fromHtml(String.format(getString(R.string.bike_network_change_message), DBHelper.getBikeNetworkName(NearbyActivity.this))));
+                alertDialog.setMessage(Html.fromHtml(String.format(getString(R.string.bike_network_change_message),
+                        DBHelper.getBikeNetworkName(NearbyActivity.this), backgroundResults.get("new_network_city"))));
                 mStationMapFragment.doInitialCameraSetup(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15), true);
             }
 
@@ -919,6 +926,8 @@ public class NearbyActivity extends BaseActivity
             if (!DBHelper.getBikeNetworkBounds(NearbyActivity.this).contains(mCurrentUserLatLng)){
 
                 mStationListFragment.removeStationHighlight();
+                mFavoriteMenuItem.setVisible(false);
+                mDirectionsMenuItem.setVisible(false);
 
                 mFindNetworkTask = new FindNetworkTask();
                 mFindNetworkTask.execute();

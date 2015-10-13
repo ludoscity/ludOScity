@@ -58,8 +58,8 @@
     <string name="download_failed">Download failed !</string>
     <string name="google_maps_not_installed">Google Maps not installed !</string>
     <string name="searching_bike_network">Searching closest bike system on citybik.es…</string>
-    <string name="bike_network_found_message">Bike share network set to &lt;b>%1$s&lt;/b> based on location.&lt;br /&gt;It will update automatically if you travel.</string>
+    <string name="bike_network_found_message">Bike share network set to &lt;b>%1$s, %2$s&lt;/b> based on location.&lt;br /&gt;It will update automatically if you travel.</string>
     <string name="searching_wait_location">Waiting on location…</string>
     <string name="welcome">Welcome</string>
-    <string name="bike_network_change_message">Bike share network changed to &lt;b>%1$s&lt;/b> based on location.&lt;br /&gt;Your favorites been preserved.</string>
+    <string name="bike_network_change_message">Bike share network changed to &lt;b>%1$s, %2$s&lt;/b> based on location.&lt;br /&gt;Your favorites been preserved.</string>
 </resources>
