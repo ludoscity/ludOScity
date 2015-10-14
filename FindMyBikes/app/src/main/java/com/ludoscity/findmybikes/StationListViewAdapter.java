@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -28,9 +29,9 @@ public class StationListViewAdapter extends BaseAdapter {
 
     private boolean mIsLookingForBikes;
 
-    StationListViewAdapter(Context _context, StationsNetwork _stationsNetwork, LatLng _currentUserLatLng, boolean isLookingForBikes){
+    public StationListViewAdapter(Context _context, ArrayList<StationItem> _stationsNetwork, LatLng _currentUserLatLng, boolean isLookingForBikes){
         mContext = _context;
-        mStationList = _stationsNetwork.stations;
+        mStationList = _stationsNetwork;
         mInflater = LayoutInflater.from(_context);
         mCurrentUserLatLng = _currentUserLatLng;
         mIsLookingForBikes = isLookingForBikes;
@@ -126,24 +127,12 @@ public class StationListViewAdapter extends BaseAdapter {
         else
             holder.availability.setText(String.valueOf(currentStation.getEmpty_slots()));
 
-        // Color change between selected and not selected
-        //TODO : remove selection tracking from adapter : listView is designed for that
-        //TODO : have selection behave like the one in BudgetInfoFragment
-        /*if (currentStation.isSelected()){
-            holder.name.setTextColor(Color.LTGRAY);
-            holder.availability.setTextColor(Color.LTGRAY);
-            holder.distance.setTextColor(Color.LTGRAY);
-            //convertView.setBackgroundColor(mContext.getResources().getColor(R.color.material_blue_grey_800));
-            int[] styleAttr = {com.ludoscity.bikeactivityexplorer.R.attr.colorAccent};
-            @SuppressWarnings("ResourceType") TypedArray ta = mContext.obtainStyledAttributes(com.ludoscity.bikeactivityexplorer.R.style.BikeActivityExplorerTheme, styleAttr);
-            convertView.setBackgroundColor(ta.getColor(0, com.ludoscity.bikeactivityexplorer.R.color.material_blue_grey_800));
-            ta.recycle();
-        } else {*/
-            holder.name.setTextColor(Color.DKGRAY);
-            holder.availability.setTextColor(Color.DKGRAY);
-            holder.distance.setTextColor(Color.DKGRAY);
-            //convertView.setBackgroundColor(mContext.getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.background_material_light));
-        //}
+
+        //That's a mystery
+        holder.name.setTextColor(Color.DKGRAY);
+        holder.availability.setTextColor(Color.DKGRAY);
+        holder.distance.setTextColor(Color.DKGRAY);
+
         return convertView;
     }
 }

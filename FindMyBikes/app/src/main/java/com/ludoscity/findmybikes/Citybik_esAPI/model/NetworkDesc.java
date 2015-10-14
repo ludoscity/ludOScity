@@ -9,7 +9,6 @@ import com.google.maps.android.SphericalUtil;
  */
 public class NetworkDesc {
 
-    //public ArrayList<String> company;
     public String href;
     public String id;
     public String name;

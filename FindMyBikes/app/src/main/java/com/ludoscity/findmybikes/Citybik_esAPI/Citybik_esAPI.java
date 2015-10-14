@@ -16,11 +16,14 @@ import retrofit.http.QueryMap;
  */
 public interface Citybik_esAPI {
 
+    //Endpoint : //http://api.citybik.es
+
+    //http://api.citybik.es/v2/networks/bixi-montreal?fields=stations
     @GET("{href}")
     Call<NetworkStatusAnswerRoot> getNetworkStatus(@Path("href") String href, @QueryMap Map<String, String> options);
+    //http://api.citybik.es/v2/networks/
     @GET("/v2/networks")
     Call<ListNetworksAnswerRoot> listNetworks();
 }
 
-//http://api.citybik.es
-//http://api.citybik.es/v2/networks/bixi-montreal?fields=stations
+

@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes;
+package com.ludoscity.findmybikes.Activities;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
@@ -20,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.ludoscity.findmybikes.R;
 
 import java.util.ArrayList;
 

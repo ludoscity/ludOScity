@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes;
+package com.ludoscity.findmybikes.Fragments;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -14,32 +14,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.ludoscity.findmybikes.R;
+import com.ludoscity.findmybikes.StationItem;
+import com.ludoscity.findmybikes.StationListViewAdapter;
 
+import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnStationListFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link StationListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class StationListFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
 
     public static final String STATION_LIST_ITEM_CLICK_PATH = "station_list_item_click";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private Bundle mSavedInstanceState = null;
 
-    ///////////////////////////////////////////////////
     private StationListViewAdapter mStationListViewAdapter;
     private TextView mBikesOrParkingColumn;
     private ListView mStationListView;
@@ -47,37 +33,6 @@ public class StationListFragment extends Fragment {
     private OnStationListFragmentInteractionListener mListener;
 
     private int mLastCheckedPos = -1;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment StationListFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static StationListFragment newInstance(String param1, String param2) {
-        StationListFragment fragment = new StationListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    public StationListFragment() {
-        // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,20 +64,6 @@ public class StationListFragment extends Fragment {
         mBikesOrParkingColumn = (TextView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.bikesOrParkingColumn);
 
         return inflatedView;
-    }
-
-    @Override
-    public void onResume(){
-
-        super.onResume();
-
-        //Uri.Builder builder = new Uri.Builder();
-        //builder.appendPath(STATION_LIST_FRAG_ONRESUME_PATH);
-
-        //if (mListener != null){
-        //    mListener.onStationListFragmentInteraction(builder.build());
-        //}
-
     }
 
     @Override
@@ -162,7 +103,7 @@ public class StationListFragment extends Fragment {
         }
     }
 
-    public void setupUI(StationsNetwork stationsNetwork, LatLng currentUserLatLng, boolean lookingForBike) {
+    public void setupUI(ArrayList<StationItem> stationsNetwork, LatLng currentUserLatLng, boolean lookingForBike) {
 
         //So that when data is refreshed, the list doesn't reset
         Parcelable savedListViewState = mStationListView.onSaveInstanceState();

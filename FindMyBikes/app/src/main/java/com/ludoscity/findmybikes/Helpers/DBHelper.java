@@ -16,7 +16,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ludoscity.findmybikes.Citybik_esAPI.model.NetworkDesc;
 import com.ludoscity.findmybikes.StationItem;
-import com.ludoscity.findmybikes.StationsNetwork;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
 
 import org.json.JSONException;
@@ -328,8 +327,8 @@ public class DBHelper {
 
     }
 
-    public static StationsNetwork getStationsNetwork() throws CouchbaseLiteException {
-        StationsNetwork stationsNetwork = new StationsNetwork();
+    public static ArrayList<StationItem> getStationsNetwork() throws CouchbaseLiteException {
+        ArrayList<StationItem> stationsNetwork = new ArrayList<>();
 
         List<QueryRow> allStations = getAllStations();
 
@@ -337,7 +336,7 @@ public class DBHelper {
         {
             Document d = qr.getDocument();
 
-            stationsNetwork.stations.add(createStationItem(d));
+            stationsNetwork.add(createStationItem(d));
         }
 
         return stationsNetwork;

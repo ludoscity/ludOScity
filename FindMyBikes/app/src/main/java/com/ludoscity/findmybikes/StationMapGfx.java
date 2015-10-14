@@ -67,22 +67,11 @@ public class StationMapGfx {
         }
     }
 
-    public void setInfoWindowVisible(boolean toSet){
-        if (toSet)
-            marker.showInfoWindow();
-        else
-            marker.hideInfoWindow();
-    }
-
     public void setBigOverlay(boolean toSet){
         if (toSet)
             groundOverlay.setDimensions(2.0f*OVERLAY_SIZE_BASE);
         else
             groundOverlay.setDimensions(OVERLAY_SIZE_BASE);
-    }
-
-    public void setGroundOverlayVisible(boolean toSet){
-        groundOverlay.setVisible(toSet);
     }
 
     public void addMarkerToMap(GoogleMap map){
@@ -91,14 +80,6 @@ public class StationMapGfx {
     }
 
     public String getMarkerTitle(){ return marker.getTitle(); }
-
-    public String getStationId(){
-        return mItem.getId();
-    }
-
-    public void invalidateMarker(){
-        groundOverlay.setImage(greyIcon);
-    }
 
     public void updateMarker(boolean isLookingForBikes) {
         if (isLookingForBikes){

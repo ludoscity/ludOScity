@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes;
+package com.ludoscity.findmybikes.Fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -16,11 +16,8 @@ import com.ludoscity.findmybikes.Helpers.DBHelper;
  * Used to handle the Settings section
  */
 public class UserSettingsFragment extends Fragment {
-    private static final String ARG_SECTION_NUMBER = "section_number";
-    public static final String PREF_NEARBY_AUTO_UPDATE = "setting.auto_update.nearby";
 
     private CheckBox autoUpdate_nearby;
-    private CheckBox mLockScreenOrientation;
 
     public interface OnFragmentInteractionListener {
         void onSettingsFragmentInteraction();

@@ -1,14 +1,17 @@
-package com.ludoscity.findmybikes;
+package com.ludoscity.findmybikes.Activities;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+
+import com.ludoscity.findmybikes.R;
+import com.ludoscity.findmybikes.Fragments.UserSettingsFragment;
 
 /**
  * Created by F8Full on 2015-08-10.
  * Activity used to display Settings fragment
  */
 public class SettingsActivity extends BaseActivity
-        implements  UserSettingsFragment.OnFragmentInteractionListener{
+        implements UserSettingsFragment.OnFragmentInteractionListener {
 
     @Override
     protected int getSelfNavDrawerItem() { return NAVDRAWER_ITEM_SETTINGS; }
@@ -35,15 +38,5 @@ public class SettingsActivity extends BaseActivity
         super.onPostCreate(savedInstanceState);
 
         setActivityTitle(getString(R.string.title_section_settings));
-
-        //mFavoritesFragment = (FavoritesFragment)getSupportFragmentManager().findFragmentById(
-        //        R.id.favorites_fragment);
-        //mNearbyFragment.setHasOptionsMenu(true);
-
-
-        //if (mNearbyFragment != null && savedInstanceState == null) {
-        //    Bundle args = intentToFragmentArguments(getIntent());
-        //    mNearbyFragment.reloadFromArguments(args);
-        //}
     }
 }

@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes;
+package com.ludoscity.findmybikes.Fragments;
 
 import android.app.Activity;
 import android.location.Location;
@@ -18,18 +18,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.ludoscity.findmybikes.R;
+import com.ludoscity.findmybikes.StationItem;
+import com.ludoscity.findmybikes.StationMapGfx;
 
 import java.util.ArrayList;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnStationMapFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link StationMapFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class StationMapFragment extends Fragment
         implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
@@ -37,18 +31,7 @@ public class StationMapFragment extends Fragment
         GoogleMap.OnCameraChangeListener,
         GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMapClickListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-
-    ///////////////////////////////////////33
     public static final String INFOWINDOW_CLICK_PATH = "infowindow_click";
     public static final String MARKER_CLICK_PATH = "marker_click";
     public static final String LOCATION_CHANGED_PATH = "location_changed";
@@ -71,37 +54,6 @@ public class StationMapFragment extends Fragment
     private ArrayList<StationMapGfx> mMapMarkersGfxData = new ArrayList<>();
 
     private OnStationMapFragmentInteractionListener mListener;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment StationMapFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static StationMapFragment newInstance(String param1, String param2) {
-        StationMapFragment fragment = new StationMapFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    public StationMapFragment() {
-        // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -165,7 +117,6 @@ public class StationMapFragment extends Fragment
         if (mListener != null){
             mListener.onStationMapFragmentInteraction(builder.build());
         }
-
     }
 
     @Override
@@ -183,8 +134,6 @@ public class StationMapFragment extends Fragment
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(MAP_READY_PATH);
 
-        //builder.appendQueryParameter(SORT_CHANGED_SUBTITLE_PARAM, subtitle);
-
         if (mListener != null){
             mListener.onStationMapFragmentInteraction(builder.build());
         }
@@ -197,8 +146,6 @@ public class StationMapFragment extends Fragment
         builder.appendPath(MARKER_CLICK_PATH);
 
         builder.appendQueryParameter(MARKER_CLICK_TITLE_PARAM, marker.getTitle());
-
-        //builder.appendQueryParameter(SORT_CHANGED_SUBTITLE_PARAM, subtitle);
 
         if (mListener != null){
             mListener.onStationMapFragmentInteraction(builder.build());
@@ -216,7 +163,6 @@ public class StationMapFragment extends Fragment
                 doInitialCameraSetup(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15), true);
             }
 
-
             Uri.Builder builder = new Uri.Builder();
             builder.appendPath(LOCATION_CHANGED_PATH);
 
@@ -226,7 +172,6 @@ public class StationMapFragment extends Fragment
             if (mListener != null){
                 mListener.onStationMapFragmentInteraction(builder.build());
             }
-
         }
     }
 
@@ -254,18 +199,6 @@ public class StationMapFragment extends Fragment
         }
     }
 
-    public void setEnforceMaxZoom(boolean toSet){
-        mEnforceMaxZoom = toSet;
-    }
-
-    public void invalidateAllMarker(){
-
-        for(StationMapGfx markerData : mMapMarkersGfxData) {
-            markerData.invalidateMarker();
-        }
-
-    }
-
     public void clearMarkerGfxData() {
         mMapMarkersGfxData.clear();
     }
@@ -276,31 +209,6 @@ public class StationMapFragment extends Fragment
             toReturn = mGoogleMap.getCameraPosition();
 
         return toReturn;
-    }
-
-    public void hideAllMarkers() {
-        setMarkersVisibility(false);
-    }
-
-    public void showMarkerForStationId(String stationId) {
-        for(StationMapGfx markerData : mMapMarkersGfxData){
-            if (markerData.getStationId().equalsIgnoreCase(stationId)){
-                markerData.setGroundOverlayVisible(true);
-                //markerData.setInfoWindowVisible(true);
-            }
-        }
-    }
-
-    public void showAllMarkers() {
-        setMarkersVisibility(true);
-
-    }
-
-    private void setMarkersVisibility(boolean newVisibility){
-        for(StationMapGfx markerData : mMapMarkersGfxData) {
-            markerData.setGroundOverlayVisible(newVisibility);
-        }
-
     }
 
     public void animateCamera(CameraUpdate cameraUpdate) {
@@ -336,7 +244,6 @@ public class StationMapFragment extends Fragment
         if (mListener != null){
             mListener.onStationMapFragmentInteraction(builder.build());
         }
-
     }
 
     /**

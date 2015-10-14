@@ -25,20 +25,12 @@ public class FavoritesListViewAdapter extends BaseAdapter {
     private List<StationItem> mStationList = null;
     private LatLng mCurrentUserLatLng;
 
-    FavoritesListViewAdapter(Context _context, List<StationItem> _stationsNetwork, LatLng _currentUserLatLng){
+    public FavoritesListViewAdapter(Context _context, List<StationItem> _stationsNetwork, LatLng _currentUserLatLng){
         mContext = _context;
         mStationList = _stationsNetwork;
         mInflater = LayoutInflater.from(_context);
         mCurrentUserLatLng = _currentUserLatLng;
         sortStationListByClosest();
-    }
-
-    public void setCurrentUserLatLng(LatLng currentUserLatLng) {
-        if (mCurrentUserLatLng != currentUserLatLng && currentUserLatLng != null) {
-            this.mCurrentUserLatLng = currentUserLatLng;
-            sortStationListByClosest();
-            notifyDataSetChanged();
-        }
     }
 
     public void sortStationListByClosest(){

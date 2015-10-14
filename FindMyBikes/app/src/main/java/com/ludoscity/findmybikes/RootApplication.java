@@ -25,7 +25,6 @@ public class RootApplication extends Application {
 
     Citybik_esAPI mCitybik_esAPI;
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -37,14 +36,6 @@ public class RootApplication extends Application {
         }
 
         mCitybik_esAPI = buildCitybik_esAPI();
-
-
-
-        //BixiTracksExplorerAPIHelper.init();
-
-
-        //googleMapsDirectionsApi = buildGMapsDirectionsApi();
-        //accessToken = PreferencesUtils.retrieveAccessToken(this);
     }
 
     private Citybik_esAPI buildCitybik_esAPI() {

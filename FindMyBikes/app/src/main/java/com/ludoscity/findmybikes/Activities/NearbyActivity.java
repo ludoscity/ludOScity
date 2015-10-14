@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes;
+package com.ludoscity.findmybikes.Activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -32,6 +32,11 @@ import com.ludoscity.findmybikes.Citybik_esAPI.model.NetworkDesc;
 import com.ludoscity.findmybikes.Citybik_esAPI.model.NetworkStatusAnswerRoot;
 import com.ludoscity.findmybikes.Citybik_esAPI.model.Station;
 import com.ludoscity.findmybikes.Helpers.DBHelper;
+import com.ludoscity.findmybikes.R;
+import com.ludoscity.findmybikes.RootApplication;
+import com.ludoscity.findmybikes.StationItem;
+import com.ludoscity.findmybikes.Fragments.StationListFragment;
+import com.ludoscity.findmybikes.Fragments.StationMapFragment;
 import com.ludoscity.findmybikes.Utils.Utils;
 
 import java.io.IOException;
@@ -50,12 +55,10 @@ import retrofit.Response;
  */
 public class NearbyActivity extends BaseActivity
         implements StationMapFragment.OnStationMapFragmentInteractionListener,
-        StationListFragment.OnStationListFragmentInteractionListener,
-        StationInfoFragment.OnStationInfoFragmentInteractionListener{
+        StationListFragment.OnStationListFragmentInteractionListener {
 
     private StationMapFragment mStationMapFragment = null;
     private StationListFragment mStationListFragment = null;
-    private StationInfoFragment mStationInfoFragment = null;
 
     private Handler mUpdateRefreshHandler = null;
     private Runnable mUpdateRefreshRunnableCode = null;
@@ -64,7 +67,7 @@ public class NearbyActivity extends BaseActivity
     private RedrawMarkersTask mRedrawMarkersTask = null;
     private FindNetworkTask mFindNetworkTask = null;
 
-    private StationsNetwork mStationsNetwork;
+    private ArrayList<StationItem> mStationsNetwork = new ArrayList<>();
 
     private LatLng mCurrentUserLatLng = null;
 
@@ -105,7 +108,7 @@ public class NearbyActivity extends BaseActivity
                 mDownloadWebTask.execute();
             }
 
-            Log.d("nearbyActivity", mStationsNetwork.stations.size() + " stations loaded from DB");
+            Log.d("nearbyActivity", mStationsNetwork.size() + " stations loaded from DB");
         }
     }
 
@@ -132,17 +135,6 @@ public class NearbyActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Read app params and apply them
-        /*if (getResources().getBoolean(R.bool.allow_portrait)) {
-            if (!getResources().getBoolean(R.bool.allow_landscape)) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        } else {
-            if (getResources().getBoolean(R.bool.allow_landscape)) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            }
-        }*/
-
         setContentView(R.layout.activity_nearby);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
 
@@ -160,8 +152,7 @@ public class NearbyActivity extends BaseActivity
         if (savedInstanceState == null){
 
             //Create fragments programatically
-            //Parameters could come from an Intent ?
-            mStationListFragment = StationListFragment.newInstance("bidon", "bidon");
+            mStationListFragment = new StationListFragment();
 
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
@@ -203,11 +194,6 @@ public class NearbyActivity extends BaseActivity
 
         mStationMapFragment = (StationMapFragment)getSupportFragmentManager().findFragmentById(
                 R.id.station_map_fragment);
-
-        //if (mNearbyFragment != null && savedInstanceState == null) {
-        //    Bundle args = intentToFragmentArguments(getIntent());
-        //    mNearbyFragment.reloadFromArguments(args);
-        //}
     }
 
     @Override
@@ -312,7 +298,6 @@ public class NearbyActivity extends BaseActivity
                     Toast.makeText(this, getString(R.string.google_maps_not_installed), Toast.LENGTH_LONG).show();
 
                 }
-
 
                 return true;
         }
@@ -567,10 +552,6 @@ public class NearbyActivity extends BaseActivity
                     Double.valueOf(uri.getQueryParameter(StationMapFragment.LOCATION_CHANGED_LONGITUDE_PARAM)));
 
             mStationListFragment.setCurrentUserLatLng(mCurrentUserLatLng);
-
-            if (mStationInfoFragment != null){
-                mStationInfoFragment.updateUserLatLng(mCurrentUserLatLng);
-            }
         }
         //Marker click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
@@ -595,50 +576,6 @@ public class NearbyActivity extends BaseActivity
             }
 
         }
-        //InfoWindow click
-        /*else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.INFOWINDOW_CLICK_PATH)){
-
-            Fragment frag = getSupportFragmentManager().findFragmentById(R.id.station_list_or_info_container);
-            if (frag instanceof StationListFragment){
-                LatLng clickedMarkerPos = new LatLng(Double.valueOf(uri.getQueryParameter(StationMapFragment.INFOWINDOW_CLICK_MARKER_POS_LAT_PARAM)),
-                        Double.valueOf(uri.getQueryParameter(StationMapFragment.INFOWINDOW_CLICK_MARKER_POS_LNG_PARAM)));
-
-                for (StationItem station : mStationsNetwork.stations) {
-                    if (station.getPosition().equals(clickedMarkerPos)) {
-
-                        mUnselectStationCameraPosition = mStationMapFragment.getCameraPosition();
-
-                        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-
-                        boundsBuilder.include(station.getPosition());
-
-                        if (mCurrentUserLatLng != null)
-                            boundsBuilder.include(mCurrentUserLatLng);
-
-                        mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100));
-
-                        mStationMapFragment.hideAllMarkers();
-                        mStationMapFragment.showMarkerForStationId(station.getUid());
-                        mStationMapFragment.setEnforceMaxZoom(true);
-
-                        mStationInfoFragment = StationInfoFragment.newInstance(station, mCurrentUserLatLng);
-
-                        disableDrawer();
-
-                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-                        // Replace whatever is in the fragment_container view with this fragment,
-                        // and add the transaction to the back stack so the user can navigate back
-                        transaction.replace(R.id.station_list_or_info_container, mStationInfoFragment);
-                        transaction.addToBackStack(null);
-
-                        // Commit the transaction
-                        transaction.commit();
-                        break;
-                    }
-                }
-            }
-        }*/
     }
 
     private void cancelDownloadWebTask() {
@@ -652,14 +589,7 @@ public class NearbyActivity extends BaseActivity
     @Override
     public void onStationListFragmentInteraction(Uri uri) {
 
-        /*if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_FRAG_ONRESUME_PATH))
-        {
-            enableDrawer();
-            setActivityTitle(getString(R.string.title_section_nearby));
-            mStationMapFragment.setEnforceMaxZoom(false);
-            setupUI();
-        }
-        else*/ if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
+        if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
         {
             //if null, means the station was clicked twice, hence unchecked
             StationItem clickedStation = mStationListFragment.getHighlightedStation();
@@ -699,11 +629,6 @@ public class NearbyActivity extends BaseActivity
             mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite_outline);
 
         mFavoriteMenuItem.setVisible(true);
-    }
-
-    @Override
-    public void onStationInfoFragmentInteraction(Uri uri) {
-
     }
 
     public class RedrawMarkersTask extends AsyncTask<Void, Void, Void> {
@@ -750,7 +675,7 @@ public class NearbyActivity extends BaseActivity
             setRefreshActionButtonState(false);
 
             //SETUP MARKERS DATA
-            for (StationItem item : mStationsNetwork.stations){
+            for (StationItem item : mStationsNetwork){
                 mStationMapFragment.addMarkerForStationItem(item, mLookingForBike);
             }
 
@@ -766,8 +691,6 @@ public class NearbyActivity extends BaseActivity
     }
 
     public class FindNetworkTask extends AsyncTask<Void, Void, Map<String,String>> {
-
-        //private final ProgressDialog mFindNetworkDialog = new ProgressDialog(NearbyActivity.this, R.style.BikeActivityExplorerTheme);
 
         @Override
         protected void onPreExecute() {
@@ -795,7 +718,7 @@ public class NearbyActivity extends BaseActivity
             //noinspection StatementWithEmptyBody
             while (mCurrentUserLatLng == null)
             {
-
+                //Do nothing
             }
 
             publishProgress();
@@ -894,7 +817,7 @@ public class NearbyActivity extends BaseActivity
 
             LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
-            for (StationItem station : mStationsNetwork.stations){
+            for (StationItem station : mStationsNetwork){
                 boundsBuilder.include(station.getPosition());
             }
 
@@ -908,7 +831,7 @@ public class NearbyActivity extends BaseActivity
             try {
                 DBHelper.deleteAllStations();
 
-                for (StationItem station : mStationsNetwork.stations) {
+                for (StationItem station : mStationsNetwork) {
                     DBHelper.saveStation(station);
                 }
             } catch (Exception e) {
@@ -951,11 +874,11 @@ public class NearbyActivity extends BaseActivity
             try {
                 statusAnswer = call.execute();
 
-                mStationsNetwork = new StationsNetwork();
+                mStationsNetwork.clear();
 
                 for (Station station : statusAnswer.body().network.stations) {
                     StationItem stationItem = new StationItem(station, NearbyActivity.this);
-                    mStationsNetwork.stations.add(stationItem);
+                    mStationsNetwork.add(stationItem);
                 }
             } catch (IOException e) {
                 Toast toast;
@@ -1005,7 +928,7 @@ public class NearbyActivity extends BaseActivity
             DBHelper.saveLastUpdateTimestampAsNow(getApplicationContext());
             mRefreshMarkers = true;
             setupUI();
-            Log.d("nearbyFragment", mStationsNetwork.stations.size() + " stations downloaded from citibik.es");
+            Log.d("nearbyFragment", mStationsNetwork.size() + " stations downloaded from citibik.es");
 
             new SaveNetworkToDatabaseTask().execute();
 

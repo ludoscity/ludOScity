@@ -16,15 +16,15 @@
         android:theme="@style/FindMyBikesTheme">
 
         <activity
-            android:name="com.ludoscity.findmybikes.NearbyActivity"
+            android:name=".Activities.NearbyActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.ludoscity.findmybikes.FavoritesActivity"/>
-        <activity android:name="com.ludoscity.findmybikes.SettingsActivity"/>
+        <activity android:name=".Activities.FavoritesActivity"/>
+        <activity android:name=".Activities.SettingsActivity"/>
 
         <receiver
             android:name="com.ludoscity.findmybikes.Utils.Utils$Connectivity"

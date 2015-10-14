@@ -106,8 +106,8 @@ public class StationItem implements Parcelable, ClusterItem {
     public double getMeterFromLatLng(LatLng userLocation) {
         return SphericalUtil.computeDistanceBetween(userLocation, new LatLng(latitude,longitude));}
 
-    public double getBearingFromLatLng(LatLng userLocation){
-        return SphericalUtil.computeHeading(userLocation, new LatLng(latitude,longitude) );}
+    //public double getBearingFromLatLng(LatLng userLocation){
+    //    return SphericalUtil.computeHeading(userLocation, new LatLng(latitude,longitude) );}
 
     public LatLng getPosition() {return new LatLng(latitude,longitude);}
 

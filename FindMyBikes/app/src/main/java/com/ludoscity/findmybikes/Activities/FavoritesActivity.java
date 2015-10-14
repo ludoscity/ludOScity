@@ -1,16 +1,18 @@
-package com.ludoscity.findmybikes;
+package com.ludoscity.findmybikes.Activities;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+
+import com.ludoscity.findmybikes.Fragments.FavoritesFragment;
+import com.ludoscity.findmybikes.R;
+import com.ludoscity.findmybikes.StationItem;
 
 /**
  * Created by F8Full on 2015-08-09.
  * Activity used to display the favorites section
  */
 public class FavoritesActivity extends BaseActivity
-        implements FavoritesFragment.OnFragmentInteractionListener{
-
-    private FavoritesFragment mFavoritesFragment = null;
+        implements FavoritesFragment.OnFragmentInteractionListener {
 
     @Override
     protected int getSelfNavDrawerItem() { return NAVDRAWER_ITEM_FAVORITES; }
@@ -18,10 +20,7 @@ public class FavoritesActivity extends BaseActivity
 
     @Override
     public void onFavoritesFragmentInteraction(StationItem stationToShow) {
-        //This should run a special intent to launch NearbyActivity displaying correct data
-        //From MainActivity
-        //mNearbyFragment.showStationInfoFromFavoriteSection(stationToShow);
-        //invalidateOptionsMenu();
+
     }
 
     @Override
@@ -41,15 +40,5 @@ public class FavoritesActivity extends BaseActivity
         super.onPostCreate(savedInstanceState);
 
         setActivityTitle(getString(R.string.title_section_favorites));
-
-        mFavoritesFragment = (FavoritesFragment)getSupportFragmentManager().findFragmentById(
-                R.id.favorites_fragment);
-        //mNearbyFragment.setHasOptionsMenu(true);
-
-
-        //if (mNearbyFragment != null && savedInstanceState == null) {
-        //    Bundle args = intentToFragmentArguments(getIntent());
-        //    mNearbyFragment.reloadFromArguments(args);
-        //}
     }
 }

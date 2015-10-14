@@ -57,6 +57,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
+                                android:textColor="@color/light_gray"
                                 android:text="@string/fromCitibik_es"/>
 
                         </LinearLayout>
@@ -70,7 +71,7 @@
                         android:layout_weight="9">
                         <fragment
                             xmlns:android="http://schemas.android.com/apk/res/android"
-                            android:name="com.ludoscity.findmybikes.StationMapFragment"
+                            android:name="com.ludoscity.findmybikes.Fragments.StationMapFragment"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:id="@+id/station_map_fragment"

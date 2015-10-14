@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes;
+package com.ludoscity.findmybikes.Fragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,7 +15,9 @@ import android.widget.TextView;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.model.LatLng;
+import com.ludoscity.findmybikes.FavoritesListViewAdapter;
 import com.ludoscity.findmybikes.Helpers.DBHelper;
+import com.ludoscity.findmybikes.StationItem;
 
 import java.util.ArrayList;
 
@@ -25,7 +27,6 @@ public class FavoritesFragment extends Fragment {
     private View mFavoritesView;
     private TextView mNoFavoritesView;
 
-    private static final String ARG_SECTION_NUMBER = "section_number";
     private LocationManager mLocationManager;
     private LatLng mCurrentUserLatLng;
     private FavoritesListViewAdapter mFavoritesStationListViewAdapter;
@@ -35,15 +36,6 @@ public class FavoritesFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void onFavoritesFragmentInteraction(StationItem stationToShow);
-    }
-
-    public static FavoritesFragment newInstance(int sectionNumber) {
-        FavoritesFragment fragment = new FavoritesFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-        fragment.setArguments(args);
-        fragment.setHasOptionsMenu(true);
-        return fragment;
     }
 
     @Override
@@ -61,24 +53,17 @@ public class FavoritesFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // Retain this fragment across configuration changes.
-        //setRetainInstance(true);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View inflatedView = layoutInflater.inflate(com.ludoscity.findmybikes.R.layout.fragment_favoris, container, false);
         mFavoritesView = inflatedView.findViewById(com.ludoscity.findmybikes.R.id.favoritesListView_Holder);
         mNoFavoritesView = (TextView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.noFavorite_holder);
         mFavoritesList = (ListView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.favorites_listView);
-        setUpUI();
+        setupUI();
         return inflatedView;
     }
 
-    public void setUpUI(){
+    public void setupUI(){
         try {
             mStationsFavorites = DBHelper.getFavoriteStations(getActivity());
         } catch (CouchbaseLiteException e) {
