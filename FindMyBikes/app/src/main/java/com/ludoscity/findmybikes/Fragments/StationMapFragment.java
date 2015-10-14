@@ -158,7 +158,7 @@ public class StationMapFragment extends Fragment
     @Override
     public void onMyLocationChange(Location location) {
         if (location != null) {
-            Log.d("onMyLocationChange", "new location " + location.toString());
+            //Log.d("onMyLocationChange", "new location " + location.toString());
             if (!mInitialCameraSetupDone && mGoogleMap != null) {
                 doInitialCameraSetup(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15), true);
             }

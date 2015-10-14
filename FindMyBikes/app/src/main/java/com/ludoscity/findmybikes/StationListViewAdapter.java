@@ -31,7 +31,8 @@ public class StationListViewAdapter extends BaseAdapter {
 
     public StationListViewAdapter(Context _context, ArrayList<StationItem> _stationsNetwork, LatLng _currentUserLatLng, boolean isLookingForBikes){
         mContext = _context;
-        mStationList = _stationsNetwork;
+        //Making a copy as sorting shouldn't interfere with the rest of the code
+        mStationList = new ArrayList<>(_stationsNetwork);
         mInflater = LayoutInflater.from(_context);
         mCurrentUserLatLng = _currentUserLatLng;
         mIsLookingForBikes = isLookingForBikes;
