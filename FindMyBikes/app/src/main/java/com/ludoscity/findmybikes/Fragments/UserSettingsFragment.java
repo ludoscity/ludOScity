@@ -10,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
 import com.ludoscity.findmybikes.Helpers.DBHelper;
+import com.ludoscity.findmybikes.R;
 
 /**
  * Created by Looney on 19-04-15.
@@ -40,9 +41,9 @@ public class UserSettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View inflatedView = layoutInflater.inflate(com.ludoscity.findmybikes.R.layout.fragment_settings, container, false);
+        View inflatedView = layoutInflater.inflate(R.layout.fragment_settings, container, false);
 
-        autoUpdate_nearby = (CheckBox) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.checkBox_setting_auto_update);
+        autoUpdate_nearby = (CheckBox) inflatedView.findViewById(R.id.checkBox_setting_auto_update);
         autoUpdate_nearby.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

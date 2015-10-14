@@ -40,7 +40,7 @@ public class StationListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View inflatedView =  inflater.inflate(R.layout.fragment_station_list, container, false);
-        mStationListView = (ListView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.station_listview);
+        mStationListView = (ListView) inflatedView.findViewById(R.id.station_listview);
         mStationListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
         mStationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -62,7 +62,7 @@ public class StationListFragment extends Fragment {
             }
         });
 
-        mBikesOrParkingHeader = (TextView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.station_list_bike_parking_header);
+        mBikesOrParkingHeader = (TextView) inflatedView.findViewById(R.id.station_list_bike_parking_header);
         mDistanceHeader = (TextView) inflatedView.findViewById(R.id.station_list_distance_header);
 
         return inflatedView;

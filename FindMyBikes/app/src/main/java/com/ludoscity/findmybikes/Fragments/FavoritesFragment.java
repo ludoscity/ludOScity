@@ -17,6 +17,7 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.FavoritesListViewAdapter;
 import com.ludoscity.findmybikes.Helpers.DBHelper;
+import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
 
 import java.util.ArrayList;
@@ -55,10 +56,10 @@ public class FavoritesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View inflatedView = layoutInflater.inflate(com.ludoscity.findmybikes.R.layout.fragment_favoris, container, false);
-        mFavoritesView = inflatedView.findViewById(com.ludoscity.findmybikes.R.id.favoritesListView_Holder);
-        mNoFavoritesView = (TextView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.noFavorite_holder);
-        mFavoritesList = (ListView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.favorites_listView);
+        View inflatedView = layoutInflater.inflate(R.layout.fragment_favoris, container, false);
+        mFavoritesView = inflatedView.findViewById(R.id.favoritesListView_Holder);
+        mNoFavoritesView = (TextView) inflatedView.findViewById(R.id.noFavorite_holder);
+        mFavoritesList = (ListView) inflatedView.findViewById(R.id.favorites_listView);
         setupUI();
         return inflatedView;
     }

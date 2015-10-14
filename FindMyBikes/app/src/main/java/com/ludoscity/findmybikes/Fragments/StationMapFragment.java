@@ -62,7 +62,7 @@ public class StationMapFragment extends Fragment
         View inflatedView = inflater.inflate(R.layout.fragment_station_map, container, false);
 
         if(mGoogleMap == null)
-            ((MapFragment) getActivity().getFragmentManager().findFragmentById(com.ludoscity.findmybikes.R.id.mapNearby)).getMapAsync(this);
+            ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
 
         return inflatedView;
     }
@@ -71,7 +71,7 @@ public class StationMapFragment extends Fragment
     public void onDestroyView() {
         super.onDestroyView();
         MapFragment f = (MapFragment) getActivity().getFragmentManager()
-                .findFragmentById(com.ludoscity.findmybikes.R.id.mapNearby);
+                .findFragmentById(R.id.mapNearby);
         if (f != null) {
             getActivity().getFragmentManager().beginTransaction().remove(f).commit();
             mGoogleMap = null;

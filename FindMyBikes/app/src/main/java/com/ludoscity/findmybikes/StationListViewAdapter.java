@@ -105,10 +105,10 @@ public class StationListViewAdapter extends BaseAdapter {
         final ViewHolder holder;
         if (convertView == null){
             holder = new ViewHolder();
-            convertView = mInflater.inflate(com.ludoscity.findmybikes.R.layout.stationlist_item, null);
-            holder.distance = (TextView) convertView.findViewById(com.ludoscity.findmybikes.R.id.station_distance);
-            holder.name = (TextView) convertView.findViewById(com.ludoscity.findmybikes.R.id.station_name);
-            holder.availability = (TextView) convertView.findViewById(com.ludoscity.findmybikes.R.id.station_availability);
+            convertView = mInflater.inflate(R.layout.stationlist_item, null);
+            holder.distance = (TextView) convertView.findViewById(R.id.station_distance);
+            holder.name = (TextView) convertView.findViewById(R.id.station_name);
+            holder.availability = (TextView) convertView.findViewById(R.id.station_availability);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

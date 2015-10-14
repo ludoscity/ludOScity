@@ -32,13 +32,12 @@ import com.ludoscity.findmybikes.Citybik_esAPI.model.NetworkDesc;
 import com.ludoscity.findmybikes.Citybik_esAPI.model.NetworkStatusAnswerRoot;
 import com.ludoscity.findmybikes.Citybik_esAPI.model.Station;
 import com.ludoscity.findmybikes.Helpers.DBHelper;
-import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.RootApplication;
 import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.Fragments.StationListFragment;
 import com.ludoscity.findmybikes.Fragments.StationMapFragment;
 import com.ludoscity.findmybikes.Utils.Utils;
-
+import com.ludoscity.findmybikes.R;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -144,8 +143,8 @@ public class NearbyActivity extends BaseActivity
         restoreActionBar();
 
         // Update Bar
-        mStatusTextView = (TextView) findViewById(com.ludoscity.findmybikes.R.id.status_textView);
-        mStatusBar = findViewById(com.ludoscity.findmybikes.R.id.statusBar);
+        mStatusTextView = (TextView) findViewById(R.id.status_textView);
+        mStatusBar = findViewById(R.id.statusBar);
         setStatusBarListener();
 
 
@@ -201,12 +200,12 @@ public class NearbyActivity extends BaseActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_nearby, menu);
 
-        mParkingSwitch = menu.findItem(com.ludoscity.findmybikes.R.id.bike_parking_switch_menu_item);
+        mParkingSwitch = menu.findItem(R.id.bike_parking_switch_menu_item);
 
         if (!mStationListFragment.isListReady())
             mParkingSwitch.setVisible(false);
 
-        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.findmybikes.R.id.action_bar_find_bike_parking_switch)).setChecked(mLookingForBike);
+        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setChecked(mLookingForBike);
 
         setOnClickFindSwitchListener();
 
@@ -320,7 +319,7 @@ public class NearbyActivity extends BaseActivity
     }
 
     private void setOnClickFindSwitchListener() {
-        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(com.ludoscity.findmybikes.R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
@@ -430,9 +429,9 @@ public class NearbyActivity extends BaseActivity
                     if (DBHelper.isBikeNetworkIdAvailable(getApplicationContext())) {
                         //First taking care of past time...
                         if (difference < DateUtils.MINUTE_IN_MILLIS)
-                            updateTextBuilder.append(getString(com.ludoscity.findmybikes.R.string.momentsAgo)).append(" ").append(getString(com.ludoscity.findmybikes.R.string.fromCitibik_es));//mStatusTextView.setText();
+                            updateTextBuilder.append(getString(R.string.momentsAgo)).append(" ").append(getString(R.string.fromCitibik_es));//mStatusTextView.setText();
                         else
-                            updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(com.ludoscity.findmybikes.R.string.minsAgo)).append(" ").append(getString(com.ludoscity.findmybikes.R.string.fromCitibik_es));
+                            updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(R.string.minsAgo)).append(" ").append(getString(R.string.fromCitibik_es));
                     }
                     //mStatusTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
 
@@ -474,7 +473,7 @@ public class NearbyActivity extends BaseActivity
                                     //lastUpdateTime = now;
                                 } else {
 
-                                    updateTextBuilder.append(" - ").append(getString(com.ludoscity.findmybikes.R.string.nextUpdate)).append(" ");
+                                    updateTextBuilder.append(" - ").append(getString(R.string.nextUpdate)).append(" ");
 
 
                                     long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
@@ -492,7 +491,7 @@ public class NearbyActivity extends BaseActivity
                         }
                     }
                     else{
-                        updateTextBuilder.append(" - ").append(getString(com.ludoscity.findmybikes.R.string.no_connectivity));
+                        updateTextBuilder.append(" - ").append(getString(R.string.no_connectivity));
 
                         setRefreshActionButtonState(false);
                         if (null != mRefreshMenuItem)
