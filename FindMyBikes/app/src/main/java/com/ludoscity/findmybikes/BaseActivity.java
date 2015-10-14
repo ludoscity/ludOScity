@@ -66,17 +66,11 @@ public abstract class BaseActivity extends ActionBarActivity {
     };
 
     // icons for navdrawer items (indices must correspond to above array)
-    /*private static final int[] NAVDRAWER_ICON_RES_ID = new int[] {
-            R.drawable.ic_drawer_my_schedule,  // My Schedule
-            R.drawable.ic_drawer_explore,  // Explore
-            R.drawable.ic_drawer_map, // Map
-            R.drawable.ic_drawer_social, // Social
-            R.drawable.ic_drawer_video_library, // Video Library
-            0, // Sign in
+    private static final int[] NAVDRAWER_ICON_RES_ID = new int[] {
+            R.drawable.ic_drawer_nearby,
+            R.drawable.ic_drawer_favorites,
             R.drawable.ic_drawer_settings,
-            R.drawable.ic_drawer_experts,
-            R.drawable.ic_drawer_people_met,
-    };*/
+    };
 
     // delay to launch nav drawer item, to allow close animation to play
     private static final int NAVDRAWER_LAUNCH_DELAY = 250;
@@ -607,16 +601,16 @@ public abstract class BaseActivity extends ActionBarActivity {
 
         ImageView iconView = (ImageView) view.findViewById(R.id.icon);
         TextView titleView = (TextView) view.findViewById(R.id.title);
-        //int iconId = itemId >= 0 && itemId < NAVDRAWER_ICON_RES_ID.length ?
-         //       NAVDRAWER_ICON_RES_ID[itemId] : 0;
+        int iconId = itemId >= 0 && itemId < NAVDRAWER_ICON_RES_ID.length ?
+                NAVDRAWER_ICON_RES_ID[itemId] : 0;
         int titleId = itemId >= 0 && itemId < NAVDRAWER_TITLE_RES_ID.length ?
                 NAVDRAWER_TITLE_RES_ID[itemId] : 0;
 
         // set icon and text
-        /*iconView.setVisibility(iconId > 0 ? View.VISIBLE : View.GONE);
+        iconView.setVisibility(iconId > 0 ? View.VISIBLE : View.GONE);
         if (iconId > 0) {
             iconView.setImageResource(iconId);
-        }*/
+        }
         titleView.setText(getString(titleId));
 
         formatNavDrawerItem(view, itemId, selected);
@@ -645,7 +639,7 @@ public abstract class BaseActivity extends ActionBarActivity {
             return;
         }
 
-        //ImageView iconView = (ImageView) view.findViewById(R.id.icon);
+        ImageView iconView = (ImageView) view.findViewById(R.id.icon);
         TextView titleView = (TextView) view.findViewById(R.id.title);
 
         if (selected) {
@@ -656,9 +650,9 @@ public abstract class BaseActivity extends ActionBarActivity {
         titleView.setTextColor(selected ?
                 getResources().getColor(R.color.navdrawer_text_color_selected) :
                 getResources().getColor(R.color.navdrawer_text_color));
-        //iconView.setColorFilter(selected ?
-        //        getResources().getColor(R.color.navdrawer_icon_tint_selected) :
-        //        getResources().getColor(R.color.navdrawer_icon_tint));
+        iconView.setColorFilter(selected ?
+                getResources().getColor(R.color.navdrawer_icon_tint_selected) :
+                getResources().getColor(R.color.navdrawer_icon_tint));
     }
 
     @Override
