@@ -98,6 +98,8 @@ public abstract class BaseActivity extends ActionBarActivity {
     private static final TypeEvaluator ARGB_EVALUATOR = new ArgbEvaluator();
     //private ImageLoader mImageLoader;
 
+    private CharSequence mRestorableTitle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -204,12 +206,18 @@ public abstract class BaseActivity extends ActionBarActivity {
                     mDeferredOnDrawerClosedRunnable = null;
                 }
 
+                setActivityTitle(mRestorableTitle);
+                restoreActionBar();
+
                 onNavDrawerStateChanged(false, false);
             }
 
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
+                mRestorableTitle = mTitle;
+                setActivityTitle(getTitle());
+                restoreActionBar();
                 onNavDrawerStateChanged(true, false);
             }
 
