@@ -612,12 +612,15 @@ public class NearbyActivity extends BaseActivity
 
                 boundsBuilder.include(clickedStation.getPosition());
 
-                if (mCurrentUserLatLng != null)
-                    boundsBuilder.include(mCurrentUserLatLng);
-
                 mUnselectStationCameraPosition = mStationMapFragment.getCameraPosition();
 
-                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200));
+                if (mCurrentUserLatLng != null) {
+                    boundsBuilder.include(mCurrentUserLatLng);
+                    mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200));
+                }
+                else{
+                    mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(clickedStation.getPosition(), 15));
+                }
             }
         }
     }
@@ -824,7 +827,7 @@ public class NearbyActivity extends BaseActivity
             DBHelper.saveBikeNetworkBounds(boundsBuilder.build(), NearbyActivity.this);
 
             //User is not in coverage are, postExecute will launch appropriate task
-            if (!boundsBuilder.build().contains(mCurrentUserLatLng)){
+            if (mCurrentUserLatLng != null && !boundsBuilder.build().contains(mCurrentUserLatLng)){
                 return null;
             }
 
@@ -844,7 +847,7 @@ public class NearbyActivity extends BaseActivity
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            if (!DBHelper.getBikeNetworkBounds(NearbyActivity.this).contains(mCurrentUserLatLng)){
+            if (mCurrentUserLatLng != null && !DBHelper.getBikeNetworkBounds(NearbyActivity.this).contains(mCurrentUserLatLng)){
 
                 mStationListFragment.removeStationHighlight();
                 mFavoriteMenuItem.setVisible(false);

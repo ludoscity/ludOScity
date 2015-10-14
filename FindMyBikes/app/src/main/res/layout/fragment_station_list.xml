@@ -6,7 +6,7 @@
     <!-- STATION LIST VIEW -->
     <LinearLayout
 
-        android:id="@+id/stationList"
+        android:id="@+id/station_list_layout"
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
@@ -23,6 +23,7 @@
                 android:layout_width="0px"
                 android:layout_height="fill_parent"
                 android:layout_gravity="center"
+                android:id="@+id/station_list_distance_header"
                 android:padding="5dp"
                 android:text="@string/distance"
                 android:layout_weight="@dimen/station_list_distance_column_weight"
@@ -45,7 +46,7 @@
                 />
 
             <TextView
-                android:id="@+id/bikesOrParkingColumn"
+                android:id="@+id/station_list_bike_parking_header"
                 android:layout_width="0px"
                 android:layout_height="fill_parent"
                 android:textSize="16sp"
@@ -63,7 +64,7 @@
         <ListView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/stationListView"/>
+            android:id="@+id/station_listview"/>
     </LinearLayout>
 
 </FrameLayout>

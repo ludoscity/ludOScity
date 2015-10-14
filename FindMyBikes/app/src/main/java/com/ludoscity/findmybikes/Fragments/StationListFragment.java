@@ -27,7 +27,8 @@ public class StationListFragment extends Fragment {
     private Bundle mSavedInstanceState = null;
 
     private StationListViewAdapter mStationListViewAdapter;
-    private TextView mBikesOrParkingColumn;
+    private TextView mBikesOrParkingHeader;
+    private TextView mDistanceHeader;
     private ListView mStationListView;
 
     private OnStationListFragmentInteractionListener mListener;
@@ -39,7 +40,7 @@ public class StationListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View inflatedView =  inflater.inflate(R.layout.fragment_station_list, container, false);
-        mStationListView = (ListView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.stationListView);
+        mStationListView = (ListView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.station_listview);
         mStationListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
         mStationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -61,7 +62,8 @@ public class StationListFragment extends Fragment {
             }
         });
 
-        mBikesOrParkingColumn = (TextView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.bikesOrParkingColumn);
+        mBikesOrParkingHeader = (TextView) inflatedView.findViewById(com.ludoscity.findmybikes.R.id.station_list_bike_parking_header);
+        mDistanceHeader = (TextView) inflatedView.findViewById(R.id.station_list_distance_header);
 
         return inflatedView;
     }
@@ -126,6 +128,12 @@ public class StationListFragment extends Fragment {
         if (mLastCheckedPos != -1)
             mStationListView.setItemChecked(mLastCheckedPos, true);
 
+        if (currentUserLatLng == null)
+            mDistanceHeader.setVisibility(View.GONE);
+        else
+            mDistanceHeader.setVisibility(View.VISIBLE);
+
+
 
         mStationListView.onRestoreInstanceState(savedListViewState);
 
@@ -136,6 +144,8 @@ public class StationListFragment extends Fragment {
     public void setCurrentUserLatLng(LatLng currentUserLatLng) {
         if (null != mStationListViewAdapter)
             mStationListViewAdapter.setCurrentUserLatLng(currentUserLatLng);
+
+        mDistanceHeader.setVisibility(View.VISIBLE);
     }
 
     public void highlightStationFromName(String stationName) {
@@ -168,9 +178,9 @@ public class StationListFragment extends Fragment {
         mStationListViewAdapter.lookingForBikesNotify(lookingForBike);
 
         if (lookingForBike)
-            mBikesOrParkingColumn.setText(R.string.bikes);
+            mBikesOrParkingHeader.setText(R.string.bikes);
         else
-            mBikesOrParkingColumn.setText(R.string.parking);
+            mBikesOrParkingHeader.setText(R.string.parking);
     }
 
     /**
