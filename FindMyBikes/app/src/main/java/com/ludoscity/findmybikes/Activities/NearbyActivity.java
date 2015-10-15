@@ -117,8 +117,9 @@ public class NearbyActivity extends BaseActivity
 
         super.onResume();
 
-        mRefreshMarkers = true;
         mUpdateRefreshHandler = new Handler();
+
+        setupUI();
     }
 
     @Override
