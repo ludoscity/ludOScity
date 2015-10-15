@@ -98,7 +98,8 @@ public class NearbyActivity extends BaseActivity
             mFindNetworkTask = new FindNetworkTask();
             mFindNetworkTask.execute();
         }
-        else{
+        else if(mStationsNetwork.isEmpty()){
+
             try {
                 mStationsNetwork = DBHelper.getStationsNetwork();
             } catch (CouchbaseLiteException e) {
@@ -118,7 +119,6 @@ public class NearbyActivity extends BaseActivity
 
         mRefreshMarkers = true;
         mUpdateRefreshHandler = new Handler();
-        setupUI();
     }
 
     @Override
@@ -164,6 +164,7 @@ public class NearbyActivity extends BaseActivity
             mUnselectStationCameraPosition = savedInstanceState.getParcelable("back_camera_pos");
             mSavedInstanceCameraPosition = savedInstanceState.getParcelable("saved_camera_pos");
             mLookingForBike = savedInstanceState.getBoolean("looking_for_bike");
+            mStationsNetwork = savedInstanceState.getParcelableArrayList("network_data");
         }
     }
 
@@ -185,6 +186,7 @@ public class NearbyActivity extends BaseActivity
         outState.putParcelable("back_camera_pos", mUnselectStationCameraPosition);
         outState.putParcelable("saved_camera_pos", mStationMapFragment.getCameraPosition());
         outState.putBoolean("looking_for_bike", mLookingForBike);
+        outState.putParcelableArrayList("network_data", mStationsNetwork);
     }
 
     @Override
@@ -638,9 +640,6 @@ public class NearbyActivity extends BaseActivity
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //mStationMapFragment.invalidateAllMarker();
-
-            mStationMapFragment.clearMarkerGfxData();
 
             mStatusTextView.setText(getString(R.string.refreshing));
             setRefreshActionButtonState(true);
@@ -649,13 +648,18 @@ public class NearbyActivity extends BaseActivity
         @Override
         protected Void doInBackground(Void... voids) {
 
-            //The ugliest part of this app. After numerous tests, it became evident that I cannot
-            //manipulate GroundOverlays from a background thread AND that for some reason I also
-            //can't clear and recreate them too rapidly. Hence this.
+            //This improves the UX by giving time to the listview to render
             try {
                 Thread.sleep(250);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+
+
+            mStationMapFragment.clearMarkerGfxData();
+            //SETUP MARKERS DATA
+            for (StationItem item : mStationsNetwork){
+                mStationMapFragment.addMarkerForStationItem(item, mLookingForBike);
             }
 
             return null;
@@ -675,11 +679,6 @@ public class NearbyActivity extends BaseActivity
             super.onPostExecute(aVoid);
 
             setRefreshActionButtonState(false);
-
-            //SETUP MARKERS DATA
-            for (StationItem item : mStationsNetwork){
-                mStationMapFragment.addMarkerForStationItem(item, mLookingForBike);
-            }
 
             mStationMapFragment.redrawMarkers();
 
@@ -883,12 +882,6 @@ public class NearbyActivity extends BaseActivity
                     mStationsNetwork.add(stationItem);
                 }
             } catch (IOException e) {
-                Toast toast;
-
-                toast = Toast.makeText(getApplicationContext(),getString(R.string.download_failed),Toast.LENGTH_LONG);
-
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
 
                 cancel(false); //No need to try to interrupt the thread
             }
@@ -909,6 +902,13 @@ public class NearbyActivity extends BaseActivity
             super.onCancelled(aVoid);
             //Set interface back
             setRefreshActionButtonState(false);
+
+            Toast toast;
+
+            toast = Toast.makeText(getApplicationContext(),getString(R.string.download_failed),Toast.LENGTH_LONG);
+
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
 
             //must be done last
             mDownloadWebTask = null;
