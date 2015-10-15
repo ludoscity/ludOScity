@@ -100,10 +100,17 @@ public class NearbyActivity extends BaseActivity
         }
         else if(mStationsNetwork.isEmpty()){
 
+            boolean needDownload = false;
+
             try {
                 mStationsNetwork = DBHelper.getStationsNetwork();
             } catch (CouchbaseLiteException e) {
                 Log.d("nearbyActivity", "Couldn't retrieve Station Network from db, trying to get a fresh copy from network",e );
+
+                needDownload = true;
+            }
+
+            if (needDownload || mStationsNetwork.isEmpty()){
                 mDownloadWebTask = new DownloadWebTask();
                 mDownloadWebTask.execute();
             }
