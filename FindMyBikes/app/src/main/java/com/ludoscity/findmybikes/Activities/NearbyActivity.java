@@ -1,12 +1,16 @@
 package com.ludoscity.findmybikes.Activities;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -701,9 +705,40 @@ public class NearbyActivity extends BaseActivity
 
     public class FindNetworkTask extends AsyncTask<Void, Void, Map<String,String>> {
 
+        private void checkAndAskLocationPermission(){
+            // Here, thisActivity is the current activity
+            if (ContextCompat.checkSelfPermission(NearbyActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Should we show an explanation?
+                //if (ActivityCompat.shouldShowRequestPermissionRationale(NearbyActivity.this,
+                //        Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                    // Show an expanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+
+                //} else {
+
+                    // No explanation needed, we can request the permission.
+
+                    ActivityCompat.requestPermissions(NearbyActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            0);
+
+                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                    // app-defined int constant. The callback method gets the
+                    // result of the request.
+                //}
+            }
+        }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
+            checkAndAskLocationPermission();
 
             mStatusTextView.setText(getString(R.string.searching_wait_location));
 
@@ -868,6 +903,36 @@ public class NearbyActivity extends BaseActivity
     }
 
     public class DownloadWebTask extends AsyncTask<Void, Void, Void> {
+
+        private void checkAndAskLocationPermission(){
+            // Here, thisActivity is the current activity
+            if (ContextCompat.checkSelfPermission(NearbyActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Should we show an explanation?
+                //if (ActivityCompat.shouldShowRequestPermissionRationale(NearbyActivity.this,
+                //        Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+                //} else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(NearbyActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        0);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+                //}
+            }
+        }
+
         @Override
         protected Void doInBackground(Void... aVoid) {
 
@@ -901,6 +966,10 @@ public class NearbyActivity extends BaseActivity
         protected void onPreExecute() {
             super.onPreExecute();
             mStatusTextView.setText(getString(R.string.downloading));
+
+            //Cannot do that, for some obscure reason, task gets automatically
+            //cancelled when the permission dialog is visible
+            //checkAndAskLocationPermission();
 
             setRefreshActionButtonState(true);
         }
@@ -941,6 +1010,8 @@ public class NearbyActivity extends BaseActivity
             Log.d("nearbyFragment", mStationsNetwork.size() + " stations downloaded from citibik.es");
 
             new SaveNetworkToDatabaseTask().execute();
+
+            checkAndAskLocationPermission();
 
             //must be done last
             mDownloadWebTask = null;
