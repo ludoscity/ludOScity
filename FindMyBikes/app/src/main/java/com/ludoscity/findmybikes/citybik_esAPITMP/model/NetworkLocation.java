@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.Citybik_esAPI.model;
+package com.ludoscity.findmybikes.citybik_esAPITMP.model;
 
 import com.google.android.gms.maps.model.LatLng;
 

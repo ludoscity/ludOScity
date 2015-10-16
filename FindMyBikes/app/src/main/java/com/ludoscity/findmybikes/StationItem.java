@@ -8,8 +8,8 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterItem;
-import com.ludoscity.findmybikes.citybik_esAPI.model.Station;
-import com.ludoscity.findmybikes.helpers.DBHelper;
+import com.ludoscity.findmybikes.citybik_esAPITMP.model.Station;
+import com.ludoscity.findmybikes.helpersTMP.DBHelper;
 
 import java.io.UnsupportedEncodingException;
 

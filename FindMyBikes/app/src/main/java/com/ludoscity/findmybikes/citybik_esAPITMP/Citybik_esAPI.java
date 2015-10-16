@@ -1,7 +1,7 @@
-package com.ludoscity.findmybikes.Citybik_esAPI;
+package com.ludoscity.findmybikes.citybik_esAPITMP;
 
-import com.ludoscity.findmybikes.Citybik_esAPI.model.ListNetworksAnswerRoot;
-import com.ludoscity.findmybikes.Citybik_esAPI.model.NetworkStatusAnswerRoot;
+import com.ludoscity.findmybikes.citybik_esAPITMP.model.ListNetworksAnswerRoot;
+import com.ludoscity.findmybikes.citybik_esAPITMP.model.NetworkStatusAnswerRoot;
 
 import java.util.Map;
 

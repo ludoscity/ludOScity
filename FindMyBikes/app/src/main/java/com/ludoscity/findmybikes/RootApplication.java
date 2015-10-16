@@ -4,8 +4,8 @@ import android.app.Application;
 import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
-import com.ludoscity.findmybikes.citybik_esAPI.Citybik_esAPI;
-import com.ludoscity.findmybikes.helpers.DBHelper;
+import com.ludoscity.findmybikes.citybik_esAPITMP.Citybik_esAPI;
+import com.ludoscity.findmybikes.helpersTMP.DBHelper;
 
 import java.io.IOException;
 

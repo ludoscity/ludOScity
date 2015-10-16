@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.Utils;
+package com.ludoscity.findmybikes.utilsTMP;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;

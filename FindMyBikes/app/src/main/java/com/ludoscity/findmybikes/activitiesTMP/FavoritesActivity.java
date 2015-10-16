@@ -1,9 +1,9 @@
-package com.ludoscity.findmybikes.Activities;
+package com.ludoscity.findmybikes.activitiesTMP;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
-import com.ludoscity.findmybikes.Fragments.FavoritesFragment;
+import com.ludoscity.findmybikes.fragmentsTMP.FavoritesFragment;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
 

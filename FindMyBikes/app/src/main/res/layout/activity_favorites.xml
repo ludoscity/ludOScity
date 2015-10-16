@@ -16,7 +16,7 @@
         <FrameLayout android:id="@+id/main_content" android:layout_width="fill_parent"
             android:layout_height="match_parent" >
 
-            <fragment android:name="com.ludoscity.findmybikes.fragments.FavoritesFragment"
+            <fragment android:name="com.ludoscity.findmybikes.fragmentsTMP.FavoritesFragment"
                 android:id="@+id/favorites_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
