@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.ActivitiesTMP;
+package com.ludoscity.findmybikes.activities;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;

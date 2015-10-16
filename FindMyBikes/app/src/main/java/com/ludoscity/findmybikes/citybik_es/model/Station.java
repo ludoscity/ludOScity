@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.Citybik_esAPITMP.model;
+package com.ludoscity.findmybikes.citybik_es.model;
 
 public class Station {
     public Integer empty_slots;

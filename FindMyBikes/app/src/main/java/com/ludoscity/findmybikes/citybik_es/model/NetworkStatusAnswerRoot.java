@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.Citybik_esAPITMP.model;
+package com.ludoscity.findmybikes.citybik_es.model;
 
 /**
  * Created by Gevrai on 15-03-30.
