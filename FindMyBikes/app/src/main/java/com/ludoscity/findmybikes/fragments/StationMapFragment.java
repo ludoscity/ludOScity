@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.fragmentsTMP;
+package com.ludoscity.findmybikes.fragments;
 
 import android.app.Activity;
 import android.location.Location;
