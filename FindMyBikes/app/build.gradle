@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 23
     buildToolsVersion "23.0.1"
 
     // workaround for "duplicate files during packaging of APK" issue
@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId "com.ludoscity.findmybikes"
         minSdkVersion 16
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 0
         versionName "v0.9"
     }
@@ -45,11 +45,11 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(path: ':backend', configuration: 'android-endpoints')
-    compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'com.google.android.gms:play-services-maps:7.0.0'
-    compile 'com.google.android.gms:play-services-location:7.0.0'
-    compile 'com.google.maps.android:android-maps-utils:0.3+'
-    compile 'com.google.code.gson:gson:+'
+    compile 'com.android.support:appcompat-v7:23.1.0'
+    compile 'com.google.android.gms:play-services-maps:8.1.0'
+    compile 'com.google.android.gms:play-services-location:8.1.0'
+    compile 'com.google.maps.android:android-maps-utils:0.4'
+    compile 'com.google.code.gson:gson:2.4'
     compile 'com.couchbase.lite:couchbase-lite-android:1.1.0'
 
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta1'
