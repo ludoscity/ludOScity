@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.Fragments;
+package com.ludoscity.findmybikes.FragmentsTMP;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-import com.ludoscity.findmybikes.Helpers.DBHelper;
+import com.ludoscity.findmybikes.HelpersTMP.DBHelper;
 import com.ludoscity.findmybikes.R;
 
 /**

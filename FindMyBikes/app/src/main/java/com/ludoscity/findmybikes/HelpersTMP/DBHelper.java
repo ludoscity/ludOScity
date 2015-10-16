@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.Helpers;
+package com.ludoscity.findmybikes.HelpersTMP;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.ludoscity.findmybikes.Citybik_esAPI.model.NetworkDesc;
+import com.ludoscity.findmybikes.Citybik_esAPITMP.model.NetworkDesc;
 import com.ludoscity.findmybikes.StationItem;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
 

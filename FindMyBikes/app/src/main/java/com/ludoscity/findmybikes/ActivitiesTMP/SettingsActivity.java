@@ -1,10 +1,10 @@
-package com.ludoscity.findmybikes.Activities;
+package com.ludoscity.findmybikes.ActivitiesTMP;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 import com.ludoscity.findmybikes.R;
-import com.ludoscity.findmybikes.Fragments.UserSettingsFragment;
+import com.ludoscity.findmybikes.FragmentsTMP.UserSettingsFragment;
 
 /**
  * Created by F8Full on 2015-08-10.
