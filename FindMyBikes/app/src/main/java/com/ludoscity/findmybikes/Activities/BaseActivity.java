@@ -8,10 +8,12 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
@@ -31,7 +33,7 @@ import java.util.ArrayList;
  * https://github.com/google/iosched
  *
  */
-public abstract class BaseActivity extends ActionBarActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * Helper component that ties the action bar to the navigation drawer.
@@ -176,9 +178,9 @@ public abstract class BaseActivity extends ActionBarActivity {
                     if (mDrawerToggle.isDrawerIndicatorEnabled()) {
 
                         if (isNavDrawerOpen())
-                            mDrawerLayout.closeDrawer(Gravity.START);
+                            mDrawerLayout.closeDrawer(GravityCompat.START);
                         else
-                            mDrawerLayout.openDrawer(Gravity.START);
+                            mDrawerLayout.openDrawer(GravityCompat.START);
                     }
                     else{
                         onBackPressed();
@@ -256,7 +258,7 @@ public abstract class BaseActivity extends ActionBarActivity {
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
         // populate the nav drawer with the correct items
         populateNavDrawer();
@@ -283,12 +285,12 @@ public abstract class BaseActivity extends ActionBarActivity {
     protected void onNavDrawerSlide(float offset) {}
 
     protected boolean isNavDrawerOpen() {
-        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.START);
+        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START);
     }
 
     protected void closeNavDrawer() {
         if (mDrawerLayout != null) {
-            mDrawerLayout.closeDrawer(Gravity.START);
+            mDrawerLayout.closeDrawer(GravityCompat.START);
         }
     }
 
@@ -459,7 +461,7 @@ public abstract class BaseActivity extends ActionBarActivity {
 
     private void onNavDrawerItemClicked(final int itemId) {
         if (itemId == getSelfNavDrawerItem()) {
-            mDrawerLayout.closeDrawer(Gravity.START);
+            mDrawerLayout.closeDrawer(GravityCompat.START);
             return;
         }
 
@@ -483,7 +485,7 @@ public abstract class BaseActivity extends ActionBarActivity {
             }
         }
 
-        mDrawerLayout.closeDrawer(Gravity.START);
+        mDrawerLayout.closeDrawer(GravityCompat.START);
     }
 
     @Override
@@ -658,11 +660,11 @@ public abstract class BaseActivity extends ActionBarActivity {
 
         // configure its appearance according to whether or not it's selected
         titleView.setTextColor(selected ?
-                getResources().getColor(R.color.navdrawer_text_color_selected) :
-                getResources().getColor(R.color.navdrawer_text_color));
+                ContextCompat.getColor(this, R.color.navdrawer_text_color_selected) :
+                ContextCompat.getColor(this, R.color.navdrawer_text_color));
         iconView.setColorFilter(selected ?
-                getResources().getColor(R.color.navdrawer_icon_tint_selected) :
-                getResources().getColor(R.color.navdrawer_icon_tint));
+                ContextCompat.getColor(this, R.color.navdrawer_icon_tint_selected) :
+                ContextCompat.getColor(this, R.color.navdrawer_icon_tint));
     }
 
     @Override

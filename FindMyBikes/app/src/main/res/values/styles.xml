@@ -2,7 +2,7 @@
     <style name="FindMyBikesTheme" parent="FindMyBikes.Base">
     </style>
     <!-- Base theme applied no matter what API -->
-    <style name="FindMyBikes.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="FindMyBikes.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <!--We will be using the toolbar so no need to show ActionBar-->
         <item name="windowActionBar">false</item>
