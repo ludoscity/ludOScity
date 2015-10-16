@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.citybik_es.model;
+package com.ludoscity.findmybikes.Citybik_esAPI.model;
 
 /**
  * Created by Gevrai on 15-03-30.

@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.fragments;
+package com.ludoscity.findmybikes.Fragments;
 
 import android.app.Activity;
 import android.net.Uri;

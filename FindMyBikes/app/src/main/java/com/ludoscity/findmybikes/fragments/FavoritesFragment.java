@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.fragments;
+package com.ludoscity.findmybikes.Fragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.FavoritesListViewAdapter;
-import com.ludoscity.findmybikes.helpers.DBHelper;
+import com.ludoscity.findmybikes.Helpers.DBHelper;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
 

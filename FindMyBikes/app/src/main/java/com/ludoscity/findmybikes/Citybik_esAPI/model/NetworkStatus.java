@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.citybik_es.model;
+package com.ludoscity.findmybikes.Citybik_esAPI.model;
 
 import java.util.ArrayList;
 

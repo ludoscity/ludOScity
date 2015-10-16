@@ -1,4 +1,4 @@
-package com.ludoscity.findmybikes.helpers;
+package com.ludoscity.findmybikes.Helpers;
 
 import android.app.backup.BackupAgentHelper;
 import android.app.backup.SharedPreferencesBackupHelper;
