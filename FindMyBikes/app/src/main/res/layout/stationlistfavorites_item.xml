@@ -50,6 +50,6 @@
         android:layout_weight="0.36"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="@string/stationIsLocked"
+        android:text="@string/locked"
         android:textSize="24sp"/>
 </LinearLayout>

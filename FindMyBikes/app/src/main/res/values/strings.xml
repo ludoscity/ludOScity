@@ -1,59 +1,26 @@
 <resources>
     <string name="app_name">FindMyBikes</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
     <string name="title_section_favorites">Favorites</string>
-    <string name="title_section_budget">Budget</string>
     <string name="title_section_nearby">Nearby</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="download_success">Bixi Stations Data downloaded with success!</string>
-    <string name="noData">Connection needed for data download!</string>
-    <string name="timespan_season">Season</string>
-    <string name="timespan_this_month">This month</string>
-    <string name="access_cost_label">Access cost :</string>
-    <string name="use_cost_label">Usage cost :</string>
-    <string name="total_cost_label">Total cost :</string>
-    <string name="budget_prerecorded_data_checkbox">Prerecorded data</string>
-    <string name="budgetinfo_subtitle_by_cost">by amount</string>
-    <string name="budgetinfo_subtitle_by_duration">by duration</string>
-    <string name="budgetinfo_subtitle_by_date">by date</string>
-    <string name="budgettrackdetails_subtitle">Trip details</string>
+    <string name="no_data">Connection needed for data download!</string>
     <string name="title_section_settings">Settings</string>
-    <string name="setting_auto_update_nearby">ALLO</string>
-    <string name="budgetoverview_loading_costs">Calculating cost\n</string>
-    <string name="budgetoverview_loading_tracks">Downloading trip\n</string>
-    <string name="generic_please_wait">Please wait…</string>
     <string name="fromCitibik_es">from citybik.es</string>
     <string name="momentsAgo">Moments ago</string>
     <string name="minsAgo">min ago</string>
-    <string name="bikesAvailability">Bikes available:</string>
-    <string name="bikeAvailable_sing">bike available</string>
-    <string name="bikesAvailable_plur">bikes available</string>
-    <string name="parkingAvailable_sing">parking space</string>
-    <string name="parkingsAvailable_plur">parking spaces</string>
-    <string name="stationIsLocked">Locked</string>
     <string name="favorite_removed">Favorite removed</string>
     <string name="favorite_added">Favorite added</string>
-    <string name="findABikes">Find a bike</string>
     <string name="setting_auto_update">Update nearby automatically</string>
-    <string name="findAParking">Find a parking</string>
     <string name="distance">Distance</string>
     <string name="station">Station</string>
     <string name="bikes">Bikes</string>
-    <string name="bike">Bike</string>
     <string name="parking">Parking</string>
-    <string name="parkings">Parkings</string>
-    <string name="nearbyfragment_default_never_web_updated">No data: tap to update from citibik.es</string>
     <string name="noFavorite">No favorites</string>
     <string name="downloading">Downloading data…</string>
     <string name="nextUpdate">Next update</string>
-    <string name="minuteAbbreviated" translatable="false">min</string>
-    <string name="stationDetails">Station details</string>
     <string name="no_connectivity">No connectivity</string>
     <string name="placeholder_lorem_ipsum" translatable="false">lorem ipsum</string>
-    <string name="nearbyfragment_no_auto_update">Tap to refresh</string>
     <string name="refreshing">Refreshing map…</string>
     <string name="download_failed">Download failed !</string>
     <string name="google_maps_not_installed">Google Maps not installed !</string>
@@ -62,4 +29,5 @@
     <string name="searching_wait_location">Waiting on location…</string>
     <string name="welcome">Welcome</string>
     <string name="bike_network_change_message">Bike share network changed to &lt;b>%1$s, %2$s&lt;/b> based on location.&lt;br /&gt;Your favorites been preserved.</string>
+    <string name="locked">Locked</string>
 </resources>
