@@ -98,9 +98,6 @@ public class StationListFragment extends Fragment
 
         if (savedInstanceState != null) {
 
-            ArrayList<StationItem> stationList = savedInstanceState.getParcelableArrayList("stationitem_arraylist");
-            getRecyclerViewAdapter().setStationList(stationList);
-
             int selectedPos = savedInstanceState.getInt("selected_pos");
 
             if (selectedPos != NO_POSITION)
@@ -109,6 +106,9 @@ public class StationListFragment extends Fragment
             currentUserLatLng = savedInstanceState.getParcelable("user_current_LatLng");
 
             getRecyclerViewAdapter().setCurrentUserLatLng(currentUserLatLng, false);
+
+            ArrayList<StationItem> stationList = savedInstanceState.getParcelableArrayList("stationitem_arraylist");
+            getRecyclerViewAdapter().setupStationList(stationList);
         }
 
         if (currentUserLatLng == null)
@@ -120,7 +120,7 @@ public class StationListFragment extends Fragment
     public void setupUI(ArrayList<StationItem> stationsNetwork, boolean lookingForBike) {
 
         if (stationsNetwork != null) {
-            getRecyclerViewAdapter().setStationList(stationsNetwork);
+            getRecyclerViewAdapter().setupStationList(stationsNetwork);
             lookingForBikes(lookingForBike);
         }
     }

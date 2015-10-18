@@ -120,7 +120,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         }
     }
 
-    public void setStationList(ArrayList<StationItem> toSet){
+    public void setupStationList(ArrayList<StationItem> toSet){
         String selectedNameBefore = null;
 
         if (null != getSelected())
@@ -129,6 +129,13 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         //Making a copy as sorting shouldn't interfere with the rest of the code
         mStationList.clear();
         mStationList.addAll(toSet);
+
+        //So that list get sorted before setting selection again
+        if (mCurrentUserLatLng != null) {
+            LatLng buffered = mCurrentUserLatLng;
+            mCurrentUserLatLng = null;
+            setCurrentUserLatLng(buffered, false);
+        }
 
         if (selectedNameBefore != null)
             setSelectionFromName(selectedNameBefore, false);
@@ -155,7 +162,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     public StationItem getSelected(){
         StationItem toReturn = null;
 
-        if (mSelectedPos != NO_POSITION)
+        if (mSelectedPos != NO_POSITION && mSelectedPos < mStationList.size())
             toReturn = mStationList.get(mSelectedPos);
 
         return toReturn;
