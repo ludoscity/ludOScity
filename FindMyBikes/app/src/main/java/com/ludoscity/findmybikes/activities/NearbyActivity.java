@@ -216,9 +216,6 @@ public class NearbyActivity extends BaseActivity
 
         mParkingSwitch = menu.findItem(R.id.bike_parking_switch_menu_item);
 
-        if (!mStationListFragment.isListReady())
-            mParkingSwitch.setVisible(false);
-
         ((SwitchCompat)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setChecked(mLookingForBike);
 
         setOnClickFindSwitchListener();
@@ -410,7 +407,7 @@ public class NearbyActivity extends BaseActivity
                 }
 
                 if (null != mStationListFragment){
-                    mStationListFragment.setupUI(mStationsNetwork, mCurrentUserLatLng, mLookingForBike);
+                    mStationListFragment.setupUI(mStationsNetwork, mLookingForBike);
 
                     if (null != mParkingSwitch && !mParkingSwitch.isVisible() && !isNavDrawerOpen())
                         mParkingSwitch.setVisible(true);
