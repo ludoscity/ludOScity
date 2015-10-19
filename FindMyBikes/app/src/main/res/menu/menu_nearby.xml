@@ -19,13 +19,6 @@
 
 
     <item
-        android:id="@+id/refresh_menu_item"
-        android:title=""
-        app:showAsAction="always"
-        android:icon="@drawable/ic_action_refresh"
-        />
-
-    <item
         android:id="@+id/bike_parking_switch_menu_item"
         android:title=""
         app:showAsAction="always"

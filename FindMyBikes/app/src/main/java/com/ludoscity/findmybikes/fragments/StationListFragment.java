@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ public class StationListFragment extends Fragment
     private TextView mBikesOrParkingHeader;
     private TextView mDistanceHeader;
     private RecyclerView mStationRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mRecyclerViewScrollingState = SCROLL_STATE_IDLE;
 
     private OnStationListFragmentInteractionListener mListener;
@@ -44,7 +46,7 @@ public class StationListFragment extends Fragment
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View inflatedView =  inflater.inflate(R.layout.fragment_station_list, container, false);
-        mStationRecyclerView = (RecyclerView) inflatedView.findViewById(R.id.station_recyclerview);
+        mStationRecyclerView = (RecyclerView) inflatedView.findViewById(R.id.station_list_recyclerview);
         mStationRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
         //mStationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mStationRecyclerView.setLayoutManager(new ScrollingLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false, 300));
@@ -56,6 +58,10 @@ public class StationListFragment extends Fragment
 
             }
         });
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) inflatedView.findViewById(R.id.station_list_swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener((SwipeRefreshLayout.OnRefreshListener)getActivity());
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.stationlist_refresh_spinner_green, R.color.stationlist_refresh_spinner_yellow, R.color.stationlist_refresh_spinner_red);
 
         mBikesOrParkingHeader = (TextView) inflatedView.findViewById(R.id.station_list_bike_parking_header);
         mDistanceHeader = (TextView) inflatedView.findViewById(R.id.station_list_distance_header);
@@ -167,6 +173,14 @@ public class StationListFragment extends Fragment
         if (mListener != null) {
             mListener.onStationListFragmentInteraction(builder.build());
         }
+    }
+
+    public void setRefreshing(boolean toSet) {
+        mSwipeRefreshLayout.setRefreshing(toSet);
+    }
+
+    public void setRefreshEnable(boolean toSet) {
+        mSwipeRefreshLayout.setEnabled(toSet);
     }
 
     public interface OnStationListFragmentInteractionListener {

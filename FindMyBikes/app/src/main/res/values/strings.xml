@@ -11,7 +11,7 @@
     <string name="minsAgo">min ago</string>
     <string name="favorite_removed">Favorite removed</string>
     <string name="favorite_added">Favorite added</string>
-    <string name="setting_auto_update">Update nearby automatically</string>
+    <string name="setting_pull_to_refresh">Station list in \'pull to refresh\' mode</string>
     <string name="distance">Distance</string>
     <string name="station">Station</string>
     <string name="bikes">Bikes</string>
@@ -30,4 +30,5 @@
     <string name="welcome">Welcome</string>
     <string name="bike_network_change_message">Bike share network changed to &lt;b>%1$s, %2$s&lt;/b> based on location.&lt;br /&gt;Your favorites been preserved.</string>
     <string name="locked">Locked</string>
+    <string name="pull_to_refresh">Pull to refresh</string>
 </resources>

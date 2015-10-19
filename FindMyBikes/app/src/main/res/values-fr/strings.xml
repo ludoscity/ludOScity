@@ -7,21 +7,21 @@
     <string name="navigation_drawer_open">Ouvrir navigation drawer</string>
     <string name="navigation_drawer_close">Fermer navigation drawer</string>
     <string name="no_data">Connection internet requise pour le téléchargement des données!</string>
-    <string name="setting_auto_update">Mettre à jour automatiquement</string>
+    <string name="setting_pull_to_refresh">Liste des stations en mode \'pull to refresh\'</string>
     <string name="favorite_added">Favori ajouté</string>
     <string name="bikes">Vélos</string>
     <string name="distance">Distance</string>
     <string name="fromCitibik_es">de citybik.es</string>
     <string name="minsAgo">min</string>
     <string name="momentsAgo">À l\'instant</string>
-    <string name="nextUpdate">Prochaine MAJ</string>
+    <string name="nextUpdate">Prochaine màj</string>
     <string name="noFavorite">Aucun favoris</string>
     <string name="parking">Parking</string>
     <string name="favorite_removed">Favori supprimé</string>
     <string name="station">Station</string>
     <string name="downloading">Téléchargement des données…</string>
     <string name="no_connectivity">Non connecté</string>
-    <string name="refreshing">Rafraîchissement carte…</string>
+    <string name="refreshing">Rafraîchissement de la carte…</string>
     <string name="download_failed">Échec du téléchargement !</string>
     <string name="google_maps_not_installed">Google Maps non installé !</string>
     <string name="searching_bike_network">Recherche sur citybik.es du système le plus proche…</string>
@@ -30,4 +30,5 @@
     <string name="welcome">Bienvenue</string>
     <string name="bike_network_change_message">Système de vélo changé pour &lt;b>%1$s, %2$s&lt;/b> en rapport à votre position.&lt;br /&gt;Vos favoris ont été préservés.</string>
     <string name="locked">Verrouillée</string>
+    <string name="pull_to_refresh">Tirez pour rafraîchir</string>
 </resources>

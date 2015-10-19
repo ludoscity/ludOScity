@@ -18,8 +18,6 @@ import com.ludoscity.findmybikes.R;
  */
 public class UserSettingsFragment extends Fragment {
 
-    private CheckBox autoUpdate_nearby;
-
     public interface OnFragmentInteractionListener {
         void onSettingsFragmentInteraction();
     }
@@ -43,15 +41,15 @@ public class UserSettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View inflatedView = layoutInflater.inflate(R.layout.fragment_settings, container, false);
 
-        autoUpdate_nearby = (CheckBox) inflatedView.findViewById(R.id.checkBox_setting_auto_update);
-        autoUpdate_nearby.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        CheckBox pullToRefreshCheckBox = (CheckBox) inflatedView.findViewById(R.id.checkBox_setting_pull_to_refresh);
+        pullToRefreshCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                DBHelper.setAutoUpdate(isChecked, getActivity());
+                DBHelper.setAutoUpdate(!isChecked, getActivity());
             }
         });
 
-        autoUpdate_nearby.setChecked(DBHelper.getAutoUpdate(getActivity()));
+        pullToRefreshCheckBox.setChecked(!DBHelper.getAutoUpdate(getActivity()));
 
         return inflatedView;
     }

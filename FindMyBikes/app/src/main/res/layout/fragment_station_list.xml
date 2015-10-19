@@ -61,11 +61,18 @@
                 />
         </LinearLayout>
 
-        <!-- STATION LIST -->
-        <android.support.v7.widget.RecyclerView
+        <!-- PULL TO REFRESH -->
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/station_list_swipe_refresh_layout"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/station_recyclerview"/>
+            android:layout_height="fill_parent">
+
+            <!-- STATION LIST -->
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/station_list_recyclerview"/>
+        </android.support.v4.widget.SwipeRefreshLayout>
     </LinearLayout>
 
 </FrameLayout>

@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -58,7 +59,8 @@ import retrofit.Response;
  */
 public class NearbyActivity extends BaseActivity
         implements StationMapFragment.OnStationMapFragmentInteractionListener,
-        StationListFragment.OnStationListFragmentInteractionListener {
+        StationListFragment.OnStationListFragmentInteractionListener,
+        SwipeRefreshLayout.OnRefreshListener{
 
     private StationMapFragment mStationMapFragment = null;
     private StationListFragment mStationListFragment = null;
@@ -81,7 +83,6 @@ public class NearbyActivity extends BaseActivity
     private boolean mLookingForBike = true;
 
     private MenuItem mParkingSwitch;
-    private MenuItem mRefreshMenuItem;
     private MenuItem mFavoriteMenuItem;
     private MenuItem mDirectionsMenuItem;
 
@@ -220,15 +221,6 @@ public class NearbyActivity extends BaseActivity
 
         setOnClickFindSwitchListener();
 
-        mRefreshMenuItem = menu.findItem(R.id.refresh_menu_item);
-
-        //This is here instead of findNetworkTask because menu is created late
-        if (Utils.Connectivity.isConnected(getApplicationContext()) && !DBHelper.isBikeNetworkIdAvailable(this)) {
-            setRefreshActionButtonState(true);
-        }
-        else if (!Utils.Connectivity.isConnected(getApplicationContext()))
-            mRefreshMenuItem.setVisible(false);
-
         mFavoriteMenuItem = menu.findItem(R.id.favorite_menu_item);
 
         mDirectionsMenuItem = menu.findItem(R.id.directions_menu_item);
@@ -253,14 +245,6 @@ public class NearbyActivity extends BaseActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
-            case R.id.refresh_menu_item:
-
-                if (Utils.Connectivity.isConnected(getApplicationContext()) && mDownloadWebTask == null) {
-                    mDownloadWebTask = new DownloadWebTask();
-                    mDownloadWebTask.execute();
-                }
-
-                return true;
 
             case R.id.favorite_menu_item:
 
@@ -456,15 +440,13 @@ public class NearbyActivity extends BaseActivity
                     //... then about next update
                     if (Utils.Connectivity.isConnected(getApplicationContext())) {
 
-                        if (!mRefreshMenuItem.isVisible())
-                            mRefreshMenuItem.setVisible(true);
+                        mStationListFragment.setRefreshEnable(true);
 
                         if (DBHelper.isBikeNetworkIdAvailable(getApplicationContext())) {
 
                             if (!DBHelper.getAutoUpdate(getApplicationContext())) {
-                                //updateTextBuilder.append(" - ").append(getString(R.string.nearbyfragment_no_auto_update));
+                                updateTextBuilder.append(" - ").append(getString(R.string.pull_to_refresh));
 
-                                setRefreshActionButtonState(false);
                             } else {
 
                                 //Should come from something keeping tabs on time, maybe this runnable itself
@@ -491,8 +473,6 @@ public class NearbyActivity extends BaseActivity
 
                                     // formatted will be HH:MM:SS or MM:SS
                                     updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
-
-                                    setRefreshActionButtonState(false);
                                 }
                             }
                         }
@@ -504,9 +484,7 @@ public class NearbyActivity extends BaseActivity
                     else{
                         updateTextBuilder.append(" - ").append(getString(R.string.no_connectivity));
 
-                        setRefreshActionButtonState(false);
-                        if (null != mRefreshMenuItem)
-                            mRefreshMenuItem.setVisible(false);
+                        mStationListFragment.setRefreshEnable(false);
                     }
 
                     mStatusTextView.setText(updateTextBuilder.toString());
@@ -530,21 +508,7 @@ public class NearbyActivity extends BaseActivity
         });
     }
 
-    private void setRefreshActionButtonState(final boolean refreshing) {
-        if (mRefreshMenuItem != null) {
 
-            if (null == mRefreshMenuItem.getActionView())
-            {
-                if (refreshing)
-                    mRefreshMenuItem.setActionView(R.layout.action_refresh_progress);
-            }
-            else
-            {
-                if (!refreshing)
-                    mRefreshMenuItem.setActionView(null);
-            }
-        }
-    }
 
     @Override
     public void onStationMapFragmentInteraction(Uri uri) {
@@ -644,6 +608,16 @@ public class NearbyActivity extends BaseActivity
         mFavoriteMenuItem.setVisible(true);
     }
 
+    @Override
+    public void onRefresh() {
+
+        if (mDownloadWebTask == null){
+            mDownloadWebTask = new DownloadWebTask();
+            mDownloadWebTask.execute();
+        }
+
+    }
+
     public class RedrawMarkersTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -651,7 +625,6 @@ public class NearbyActivity extends BaseActivity
             super.onPreExecute();
 
             mStatusTextView.setText(getString(R.string.refreshing));
-            setRefreshActionButtonState(true);
         }
 
         @Override
@@ -686,8 +659,6 @@ public class NearbyActivity extends BaseActivity
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
-            setRefreshActionButtonState(false);
 
             mStationMapFragment.redrawMarkers();
 
@@ -738,15 +709,14 @@ public class NearbyActivity extends BaseActivity
             checkAndAskLocationPermission();
 
             mStatusTextView.setText(getString(R.string.searching_wait_location));
-
-            setRefreshActionButtonState(true);
+            mStationListFragment.setRefreshing(true);
         }
 
         @Override
         protected void onCancelled() {
             super.onCancelled();
 
-            setRefreshActionButtonState(false);
+            mStationListFragment.setRefreshing(false);
 
             mFindNetworkTask = null;
         }
@@ -968,14 +938,14 @@ public class NearbyActivity extends BaseActivity
             //cancelled when the permission dialog is visible
             //checkAndAskLocationPermission();
 
-            setRefreshActionButtonState(true);
+            mStationListFragment.setRefreshing(true);
         }
 
         @Override
         protected void onCancelled (Void aVoid){
             super.onCancelled(aVoid);
             //Set interface back
-            setRefreshActionButtonState(false);
+            mStationListFragment.setRefreshing(false);
 
             Toast toast;
 
@@ -994,7 +964,7 @@ public class NearbyActivity extends BaseActivity
 
             //switch progressbar view visibility
 
-            setRefreshActionButtonState(false);
+            mStationListFragment.setRefreshing(false);
 
             //Removed this Toast as progressBar AND updated textView with time in minutes already convey the idea
             //Maybe have a toast if it was NOT a success
