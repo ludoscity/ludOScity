@@ -68,8 +68,27 @@ public class StationItem implements Parcelable, ClusterItem {
         if (null != _station.extra.locked)
             this.locked = _station.extra.locked;
 
+
+        //Laurier / Brébeuf
+        /*if (_station.id.equalsIgnoreCase("f132843c3c740cce6760167985bc4d17")){
+            this.empty_slots = 35;
+            this.free_bikes = 0;
+
+            //Lanaudiere / Laurier
+        }else if (_station.id.equalsIgnoreCase("92d97d6adec177649b366c36f3e8e2ff")){
+            this.empty_slots = 17;
+            this.free_bikes = 2;
+
+        }else if (_station.id.equalsIgnoreCase("d20fea946f06e7e64e6da7d95b3c3a89")){
+            this.empty_slots = 1;
+            this.free_bikes = 19;
+        }else if (_station.id.equalsIgnoreCase("3500704c9971a0c13924e696f5804bbd")){
+            this.empty_slots = 0;
+            this.free_bikes = 31;
+        } else {*/
         this.empty_slots = _station.empty_slots;
         this.free_bikes = _station.free_bikes;
+        //}
         this.latitude = _station.latitude;
         this.longitude = _station.longitude;
         //this.position = new LatLng(_station.latitude, _station.longitude);
