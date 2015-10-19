@@ -12,8 +12,8 @@
     <string name="bikes">Vélos</string>
     <string name="distance">Distance</string>
     <string name="fromCitibik_es">de citybik.es</string>
-    <string name="minsAgo">min</string>
-    <string name="momentsAgo">À l\'instant</string>
+    <string name="min">min</string>
+    <string name="moments">À l\'instant</string>
     <string name="nextUpdate">Prochaine màj</string>
     <string name="noFavorite">Aucun favoris</string>
     <string name="parking">Parking</string>
@@ -30,5 +30,7 @@
     <string name="welcome">Bienvenue</string>
     <string name="bike_network_change_message">Système de vélo changé pour &lt;b>%1$s, %2$s&lt;/b> en rapport à votre position.&lt;br /&gt;Vos favoris ont été préservés.</string>
     <string name="locked">Verrouillée</string>
-    <string name="pull_to_refresh">Tirez pour rafraîchir</string>
+    <string name="pull_to_refresh">Tirer pour rafraîchir</string>
+    <string name="status_string">%1$s de citybik.es - %2$s</string>
+    <string name="il_y_a">"Il y a "</string>
 </resources>

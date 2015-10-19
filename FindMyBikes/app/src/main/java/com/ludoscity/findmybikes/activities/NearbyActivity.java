@@ -419,14 +419,15 @@ public class NearbyActivity extends BaseActivity
 
                     long difference = now - runnableLastRefreshTimestamp;
 
-                    StringBuilder updateTextBuilder = new StringBuilder();
+                    StringBuilder pastStringBuilder = new StringBuilder();
+                    StringBuilder futureStringBuilder = new StringBuilder();
 
                     if (DBHelper.isBikeNetworkIdAvailable(getApplicationContext())) {
                         //First taking care of past time...
                         if (difference < DateUtils.MINUTE_IN_MILLIS)
-                            updateTextBuilder.append(getString(R.string.momentsAgo)).append(" ").append(getString(R.string.fromCitibik_es));//mStatusTextView.setText();
+                            pastStringBuilder.append(getString(R.string.moments));
                         else
-                            updateTextBuilder.append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(R.string.minsAgo)).append(" ").append(getString(R.string.fromCitibik_es));
+                            pastStringBuilder.append(getString(R.string.il_y_a)).append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(R.string.min));
                     }
                     //mStatusTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
 
@@ -445,7 +446,7 @@ public class NearbyActivity extends BaseActivity
                         if (DBHelper.isBikeNetworkIdAvailable(getApplicationContext())) {
 
                             if (!DBHelper.getAutoUpdate(getApplicationContext())) {
-                                updateTextBuilder.append(" - ").append(getString(R.string.pull_to_refresh));
+                                futureStringBuilder.append(getString(R.string.pull_to_refresh));
 
                             } else {
 
@@ -454,25 +455,16 @@ public class NearbyActivity extends BaseActivity
 
                                 if (now >= wishedUpdateTime) {
 
-                                    //Put a string same length as the other one ?
-                                    updateTextBuilder.append(" ").append(getString(R.string.downloading));
-
-                                    //Run update
-
                                     mDownloadWebTask = new DownloadWebTask();
                                     mDownloadWebTask.execute();
 
-
-                                    //lastUpdateTime = now;
                                 } else {
 
-                                    updateTextBuilder.append(" - ").append(getString(R.string.nextUpdate)).append(" ");
-
-
+                                    futureStringBuilder.append(getString(R.string.nextUpdate)).append(" ");
                                     long differenceSecond = (wishedUpdateTime - now) / DateUtils.SECOND_IN_MILLIS;
 
                                     // formatted will be HH:MM:SS or MM:SS
-                                    updateTextBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
+                                    futureStringBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
                                 }
                             }
                         }
@@ -482,12 +474,13 @@ public class NearbyActivity extends BaseActivity
                         }
                     }
                     else{
-                        updateTextBuilder.append(" - ").append(getString(R.string.no_connectivity));
+                        futureStringBuilder.append(getString(R.string.no_connectivity));
 
                         mStationListFragment.setRefreshEnable(false);
                     }
 
-                    mStatusTextView.setText(updateTextBuilder.toString());
+                    mStatusTextView.setText(String.format(getString(R.string.status_string),
+                            pastStringBuilder.toString(), futureStringBuilder.toString()));
                 }
 
                 //UI will be refreshed every second
