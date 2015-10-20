@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -31,11 +32,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.ludoscity.findmybikes.StationListPagerAdapter;
 import com.ludoscity.findmybikes.citybik_es.Citybik_esAPI;
 import com.ludoscity.findmybikes.citybik_es.model.ListNetworksAnswerRoot;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkStatusAnswerRoot;
 import com.ludoscity.findmybikes.citybik_es.model.Station;
+import com.ludoscity.findmybikes.fragments.FavoritesFragment;
 import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.RootApplication;
 import com.ludoscity.findmybikes.StationItem;
@@ -60,10 +63,10 @@ import retrofit.Response;
 public class NearbyActivity extends BaseActivity
         implements StationMapFragment.OnStationMapFragmentInteractionListener,
         StationListFragment.OnStationListFragmentInteractionListener,
+        FavoritesFragment.OnFragmentInteractionListener,
         SwipeRefreshLayout.OnRefreshListener{
 
     private StationMapFragment mStationMapFragment = null;
-    private StationListFragment mStationListFragment = null;
 
     private Handler mUpdateRefreshHandler = null;
     private Runnable mUpdateRefreshRunnableCode = null;
@@ -78,6 +81,7 @@ public class NearbyActivity extends BaseActivity
 
     private TextView mStatusTextView;
     private View mStatusBar;
+    private ViewPager mStationListViewPager;
 
     private boolean mRefreshMarkers = true;
     private boolean mLookingForBike = true;
@@ -158,21 +162,14 @@ public class NearbyActivity extends BaseActivity
         // Update Bar
         mStatusTextView = (TextView) findViewById(R.id.status_textView);
         mStatusBar = findViewById(R.id.statusBar);
+
+        mStationListViewPager = (ViewPager)findViewById(R.id.station_list_viewpager);
+        mStationListViewPager.setAdapter(new StationListPagerAdapter(getSupportFragmentManager()));
+
         setStatusBarListener();
 
 
-        if (savedInstanceState == null){
-
-            //Create fragments programatically
-            mStationListFragment = new StationListFragment();
-
-            // Add the fragment to the 'fragment_container' FrameLayout
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.station_list_or_info_container, mStationListFragment, "stationListFragTag").commit();
-
-        }
-        else{
-            mStationListFragment = (StationListFragment)getSupportFragmentManager().findFragmentByTag("stationListFragTag");
+        if (savedInstanceState != null) {
 
             mUnselectStationCameraPosition = savedInstanceState.getParcelable("back_camera_pos");
             mSavedInstanceCameraPosition = savedInstanceState.getParcelable("saved_camera_pos");
@@ -225,9 +222,9 @@ public class NearbyActivity extends BaseActivity
 
         mDirectionsMenuItem = menu.findItem(R.id.directions_menu_item);
 
-        if (null != mStationListFragment) {
+        if (null != retrieveStationListFragment()) {
 
-            StationItem highlightedStation = mStationListFragment.getHighlightedStation();
+            StationItem highlightedStation = retrieveStationListFragment().getHighlightedStation();
             if (null != highlightedStation) {
                 setupFavoriteActionIcon(highlightedStation);
                 mDirectionsMenuItem.setVisible(true);
@@ -248,7 +245,7 @@ public class NearbyActivity extends BaseActivity
 
             case R.id.favorite_menu_item:
 
-                StationItem station = mStationListFragment.getHighlightedStation();
+                StationItem station = retrieveStationListFragment().getHighlightedStation();
 
                 boolean newState = !station.isFavorite(this);
 
@@ -267,7 +264,7 @@ public class NearbyActivity extends BaseActivity
 
             case R.id.directions_menu_item:
 
-                StationItem targetStation = mStationListFragment.getHighlightedStation();
+                StationItem targetStation = retrieveStationListFragment().getHighlightedStation();
 
                 StringBuilder builder = new StringBuilder("http://maps.google.com/maps?&saddr=").
                         append(mCurrentUserLatLng.latitude).
@@ -304,7 +301,7 @@ public class NearbyActivity extends BaseActivity
         if (null != mParkingSwitch)
             mParkingSwitch.setVisible(!isOpen && !isAnimating);
 
-        if (null != mStationListFragment.getHighlightedStation())
+        if (null != retrieveStationListFragment().getHighlightedStation())
         {
             if (null != mFavoriteMenuItem)
                 mFavoriteMenuItem.setVisible(!isOpen && !isAnimating);
@@ -318,7 +315,7 @@ public class NearbyActivity extends BaseActivity
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                mStationListFragment.lookingForBikes(isChecked);
+                retrieveStationListFragment().lookingForBikes(isChecked);
                 mStationMapFragment.lookingForBikes(isChecked);
                 mLookingForBike = isChecked;
                 //if(isChecked){
@@ -390,8 +387,8 @@ public class NearbyActivity extends BaseActivity
                     mSavedInstanceCameraPosition = null;
                 }
 
-                if (null != mStationListFragment){
-                    mStationListFragment.setupUI(mStationsNetwork, mLookingForBike);
+                if (null != retrieveStationListFragment()){
+                    retrieveStationListFragment().setupUI(mStationsNetwork, mLookingForBike);
 
                     if (null != mParkingSwitch && !mParkingSwitch.isVisible() && !isNavDrawerOpen())
                         mParkingSwitch.setVisible(true);
@@ -403,6 +400,8 @@ public class NearbyActivity extends BaseActivity
     private Runnable createUpdateRefreshRunnableCode(){
         return new Runnable() {
 
+            private boolean mStationListReady = false;
+
             /*private final long startTime = System.currentTimeMillis();
             private long lastRunTime;
             private long lastUpdateTime = System.currentTimeMillis();   //Update should be run automatically ?
@@ -412,8 +411,13 @@ public class NearbyActivity extends BaseActivity
 
                 long now = System.currentTimeMillis();
 
+                if (!mStationListReady && retrieveStationListFragment() != null){
+                    retrieveStationListFragment().setupUI(mStationsNetwork, mLookingForBike);
+                    mStationListReady = true;
+                }
+
                 //Update not already in progress
-                if (mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null) {
+                if (mStationListReady && mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null) {
 
                     long runnableLastRefreshTimestamp = DBHelper.getLastUpdateTimestamp(getApplicationContext());
 
@@ -441,7 +445,7 @@ public class NearbyActivity extends BaseActivity
                     //... then about next update
                     if (Utils.Connectivity.isConnected(getApplicationContext())) {
 
-                        mStationListFragment.setRefreshEnable(true);
+                        retrieveStationListFragment().setRefreshEnable(true);
 
                         if (DBHelper.isBikeNetworkIdAvailable(getApplicationContext())) {
 
@@ -452,6 +456,8 @@ public class NearbyActivity extends BaseActivity
 
                                 //Should come from something keeping tabs on time, maybe this runnable itself
                                 long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60;  //comes from Prefs
+                                //Debug
+                                //long wishedUpdateTime = runnableLastRefreshTimestamp + 15 * 1000;  //comes from Prefs
 
                                 if (now >= wishedUpdateTime) {
 
@@ -476,11 +482,12 @@ public class NearbyActivity extends BaseActivity
                     else{
                         futureStringBuilder.append(getString(R.string.no_connectivity));
 
-                        mStationListFragment.setRefreshEnable(false);
+                        retrieveStationListFragment().setRefreshEnable(false);
                     }
 
-                    mStatusTextView.setText(String.format(getString(R.string.status_string),
-                            pastStringBuilder.toString(), futureStringBuilder.toString()));
+                    if (mDownloadWebTask == null)
+                        mStatusTextView.setText(String.format(getString(R.string.status_string),
+                                pastStringBuilder.toString(), futureStringBuilder.toString()));
                 }
 
                 //UI will be refreshed every second
@@ -518,13 +525,14 @@ public class NearbyActivity extends BaseActivity
             mCurrentUserLatLng = new LatLng(Double.valueOf(uri.getQueryParameter(StationMapFragment.LOCATION_CHANGED_LATITUDE_PARAM)),
                     Double.valueOf(uri.getQueryParameter(StationMapFragment.LOCATION_CHANGED_LONGITUDE_PARAM)));
 
-            mStationListFragment.setCurrentUserLatLng(mCurrentUserLatLng);
+            if(retrieveStationListFragment() != null)
+                retrieveStationListFragment().setCurrentUserLatLng(mCurrentUserLatLng);
         }
         //Marker click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
 
-            mStationListFragment.highlightStationFromName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
-            setupFavoriteActionIcon(mStationListFragment.getHighlightedStation());
+            retrieveStationListFragment().highlightStationFromName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
+            setupFavoriteActionIcon(retrieveStationListFragment().getHighlightedStation());
             mDirectionsMenuItem.setVisible(true);
             mStationMapFragment.oversizeMarkerUniqueForStationName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
 
@@ -532,16 +540,15 @@ public class NearbyActivity extends BaseActivity
         //Map click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MAP_CLICK_PATH)){
 
-            StationItem highlightedStation = mStationListFragment.getHighlightedStation();
+            StationItem highlightedStation = retrieveStationListFragment().getHighlightedStation();
 
             if (null != highlightedStation){
 
                 mFavoriteMenuItem.setVisible(false);
                 mDirectionsMenuItem.setVisible(false);
-                mStationListFragment.removeStationHighlight();
+                retrieveStationListFragment().removeStationHighlight();
                 mStationMapFragment.resetMarkerSizeAll();
             }
-
         }
     }
 
@@ -559,7 +566,7 @@ public class NearbyActivity extends BaseActivity
         if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
         {
             //if null, means the station was clicked twice, hence unchecked
-            StationItem clickedStation = mStationListFragment.getHighlightedStation();
+            StationItem clickedStation = retrieveStationListFragment().getHighlightedStation();
             if (null == clickedStation){
 
                 mFavoriteMenuItem.setVisible(false);
@@ -601,6 +608,7 @@ public class NearbyActivity extends BaseActivity
         mFavoriteMenuItem.setVisible(true);
     }
 
+    //Callback from pull-to-refresh
     @Override
     public void onRefresh() {
 
@@ -609,6 +617,15 @@ public class NearbyActivity extends BaseActivity
             mDownloadWebTask.execute();
         }
 
+    }
+
+    @Override
+    public void onFavoritesFragmentInteraction(StationItem stationToShow) {
+
+    }
+
+    private StationListFragment retrieveStationListFragment(){
+        return (StationListFragment)((StationListPagerAdapter) mStationListViewPager.getAdapter()).getRegisteredFragment(StationListPagerAdapter.ALL_STATIONS);
     }
 
     public class RedrawMarkersTask extends AsyncTask<Void, Void, Void> {
@@ -655,10 +672,12 @@ public class NearbyActivity extends BaseActivity
 
             mStationMapFragment.redrawMarkers();
 
-            StationItem highlighted = mStationListFragment.getHighlightedStation();
+            if (null != retrieveStationListFragment()) {
+                StationItem highlighted = retrieveStationListFragment().getHighlightedStation();
 
-            if (null != highlighted)
-                mStationMapFragment.oversizeMarkerUniqueForStationName(highlighted.getName());
+                if (null != highlighted)
+                    mStationMapFragment.oversizeMarkerUniqueForStationName(highlighted.getName());
+            }
 
             mRedrawMarkersTask = null;
         }
@@ -702,14 +721,16 @@ public class NearbyActivity extends BaseActivity
             checkAndAskLocationPermission();
 
             mStatusTextView.setText(getString(R.string.searching_wait_location));
-            mStationListFragment.setRefreshing(true);
+
+            if (retrieveStationListFragment() != null)
+                retrieveStationListFragment().setRefreshing(true);
         }
 
         @Override
         protected void onCancelled() {
             super.onCancelled();
 
-            mStationListFragment.setRefreshing(false);
+            retrieveStationListFragment().setRefreshing(false);
 
             mFindNetworkTask = null;
         }
@@ -717,15 +738,22 @@ public class NearbyActivity extends BaseActivity
         @Override
         protected Map<String,String> doInBackground(Void... voids) {
 
-            Map<String,String> toReturn = new HashMap<>();
+            //noinspection StatementWithEmptyBody
+            while (retrieveStationListFragment() == null){
+                //Waiting on viewpager init
+            }
+
+            publishProgress();
 
             //noinspection StatementWithEmptyBody
             while (mCurrentUserLatLng == null)
             {
-                //Do nothing
+                //Wainting on location
             }
 
             publishProgress();
+
+            Map<String,String> toReturn = new HashMap<>();
 
             Citybik_esAPI api = ((RootApplication) getApplication()).getCitybik_esApi();
 
@@ -781,7 +809,11 @@ public class NearbyActivity extends BaseActivity
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
 
-            mStatusTextView.setText(getString(R.string.searching_bike_network));
+            if (retrieveStationListFragment() != null)
+                retrieveStationListFragment().setRefreshing(true);
+
+            if (mCurrentUserLatLng != null)
+                mStatusTextView.setText(getString(R.string.searching_bike_network));
 
         }
 
@@ -850,7 +882,7 @@ public class NearbyActivity extends BaseActivity
 
             if (mCurrentUserLatLng != null && !DBHelper.getBikeNetworkBounds(NearbyActivity.this).contains(mCurrentUserLatLng)){
 
-                mStationListFragment.removeStationHighlight();
+                retrieveStationListFragment().removeStationHighlight();
                 mFavoriteMenuItem.setVisible(false);
                 mDirectionsMenuItem.setVisible(false);
 
@@ -896,6 +928,13 @@ public class NearbyActivity extends BaseActivity
         @Override
         protected Void doInBackground(Void... aVoid) {
 
+            //noinspection StatementWithEmptyBody
+            while (retrieveStationListFragment() == null){
+                //Waiting on viewpager init
+            }
+
+            publishProgress();
+
             Map<String, String> UrlParams = new HashMap<>();
             UrlParams.put("fields", "stations");
 
@@ -923,6 +962,13 @@ public class NearbyActivity extends BaseActivity
         }
 
         @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+
+            retrieveStationListFragment().setRefreshing(true);
+        }
+
+        @Override
         protected void onPreExecute() {
             super.onPreExecute();
             mStatusTextView.setText(getString(R.string.downloading));
@@ -931,14 +977,15 @@ public class NearbyActivity extends BaseActivity
             //cancelled when the permission dialog is visible
             //checkAndAskLocationPermission();
 
-            mStationListFragment.setRefreshing(true);
+            if (retrieveStationListFragment() != null)
+                retrieveStationListFragment().setRefreshing(true);
         }
 
         @Override
         protected void onCancelled (Void aVoid){
             super.onCancelled(aVoid);
             //Set interface back
-            mStationListFragment.setRefreshing(false);
+            retrieveStationListFragment().setRefreshing(false);
 
             Toast toast;
 
@@ -957,7 +1004,7 @@ public class NearbyActivity extends BaseActivity
 
             //switch progressbar view visibility
 
-            mStationListFragment.setRefreshing(false);
+            retrieveStationListFragment().setRefreshing(false);
 
             //Removed this Toast as progressBar AND updated textView with time in minutes already convey the idea
             //Maybe have a toast if it was NOT a success

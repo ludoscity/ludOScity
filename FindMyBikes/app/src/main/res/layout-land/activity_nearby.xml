@@ -36,13 +36,13 @@
 
 
 
-                        <!-- Container for StationListFragment/StationInfoFragment -->
-                        <FrameLayout
+                        <!-- VIEWPAGER -->
+                        <android.support.v4.view.ViewPager
                             android:layout_width="fill_parent"
                             android:layout_height="0px"
                             android:layout_weight="10"
-                            android:id="@+id/station_list_or_info_container">
-                        </FrameLayout>
+                            android:id="@+id/station_list_viewpager">
+                        </android.support.v4.view.ViewPager>
 
                         <!-- LAST UPDATED -->
                         <LinearLayout

@@ -86,11 +86,11 @@ public class FavoritesFragment extends Fragment {
     }
 
     public void setCurrentLocation() {
-        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (location != null) {
-            mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-        }
+        //mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        //Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        //if (location != null) {
+        //    mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        //}
     }
 
     private void setOnClickItemListenerStationListView() {

@@ -176,7 +176,8 @@ public class StationListFragment extends Fragment
     }
 
     public void setRefreshing(boolean toSet) {
-        mSwipeRefreshLayout.setRefreshing(toSet);
+        if (toSet != mSwipeRefreshLayout.isRefreshing())
+            mSwipeRefreshLayout.setRefreshing(toSet);
     }
 
     public void setRefreshEnable(boolean toSet) {

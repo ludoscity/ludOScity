@@ -69,7 +69,7 @@ public class StationItem implements Parcelable, ClusterItem {
             this.locked = _station.extra.locked;
 
 
-        //Laurier / Brébeuf
+        //Laurier / Brebeuf
         /*if (_station.id.equalsIgnoreCase("f132843c3c740cce6760167985bc4d17")){
             this.empty_slots = 35;
             this.free_bikes = 0;
