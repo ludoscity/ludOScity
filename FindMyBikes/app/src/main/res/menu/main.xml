@@ -1,6 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity">
-    <!--<item android:id="@+id/action_example" android:title="@string/action_example"
-        app:showAsAction="withText|ifRoom" /> -->
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:context="com.ludoscity.findmybikes.activities.BaseActivity">
+    <item
+        android:id="@+id/settings_menu_item"
+        app:showAsAction="always"
+        android:title=""
+        android:icon="@drawable/ic_action_action_settings"/>
 
 </menu>

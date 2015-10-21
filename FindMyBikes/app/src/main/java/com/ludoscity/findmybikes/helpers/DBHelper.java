@@ -2,6 +2,7 @@ package com.ludoscity.findmybikes.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
@@ -14,6 +15,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
 import com.ludoscity.findmybikes.StationItem;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
@@ -46,7 +48,6 @@ public class DBHelper {
     public static final String SHARED_PREF_FILENAME = "FindMyBikes_prefs";
 
     private static final String PREF_CURRENT_BIKE_NETWORK_ID = "current_bike_network_id";
-    private static final String PREF_NEARBY_AUTO_UPDATE = "setting.auto_update.nearby";
 
     private static final String PREF_SUFFIX_FAVORITES_SET = "_favorites";
     private static final String PREF_SUFFIX_WEBTASK_LAST_TIMESTAMP_MS = "_last_refresh_timestamp";
@@ -66,16 +67,9 @@ public class DBHelper {
     }
 
     public static boolean getAutoUpdate(Context ctx){
-        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
 
-        return sp.getBoolean(PREF_NEARBY_AUTO_UPDATE, true);
-    }
-
-    public static void setAutoUpdate(boolean toSet, Context ctx){
-
-        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
-
-        sp.edit().putBoolean(PREF_NEARBY_AUTO_UPDATE, toSet).apply();
+        return sp.getBoolean(ctx.getString(R.string.pref_refresh_options_key), true);
     }
 
     public static long getLastUpdateTimestamp(Context ctx){
