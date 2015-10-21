@@ -1,8 +1,10 @@
 package com.ludoscity.findmybikes.activities;
 
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.fragments.SettingsFragment;
@@ -27,6 +29,9 @@ public class SettingsActivity extends AppCompatActivity
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
 
+        //noinspection ConstantConditions
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         // Display the fragment as the main content.
         getFragmentManager().beginTransaction()
                 .replace(R.id.main_content, new SettingsFragment())
@@ -39,5 +44,16 @@ public class SettingsActivity extends AppCompatActivity
 
         //noinspection ConstantConditions
         getSupportActionBar().setSubtitle(getString(R.string.title_section_settings));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
