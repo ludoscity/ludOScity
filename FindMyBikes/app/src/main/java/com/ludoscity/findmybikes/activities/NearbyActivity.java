@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -82,6 +83,13 @@ public class NearbyActivity extends BaseActivity
     private TextView mStatusTextView;
     private View mStatusBar;
     private ViewPager mStationListViewPager;
+    private TabLayout mTabLayout;
+
+    // titles for tabs (indices must correspond to the viewPager)
+    private static final int[] TABS_TITLE_RES_ID = new int[]{
+            R.string.title_section_nearby,
+            R.string.title_section_favorites
+    };
 
     private boolean mRefreshMarkers = true;
     private boolean mLookingForBike = true;
@@ -166,6 +174,10 @@ public class NearbyActivity extends BaseActivity
         mStationListViewPager = (ViewPager)findViewById(R.id.station_list_viewpager);
         mStationListViewPager.setAdapter(new StationListPagerAdapter(getSupportFragmentManager()));
 
+        // Give the TabLayout the ViewPager
+        mTabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        mTabLayout.setupWithViewPager(mStationListViewPager);
+
         setStatusBarListener();
 
 
@@ -215,6 +227,8 @@ public class NearbyActivity extends BaseActivity
         mParkingSwitch = menu.findItem(R.id.bike_parking_switch_menu_item);
 
         ((SwitchCompat)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setChecked(mLookingForBike);
+
+        setupTabTitles();
 
         setOnClickFindSwitchListener();
 
@@ -318,35 +332,7 @@ public class NearbyActivity extends BaseActivity
                 retrieveStationListFragment().lookingForBikes(isChecked);
                 mStationMapFragment.lookingForBikes(isChecked);
                 mLookingForBike = isChecked;
-                //if(isChecked){
-                //Hackfix, the UX REALLY is improved by a toast like graphical element, though it seems bugged by recent changes (mea culpa)
-                //toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findABikes);
-                //icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.bike_icon_toast);
-                //}
-                //else{
-                //toastText = getString(com.ludoscity.bikeactivityexplorer.R.string.findAParking);
-                //icon = getResources().getDrawable(com.ludoscity.bikeactivityexplorer.R.drawable.parking_icon_toast);
-                //}
-
-                // Create a toast with icon and text
-                //TODO: create this as XML layout
-                /*TextView toastView = new TextView(mContext);
-                toastView.setAlpha(0.25f);
-                toastView.setBackgroundColor(getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark));
-                toastView.setShadowLayer(2.75f, 0, 0, com.ludoscity.bikeactivityexplorer.R.color.background_floating_material_dark);
-                toastView.setText(toastText);
-                toastView.setTextSize(24f);
-                toastView.setTextColor(getResources().getColor(com.ludoscity.bikeactivityexplorer.R.color.primary_text_default_material_dark));
-                toastView.setGravity(Gravity.CENTER);
-                icon.setBounds(0, 0, 64, 64);
-                toastView.setCompoundDrawables(icon, null, null, null);
-                toastView.setCompoundDrawablePadding(16);
-                toastView.setPadding(5, 5, 5, 5);
-                Toast toast = new Toast(mContext);
-                toast.setDuration(Toast.LENGTH_SHORT);
-                toast.setView(toastView);
-                toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL, 0, 0);
-                toast.show();*/
+                setupTabTitles();
             }
         });
     }
@@ -628,6 +614,20 @@ public class NearbyActivity extends BaseActivity
         return (StationListFragment)((StationListPagerAdapter) mStationListViewPager.getAdapter()).getRegisteredFragment(StationListPagerAdapter.ALL_STATIONS);
     }
 
+    private void setupTabTitles() {
+        String tabTitlePostfix;
+
+        if (mLookingForBike)
+            tabTitlePostfix = getString(R.string.bikes);
+        else
+            tabTitlePostfix = getString(R.string.parking);
+
+        for (int i=0; i<TABS_TITLE_RES_ID.length; ++i){
+            //noinspection ConstantConditions
+            mTabLayout.getTabAt(i).setText(getString(TABS_TITLE_RES_ID[i]) + " - " + tabTitlePostfix);
+        }
+    }
+
     public class RedrawMarkersTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -748,7 +748,7 @@ public class NearbyActivity extends BaseActivity
             //noinspection StatementWithEmptyBody
             while (mCurrentUserLatLng == null)
             {
-                //Wainting on location
+                //Waiting on location
             }
 
             publishProgress();

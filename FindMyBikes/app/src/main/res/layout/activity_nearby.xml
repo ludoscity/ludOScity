@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:clipChildren="false"
     tools:context=".BaseActivity">
 
@@ -22,6 +23,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <!-- TABS -->
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/sliding_tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    style="@style/MyCustomTabLayout"
+                    app:tabGravity="fill"
+                    app:tabMode="fixed" />
 
                 <!-- VIEWPAGER -->
                 <android.support.v4.view.ViewPager

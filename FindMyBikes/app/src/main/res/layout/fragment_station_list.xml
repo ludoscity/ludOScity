@@ -11,56 +11,6 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-        <!-- COLUMN DESCRIPTION -->
-        <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/theme_primary_dark">
-
-            <TextView
-                android:layout_width="0px"
-                android:layout_height="fill_parent"
-                android:layout_gravity="center"
-                android:id="@+id/station_list_distance_header"
-                android:padding="5dp"
-                android:text="@string/distance"
-                android:layout_weight="@dimen/station_list_distance_column_weight"
-                android:gravity="center"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textStyle="bold"
-                android:textColor="@color/primary_text_default_material_dark"
-                />
-
-            <TextView
-                android:layout_width="0px"
-                android:layout_height="fill_parent"
-                android:textSize="16sp"
-                android:gravity="center"
-                android:text="@string/station"
-                android:layout_weight="@dimen/station_list_name_column_weight"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textColor="@color/primary_text_default_material_dark"
-                />
-
-            <TextView
-                android:id="@+id/station_list_bike_parking_header"
-                android:layout_width="0px"
-                android:layout_height="fill_parent"
-                android:textSize="16sp"
-                android:gravity="center"
-                android:text="@string/bikes"
-                android:layout_weight="@dimen/station_list_availability_column_weight"
-                android:textStyle="bold"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textColor="@color/primary_text_default_material_dark"
-                />
-        </LinearLayout>
-
         <!-- PULL TO REFRESH -->
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/station_list_swipe_refresh_layout"

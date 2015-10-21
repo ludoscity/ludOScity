@@ -29,8 +29,6 @@ public class StationListFragment extends Fragment
 
     public static final String STATION_LIST_ITEM_CLICK_PATH = "station_list_item_click";
 
-    private TextView mBikesOrParkingHeader;
-    private TextView mDistanceHeader;
     private RecyclerView mStationRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mRecyclerViewScrollingState = SCROLL_STATE_IDLE;
@@ -62,9 +60,6 @@ public class StationListFragment extends Fragment
         mSwipeRefreshLayout = (SwipeRefreshLayout) inflatedView.findViewById(R.id.station_list_swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener((SwipeRefreshLayout.OnRefreshListener)getActivity());
         mSwipeRefreshLayout.setColorSchemeResources(R.color.stationlist_refresh_spinner_green, R.color.stationlist_refresh_spinner_yellow, R.color.stationlist_refresh_spinner_red);
-
-        mBikesOrParkingHeader = (TextView) inflatedView.findViewById(R.id.station_list_bike_parking_header);
-        mDistanceHeader = (TextView) inflatedView.findViewById(R.id.station_list_distance_header);
 
         return inflatedView;
     }
@@ -100,8 +95,6 @@ public class StationListFragment extends Fragment
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        LatLng currentUserLatLng = null;
-
         if (savedInstanceState != null) {
 
             int selectedPos = savedInstanceState.getInt("selected_pos");
@@ -109,18 +102,13 @@ public class StationListFragment extends Fragment
             if (selectedPos != NO_POSITION)
                 getRecyclerViewAdapter().setSelectedPos(selectedPos, false);
 
-            currentUserLatLng = savedInstanceState.getParcelable("user_current_LatLng");
+            LatLng currentUserLatLng = savedInstanceState.getParcelable("user_current_LatLng");
 
             getRecyclerViewAdapter().setCurrentUserLatLng(currentUserLatLng, false);
 
             ArrayList<StationItem> stationList = savedInstanceState.getParcelableArrayList("stationitem_arraylist");
             getRecyclerViewAdapter().setupStationList(stationList);
         }
-
-        if (currentUserLatLng == null)
-            mDistanceHeader.setVisibility(View.GONE);
-        else
-            mDistanceHeader.setVisibility(View.VISIBLE);
     }
 
     public void setupUI(ArrayList<StationItem> stationsNetwork, boolean lookingForBike) {
@@ -136,7 +124,6 @@ public class StationListFragment extends Fragment
         if (mRecyclerViewScrollingState == SCROLL_STATE_IDLE) {
 
             getRecyclerViewAdapter().setCurrentUserLatLng(currentUserLatLng, true);
-            mDistanceHeader.setVisibility(View.VISIBLE);
         }
     }
 
@@ -157,11 +144,6 @@ public class StationListFragment extends Fragment
     public void lookingForBikes(boolean lookingForBike) {
 
         getRecyclerViewAdapter().lookingForBikesNotify(lookingForBike);
-
-        if (lookingForBike)
-            mBikesOrParkingHeader.setText(R.string.bikes);
-        else
-            mBikesOrParkingHeader.setText(R.string.parking);
     }
 
     @Override
