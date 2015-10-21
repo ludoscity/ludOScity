@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -61,7 +62,7 @@ import retrofit.Response;
  * Created by F8Full on 2015-07-26.
  * Activity used to display the nearby section
  */
-public class NearbyActivity extends BaseActivity
+public class NearbyActivity extends AppCompatActivity
         implements StationMapFragment.OnStationMapFragmentInteractionListener,
         StationListFragment.OnStationListFragmentInteractionListener,
         FavoritesFragment.OnFragmentInteractionListener,
@@ -100,11 +101,6 @@ public class NearbyActivity extends BaseActivity
 
     private CameraPosition mUnselectStationCameraPosition;
     private CameraPosition mSavedInstanceCameraPosition;
-
-    @Override
-    protected int getSelfNavDrawerItem() {
-        return NAVDRAWER_ITEM_NEARBY;
-    }
 
     @Override
     public void onStart(){
@@ -162,10 +158,9 @@ public class NearbyActivity extends BaseActivity
         setContentView(R.layout.activity_nearby);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
 
-        setActivityTitle(getActionbarTitle());
-        setActivitySubtitle("");
-
-        restoreActionBar();
+        //noinspection ConstantConditions
+        getSupportActionBar().setTitle(getString(R.string.app_name));
+        getSupportActionBar().setSubtitle(DBHelper.getBikeNetworkName(this));
 
         // Update Bar
         mStatusTextView = (TextView) findViewById(R.id.status_textView);
@@ -257,6 +252,11 @@ public class NearbyActivity extends BaseActivity
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
 
+            case R.id.settings_menu_item:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+
             case R.id.favorite_menu_item:
 
                 StationItem station = retrieveStationListFragment().getHighlightedStation();
@@ -307,21 +307,6 @@ public class NearbyActivity extends BaseActivity
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onNavDrawerStateChanged(boolean isOpen, boolean isAnimating) {
-
-        if (null != mParkingSwitch)
-            mParkingSwitch.setVisible(!isOpen && !isAnimating);
-
-        if (null != retrieveStationListFragment().getHighlightedStation())
-        {
-            if (null != mFavoriteMenuItem)
-                mFavoriteMenuItem.setVisible(!isOpen && !isAnimating);
-            if (null != mDirectionsMenuItem)
-                mDirectionsMenuItem.setVisible(!isOpen && !isAnimating);
-        }
     }
 
     private void setOnClickFindSwitchListener() {
@@ -376,7 +361,7 @@ public class NearbyActivity extends BaseActivity
                 if (null != retrieveStationListFragment()){
                     retrieveStationListFragment().setupUI(mStationsNetwork, mLookingForBike);
 
-                    if (null != mParkingSwitch && !mParkingSwitch.isVisible() && !isNavDrawerOpen())
+                    if (null != mParkingSwitch && !mParkingSwitch.isVisible())
                         mParkingSwitch.setVisible(true);
                 }
             }
@@ -821,8 +806,8 @@ public class NearbyActivity extends BaseActivity
         protected void onPostExecute(Map<String,String> backgroundResults) {
             super.onPostExecute(backgroundResults);
 
-            setActivityTitle(getActionbarTitle());
-            restoreActionBar();
+            //noinspection ConstantConditions
+            getSupportActionBar().setSubtitle(DBHelper.getBikeNetworkName(NearbyActivity.this));
 
             AlertDialog alertDialog = new AlertDialog.Builder(NearbyActivity.this).create();
             //alertDialog.setTitle(getString(R.string.network_found_title));
