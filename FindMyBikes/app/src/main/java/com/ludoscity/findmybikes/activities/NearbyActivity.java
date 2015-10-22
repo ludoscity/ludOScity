@@ -101,7 +101,6 @@ public class NearbyActivity extends AppCompatActivity
     private MenuItem mFavoriteMenuItem;
     private MenuItem mDirectionsMenuItem;
 
-    private CameraPosition mUnselectStationCameraPosition;
     private CameraPosition mSavedInstanceCameraPosition;
 
     @Override
@@ -180,7 +179,6 @@ public class NearbyActivity extends AppCompatActivity
 
         if (savedInstanceState != null) {
 
-            mUnselectStationCameraPosition = savedInstanceState.getParcelable("back_camera_pos");
             mSavedInstanceCameraPosition = savedInstanceState.getParcelable("saved_camera_pos");
             mLookingForBike = savedInstanceState.getBoolean("looking_for_bike");
             mStationsNetwork = savedInstanceState.getParcelableArrayList("network_data");
@@ -202,7 +200,6 @@ public class NearbyActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelable("back_camera_pos", mUnselectStationCameraPosition);
         outState.putParcelable("saved_camera_pos", mStationMapFragment.getCameraPosition());
         outState.putBoolean("looking_for_bike", mLookingForBike);
         outState.putParcelableArrayList("network_data", mStationsNetwork);
@@ -266,6 +263,8 @@ public class NearbyActivity extends AppCompatActivity
                 boolean newState = !station.isFavorite(this);
 
                 station.setFavorite(newState, this);
+
+                mStationListViewPager.setCurrentItem(1,true);
 
                 if (newState) {
                     mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
@@ -545,7 +544,6 @@ public class NearbyActivity extends AppCompatActivity
                 mFavoriteMenuItem.setVisible(false);
                 mDirectionsMenuItem.setVisible(false);
                 mStationMapFragment.resetMarkerSizeAll();
-                mStationMapFragment.animateCamera(CameraUpdateFactory.newCameraPosition(mUnselectStationCameraPosition));
 
             }
             else {
@@ -558,8 +556,6 @@ public class NearbyActivity extends AppCompatActivity
                 LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
                 boundsBuilder.include(clickedStation.getPosition());
-
-                mUnselectStationCameraPosition = mStationMapFragment.getCameraPosition();
 
                 if (mCurrentUserLatLng != null) {
                     boundsBuilder.include(mCurrentUserLatLng);
