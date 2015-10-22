@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -561,7 +563,11 @@ public class NearbyActivity extends AppCompatActivity
 
                 if (mCurrentUserLatLng != null) {
                     boundsBuilder.include(mCurrentUserLatLng);
-                    mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200));
+
+                    /// Converts 66 dip into its equivalent px
+                    Resources r = getResources();
+                    float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 66, r.getDisplayMetrics());
+                    mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), (int)px));
                 }
                 else{
                     mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(clickedStation.getPosition(), 15));
