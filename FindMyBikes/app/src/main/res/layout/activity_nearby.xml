@@ -10,81 +10,66 @@
         android:id="@+id/toolbar_main"
         layout="@layout/toolbar" />
 
-    <android.support.v4.widget.DrawerLayout android:id="@+id/drawer_layout"
-        android:layout_width="match_parent" android:layout_height="match_parent"
+    <FrameLayout android:id="@+id/main_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@id/toolbar_main">
 
-        <FrameLayout android:id="@+id/main_content"
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent" >
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <LinearLayout
-                android:orientation="vertical"
+            <!-- TABS -->
+            <android.support.design.widget.TabLayout
+                android:id="@+id/sliding_tabs"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="38dp"
+                style="@style/MyCustomTabLayout"
+                app:tabGravity="fill"
+                app:tabMode="fixed" />
 
-                <!-- TABS -->
-                <android.support.design.widget.TabLayout
-                    android:id="@+id/sliding_tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    style="@style/MyCustomTabLayout"
-                    app:tabGravity="fill"
-                    app:tabMode="fixed" />
+            <!-- VIEWPAGER -->
+            <android.support.v4.view.ViewPager
+                android:layout_width="fill_parent"
+                android:layout_height="0px"
+                android:layout_weight="4"
+                android:id="@+id/station_list_viewpager">
+            </android.support.v4.view.ViewPager>
 
-                <!-- VIEWPAGER -->
-                <android.support.v4.view.ViewPager
+            <!-- STATUS BAR -->
+            <LinearLayout
+                android:id="@+id/statusBar"
+                android:layout_width="fill_parent"
+                android:layout_height="0px"
+                android:layout_weight="0.5"
+                android:orientation="horizontal"
+                android:background="@color/background_material_dark">
+                <TextView
+                    android:id="@+id/status_textView"
                     android:layout_width="fill_parent"
-                    android:layout_height="0px"
-                    android:layout_weight="4"
-                    android:id="@+id/station_list_viewpager">
-                </android.support.v4.view.ViewPager>
-
-                <!-- STATUS BAR -->
-                <LinearLayout
-                    android:id="@+id/statusBar"
-                    android:layout_width="fill_parent"
-                    android:layout_height="0px"
-                    android:layout_weight="0.5"
-                    android:orientation="horizontal"
-                    android:background="@color/background_material_dark">
-                    <TextView
-                        android:id="@+id/status_textView"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textColor="@color/light_gray"
-                        android:text="@string/fromCitibik_es"/>
-
-                </LinearLayout>
-                <!-- MAP -->
-                <FrameLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="0px"
-                    android:layout_weight="6">
-                    <fragment
-                        xmlns:android="http://schemas.android.com/apk/res/android"
-                        android:name="com.ludoscity.findmybikes.fragments.StationMapFragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/station_map_fragment"
-                        tools:layout="@layout/fragment_station_map" />
-                </FrameLayout>
-
-
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/light_gray"
+                    android:text="@string/fromCitibik_es"/>
 
             </LinearLayout>
+            <!-- MAP -->
+            <FrameLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0px"
+                android:layout_weight="6">
+                <fragment
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:name="com.ludoscity.findmybikes.fragments.StationMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/station_map_fragment"
+                    tools:layout="@layout/fragment_station_map" />
+            </FrameLayout>
 
-        </FrameLayout>
+        </LinearLayout>
 
-        <!-- android:layout_gravity="start" tells DrawerLayout to treat
-             this as a sliding drawer on the left side for left-to-right
-             languages and on the right side for right-to-left languages.
-             If you're not building against API 17 or higher, use
-             android:layout_gravity="left" instead. -->
-        <!-- The drawer is given a fixed width in dp and extends the full height of
-             the container. -->
+    </FrameLayout>
 
-        <include layout="@layout/navdrawer" />
-    </android.support.v4.widget.DrawerLayout>
 </RelativeLayout>
