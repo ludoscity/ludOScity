@@ -5,9 +5,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.TypedValue;
 
 /**
  * Created by F8Full on 2015-04-30.
@@ -15,6 +17,12 @@ import android.os.Bundle;
  * Class with static utilities
  */
 public class Utils {
+
+    public static int dpToPx(float toConvert, Context ctx){
+        /// Converts 66 dip into its equivalent px
+        Resources r = ctx.getResources();
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, toConvert, r.getDisplayMetrics());
+    }
 
     /**
      * Created by F8Full on 2015-03-15.

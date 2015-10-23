@@ -35,6 +35,25 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         outState.putParcelableArrayList("stationitem_arraylist", mStationList);
     }
 
+    public boolean removeItem(StationItem toRemove) {
+        int positionToRemove = getPositionInList(toRemove.getName());
+
+        if ( positionToRemove == mSelectedPos)
+            mSelectedPos = NO_POSITION;
+
+        mStationList.remove(positionToRemove);
+
+        notifyDataSetChanged();
+
+        return mStationList.isEmpty();
+    }
+
+    public void addItem(StationItem toAdd) {
+        mStationList.add(toAdd);
+
+        notifyDataSetChanged();
+    }
+
     public interface OnStationListItemClickListener {
         void onStationListItemClick();
     }

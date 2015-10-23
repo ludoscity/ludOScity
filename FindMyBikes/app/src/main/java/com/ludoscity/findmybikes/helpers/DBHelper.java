@@ -336,28 +336,34 @@ public class DBHelper {
         return stationsNetwork;
     }
 
-    public static ArrayList<StationItem> getFavoriteStations(Context ctx) throws CouchbaseLiteException {
-        ArrayList<StationItem> items = new ArrayList<>();
+    public static ArrayList<StationItem> getFavoriteStations(Context ctx) {
 
-        List<QueryRow> allStations = getAllStations();
+        ArrayList<StationItem> toReturn = new ArrayList<>();
 
-        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+        try {
 
-        Set<String> favorites = sp.getStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), new HashSet<String>());
+            List<QueryRow> allStations;
+            allStations = getAllStations();
+            SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        for (QueryRow qr : allStations) {
-            Document d = qr.getDocument();
+            Set<String> favorites = sp.getStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), new HashSet<String>());
 
-            Map<String, Object> properties = d.getProperties();
+            for (QueryRow qr : allStations) {
+                Document d = qr.getDocument();
 
-            //noinspection SuspiciousMethodCalls
-            if (favorites.contains(properties.get("id")))
-            {
-                items.add(createStationItem(d));
+                Map<String, Object> properties = d.getProperties();
+
+                //noinspection SuspiciousMethodCalls
+                if (favorites.contains(properties.get("id")))
+                {
+                    toReturn.add(createStationItem(d));
+                }
             }
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
         }
 
-        return items;
+        return toReturn;
     }
 
     public static boolean isFavorite(String id, Context ctx) {

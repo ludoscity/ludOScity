@@ -3,9 +3,11 @@ package com.ludoscity.findmybikes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
-import com.ludoscity.findmybikes.fragments.FavoritesFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.fragments.StationListFragment;
 import com.ludoscity.findmybikes.utils.SmartFragmentPagerAdapter;
+
+import java.util.ArrayList;
 
 /**
  * Created by F8Full on 2015-10-19.
@@ -28,7 +30,7 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         if (position == ALL_STATIONS)
             toReturn = new StationListFragment();
         else
-            toReturn = new FavoritesFragment();
+            toReturn = new StationListFragment();
 
         return toReturn;
     }
@@ -36,5 +38,60 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
     @Override
     public int getCount() {
         return NUM_ITEMS;
+    }
+
+    public void setupUIAll(ArrayList<StationItem> nearbyStations, ArrayList<StationItem> favoriteStations,
+                           String noFavoritesString, boolean lookingForBike) {
+        retrieveListFragment(ALL_STATIONS).setupUI(nearbyStations, lookingForBike, "");
+        retrieveListFragment(FAVORITE_STATIONS).setupUI(favoriteStations, lookingForBike, noFavoritesString);
+    }
+
+    public void setRefreshEnableAll(boolean toSet) {
+        retrieveListFragment(ALL_STATIONS).setRefreshEnable(toSet);
+        retrieveListFragment(FAVORITE_STATIONS).setRefreshEnable(toSet);
+    }
+
+    private StationListFragment retrieveListFragment(int position){
+        return ((StationListFragment)getRegisteredFragment(position));
+    }
+
+    public StationItem getHighlightedStationForPage(int position) {
+        StationItem toReturn = null;
+
+        if (isViewPagerReady())
+            toReturn = retrieveListFragment(position).getHighlightedStation();
+
+        return toReturn;
+    }
+
+    public void setCurrentUserLatLngForNearby(LatLng currentUserLatLng) {
+        if (isViewPagerReady())
+            retrieveListFragment(ALL_STATIONS).setCurrentUserLatLng(currentUserLatLng);
+    }
+
+    public void highlightStationFromNameForPage(String stationName, int position) {
+        retrieveListFragment(position).highlightStationFromName(stationName);
+    }
+
+    public void removeStationHighlightForPage(int position) {
+        retrieveListFragment(position).removeStationHighlight();
+    }
+
+    public void lookingForBikesAll(boolean lookingForBikes) {
+        retrieveListFragment(ALL_STATIONS).lookingForBikes(lookingForBikes);
+        retrieveListFragment(FAVORITE_STATIONS).lookingForBikes(lookingForBikes);
+    }
+
+    public void setRefreshingAll(boolean toSet) {
+        retrieveListFragment(ALL_STATIONS).setRefreshing(toSet);
+        retrieveListFragment(FAVORITE_STATIONS).setRefreshing(toSet);
+    }
+
+    public void removeStationForPage(int position, StationItem station, String stringIfEmpty) {
+        retrieveListFragment(position).removeStation(station, stringIfEmpty);
+    }
+
+    public void addStationForPage(int position, StationItem station) {
+        retrieveListFragment(position).addStation(station);
     }
 }

@@ -32,6 +32,7 @@ public class StationListFragment extends Fragment
     private RecyclerView mStationRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mRecyclerViewScrollingState = SCROLL_STATE_IDLE;
+    private TextView mEmptyListTextView;
 
     private OnStationListFragmentInteractionListener mListener;
 
@@ -44,6 +45,7 @@ public class StationListFragment extends Fragment
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View inflatedView =  inflater.inflate(R.layout.fragment_station_list, container, false);
+        mEmptyListTextView = (TextView) inflatedView.findViewById(R.id.empty_list_text);
         mStationRecyclerView = (RecyclerView) inflatedView.findViewById(R.id.station_list_recyclerview);
         mStationRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
         //mStationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -111,11 +113,22 @@ public class StationListFragment extends Fragment
         }
     }
 
-    public void setupUI(ArrayList<StationItem> stationsNetwork, boolean lookingForBike) {
+    public void setupUI(ArrayList<StationItem> stationsNetwork, boolean lookingForBike, String stringIfEmpty) {
 
         if (stationsNetwork != null) {
-            getRecyclerViewAdapter().setupStationList(stationsNetwork);
-            lookingForBikes(lookingForBike);
+
+            if (!stationsNetwork.isEmpty()) {
+                mStationRecyclerView.setVisibility(View.VISIBLE);
+                mEmptyListTextView.setVisibility(View.GONE);
+                getRecyclerViewAdapter().setupStationList(stationsNetwork);
+                lookingForBikes(lookingForBike);
+            }
+            else{
+                mStationRecyclerView.setVisibility(View.GONE);
+                mEmptyListTextView.setText(stringIfEmpty);
+                mEmptyListTextView.setVisibility(View.VISIBLE);
+
+            }
         }
     }
 
@@ -164,6 +177,20 @@ public class StationListFragment extends Fragment
 
     public void setRefreshEnable(boolean toSet) {
         mSwipeRefreshLayout.setEnabled(toSet);
+    }
+
+    public void removeStation(StationItem toRemove, String stringIfEmpty) {
+        if (getRecyclerViewAdapter().removeItem(toRemove)){
+            mStationRecyclerView.setVisibility(View.GONE);
+            mEmptyListTextView.setText(stringIfEmpty);
+            mEmptyListTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void addStation(StationItem toAdd) {
+        mEmptyListTextView.setVisibility(View.GONE);
+        mStationRecyclerView.setVisibility(View.VISIBLE);
+        getRecyclerViewAdapter().addItem(toAdd);
     }
 
     public interface OnStationListFragmentInteractionListener {

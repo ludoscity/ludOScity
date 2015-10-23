@@ -3,6 +3,15 @@
     android:layout_height="match_parent"
     tools:context="com.ludoscity.findmybikes.fragments.StationListFragment">
 
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/empty_list_text"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:textSize="28sp"
+        android:gravity="center"
+        />
+
     <!-- STATION LIST VIEW -->
     <LinearLayout
 

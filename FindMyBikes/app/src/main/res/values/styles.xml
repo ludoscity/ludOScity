@@ -32,7 +32,7 @@
     </style>
 
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
-        <item name="tabMaxWidth">0dp</item>
+
         <item name="tabIndicatorColor">?attr/colorAccent</item>
         <item name="tabIndicatorHeight">2dp</item>
         <item name="tabPaddingStart">6dp</item>
