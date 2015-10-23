@@ -141,9 +141,18 @@ public class StationListFragment extends Fragment
         }
     }
 
-    public void highlightStationFromName(String stationName) {
+    public boolean highlightStationFromName(String stationName) {
 
-        mStationRecyclerView.smoothScrollToPosition(getRecyclerViewAdapter().setSelectionFromName(stationName, false));
+        boolean toReturn = false;
+
+        int selectedPos = getRecyclerViewAdapter().setSelectionFromName(stationName, false);
+
+        if (selectedPos != NO_POSITION) {
+            mStationRecyclerView.smoothScrollToPosition(selectedPos);
+            toReturn = true;
+        }
+
+        return toReturn;
     }
 
     public StationItem getHighlightedStation(){

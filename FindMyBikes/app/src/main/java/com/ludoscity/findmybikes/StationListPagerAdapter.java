@@ -69,8 +69,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
             retrieveListFragment(ALL_STATIONS).setCurrentUserLatLng(currentUserLatLng);
     }
 
-    public void highlightStationFromNameForPage(String stationName, int position) {
-        retrieveListFragment(position).highlightStationFromName(stationName);
+    public boolean highlightStationFromNameForPage(String stationName, int position) {
+        return retrieveListFragment(position).highlightStationFromName(stationName);
     }
 
     public void removeStationHighlightForPage(int position) {

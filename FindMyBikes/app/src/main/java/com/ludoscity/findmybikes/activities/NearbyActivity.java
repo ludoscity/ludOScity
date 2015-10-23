@@ -514,13 +514,13 @@ public class NearbyActivity extends AppCompatActivity
         //Marker click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
 
-            getListPagerAdapter().highlightStationFromNameForPage(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM),
-                    mTabLayout.getSelectedTabPosition());
+            if(getListPagerAdapter().highlightStationFromNameForPage(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM),
+                    mTabLayout.getSelectedTabPosition())) {
 
-            setupFavoriteActionIcon(getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition()));
-            mDirectionsMenuItem.setVisible(true);
-            mStationMapFragment.oversizeMarkerUniqueForStationName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
-
+                setupFavoriteActionIcon(getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition()));
+                mDirectionsMenuItem.setVisible(true);
+                mStationMapFragment.oversizeMarkerUniqueForStationName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
+            }
         }
         //Map click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MAP_CLICK_PATH)){
