@@ -121,7 +121,6 @@ public class StationListFragment extends Fragment
                 mStationRecyclerView.setVisibility(View.VISIBLE);
                 mEmptyListTextView.setVisibility(View.GONE);
                 getRecyclerViewAdapter().setupStationList(stationsNetwork);
-                lookingForBikes(lookingForBike);
             }
             else{
                 mStationRecyclerView.setVisibility(View.GONE);
@@ -129,6 +128,8 @@ public class StationListFragment extends Fragment
                 mEmptyListTextView.setVisibility(View.VISIBLE);
 
             }
+
+            lookingForBikes(lookingForBike);
         }
     }
 
