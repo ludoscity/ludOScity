@@ -287,31 +287,36 @@ public class NearbyActivity extends AppCompatActivity
 
                 StationItem targetStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
 
-                StringBuilder builder = new StringBuilder("http://maps.google.com/maps?&saddr=").
-                        append(mCurrentUserLatLng.latitude).
-                        append(",").
-                        append(mCurrentUserLatLng.longitude).
-                        append("&daddr=").
-                        append(targetStation.getPosition().latitude).
-                        append(",").
-                        append(targetStation.getPosition().longitude).
-                        append("&dirflg=");
+                // Seen NullPointerException in crash report.
+                if (null != targetStation) {
+                    StringBuilder builder = new StringBuilder("http://maps.google.com/maps?&saddr=").
+                            append(mCurrentUserLatLng.latitude).
+                            append(",").
+                            append(mCurrentUserLatLng.longitude).
+                            append("&daddr=").
+                            append(targetStation.getPosition().latitude).
+                            append(",").
+                            append(targetStation.getPosition().longitude).
+                            append("&dirflg=");
 
-                if (mLookingForBike)
-                    builder.append("w");
-                else
-                    builder.append("b");
+                    if (mLookingForBike)
+                        builder.append("w");
+                    else
+                        builder.append("b");
 
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(builder.toString()));
-                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-                if (getPackageManager().queryIntentActivities(intent, 0).size() > 0) {
-                    startActivity(intent); // launch the map activity
-                } else {
-                    Toast.makeText(this, getString(R.string.google_maps_not_installed), Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(builder.toString()));
+                    intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                    if (getPackageManager().queryIntentActivities(intent, 0).size() > 0) {
+                        startActivity(intent); // launch the map activity
+                    } else {
+                        Toast.makeText(this, getString(R.string.google_maps_not_installed), Toast.LENGTH_LONG).show();
 
+                    }
+
+                    return true;
                 }
+                //else do nothing
 
-                return true;
         }
         return super.onOptionsItemSelected(item);
     }
