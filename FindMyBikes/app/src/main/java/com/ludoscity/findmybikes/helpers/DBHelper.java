@@ -165,11 +165,6 @@ public class DBHelper {
         return sp.getString(PREF_CURRENT_BIKE_NETWORK_ID, "");
     }
 
-    //Helper function for ugly fix regarding accented characters
-    public static boolean isBixiNetwork(Context ctx){
-        return getBikeNetworkId(ctx).equalsIgnoreCase("bixi-montreal");
-    }
-
     /*public static void deleteDB() throws CouchbaseLiteException {
         //If it crashes here because getDatabase returns null, uninstall and reinstall the app
         mManager.getDatabase(mTRACKS_DB_NAME).delete();

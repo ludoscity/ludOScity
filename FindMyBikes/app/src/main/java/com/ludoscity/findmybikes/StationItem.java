@@ -47,12 +47,7 @@ public class StationItem implements Parcelable, ClusterItem {
 
         if (null != _station.extra.name) {
             try {
-                //Ugly hack. Character encoding for the bixi system is weird.
-                if (DBHelper.isBixiNetwork(ctx))
-                    this.name = new String(_station.extra.name.getBytes("ISO-8859-1"), "UTF-8");
-                else
-                    this.name = new String(_station.extra.name.getBytes("UTF-8"), "UTF-8");
-                //
+                this.name = new String(_station.extra.name.getBytes("UTF-8"), "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 Log.d("StationItem constructor", "String trouble",e );
             }
