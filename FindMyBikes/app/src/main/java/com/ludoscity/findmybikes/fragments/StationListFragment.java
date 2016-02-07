@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -33,6 +35,8 @@ public class StationListFragment extends Fragment
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mRecyclerViewScrollingState = SCROLL_STATE_IDLE;
     private TextView mEmptyListTextView;
+    private ImageView mTimeHeaderImageView;
+    private TextView mAvailabilityTextView;
 
     private OnStationListFragmentInteractionListener mListener;
 
@@ -60,8 +64,11 @@ public class StationListFragment extends Fragment
         });
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) inflatedView.findViewById(R.id.station_list_swipe_refresh_layout);
-        mSwipeRefreshLayout.setOnRefreshListener((SwipeRefreshLayout.OnRefreshListener)getActivity());
+        mSwipeRefreshLayout.setOnRefreshListener((SwipeRefreshLayout.OnRefreshListener) getActivity());
         mSwipeRefreshLayout.setColorSchemeResources(R.color.stationlist_refresh_spinner_green, R.color.stationlist_refresh_spinner_yellow, R.color.stationlist_refresh_spinner_red);
+
+        mAvailabilityTextView = (TextView) inflatedView.findViewById(R.id.availability_header);
+        mTimeHeaderImageView = (ImageView) inflatedView.findViewById(R.id.time_header);
 
         return inflatedView;
     }
@@ -167,6 +174,15 @@ public class StationListFragment extends Fragment
     public void lookingForBikes(boolean lookingForBike) {
 
         getRecyclerViewAdapter().lookingForBikesNotify(lookingForBike);
+
+        if (lookingForBike) {
+            mAvailabilityTextView.setText(getString(R.string.bikes));
+            mTimeHeaderImageView.setImageDrawable(ContextCompat.getDrawable(this.getContext(), R.drawable.ic_walking));
+        }
+        else {
+            mAvailabilityTextView.setText(getString(R.string.parking));
+            mTimeHeaderImageView.setImageDrawable(ContextCompat.getDrawable(this.getContext(), R.drawable.ic_biking));
+        }
     }
 
     @Override

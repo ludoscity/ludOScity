@@ -85,12 +85,6 @@ public class NearbyActivity extends AppCompatActivity
     private ViewPager mStationListViewPager;
     private TabLayout mTabLayout;
 
-    // titles for tabs (indices must correspond to the viewPager)
-    private static final int[] TABS_TITLE_RES_ID = new int[]{
-            R.string.title_section_nearby,
-            R.string.title_section_favorites
-    };
-
     private boolean mRefreshMarkers = true;
     private boolean mLookingForBike = true;
 
@@ -165,7 +159,7 @@ public class NearbyActivity extends AppCompatActivity
         mStatusBar = findViewById(R.id.statusBar);
 
         mStationListViewPager = (ViewPager)findViewById(R.id.station_list_viewpager);
-        mStationListViewPager.setAdapter(new StationListPagerAdapter(getSupportFragmentManager()));
+        mStationListViewPager.setAdapter(new StationListPagerAdapter(getSupportFragmentManager(), getApplicationContext()));
         mStationListViewPager.addOnPageChangeListener(this);
 
         // Give the TabLayout the ViewPager
@@ -173,7 +167,6 @@ public class NearbyActivity extends AppCompatActivity
         mTabLayout.setupWithViewPager(mStationListViewPager);
 
         setStatusBarListener();
-
 
         if (savedInstanceState != null) {
 
@@ -219,8 +212,6 @@ public class NearbyActivity extends AppCompatActivity
         mParkingSwitch = menu.findItem(R.id.bike_parking_switch_menu_item);
 
         ((SwitchCompat)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setChecked(mLookingForBike);
-
-        setupTabTitles();
 
         setOnClickFindSwitchListener();
 
@@ -329,7 +320,6 @@ public class NearbyActivity extends AppCompatActivity
                 getListPagerAdapter().lookingForBikesAll(isChecked);
                 mStationMapFragment.lookingForBikes(isChecked);
                 mLookingForBike = isChecked;
-                setupTabTitles();
             }
         });
     }
@@ -613,20 +603,6 @@ public class NearbyActivity extends AppCompatActivity
 
     private StationListPagerAdapter getListPagerAdapter(){
         return (StationListPagerAdapter) mStationListViewPager.getAdapter();
-    }
-
-    private void setupTabTitles() {
-        String tabTitlePostfix;
-
-        if (mLookingForBike)
-            tabTitlePostfix = getString(R.string.bikes);
-        else
-            tabTitlePostfix = getString(R.string.parking);
-
-        for (int i=0; i<TABS_TITLE_RES_ID.length; ++i){
-            //noinspection ConstantConditions
-            mTabLayout.getTabAt(i).setText(getString(TABS_TITLE_RES_ID[i]) + " - " + tabTitlePostfix);
-        }
     }
 
     @Override
