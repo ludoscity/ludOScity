@@ -20,6 +20,48 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
+        <!-- COLUMN DESCRIPTION -->
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background_material_dark"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp">
+
+            <ImageView
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+
+                android:layout_weight="0.19"
+                android:src="@drawable/ic_walking" />
+
+            <TextView
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="@string/station"
+                android:layout_weight="0.66"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/primary_text_default_material_dark"
+                />
+
+            <TextView
+                android:id="@+id/bikesOrParkingColumn"
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="@string/bikes"
+                android:layout_weight="0.19"
+                android:textStyle="bold"
+                android:textColor="@color/primary_text_default_material_dark"
+                />
+        </LinearLayout>
+
         <!-- PULL TO REFRESH -->
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/station_list_swipe_refresh_layout"
@@ -32,6 +74,7 @@
                 android:layout_height="match_parent"
                 android:id="@+id/station_list_recyclerview"/>
         </android.support.v4.widget.SwipeRefreshLayout>
+
     </LinearLayout>
 
 </FrameLayout>
