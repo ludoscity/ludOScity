@@ -1,9 +1,12 @@
 package com.ludoscity.findmybikes.fragments;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,7 +63,7 @@ public class StationMapFragment extends Fragment
         // Inflate the layout for this fragment
         View inflatedView = inflater.inflate(R.layout.fragment_station_map, container, false);
 
-        if(mGoogleMap == null)
+        if (mGoogleMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
 
         return inflatedView;
@@ -97,7 +100,7 @@ public class StationMapFragment extends Fragment
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         //Log.d("CameraZoomLevel", Float.toString(cameraPosition.zoom));
-        if (mEnforceMaxZoom && cameraPosition.zoom > mMaxZoom){
+        if (mEnforceMaxZoom && cameraPosition.zoom > mMaxZoom) {
             mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(mMaxZoom));
         }
     }
@@ -113,7 +116,7 @@ public class StationMapFragment extends Fragment
         builder.appendQueryParameter(INFOWINDOW_CLICK_MARKER_POS_LAT_PARAM, String.valueOf(marker.getPosition().latitude));
         builder.appendQueryParameter(INFOWINDOW_CLICK_MARKER_POS_LNG_PARAM, String.valueOf(marker.getPosition().longitude));
 
-        if (mListener != null){
+        if (mListener != null) {
             mListener.onStationMapFragmentInteraction(builder.build());
         }
     }
@@ -122,7 +125,7 @@ public class StationMapFragment extends Fragment
     public void onMapReady(GoogleMap googleMap) {
         mInitialCameraSetupDone = false;
         mGoogleMap = googleMap;
-        mGoogleMap.setMyLocationEnabled(true);
+        enableMyLocationCheckingPermission();
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
         mGoogleMap.setOnMarkerClickListener(this);
         mGoogleMap.setOnInfoWindowClickListener(this);
@@ -171,6 +174,23 @@ public class StationMapFragment extends Fragment
             if (mListener != null){
                 mListener.onStationMapFragmentInteraction(builder.build());
             }
+        }
+    }
+
+    public void enableMyLocationCheckingPermission(){
+        if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            //return;
+
+        }
+        else{
+            mGoogleMap.setMyLocationEnabled(true);
         }
     }
 

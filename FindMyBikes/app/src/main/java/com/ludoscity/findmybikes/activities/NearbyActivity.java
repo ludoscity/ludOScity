@@ -235,6 +235,21 @@ public class NearbyActivity extends AppCompatActivity
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            // permission was granted, yay! Do the
+            mStationMapFragment.enableMyLocationCheckingPermission();
+
+        }else {
+
+            // permission denied, boo! Disable the
+            // functionality that depends on this permission.
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
 
