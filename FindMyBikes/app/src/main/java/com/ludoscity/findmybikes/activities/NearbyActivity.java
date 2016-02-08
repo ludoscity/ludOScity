@@ -386,6 +386,8 @@ public class NearbyActivity extends AppCompatActivity
                 long now = System.currentTimeMillis();
 
                 if (!mPagerReady && getListPagerAdapter().isViewPagerReady()){
+                    //TODO: calling DBHelper.getFavoriteStations can return incomplete result when db is updating
+                    //it happens when data is downladed and screen configuration is changed shortly after
                     getListPagerAdapter().setupUIAll(mStationsNetwork, DBHelper.getFavoriteStations(NearbyActivity.this),
                             getString(R.string.no_favorites), mLookingForBike);
                     mPagerReady = true;
@@ -877,7 +879,7 @@ public class NearbyActivity extends AppCompatActivity
 
             DBHelper.saveBikeNetworkBounds(boundsBuilder.build(), NearbyActivity.this);
 
-            //User is not in coverage are, postExecute will launch appropriate task
+            //User is not in coverage area, postExecute will launch appropriate task
             if (mCurrentUserLatLng != null && !boundsBuilder.build().contains(mCurrentUserLatLng)){
                 return null;
             }

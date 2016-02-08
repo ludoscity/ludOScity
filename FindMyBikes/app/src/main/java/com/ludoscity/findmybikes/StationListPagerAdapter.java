@@ -1,6 +1,7 @@
 package com.ludoscity.findmybikes;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
@@ -38,8 +39,12 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         Fragment toReturn;
         if (position == ALL_STATIONS)
             toReturn = new StationListFragment();
-        else
+        else {
             toReturn = new StationListFragment();
+            Bundle args = new Bundle();
+            args.putInt(StationListFragment.STATION_LIST_ARG_BACKGROUND_RES_ID, R.drawable.ic_favorites_background);
+            toReturn.setArguments(args);
+        }
 
         return toReturn;
     }

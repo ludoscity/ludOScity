@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="station_list_proximity_column_weight" format="float" type="dimen">0.19</item>
-    <item name="station_list_name_column_weight" format="float" type="dimen">0.63</item>
-    <item name="station_list_availability_column_weight" format="float" type="dimen">0.17</item>
-
-    <item name="station_list_proximity_header_weight" format="float" type="dimen">0.3</item>
-    <item name="station_list_name_header_weight" format="float" type="dimen">0.66</item>
-    <item name="station_list_availability_header_weight" format="float" type="dimen">0.25</item>
+    <item name="station_list_proximity_column_weight" format="float" type="dimen">0.3</item>
+    <item name="station_list_name_column_weight" format="float" type="dimen">0.66</item>
+    <item name="station_list_availability_column_weight" format="float" type="dimen">0.25</item>
 </resources>

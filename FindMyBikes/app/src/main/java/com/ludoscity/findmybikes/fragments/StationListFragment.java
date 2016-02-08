@@ -31,6 +31,7 @@ public class StationListFragment extends Fragment
             implements StationRecyclerViewAdapter.OnStationListItemClickListener{
 
     public static final String STATION_LIST_ITEM_CLICK_PATH = "station_list_item_click";
+    public static final String STATION_LIST_ARG_BACKGROUND_RES_ID = "station_list_arg_background_res_id";
 
     private RecyclerView mStationRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -72,6 +73,14 @@ public class StationListFragment extends Fragment
         mAvailabilityTextView = (TextView) inflatedView.findViewById(R.id.availability_header);
         mProximityHeaderImageView = (ImageView) inflatedView.findViewById(R.id.time_header_iv);
         mProximityHeaderTextView = (TextView) inflatedView.findViewById(R.id.time_header_tv);
+
+        Bundle args = getArguments();
+        if (args != null){
+
+            mStationRecyclerView.setBackground(ContextCompat.getDrawable(this.getContext(), args.getInt(STATION_LIST_ARG_BACKGROUND_RES_ID)));
+            mProximityHeaderImageView.setVisibility(View.GONE);
+            mProximityHeaderTextView.setVisibility(View.GONE);
+        }
 
         return inflatedView;
     }
@@ -182,7 +191,11 @@ public class StationListFragment extends Fragment
 
             mAvailabilityTextView.setText(getString(R.string.bikes));
 
-            if (DBHelper.getWalkingProximityAsDistance(this.getContext())){
+            if (getArguments()!= null){
+                mProximityHeaderTextView.setVisibility(View.GONE);
+                mProximityHeaderImageView.setVisibility(View.GONE);
+            }
+            else if (DBHelper.getWalkingProximityAsDistance(this.getContext())){
                 mProximityHeaderTextView.setVisibility(View.VISIBLE);
                 mProximityHeaderImageView.setVisibility(View.GONE);
             }
@@ -196,7 +209,11 @@ public class StationListFragment extends Fragment
 
             mAvailabilityTextView.setText(getString(R.string.parking));
 
-            if (DBHelper.getBikingProximityAsDistance(this.getContext())){
+            if (getArguments()!= null){
+                mProximityHeaderTextView.setVisibility(View.GONE);
+                mProximityHeaderImageView.setVisibility(View.GONE);
+            }
+            else if (DBHelper.getBikingProximityAsDistance(this.getContext())){
                 mProximityHeaderTextView.setVisibility(View.VISIBLE);
                 mProximityHeaderImageView.setVisibility(View.GONE);
             }
