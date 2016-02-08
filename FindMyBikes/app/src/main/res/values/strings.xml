@@ -12,6 +12,7 @@
     <string name="favorite_removed">Favorite removed</string>
     <string name="favorite_added">Favorite added</string>
     <string name="setting_pull_to_refresh">Manual refresh only (pull to refresh)</string>
+    <string name="distance">Distance</string>
     <string name="station">Station</string>
     <string name="bikes">Bikes</string>
     <string name="parking">Parking</string>
@@ -32,8 +33,16 @@
     <string name="pull_to_refresh">Pull to refresh</string>
     <string name="status_string">%1$s ago from citybik.es - %2$s</string>
     <string name="il_y_a">""</string>
-    <string name="pref_manual_refresh_mode">Refresh options</string>
+    <string name="pref_manual_refresh_mode">Refresh</string>
     <string name="pref_manual_refresh_mode_manual">Pull to refresh only.</string>
     <string name="pref_manual_refresh_mode_all">Every 5 minutes + pull to refresh.</string>
     <string name="pref_refresh_options_key" translatable="false">pref_refresh_options</string>
+    <string name="pref_walking_proximity_title">Walking proximity</string>
+    <string name="pref_walking_proximity_time">Time. (As the crow flies, at 4km/h)</string>
+    <string name="pref_proximity_distance">Distance. (As the crow flies)</string>
+    <string name="pref_walking_proximity_key" translatable="false">pref_walking_proximity_key</string>
+    <string name="pref_biking_proximity_key" translatable="false">pref_biking_proximity_key</string>
+    <string name="pref_biking_proximity_title">Biking proximity</string>
+    <string name="pref_biking_proximity_time">Time. (As the crow flies, at 12km/h)</string>
+    <string name="hour_symbol">h</string>
 </resources>

@@ -72,6 +72,18 @@ public class DBHelper {
         return sp.getBoolean(ctx.getString(R.string.pref_refresh_options_key), true);
     }
 
+    public static boolean getWalkingProximityAsDistance(Context _ctx){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(_ctx);
+
+        return sp.getBoolean(_ctx.getString(R.string.pref_walking_proximity_key), false);
+    }
+
+    public static boolean getBikingProximityAsDistance(Context _ctx){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(_ctx);
+
+        return sp.getBoolean(_ctx.getString(R.string.pref_biking_proximity_key), false);
+    }
+
     public static long getLastUpdateTimestamp(Context ctx){
 
         return ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE)

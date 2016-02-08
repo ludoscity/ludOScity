@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
+import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.DividerItemDecoration;
 import com.ludoscity.findmybikes.utils.ScrollingLinearLayoutManager;
 
@@ -35,7 +36,8 @@ public class StationListFragment extends Fragment
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mRecyclerViewScrollingState = SCROLL_STATE_IDLE;
     private TextView mEmptyListTextView;
-    private ImageView mTimeHeaderImageView;
+    private ImageView mProximityHeaderImageView;
+    private TextView mProximityHeaderTextView;
     private TextView mAvailabilityTextView;
 
     private OnStationListFragmentInteractionListener mListener;
@@ -54,7 +56,7 @@ public class StationListFragment extends Fragment
         mStationRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
         //mStationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mStationRecyclerView.setLayoutManager(new ScrollingLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false, 300));
-        mStationRecyclerView.setAdapter(new StationRecyclerViewAdapter(this));
+        mStationRecyclerView.setAdapter(new StationRecyclerViewAdapter(this, getContext()));
         mStationRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -68,7 +70,8 @@ public class StationListFragment extends Fragment
         mSwipeRefreshLayout.setColorSchemeResources(R.color.stationlist_refresh_spinner_green, R.color.stationlist_refresh_spinner_yellow, R.color.stationlist_refresh_spinner_red);
 
         mAvailabilityTextView = (TextView) inflatedView.findViewById(R.id.availability_header);
-        mTimeHeaderImageView = (ImageView) inflatedView.findViewById(R.id.time_header);
+        mProximityHeaderImageView = (ImageView) inflatedView.findViewById(R.id.time_header_iv);
+        mProximityHeaderTextView = (TextView) inflatedView.findViewById(R.id.time_header_tv);
 
         return inflatedView;
     }
@@ -176,12 +179,32 @@ public class StationListFragment extends Fragment
         getRecyclerViewAdapter().lookingForBikesNotify(lookingForBike);
 
         if (lookingForBike) {
+
             mAvailabilityTextView.setText(getString(R.string.bikes));
-            mTimeHeaderImageView.setImageDrawable(ContextCompat.getDrawable(this.getContext(), R.drawable.ic_walking));
+
+            if (DBHelper.getWalkingProximityAsDistance(this.getContext())){
+                mProximityHeaderTextView.setVisibility(View.VISIBLE);
+                mProximityHeaderImageView.setVisibility(View.GONE);
+            }
+            else {
+                mProximityHeaderTextView.setVisibility(View.GONE);
+                mProximityHeaderImageView.setVisibility(View.VISIBLE);
+                mProximityHeaderImageView.setImageDrawable(ContextCompat.getDrawable(this.getContext(), R.drawable.ic_walking));
+            }
         }
         else {
+
             mAvailabilityTextView.setText(getString(R.string.parking));
-            mTimeHeaderImageView.setImageDrawable(ContextCompat.getDrawable(this.getContext(), R.drawable.ic_biking));
+
+            if (DBHelper.getBikingProximityAsDistance(this.getContext())){
+                mProximityHeaderTextView.setVisibility(View.VISIBLE);
+                mProximityHeaderImageView.setVisibility(View.GONE);
+            }
+            else {
+                mProximityHeaderTextView.setVisibility(View.GONE);
+                mProximityHeaderImageView.setVisibility(View.VISIBLE);
+                mProximityHeaderImageView.setImageDrawable(ContextCompat.getDrawable(this.getContext(), R.drawable.ic_biking));
+            }
         }
     }
 

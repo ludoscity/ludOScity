@@ -14,9 +14,9 @@
         android:layout_width="0px"
         android:layout_height="fill_parent"
         android:layout_gravity="center"
-        android:padding="5dp"
-        android:id="@+id/station_distance"
-        android:layout_weight="@dimen/station_list_distance_column_weight"
+
+        android:id="@+id/station_proximity"
+        android:layout_weight="@dimen/station_list_proximity_column_weight"
         android:ellipsize="end"
         android:gravity="center"
         android:singleLine="true"

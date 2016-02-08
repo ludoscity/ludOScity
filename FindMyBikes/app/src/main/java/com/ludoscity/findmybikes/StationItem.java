@@ -159,12 +159,38 @@ public class StationItem implements Parcelable, ClusterItem {
         dest.writeString(timestamp);
     }
 
-    public String getDistanceStringFromLatLng(LatLng currentUserLatLng) {
+    public String getProximityStringFromLatLng(LatLng currentUserLatLng, boolean _asDistance, float _speedKmh, Context _ctx) {
+
+        String toReturn;
+
         int distance = (int) getMeterFromLatLng(currentUserLatLng);
-        if (distance < 1000)
-            return "" + distance + " m";
-        distance = distance/1000;
-        return String.format("%d.3",distance) + " km";
+
+        if (_asDistance) {
+            if (distance < 1000)
+                toReturn = "" + distance + " m";
+            else {
+                distance = distance / 1000;
+                toReturn = String.format("%d.3", distance) + " km";
+            }
+        }
+        else {
+            //I want a result in milliseconds
+            float speedMetersPerH = _speedKmh * 1000f;
+            float speedMetersPerS = speedMetersPerH / 3600f;
+
+            float timeInS = distance / speedMetersPerS;
+
+            long timeInMs = (long) (timeInS * 1000);
+
+            if (timeInMs < 60000)
+                toReturn = "< 1" + _ctx.getString(R.string.min);
+            else if (timeInMs < 3600000 )
+                toReturn = "~" + timeInMs / 1000 / 60 + _ctx.getString(R.string.min);
+            else
+                toReturn = "> 1" + _ctx.getString(R.string.hour_symbol);
+        }
+
+        return toReturn;
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator(){

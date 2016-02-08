@@ -1,5 +1,6 @@
 package com.ludoscity.findmybikes;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.ludoscity.findmybikes.helpers.DBHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,9 +27,16 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     private ArrayList<StationItem> mStationList = new ArrayList<>();
     private LatLng mCurrentUserLatLng;
 
+    private Context mCtx;
+
     private boolean mIsLookingForBikes;
 
     private int mSelectedPos = NO_POSITION;
+
+    //TODO: move those into resources and retrieve them for display in Settings Fragment UI
+    //in km/h
+    private static float WALKING_AVERAGE_SPEED = 4.0f;
+    private static float BIKING_AVERAGE_SPEED = 12.0f;
 
     private OnStationListItemClickListener mListener;
 
@@ -58,9 +67,11 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         void onStationListItemClick();
     }
 
-    public StationRecyclerViewAdapter(OnStationListItemClickListener listener){
+    public StationRecyclerViewAdapter(OnStationListItemClickListener listener,
+                                      Context _ctx){
         super();
         mListener = listener;
+        mCtx = _ctx;
     }
 
     @Override
@@ -84,14 +95,14 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     public class StationListItemViewHolder extends RecyclerView.ViewHolder
                 implements View.OnClickListener{
 
-        TextView mDistance;
+        TextView mProximity;
         TextView mName;
         TextView mAvailability;
 
         public StationListItemViewHolder(View itemView) {
             super(itemView);
 
-            mDistance = (TextView) itemView.findViewById(R.id.station_distance);
+            mProximity = (TextView) itemView.findViewById(R.id.station_proximity);
             mName = (TextView) itemView.findViewById(R.id.station_name);
             mAvailability = (TextView) itemView.findViewById(R.id.station_availability);
             itemView.setOnClickListener(this);
@@ -102,10 +113,21 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             mName.setText(station.getName());
 
             if (mCurrentUserLatLng != null) {
-                mDistance.setVisibility(View.VISIBLE);
-                mDistance.setText(station.getDistanceStringFromLatLng(mCurrentUserLatLng));
+
+                String proximityString;
+                if (mIsLookingForBikes){
+                    proximityString = station.getProximityStringFromLatLng(mCurrentUserLatLng,
+                            DBHelper.getWalkingProximityAsDistance(mCtx), WALKING_AVERAGE_SPEED, mCtx);
+                }
+                else{
+                    proximityString = station.getProximityStringFromLatLng(mCurrentUserLatLng,
+                            DBHelper.getBikingProximityAsDistance(mCtx), BIKING_AVERAGE_SPEED, mCtx);
+                }
+
+                mProximity.setVisibility(View.VISIBLE);
+                mProximity.setText(proximityString);
             } else {
-                mDistance.setVisibility(View.GONE);
+                mProximity.setVisibility(View.GONE);
             }
 
             if (mIsLookingForBikes) {

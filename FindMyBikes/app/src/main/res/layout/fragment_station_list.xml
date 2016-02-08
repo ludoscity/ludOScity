@@ -33,10 +33,25 @@
             <ImageView
                 android:layout_width="0px"
                 android:layout_height="match_parent"
-                android:id="@+id/time_header"
+                android:id="@+id/time_header_iv"
 
-                android:layout_weight="0.19"
+                android:layout_weight="@dimen/station_list_proximity_header_weight"
                 android:src="@drawable/ic_walking" />
+
+            <TextView
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:id="@+id/time_header_tv"
+
+                android:layout_weight="@dimen/station_list_proximity_header_weight"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="@string/distance"
+                android:singleLine="true"
+                android:textStyle="bold"
+                android:ellipsize="end"
+                android:textColor="@color/primary_text_default_material_dark"
+                />
 
             <TextView
                 android:layout_width="0px"
@@ -44,7 +59,7 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:text="@string/station"
-                android:layout_weight="0.66"
+                android:layout_weight="@dimen/station_list_name_header_weight"
                 android:singleLine="true"
                 android:textColor="@color/primary_text_default_material_dark"
                 />
@@ -56,7 +71,7 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:text="@string/bikes"
-                android:layout_weight="0.25"
+                android:layout_weight="@dimen/station_list_availability_header_weight"
                 android:textStyle="bold"
                 android:ellipsize="end"
                 android:textColor="@color/primary_text_default_material_dark"

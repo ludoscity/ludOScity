@@ -10,6 +10,7 @@
     <string name="setting_pull_to_refresh">Rafraîchissement manuel seulement (tirer pour rafraîchir)</string>
     <string name="favorite_added">Favori ajouté</string>
     <string name="bikes">Vélos</string>
+    <string name="distance">Distance</string>
     <string name="fromCitibik_es">de citybik.es</string>
     <string name="min">min</string>
     <string name="moments">À l\'instant</string>
@@ -32,7 +33,13 @@
     <string name="pull_to_refresh">Tirer pour rafraîchir</string>
     <string name="status_string">%1$s de citybik.es - %2$s</string>
     <string name="il_y_a">"Il y a "</string>
-    <string name="pref_manual_refresh_mode">Options de rafraîchissement</string>
+    <string name="pref_manual_refresh_mode">Rafraîchissement</string>
     <string name="pref_manual_refresh_mode_all">Toutes les 5 minutes + tirer pour rafraîchir.</string>
     <string name="pref_manual_refresh_mode_manual">Tirer pour rafraîchir seulement.</string>
+    <string name="pref_walking_proximity_title">Proximité à pied</string>
+    <string name="pref_proximity_distance">Distance. (À vol d\'oiseau)</string>
+    <string name="pref_walking_proximity_time">Temps. (À vol d\'oiseau, à 4 km/h)</string>
+    <string name="pref_biking_proximity_time">Temps. (À vol d\'oiseau, à 12 km/h)</string>
+    <string name="pref_biking_proximity_title">Proximité à vélo</string>
+    <string name="hour_symbol">h</string>
 </resources>
