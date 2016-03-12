@@ -54,8 +54,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import retrofit.Call;
-import retrofit.Response;
+import retrofit2.Call;
+import retrofit2.Response;
 
 /**
  * Created by F8Full on 2015-07-26.
@@ -244,6 +244,7 @@ public class NearbyActivity extends AppCompatActivity
 
         }else {
 
+            //TODO: Actualy do something so that it doesn't look and feel horribly horribly broken
             // permission denied, boo! Disable the
             // functionality that depends on this permission.
         }

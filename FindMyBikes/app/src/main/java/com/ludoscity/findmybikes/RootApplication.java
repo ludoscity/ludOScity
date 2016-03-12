@@ -9,8 +9,8 @@ import com.ludoscity.findmybikes.helpers.DBHelper;
 
 import java.io.IOException;
 
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by F8Full on 2015-09-28.
