@@ -883,6 +883,7 @@ public class NearbyActivity extends AppCompatActivity
         }
     }
 
+    //TODO: NOT use an asynchtask for this long running database operation
     public class SaveNetworkToDatabaseTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -901,6 +902,10 @@ public class NearbyActivity extends AppCompatActivity
             }
 
             try {
+                //TODO: This strategy of deleting everything and re adding is broken
+                //when screen orientation changes happen while it's saving stations
+                //Anyone using DBHelper at that time get fed partial results
+                //This process shouldn't use an asynctask anyway as it's long running :/
                 DBHelper.deleteAllStations();
 
                 for (StationItem station : mStationsNetwork) {
