@@ -1,24 +1,26 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:clipChildren="false"
     tools:context=".BaseActivity">
 
-    <include
-        android:id="@+id/toolbar_main"
-        layout="@layout/toolbar" />
 
-    <FrameLayout android:id="@+id/main_content"
+    <!--suppress AndroidDomInspection -->
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_main">
+        android:id="@+id/appbar_coordinator"
+        app:layout_heightPercent="50%">
 
-        <LinearLayout
-            android:orientation="vertical"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:id="@+id/action_toolbar_layout"
+            android:theme="@style/FindMyBikesTheme.AppBar">
+
+            <include
+                android:id="@+id/toolbar_main"
+                layout="@layout/toolbar" />
 
             <!-- TABS -->
             <android.support.design.widget.TabLayout
@@ -28,48 +30,57 @@
                 style="@style/MyCustomTabLayout"
                 app:tabGravity="fill"
                 app:tabMode="fixed" />
+        </android.support.design.widget.AppBarLayout>
 
-            <!-- VIEWPAGER -->
-            <android.support.v4.view.ViewPager
-                android:layout_width="fill_parent"
-                android:layout_height="0px"
-                android:layout_weight="4"
-                android:id="@+id/station_list_viewpager">
-            </android.support.v4.view.ViewPager>
+        <!-- VIEWPAGER -->
+        <android.support.v4.view.ViewPager
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:id="@+id/station_list_viewpager">
+        </android.support.v4.view.ViewPager>
 
-            <!-- STATUS BAR -->
-            <LinearLayout
-                android:id="@+id/statusBar"
-                android:layout_width="fill_parent"
-                android:layout_height="0px"
-                android:layout_weight="0.5"
-                android:orientation="horizontal"
-                android:background="@color/background_material_dark">
-                <TextView
-                    android:id="@+id/status_textView"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/light_gray"
-                    android:text="@string/fromCitibik_es"/>
+    </android.support.design.widget.CoordinatorLayout>
 
-            </LinearLayout>
-            <!-- MAP -->
-            <FrameLayout
+    <!--suppress AndroidDomInspection -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        app:layout_heightPercent="50%"
+        android:layout_below="@id/appbar_coordinator"
+        >
+
+        <!-- STATUS BAR -->
+        <LinearLayout
+            android:id="@+id/statusBar"
+            android:layout_width="fill_parent"
+            android:layout_height="0px"
+            android:layout_weight="0.5"
+            android:orientation="horizontal"
+            android:background="@color/background_material_dark">
+            <TextView
+                android:id="@+id/status_textView"
                 android:layout_width="fill_parent"
-                android:layout_height="0px"
-                android:layout_weight="6">
-                <fragment
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:name="com.ludoscity.findmybikes.fragments.StationMapFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/station_map_fragment"
-                    tools:layout="@layout/fragment_station_map" />
-            </FrameLayout>
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/light_gray"
+                android:text="@string/fromCitibik_es"/>
 
         </LinearLayout>
+        <!-- MAP -->
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0px"
+            android:layout_weight="6">
+            <fragment
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:name="com.ludoscity.findmybikes.fragments.StationMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/station_map_fragment"
+                tools:layout="@layout/fragment_station_map" />
+        </FrameLayout>
 
-    </FrameLayout>
+    </LinearLayout>
 
-</RelativeLayout>
+</android.support.percent.PercentRelativeLayout>

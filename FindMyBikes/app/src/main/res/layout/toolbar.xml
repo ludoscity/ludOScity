@@ -3,8 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
+    android:layout_height="@dimen/action_toolbar_size"
     app:titleTextAppearance="@style/FindMyBikesTheme.AppBarTitle"
     app:subtitleTextAppearance="@style/FindMyBikesTheme.AppBarSubtitle"
+    app:layout_scrollFlags="scroll|enterAlways"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    android:theme="@style/FindMyBikesTheme.AppBar" />
+<!-- android:theme="@style/FindMyBikesTheme.AppBar" /> -->

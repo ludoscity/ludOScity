@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -84,6 +85,7 @@ public class NearbyActivity extends AppCompatActivity
     private View mStatusBar;
     private ViewPager mStationListViewPager;
     private TabLayout mTabLayout;
+    private AppBarLayout mAppBarLayout;
 
     private boolean mRefreshMarkers = true;
     private boolean mLookingForBike = true;
@@ -165,6 +167,8 @@ public class NearbyActivity extends AppCompatActivity
         // Give the TabLayout the ViewPager
         mTabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         mTabLayout.setupWithViewPager(mStationListViewPager);
+
+        mAppBarLayout = (AppBarLayout) findViewById(R.id.action_toolbar_layout);
 
         setStatusBarListener();
 
@@ -570,9 +574,13 @@ public class NearbyActivity extends AppCompatActivity
                 mFavoriteMenuItem.setVisible(false);
                 mDirectionsMenuItem.setVisible(false);
                 mStationMapFragment.resetMarkerSizeAll();
-
             }
             else {
+
+                //TODO: Work on landscape layout
+                //hackfix
+                if (mAppBarLayout != null)
+                    mAppBarLayout.setExpanded(true , true);
 
                 setupFavoriteActionIcon(clickedStation);
                 mDirectionsMenuItem.setVisible(true);
