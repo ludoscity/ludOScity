@@ -7,6 +7,5 @@
     app:titleTextAppearance="@style/FindMyBikesTheme.AppBarTitle"
     app:subtitleTextAppearance="@style/FindMyBikesTheme.AppBarSubtitle"
     app:layout_scrollFlags="scroll|enterAlways"
+    android:theme="@style/FindMyBikesTheme.AppBar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-<!-- android:theme="@style/FindMyBikesTheme.AppBar" /> -->

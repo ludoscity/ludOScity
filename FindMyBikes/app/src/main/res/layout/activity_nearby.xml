@@ -15,8 +15,7 @@
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/action_toolbar_layout"
-            android:theme="@style/FindMyBikesTheme.AppBar">
+            android:id="@+id/action_toolbar_layout">
 
             <include
                 android:id="@+id/toolbar_main"
@@ -26,7 +25,7 @@
             <android.support.design.widget.TabLayout
                 android:id="@+id/sliding_tabs"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="@dimen/tablayout_height"
                 style="@style/MyCustomTabLayout"
                 app:tabGravity="fill"
                 app:tabMode="fixed" />
