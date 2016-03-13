@@ -96,6 +96,12 @@ public class NearbyActivity extends AppCompatActivity
 
     private CameraPosition mSavedInstanceCameraPosition;
 
+    private static final int[] TABS_ICON_RES_ID = new int[]{
+            R.drawable.ic_pin_a,
+            R.drawable.ic_pin_b
+    };
+
+
     @Override
     public void onStart(){
         super.onStart();
@@ -161,12 +167,19 @@ public class NearbyActivity extends AppCompatActivity
         mStatusBar = findViewById(R.id.statusBar);
 
         mStationListViewPager = (ViewPager)findViewById(R.id.station_list_viewpager);
-        mStationListViewPager.setAdapter(new StationListPagerAdapter(getSupportFragmentManager(), getApplicationContext()));
+        mStationListViewPager.setAdapter(new StationListPagerAdapter(getSupportFragmentManager()));
         mStationListViewPager.addOnPageChangeListener(this);
 
         // Give the TabLayout the ViewPager
         mTabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         mTabLayout.setupWithViewPager(mStationListViewPager);
+
+        //Taking care of tabs icons here as pageradapter handles only title CharSequence for now
+        for (int i=0; i<mTabLayout.getTabCount() && i<TABS_ICON_RES_ID.length; ++i)
+        {
+            //noinspection ConstantConditions
+            mTabLayout.getTabAt(i).setIcon(TABS_ICON_RES_ID[i]);
+        }
 
         mAppBarLayout = (AppBarLayout) findViewById(R.id.action_toolbar_layout);
 

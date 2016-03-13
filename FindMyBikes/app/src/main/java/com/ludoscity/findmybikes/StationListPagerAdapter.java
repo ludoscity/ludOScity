@@ -1,6 +1,5 @@
 package com.ludoscity.findmybikes;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,16 +21,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
     public static int ALL_STATIONS = 0;
     public static int FAVORITE_STATIONS = 1;
 
-    private static final int[] TABS_TITLE_RES_ID = new int[]{
-            R.string.title_section_nearby,
-            R.string.title_section_favorites
-    };
-
-    private Context mCtx;
-
-    public StationListPagerAdapter(FragmentManager fm, Context _ctx) {
+    public StationListPagerAdapter(FragmentManager fm) {
         super(fm);
-        mCtx = _ctx;
     }
 
     @Override
@@ -60,10 +51,6 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         retrieveListFragment(FAVORITE_STATIONS).setupUI(favoriteStations, lookingForBike, noFavoritesString);
     }
 
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return mCtx.getString(TABS_TITLE_RES_ID[position]);
-    }
 
     public void setRefreshEnableAll(boolean toSet) {
         retrieveListFragment(ALL_STATIONS).setRefreshEnable(toSet);
