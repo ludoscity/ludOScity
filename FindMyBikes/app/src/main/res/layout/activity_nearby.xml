@@ -10,7 +10,7 @@
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:id="@+id/appbar_coordinator"
-        app:layout_heightPercent="50%">
+        app:layout_heightPercent="45%">
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
@@ -21,14 +21,24 @@
                 android:id="@+id/toolbar_main"
                 layout="@layout/toolbar" />
 
-            <!-- TABS -->
-            <android.support.design.widget.TabLayout
-                android:id="@+id/sliding_tabs"
+            <!-- STATUS BAR -->
+            <LinearLayout
+                android:id="@+id/statusBar"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/tablayout_height"
-                style="@style/MyCustomTabLayout"
-                app:tabGravity="fill"
-                app:tabMode="fixed" />
+                android:layout_height="20dp"
+                android:orientation="horizontal"
+                android:background="@color/theme_primary_dark">
+                <TextView
+                    android:id="@+id/status_textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/theme_textcolor_primary"
+                    android:text="@string/fromCitibik_es"/>
+
+            </LinearLayout>
+
+
         </android.support.design.widget.AppBarLayout>
 
         <!-- VIEWPAGER -->
@@ -45,27 +55,27 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        app:layout_heightPercent="50%"
+        app:layout_heightPercent="55%"
         android:layout_below="@id/appbar_coordinator"
         >
 
-        <!-- STATUS BAR -->
-        <LinearLayout
-            android:id="@+id/statusBar"
-            android:layout_width="fill_parent"
-            android:layout_height="0px"
-            android:layout_weight="0.5"
-            android:orientation="horizontal"
-            android:background="@color/background_material_dark">
-            <TextView
-                android:id="@+id/status_textView"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/light_gray"
-                android:text="@string/fromCitibik_es"/>
+        <!-- TABS -->
+        <android.support.design.widget.TabLayout
+            android:id="@+id/sliding_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/tablayout_height"
 
-        </LinearLayout>
+            style="@style/MyCustomTabLayout"
+
+            app:tabGravity="fill"
+            app:tabMode="fixed"
+            app:tabBackground="@color/background_material_dark"/>
+            <!--TODO: Find how to tint or setup background such as having ripple effect. Can be achieved
+            by deleting the preseding line and removing the default blue from MyCustomTabLayout. It then
+            reverts to ?android:attr/selectableItemBackground, which is white with ripple effect. -->
+
+
+
         <!-- MAP -->
         <FrameLayout
             android:layout_width="fill_parent"
