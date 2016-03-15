@@ -9,7 +9,11 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.util.TypedValue;
+import android.view.View;
 
 /**
  * Created by F8Full on 2015-04-30.
@@ -23,6 +27,45 @@ public class Utils {
         Resources r = ctx.getResources();
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, toConvert, r.getDisplayMetrics());
     }
+
+    //Snackbar related utils
+    public static class Snackbar{
+
+
+        //A modified version of make that allows background color manipulation
+        //as it is not currently supported through styles/theming
+        //Should be done something like this
+        /*<style name="MyCustomSnackbar" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">@color/theme_accent</item>
+        <item name="android:textColor">@color/theme_textcolor_primary</item>
+        <item name="android:background">@color/theme_primary_dark</item>
+        </style>*/
+        //Right now, textColor and action color are controlled through theming,
+        //but not background color.
+        public static android.support.design.widget.Snackbar makeStyled(@NonNull View _view, @StringRes int _textStringResId, @android.support.design.widget.Snackbar.Duration int _duration,
+                                                                                  @ColorInt int _backgroundColor/*, @ColorInt int _textColor, @ColorInt int _actionTextColor*/ ){
+
+            android.support.design.widget.Snackbar toReturn = android.support.design.widget.Snackbar.make(_view, _textStringResId, _duration );
+
+            View snackbarView = toReturn.getView();
+
+            /*//change snackbar action text color
+            toReturn.setActionTextColor(_actionTextColor);
+
+            // change snackbar text color
+            int snackbarTextId = android.support.design.R.id.snackbar_text;
+            TextView textView = (TextView)snackbarView.findViewById(snackbarTextId);
+            textView.setTextColor(_textColor);*/
+
+            // change snackbar background
+            snackbarView.setBackgroundColor(_backgroundColor);
+
+            return toReturn;
+        }
+
+    }
+
+
 
     /**
      * Created by F8Full on 2015-03-15.

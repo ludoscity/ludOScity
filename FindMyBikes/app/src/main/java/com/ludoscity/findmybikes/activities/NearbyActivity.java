@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -86,6 +88,7 @@ public class NearbyActivity extends AppCompatActivity
     private ViewPager mStationListViewPager;
     private TabLayout mTabLayout;
     private AppBarLayout mAppBarLayout;
+    private CoordinatorLayout mCoordinatorLayout;
 
     private boolean mRefreshMarkers = true;
     private boolean mLookingForBike = true;
@@ -182,6 +185,8 @@ public class NearbyActivity extends AppCompatActivity
         }
 
         mAppBarLayout = (AppBarLayout) findViewById(R.id.action_toolbar_layout);
+
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
 
         setStatusBarListener();
 
@@ -286,7 +291,11 @@ public class NearbyActivity extends AppCompatActivity
 
                 if (newState) {
                     mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
-                    Toast.makeText(this, getString(R.string.favorite_added),Toast.LENGTH_SHORT).show();
+
+                    if (mCoordinatorLayout != null)
+                        Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark)).show();
+                    else //TODO: Rework landscape layout
+                        Toast.makeText(this, getString(R.string.favorite_added),Toast.LENGTH_SHORT).show();
 
                     getListPagerAdapter().addStationForPage(StationListPagerAdapter.FAVORITE_STATIONS, station);
                 }
@@ -302,7 +311,10 @@ public class NearbyActivity extends AppCompatActivity
                         mStationMapFragment.resetMarkerSizeAll();
                     }
 
-                    Toast.makeText(this, getString(R.string.favorite_removed),Toast.LENGTH_SHORT).show();
+                    if (mCoordinatorLayout != null)
+                        Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark)).show();
+                    else //TODO: Rework landscape layout
+                        Toast.makeText(this, getString(R.string.favorite_removed), Toast.LENGTH_SHORT).show();
                 }
 
                 return true;
@@ -590,7 +602,7 @@ public class NearbyActivity extends AppCompatActivity
             }
             else {
 
-                //TODO: Work on landscape layout
+                //TODO: Rework landscape layout
                 //hackfix
                 if (mAppBarLayout != null)
                     mAppBarLayout.setExpanded(true , true);
