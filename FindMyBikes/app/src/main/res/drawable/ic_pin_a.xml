@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="35.4dp"
-    android:height="48dp"
-    android:viewportWidth="35.4"
-    android:viewportHeight="48">
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
 
     <path
-        android:fillColor="#fff"
-        android:pathData="M17.7,0 A17.54,17.54,0,0,0,0,17.4 C0,32.9,17.7,48,17.7,48 S35.4,32.6,35.4,17.4
-A17.54,17.54,0,0,0,17.7,0 Z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M12.44,0 A8.39,8.39,0,0,0,4,8.4 C4,14.7,12.4,24,12.4,24 S20.8,14.7,20.8,8.4
+A8.39,8.39,0,0,0,12.44,0 Z" />
     <path
-        android:fillColor="#231f20"
-        android:pathData="M21.62,22.24 L13.92,22.24 L12.24,26.86 L8.6,26.86 L16.16,6.86 L19.24,6.86
-L26.8,26.86 L23.16,26.86 Z M14.76,19.44 L20.64,19.44 L17.7,11 Z" />
+        android:pathData="M0,0 L24,0 L24,24 L0,24 L0,0 Z" />
+    <path
+        android:fillColor="@color/background_material_dark"
+        android:pathData="M14.64,11.4 L10.31,11.4 L9.37,14 L7.37,14 L11.57,2.75 L13.3,2.75 L17.55,14
+L15.55,14 Z M10.79,9.83 L14.09,9.83 L12.44,5.11 Z" />
 </vector>
