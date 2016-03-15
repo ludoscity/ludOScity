@@ -283,36 +283,45 @@ public class NearbyActivity extends AppCompatActivity
 
             case R.id.favorite_menu_item:
 
-                StationItem station = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
+                final StationItem station = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
 
                 boolean newState = !station.isFavorite(this);
 
-                station.setFavorite(newState, this);
+
 
                 if (newState) {
-                    mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
+
+                    addFavorite(station);
 
                     if (mCoordinatorLayout != null)
-                        Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark)).show();
+                        Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                                .setAction(R.string.undo,new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+
+                                        //TODO: figure out why it's not animated in favorites fragment recyclerView
+                                        removeFavorite(station);
+
+                                    }
+                                }).show();
                     else //TODO: Rework landscape layout
                         Toast.makeText(this, getString(R.string.favorite_added),Toast.LENGTH_SHORT).show();
 
-                    getListPagerAdapter().addStationForPage(StationListPagerAdapter.FAVORITE_STATIONS, station);
                 }
                 else {
-                    getListPagerAdapter().removeStationForPage(StationListPagerAdapter.FAVORITE_STATIONS, station, getString(R.string.no_favorites));
-                    mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite_outline);
-
-                    StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
-                    if (null == highlightedStation){
-
-                        mFavoriteMenuItem.setVisible(false);
-                        mDirectionsMenuItem.setVisible(false);
-                        mStationMapFragment.resetMarkerSizeAll();
-                    }
+                    removeFavorite(station);
 
                     if (mCoordinatorLayout != null)
-                        Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark)).show();
+                        Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                                .setAction(R.string.undo, new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+
+                                        //TODO: figure out why it's not animated in favorites fragment recyclerView
+                                        addFavorite(station);
+
+                                    }
+                                }).show();
                     else //TODO: Rework landscape layout
                         Toast.makeText(this, getString(R.string.favorite_removed), Toast.LENGTH_SHORT).show();
                 }
@@ -355,6 +364,30 @@ public class NearbyActivity extends AppCompatActivity
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void removeFavorite(StationItem station) {
+        station.setFavorite(false, this);
+
+        getListPagerAdapter().removeStationForPage(StationListPagerAdapter.FAVORITE_STATIONS, station, getString(R.string.no_favorites));
+        mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite_outline);
+
+        StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
+        if (null == highlightedStation){
+
+            mFavoriteMenuItem.setVisible(false);
+            mDirectionsMenuItem.setVisible(false);
+            mStationMapFragment.resetMarkerSizeAll();
+        }
+    }
+
+    private void addFavorite(StationItem station) {
+        station.setFavorite(true, this);
+
+        mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
+
+
+        getListPagerAdapter().addStationForPage(StationListPagerAdapter.FAVORITE_STATIONS, station);
     }
 
     private void setOnClickFindSwitchListener() {
