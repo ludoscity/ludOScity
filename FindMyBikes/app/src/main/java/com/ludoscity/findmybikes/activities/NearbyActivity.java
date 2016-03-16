@@ -589,6 +589,9 @@ public class NearbyActivity extends AppCompatActivity
         //Marker click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
 
+            if (mAppBarLayout != null)
+                    mAppBarLayout.setExpanded(false , true);
+
             if(getListPagerAdapter().highlightStationFromNameForPage(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM),
                     mTabLayout.getSelectedTabPosition())) {
 
@@ -637,8 +640,8 @@ public class NearbyActivity extends AppCompatActivity
 
                 //TODO: Rework landscape layout
                 //hackfix
-                if (mAppBarLayout != null)
-                    mAppBarLayout.setExpanded(true , true);
+                //if (mAppBarLayout != null)
+                //    mAppBarLayout.setExpanded(true , true);
 
                 setupFavoriteActionIcon(clickedStation);
                 mDirectionsMenuItem.setVisible(true);
