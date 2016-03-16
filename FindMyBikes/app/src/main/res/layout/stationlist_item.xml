@@ -1,49 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".BaseActivity"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
     android:baselineAligned="true">
 
+    <!--<android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toEndOf="@+id/station_name"
+            android:layout_toRightOf="@+id/station_name"
+            app:fabSize="mini"
+
+            android:id="@+id/test_fab"
+            app:backgroundTint="@color/theme_primary_dark"
+
+            android:layout_alignEnd="@+id/station_name"
+            android:layout_alignRight="@+id/station_name"
+
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            app:elevation="6dp"
+            app:pressedTranslationZ="12dp"
+            android:clickable="true"
+            android:src="@drawable/ic_action_refresh"
+            android:visibility="visible"
+            />
+
+    </android.support.percent.PercentRelativeLayout>-->
+
+
+
+    <!--suppress AndroidDomInspection -->
     <TextView
-        android:layout_width="0px"
-        android:layout_height="fill_parent"
-        android:layout_gravity="center"
+        app:layout_widthPercent="@dimen/proximity_column_width_percent"
+        android:layout_height="match_parent"
+
 
         android:id="@+id/station_proximity"
-        android:layout_weight="@dimen/station_list_proximity_column_weight"
         android:ellipsize="end"
         android:gravity="center"
-        android:singleLine="true"
+        android:layout_centerVertical="true"
         android:textStyle="bold"
+
 
         />
 
+    <!--suppress AndroidDomInspection -->
+    <!--app:layout_widthPercent="27%"-->
     <TextView
-        android:layout_width="0px"
-        android:layout_height="fill_parent"
+        app:layout_widthPercent="@dimen/name_column_width_default_percent"
+        android:layout_toEndOf="@+id/station_proximity"
+        android:layout_toRightOf="@+id/station_proximity"
+        android:layout_height="match_parent"
         android:textSize="16sp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
+        android:layout_centerVertical="true"
         android:id="@+id/station_name"
-        android:layout_weight="@dimen/station_list_name_column_weight"
         android:ellipsize="end"
+
+        android:paddingTop="@dimen/station_name_textview_padding_top_default"
+        android:paddingBottom="@dimen/station_name_textview_padding_bottom_default"
         />
 
+    <!-- width = 2*fabmini width="40dp" + fabfavorite layout_marginRight="2dp" + fabdirections layout_marginStart="2dp"-->
+    <!-- height = fabmini height="40dp" + fabfavorite layout_marginTop="3dp" + fabdirections layout_marginBottom="3dp"-->
+    <!-- android:background="@color/theme_accent" -->
+    <!-- TODO: precisely measure the correct values from an actual device render pass -->
+    <FrameLayout
+        android:layout_width="84dp"
+        android:layout_height="46dp"
+        android:layout_toEndOf="@+id/station_name"
+        android:layout_toRightOf="@+id/station_name"
+        android:gravity="center"
+        android:layout_centerVertical="true"
+
+        android:id="@+id/dummy_space_for_fabs"
+        android:visibility="gone"
+        />
+
+    <!--suppress AndroidDomInspection -->
     <TextView
-        android:layout_width="0px"
-        android:layout_height="fill_parent"
+        app:layout_widthPercent="@dimen/availability_column_width_percent"
+        android:layout_height="match_parent"
+        android:layout_toEndOf="@+id/dummy_space_for_fabs"
+        android:layout_toRightOf="@+id/dummy_space_for_fabs"
         android:textSize="16sp"
         android:gravity="center"
+        android:layout_centerVertical="true"
         android:id="@+id/station_availability"
-        android:layout_weight="@dimen/station_list_availability_column_weight"
         android:textStyle="bold"
+
         />
 
 
-</LinearLayout>
+</android.support.percent.PercentRelativeLayout>

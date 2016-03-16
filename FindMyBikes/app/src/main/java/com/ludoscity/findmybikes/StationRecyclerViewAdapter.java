@@ -2,14 +2,18 @@ package com.ludoscity.findmybikes;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.percent.PercentLayoutHelper;
+import android.support.percent.PercentRelativeLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.helpers.DBHelper;
+import com.ludoscity.findmybikes.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -99,28 +103,39 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         TextView mName;
         TextView mAvailability;
 
+        //FloatingActionButton mFavoriteFab;
+        //FloatingActionButton mDirectionsFab;
+
+        //CoordinatorLayout mFabCoordinator;
+
+        FrameLayout mDummySpaceForFabs;
+
         public StationListItemViewHolder(View itemView) {
             super(itemView);
 
             mProximity = (TextView) itemView.findViewById(R.id.station_proximity);
             mName = (TextView) itemView.findViewById(R.id.station_name);
             mAvailability = (TextView) itemView.findViewById(R.id.station_availability);
+            //mFavoriteFab = (FloatingActionButton) itemView.findViewById(R.id.favorite_fab);
+            //mDirectionsFab = (FloatingActionButton) itemView.findViewById(R.id.directions_fab);
+            //mFabCoordinator = (CoordinatorLayout) itemView.findViewById(R.id.fab_coordinator);
+            mDummySpaceForFabs = (FrameLayout) itemView.findViewById(R.id.dummy_space_for_fabs);
             itemView.setOnClickListener(this);
         }
 
-        public void bindStation(StationItem station, boolean selected){
+        public void bindStation(StationItem _station, boolean _selected){
 
-            mName.setText(station.getName());
+            mName.setText(_station.getName());
 
             if (mCurrentUserLatLng != null) {
 
                 String proximityString;
                 if (mIsLookingForBikes){
-                    proximityString = station.getProximityStringFromLatLng(mCurrentUserLatLng,
+                    proximityString = _station.getProximityStringFromLatLng(mCurrentUserLatLng,
                             DBHelper.getWalkingProximityAsDistance(mCtx), WALKING_AVERAGE_SPEED, mCtx);
                 }
                 else{
-                    proximityString = station.getProximityStringFromLatLng(mCurrentUserLatLng,
+                    proximityString = _station.getProximityStringFromLatLng(mCurrentUserLatLng,
                             DBHelper.getBikingProximityAsDistance(mCtx), BIKING_AVERAGE_SPEED, mCtx);
                 }
 
@@ -130,14 +145,46 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 mProximity.setVisibility(View.GONE);
             }
 
+            if (_selected){
+
+                mName.setPadding((int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_selected),
+                        (int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_selected),
+                        (int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_selected),
+                        (int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_selected));
+
+                PercentRelativeLayout.LayoutParams params =(PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
+                PercentLayoutHelper.PercentLayoutInfo info = params.getPercentLayoutInfo();
+
+                info.widthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_selected_percent, true);
+                mName.requestLayout();
+
+                //mFabCoordinator.setVisibility(View.VISIBLE);
+                mDummySpaceForFabs.setVisibility(View.VISIBLE);
+            }
+            else{
+
+                mName.setPadding(0, (int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_top_default),
+                        0, (int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_bottom_default));
+
+                //mName.setPadding(0, Utils.dpToPx(12, mCtx), 0, Utils.dpToPx(12, mCtx));
+
+                PercentRelativeLayout.LayoutParams params =(PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
+                PercentLayoutHelper.PercentLayoutInfo info = params.getPercentLayoutInfo();
+                info.widthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_default_percent, true);
+                mName.requestLayout();
+
+                //mFabCoordinator.setVisibility(View.GONE);
+                mDummySpaceForFabs.setVisibility(View.GONE);
+            }
+
             if (mIsLookingForBikes) {
-                mAvailability.setText(String.valueOf(station.getFree_bikes()));
-                setBackgroundColor(selected, station.getFree_bikes());
+                mAvailability.setText(String.valueOf(_station.getFree_bikes()));
+                setBackgroundColor(_selected, _station.getFree_bikes());
 
             }
             else {
-                mAvailability.setText(String.valueOf(station.getEmpty_slots()));
-                setBackgroundColor(selected, station.getEmpty_slots());
+                mAvailability.setText(String.valueOf(_station.getEmpty_slots()));
+                setBackgroundColor(_selected, _station.getEmpty_slots());
             }
         }
 

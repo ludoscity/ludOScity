@@ -15,6 +15,8 @@ import android.support.annotation.StringRes;
 import android.util.TypedValue;
 import android.view.View;
 
+import java.math.BigDecimal;
+
 /**
  * Created by F8Full on 2015-04-30.
  *
@@ -26,6 +28,39 @@ public class Utils {
         /// Converts 66 dip into its equivalent px
         Resources r = ctx.getResources();
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, toConvert, r.getDisplayMetrics());
+    }
+
+    /**
+     * Round to certain number of decimals
+     *
+     * @param d
+     * @param decimalPlace
+     * @return
+     */
+    public static float round(float d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Float.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd.floatValue();
+    }
+
+    /**
+     * Returns a percentage value as a float from an XML resource file. The value can be optionally
+     * rounded.
+     *
+     * @param _ctx
+     * @param _resId
+     * @param _rounded
+     * @return float
+     */
+    public static float getPercentResource(Context _ctx, int _resId, boolean _rounded){
+        TypedValue valueContainer = new TypedValue();
+        _ctx.getResources().getValue(_resId, valueContainer, true);
+        float toReturn = valueContainer.getFraction(1, 1);http://stackoverflow.com/questions/11734470/how-does-one-use-resources-getfraction
+
+        if (_rounded)
+            toReturn = Utils.round(toReturn,2);
+
+        return toReturn;
     }
 
     //Snackbar related utils

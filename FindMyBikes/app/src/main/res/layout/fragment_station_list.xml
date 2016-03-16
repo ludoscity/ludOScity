@@ -17,8 +17,9 @@
         android:gravity="center"/>
 
     <!-- COLUMN HEADERS -->
-    <LinearLayout
+    <android.support.percent.PercentRelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,53 +27,65 @@
         android:paddingTop="3dp"
         android:paddingBottom="3dp">
 
-        <ImageView
-            android:layout_width="0px"
-            android:layout_height="match_parent"
-            android:id="@+id/time_header_iv"
+        <!--suppress AndroidDomInspection -->
+        <FrameLayout
+            app:layout_widthPercent="@dimen/proximity_column_width_percent"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageview_textview_proximity_header_container"
+            >
 
-            android:layout_weight="@dimen/station_list_proximity_column_weight"
-            android:src="@drawable/ic_walking" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/time_header_iv"
 
+                android:src="@drawable/ic_walking" />
+
+            <!-- 24dp is material base icon size -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:id="@+id/time_header_tv"
+
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="@string/distance"
+                android:singleLine="true"
+                android:textStyle="bold"
+                android:ellipsize="end"
+                android:textColor="@color/primary_text_default_material_dark"
+                />
+        </FrameLayout>
+
+        <!--suppress AndroidDomInspection -->
         <TextView
-            android:layout_width="0px"
-            android:layout_height="match_parent"
-            android:id="@+id/time_header_tv"
-
-            android:layout_weight="@dimen/station_list_proximity_column_weight"
-            android:textSize="16sp"
-            android:gravity="center"
-            android:text="@string/distance"
-            android:singleLine="true"
-            android:textStyle="bold"
-            android:ellipsize="end"
-            android:textColor="@color/primary_text_default_material_dark"
-            />
-
-        <TextView
-            android:layout_width="0px"
-            android:layout_height="match_parent"
+            app:layout_widthPercent="@dimen/name_column_width_default_percent"
+            android:layout_height="wrap_content"
             android:textSize="16sp"
             android:gravity="center"
             android:text="@string/station"
-            android:layout_weight="@dimen/station_list_name_column_weight"
             android:singleLine="true"
             android:textColor="@color/primary_text_default_material_dark"
+            android:id="@+id/name_header"
+            android:layout_toEndOf="@+id/imageview_textview_proximity_header_container"
+            android:layout_toRightOf="@+id/imageview_textview_proximity_header_container"
             />
 
+        <!--suppress AndroidDomInspection -->
         <TextView
             android:id="@+id/availability_header"
-            android:layout_width="0px"
-            android:layout_height="match_parent"
+            app:layout_widthPercent="@dimen/availability_column_width_percent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/name_header"
+            android:layout_toRightOf="@+id/name_header"
             android:textSize="16sp"
             android:gravity="center"
             android:text="@string/bikes"
-            android:layout_weight="@dimen/station_list_availability_column_weight"
             android:textStyle="bold"
             android:ellipsize="end"
             android:textColor="@color/primary_text_default_material_dark"
             />
-    </LinearLayout>
+    </android.support.percent.PercentRelativeLayout>
 
     <!-- PULL TO REFRESH -->
     <android.support.v4.widget.SwipeRefreshLayout

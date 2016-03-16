@@ -5,7 +5,15 @@
     <dimen name="action_toolbar_size">48dp</dimen>
     <dimen name="tablayout_height">40dp</dimen>
 
+    <!-- fabs in recyclerView -->
+    <dimen name="station_name_textview_padding_top_default">12dp</dimen>
+    <dimen name="station_name_textview_padding_bottom_default">12dp</dimen>
+    <dimen name="station_name_textview_padding_selected">0dp</dimen>
+
+
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">240dp</dimen>
+
+
 </resources>

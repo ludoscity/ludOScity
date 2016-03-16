@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="station_list_proximity_column_weight" format="float" type="dimen">0.3</item>
+    <!--<item name="station_list_proximity_column_weight" format="float" type="dimen">0.3</item>
     <item name="station_list_name_column_weight" format="float" type="dimen">0.66</item>
-    <item name="station_list_availability_column_weight" format="float" type="dimen">0.25</item>
+    <item name="station_list_availability_column_weight" format="float" type="dimen">0.25</item>-->
+
+    <item name="proximity_column_width_percent" type="dimen">25%</item>
+    <item name="name_column_width_default_percent" type="dimen">50%</item>
+    <item name="name_column_width_selected_percent" type="dimen">27%</item>
+    <item name="availability_column_width_percent" type="dimen">25%</item>
 </resources>
