@@ -46,4 +46,20 @@
         <item name="android:textColor">?android:textColorSecondaryInverse</item>
         <item name="textAllCaps">true</item>
     </style>
+
+    <!-- API level < 21 (LOLLIPOP) have weird bounding for floating action buttons.
+    As i'm in recyclerview, I want them as small as possible. -->
+    <style name="floating_action_button"  parent="Widget.Design.FloatingActionButton">
+        <item name="android:layout_margin">0dp</item>
+        <item name="elevation">0dp</item>
+        <item name="borderWidth">0dp</item>
+    </style>
+
+    <!-- on API < 21, this is used so that unselected single line items have same
+    height as selected ones with fabs and their margins/paddings -->
+    <style name="layout_compat_textview_minheight">
+        <item name="android:minHeight">56dp</item>
+    </style>
+
+
 </resources>

@@ -13,5 +13,15 @@
     </style>
 
 
+    <!-- so that single line items don't shrink too much -->
+    <style name="layout_compat_textview_minheight">
+        <item name="android:minHeight">46dp</item>
+    </style>
+
+    <!-- standard values grabbed from online samples -->
+    <style name="floating_action_button"  parent="Widget.Design.FloatingActionButton">
+        <item name="elevation">6dp</item>
+        <item name="pressedTranslationZ">12dp</item>
+    </style>
 
 </resources>

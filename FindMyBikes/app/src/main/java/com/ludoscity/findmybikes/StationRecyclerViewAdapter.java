@@ -2,6 +2,7 @@ package com.ludoscity.findmybikes;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.percent.PercentLayoutHelper;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.widget.RecyclerView;
@@ -103,12 +104,14 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         TextView mName;
         TextView mAvailability;
 
-        //FloatingActionButton mFavoriteFab;
-        //FloatingActionButton mDirectionsFab;
+        FloatingActionButton mFavoriteFab;
+        FloatingActionButton mDirectionsFab;
 
-        //CoordinatorLayout mFabCoordinator;
-
-        FrameLayout mDummySpaceForFabs;
+        //This View is gone by default. It becomes visible when a row in the recycler View is tapped
+        //It's used in two ways
+        //-clear the space underneath fabs final positions
+        //-anchor fabs to their final position
+        FrameLayout mFabsAnchor;
 
         public StationListItemViewHolder(View itemView) {
             super(itemView);
@@ -116,10 +119,10 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             mProximity = (TextView) itemView.findViewById(R.id.station_proximity);
             mName = (TextView) itemView.findViewById(R.id.station_name);
             mAvailability = (TextView) itemView.findViewById(R.id.station_availability);
-            //mFavoriteFab = (FloatingActionButton) itemView.findViewById(R.id.favorite_fab);
-            //mDirectionsFab = (FloatingActionButton) itemView.findViewById(R.id.directions_fab);
-            //mFabCoordinator = (CoordinatorLayout) itemView.findViewById(R.id.fab_coordinator);
-            mDummySpaceForFabs = (FrameLayout) itemView.findViewById(R.id.dummy_space_for_fabs);
+
+            mFavoriteFab = (FloatingActionButton) itemView.findViewById(R.id.favorite_fab);
+            mDirectionsFab = (FloatingActionButton) itemView.findViewById(R.id.directions_fab);
+            mFabsAnchor = (FrameLayout) itemView.findViewById(R.id.fabs_anchor);
             itemView.setOnClickListener(this);
         }
 
@@ -147,34 +150,55 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             if (_selected){
 
-                mName.setPadding((int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_selected),
-                        (int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_selected),
-                        (int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_selected),
-                        (int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_selected));
-
+                //The width percentage is updated so that the name TextView gives room to the fabs
+                //RecyclerView gives us free opacity/bounds resizing animations
                 PercentRelativeLayout.LayoutParams params =(PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
                 PercentLayoutHelper.PercentLayoutInfo info = params.getPercentLayoutInfo();
 
                 info.widthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_selected_percent, true);
                 mName.requestLayout();
 
-                //mFabCoordinator.setVisibility(View.VISIBLE);
-                mDummySpaceForFabs.setVisibility(View.VISIBLE);
+                //Show two fabs, anchored through app:layout_anchor="@id/fabs_anchor" stationlist_item.xml
+                mFabsAnchor.setVisibility(View.VISIBLE);
+                mFavoriteFab.setVisibility(View.VISIBLE);
+                mDirectionsFab.setVisibility(View.VISIBLE);
+
+                //manipulating last item column, displaying bikes or docks numbers
+                //padding is direct but didn't give desired results
+                //mAvailability.setPadding(Utils.dpToPx(20,mCtx), 0,0,0);
+                //So we will update MARGINS
+                //This is to correctly position the directions fab
+                //it got app:layout_anchorGravity="end|center_vertical"
+                //but uses the *middle* of the sprite
+                //So I want it offset by half its width minus any padding I wannna put in there
+                //40/2 - 4 = 20 - 4 = 16.
+                PercentRelativeLayout.LayoutParams availParams =(PercentRelativeLayout.LayoutParams) mAvailability.getLayoutParams();
+                availParams.setMargins((int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_left_selected), 0, 0, 0);
+                mAvailability.requestLayout();
+
             }
             else{
-
-                mName.setPadding(0, (int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_top_default),
-                        0, (int)mCtx.getResources().getDimension(R.dimen.station_name_textview_padding_bottom_default));
-
-                //mName.setPadding(0, Utils.dpToPx(12, mCtx), 0, Utils.dpToPx(12, mCtx));
-
+                //name width percentage restoration
                 PercentRelativeLayout.LayoutParams params =(PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
                 PercentLayoutHelper.PercentLayoutInfo info = params.getPercentLayoutInfo();
                 info.widthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_default_percent, true);
                 mName.requestLayout();
 
-                //mFabCoordinator.setVisibility(View.GONE);
-                mDummySpaceForFabs.setVisibility(View.GONE);
+                //Hidding two fabs and their anchor
+                mFabsAnchor.setVisibility(View.GONE);
+                mFavoriteFab.setVisibility(View.GONE);
+                mDirectionsFab.setVisibility(View.GONE);
+
+                //margins, not padding. Set to 0 when item is not selected (hidden fabs)
+                //mAvailability.setPadding(0, 0, 0, 0);
+                //see if(_selected)
+                PercentRelativeLayout.LayoutParams availParams =(PercentRelativeLayout.LayoutParams) mAvailability.getLayoutParams();
+                //availParams.setMargins(0,0,0,0);
+                availParams.setMargins((int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default),
+                        (int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default),
+                        (int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default),
+                        (int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default));
+                mAvailability.requestLayout();
             }
 
             if (mIsLookingForBikes) {

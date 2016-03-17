@@ -6,10 +6,10 @@
     <dimen name="tablayout_height">40dp</dimen>
 
     <!-- fabs in recyclerView -->
-    <dimen name="station_name_textview_padding_top_default">12dp</dimen>
-    <dimen name="station_name_textview_padding_bottom_default">12dp</dimen>
-    <dimen name="station_name_textview_padding_selected">0dp</dimen>
-
+    <dimen name="station_availability_margin_default">0dp</dimen>
+    <!--So I want it offset by half its width minus any padding I wannna put in there
+    //40/2 - 4 = 20 - 4 = 16.-->
+    <dimen name="station_availability_margin_left_selected">16dp</dimen>
 
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
