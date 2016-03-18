@@ -6,6 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".BaseActivity"
     android:clickable="true"
+    android:id="@+id/list_item_root"
     android:foreground="?android:attr/selectableItemBackground"
     android:baselineAligned="true">
 
@@ -90,7 +91,7 @@
             android:id="@+id/favorite_fab"
             android:layout_centerInParent="true"
             android:clickable="true"
-            android:src="@drawable/ic_action_action_favorite_outline"
+            android:src="@drawable/ic_action_favorite_outline_24dp"
             android:visibility="gone"
 
             app:fabSize="mini"
@@ -107,7 +108,7 @@
             android:id="@+id/directions_fab"
             android:layout_centerInParent="true"
             android:clickable="true"
-            android:src="@drawable/ic_action_maps_directions"
+            android:src="@drawable/ic_action_maps_directions_24dp"
             android:visibility="gone"
 
             app:fabSize="mini"

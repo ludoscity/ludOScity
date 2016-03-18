@@ -37,19 +37,20 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.ludoscity.findmybikes.R;
+import com.ludoscity.findmybikes.RootApplication;
+import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.StationListPagerAdapter;
 import com.ludoscity.findmybikes.citybik_es.Citybik_esAPI;
 import com.ludoscity.findmybikes.citybik_es.model.ListNetworksAnswerRoot;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkStatusAnswerRoot;
 import com.ludoscity.findmybikes.citybik_es.model.Station;
-import com.ludoscity.findmybikes.helpers.DBHelper;
-import com.ludoscity.findmybikes.RootApplication;
-import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.fragments.StationListFragment;
 import com.ludoscity.findmybikes.fragments.StationMapFragment;
+import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.Utils;
-import com.ludoscity.findmybikes.R;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,8 +95,7 @@ public class NearbyActivity extends AppCompatActivity
     private boolean mLookingForBike = true;
 
     private MenuItem mParkingSwitch;
-    private MenuItem mFavoriteMenuItem;
-    private MenuItem mDirectionsMenuItem;
+    //TODO: private MenuItem mSettingsMenuItem
 
     private CameraPosition mSavedInstanceCameraPosition;
 
@@ -237,22 +237,6 @@ public class NearbyActivity extends AppCompatActivity
 
         setOnClickFindSwitchListener();
 
-        mFavoriteMenuItem = menu.findItem(R.id.favorite_menu_item);
-
-        mDirectionsMenuItem = menu.findItem(R.id.directions_menu_item);
-
-        StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
-        if (null != highlightedStation) {
-            setupFavoriteActionIcon(highlightedStation);
-            mDirectionsMenuItem.setVisible(true);
-        }
-
-        else {
-            mFavoriteMenuItem.setVisible(false);
-            mDirectionsMenuItem.setVisible(false);
-        }
-
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -280,114 +264,52 @@ public class NearbyActivity extends AppCompatActivity
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 return true;
-
-            case R.id.favorite_menu_item:
-
-                final StationItem station = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
-
-                boolean newState = !station.isFavorite(this);
-
-
-
-                if (newState) {
-
-                    addFavorite(station);
-
-                    if (mCoordinatorLayout != null)
-                        Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                                .setAction(R.string.undo,new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        //TODO: figure out why it's not animated in favorites fragment recyclerView
-                                        removeFavorite(station);
-
-                                    }
-                                }).show();
-                    else //TODO: Rework landscape layout
-                        Toast.makeText(this, getString(R.string.favorite_added),Toast.LENGTH_SHORT).show();
-
-                }
-                else {
-                    removeFavorite(station);
-
-                    if (mCoordinatorLayout != null)
-                        Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                                .setAction(R.string.undo, new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        //TODO: figure out why it's not animated in favorites fragment recyclerView
-                                        addFavorite(station);
-
-                                    }
-                                }).show();
-                    else //TODO: Rework landscape layout
-                        Toast.makeText(this, getString(R.string.favorite_removed), Toast.LENGTH_SHORT).show();
-                }
-
-                return true;
-
-            case R.id.directions_menu_item:
-
-                StationItem targetStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
-
-                // Seen NullPointerException in crash report.
-                if (null != targetStation) {
-                    StringBuilder builder = new StringBuilder("http://maps.google.com/maps?&saddr=").
-                            append(mCurrentUserLatLng.latitude).
-                            append(",").
-                            append(mCurrentUserLatLng.longitude).
-                            append("&daddr=").
-                            append(targetStation.getPosition().latitude).
-                            append(",").
-                            append(targetStation.getPosition().longitude).
-                            append("&dirflg=");
-
-                    if (mLookingForBike)
-                        builder.append("w");
-                    else
-                        builder.append("b");
-
-                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(builder.toString()));
-                    intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-                    if (getPackageManager().queryIntentActivities(intent, 0).size() > 0) {
-                        startActivity(intent); // launch the map activity
-                    } else {
-                        Toast.makeText(this, getString(R.string.google_maps_not_installed), Toast.LENGTH_LONG).show();
-
-                    }
-
-                    return true;
-                }
-                //else do nothing
-
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void removeFavorite(StationItem station) {
+    private void removeFavorite(final StationItem station) {
         station.setFavorite(false, this);
 
         getListPagerAdapter().removeStationForPage(StationListPagerAdapter.FAVORITE_STATIONS, station, getString(R.string.no_favorites));
-        mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite_outline);
 
         StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
         if (null == highlightedStation){
 
-            mFavoriteMenuItem.setVisible(false);
-            mDirectionsMenuItem.setVisible(false);
             mStationMapFragment.resetMarkerSizeAll();
         }
+
+        if (mCoordinatorLayout != null)
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                    /*.setAction(R.string.undo, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            addFavorite(station);
+
+                        }
+                    })*/.show();
+        else //TODO: Rework landscape layout
+            Toast.makeText(this, getString(R.string.favorite_removed), Toast.LENGTH_SHORT).show();
     }
 
-    private void addFavorite(StationItem station) {
+    private void addFavorite(final StationItem station) {
         station.setFavorite(true, this);
 
-        mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
-
-
         getListPagerAdapter().addStationForPage(StationListPagerAdapter.FAVORITE_STATIONS, station);
+
+        if (mCoordinatorLayout != null)
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                    /*.setAction(R.string.undo,new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            removeFavorite(station);
+
+                        }
+                    })*/.show();
+        else //TODO: Rework landscape layout
+            Toast.makeText(this, getString(R.string.favorite_added),Toast.LENGTH_SHORT).show();
     }
 
     private void setOnClickFindSwitchListener() {
@@ -595,8 +517,6 @@ public class NearbyActivity extends AppCompatActivity
             if(getListPagerAdapter().highlightStationFromNameForPage(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM),
                     mTabLayout.getSelectedTabPosition())) {
 
-                setupFavoriteActionIcon(getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition()));
-                mDirectionsMenuItem.setVisible(true);
                 mStationMapFragment.oversizeMarkerUniqueForStationName(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
             }
         }
@@ -607,8 +527,6 @@ public class NearbyActivity extends AppCompatActivity
 
             if (null != highlightedStation){
 
-                mFavoriteMenuItem.setVisible(false);
-                mDirectionsMenuItem.setVisible(false);
                 getListPagerAdapter().removeStationHighlightForPage(mTabLayout.getSelectedTabPosition());
                 mStationMapFragment.resetMarkerSizeAll();
             }
@@ -632,8 +550,6 @@ public class NearbyActivity extends AppCompatActivity
             StationItem clickedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
             if (null == clickedStation){
 
-                mFavoriteMenuItem.setVisible(false);
-                mDirectionsMenuItem.setVisible(false);
                 mStationMapFragment.resetMarkerSizeAll();
             }
             else {
@@ -643,13 +559,61 @@ public class NearbyActivity extends AppCompatActivity
                 //if (mAppBarLayout != null)
                 //    mAppBarLayout.setExpanded(true , true);
 
-                setupFavoriteActionIcon(clickedStation);
-                mDirectionsMenuItem.setVisible(true);
-
                 mStationMapFragment.oversizeMarkerUniqueForStationName(clickedStation.getName());
 
                 animateCameraToShowUserAndStation(clickedStation);
             }
+        }
+        else if (uri.getPath().equalsIgnoreCase("/"+ StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH)){
+
+            //Setup favorite icon should be done at view binding time, might be inefficient though
+
+            final StationItem curSelectedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
+
+            //should not be null, fabs are showed only after selection
+            if (null != curSelectedStation) {
+
+                boolean newState = !curSelectedStation.isFavorite(this);
+
+                if (newState) {
+                    addFavorite(curSelectedStation);
+                } else {
+                    removeFavorite(curSelectedStation);
+                }
+            }
+        }
+        else if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_DIRECTIONS_FAB_CLICK_PATH)){
+
+            final StationItem curSelectedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
+
+            // Seen NullPointerException in crash report.
+            if (null != curSelectedStation) {
+                StringBuilder builder = new StringBuilder("http://maps.google.com/maps?&saddr=").
+                        append(mCurrentUserLatLng.latitude).
+                        append(",").
+                        append(mCurrentUserLatLng.longitude).
+                        append("&daddr=").
+                        append(curSelectedStation.getPosition().latitude).
+                        append(",").
+                        append(curSelectedStation.getPosition().longitude).
+                        append("&dirflg=");
+
+                if (mLookingForBike)
+                    builder.append("w");
+                else
+                    builder.append("b");
+
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(builder.toString()));
+                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                if (getPackageManager().queryIntentActivities(intent, 0).size() > 0) {
+                    startActivity(intent); // launch the map activity
+                } else {
+                    //TODO: replace by Snackbar
+                    Toast.makeText(this, getString(R.string.google_maps_not_installed), Toast.LENGTH_LONG).show();
+
+                }
+            }
+
         }
     }
 
@@ -666,15 +630,6 @@ public class NearbyActivity extends AppCompatActivity
         else{
             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(station.getPosition(), 15));
         }
-    }
-
-    private void setupFavoriteActionIcon(StationItem station) {
-        if (station.isFavorite(this))
-            mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite);
-        else
-            mFavoriteMenuItem.setIcon(R.drawable.ic_action_action_favorite_outline);
-
-        mFavoriteMenuItem.setVisible(true);
     }
 
     //Callback from pull-to-refresh
@@ -703,11 +658,6 @@ public class NearbyActivity extends AppCompatActivity
         StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(position);
         if (null == highlightedStation){
 
-            if (mFavoriteMenuItem != null)
-                mFavoriteMenuItem.setVisible(false);
-            if (mDirectionsMenuItem != null)
-                mDirectionsMenuItem.setVisible(false);
-
             if (mStationMapFragment != null)
                 mStationMapFragment.resetMarkerSizeAll();
 
@@ -717,8 +667,6 @@ public class NearbyActivity extends AppCompatActivity
 
         }
         else{
-            setupFavoriteActionIcon(highlightedStation);
-            mDirectionsMenuItem.setVisible(true);
             mStationMapFragment.oversizeMarkerUniqueForStationName(highlightedStation.getName());
 
             animateCameraToShowUserAndStation(highlightedStation);
@@ -993,8 +941,6 @@ public class NearbyActivity extends AppCompatActivity
             if (mCurrentUserLatLng != null && !DBHelper.getBikeNetworkBounds(NearbyActivity.this).contains(mCurrentUserLatLng)){
 
                 getListPagerAdapter().removeStationHighlightForPage(mTabLayout.getSelectedTabPosition());
-                mFavoriteMenuItem.setVisible(false);
-                mDirectionsMenuItem.setVisible(false);
 
                 mFindNetworkTask = new FindNetworkTask();
                 mFindNetworkTask.execute();

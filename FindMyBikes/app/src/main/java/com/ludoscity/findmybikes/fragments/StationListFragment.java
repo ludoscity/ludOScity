@@ -31,6 +31,8 @@ public class StationListFragment extends Fragment
             implements StationRecyclerViewAdapter.OnStationListItemClickListener{
 
     public static final String STATION_LIST_ITEM_CLICK_PATH = "station_list_item_click";
+    public static final String STATION_LIST_FAVORITE_FAB_CLICK_PATH = "station_list_fav_fab_click";
+    public static final String STATION_LIST_DIRECTIONS_FAB_CLICK_PATH = "station_list_dir_fab_click";
     public static final String STATION_LIST_ARG_BACKGROUND_RES_ID = "station_list_arg_background_res_id";
 
     private RecyclerView mStationRecyclerView;
@@ -226,10 +228,10 @@ public class StationListFragment extends Fragment
     }
 
     @Override
-    public void onStationListItemClick() {
+    public void onStationListItemClick(String _path) {
         Uri.Builder builder = new Uri.Builder();
 
-        builder.appendPath(STATION_LIST_ITEM_CLICK_PATH);
+        builder.appendPath(_path);
 
         if (mListener != null) {
             mListener.onStationListFragmentInteraction(builder.build());
@@ -260,7 +262,7 @@ public class StationListFragment extends Fragment
     }
 
     public interface OnStationListFragmentInteractionListener {
-        // TODO: Update argument type and name
+
         void onStationListFragmentInteraction(Uri uri);
     }
 

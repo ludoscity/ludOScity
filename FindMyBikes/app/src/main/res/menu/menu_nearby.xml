@@ -6,18 +6,6 @@
 
 
     <item
-        android:id="@+id/directions_menu_item"
-        app:showAsAction="always"
-        android:title=""
-        android:icon="@drawable/ic_action_maps_directions"/>
-
-    <item
-        android:id="@+id/favorite_menu_item"
-        app:showAsAction="always"
-        android:title=""
-        android:icon="@drawable/ic_action_action_favorite_outline"/>
-
-    <item
         android:id="@+id/bike_parking_switch_menu_item"
         android:title=""
         app:showAsAction="always"

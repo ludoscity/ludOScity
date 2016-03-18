@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.percent.PercentLayoutHelper;
 import android.support.percent.PercentRelativeLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.ludoscity.findmybikes.fragments.StationListFragment;
 import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.Utils;
 
@@ -69,7 +71,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     }
 
     public interface OnStationListItemClickListener {
-        void onStationListItemClick();
+        void onStationListItemClick(String _path);
     }
 
     public StationRecyclerViewAdapter(OnStationListItemClickListener listener,
@@ -124,6 +126,9 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             mDirectionsFab = (FloatingActionButton) itemView.findViewById(R.id.directions_fab);
             mFabsAnchor = (FrameLayout) itemView.findViewById(R.id.fabs_anchor);
             itemView.setOnClickListener(this);
+
+            mFavoriteFab.setOnClickListener(this);
+            mDirectionsFab.setOnClickListener(this);
         }
 
         public void bindStation(StationItem _station, boolean _selected){
@@ -160,6 +165,12 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
                 //Show two fabs, anchored through app:layout_anchor="@id/fabs_anchor" stationlist_item.xml
                 mFabsAnchor.setVisibility(View.VISIBLE);
+
+                if (_station.isFavorite(mCtx))
+                    mFavoriteFab.setImageDrawable(ContextCompat.getDrawable(mCtx,R.drawable.ic_action_favorite_24dp));
+                else
+                    mFavoriteFab.setImageDrawable(ContextCompat.getDrawable(mCtx,R.drawable.ic_action_favorite_outline_24dp));
+
                 mFavoriteFab.setVisibility(View.VISIBLE);
                 mDirectionsFab.setVisibility(View.VISIBLE);
 
@@ -227,8 +238,25 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         @Override
         public void onClick(View view) {
-            StationRecyclerViewAdapter.this.setSelectionFromName(mName.getText().toString(), true);
-            mListener.onStationListItemClick();
+
+            switch (view.getId()){
+                case R.id.list_item_root:
+                    StationRecyclerViewAdapter.this.setSelectionFromName(mName.getText().toString(), true);
+                    mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
+                    break;
+                case R.id.favorite_fab:
+                    mListener.onStationListItemClick(StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH);
+                    //ordering matters
+                    if (getSelected().isFavorite(mCtx))
+                        mFavoriteFab.setImageDrawable(ContextCompat.getDrawable(mCtx,R.drawable.ic_action_favorite_24dp));
+                    else
+                        mFavoriteFab.setImageDrawable(ContextCompat.getDrawable(mCtx,R.drawable.ic_action_favorite_outline_24dp));
+                    break;
+
+                case R.id.directions_fab:
+                    mListener.onStationListItemClick(StationListFragment.STATION_LIST_DIRECTIONS_FAB_CLICK_PATH);
+                    break;
+            }
         }
     }
 
