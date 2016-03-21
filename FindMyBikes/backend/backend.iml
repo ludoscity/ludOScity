@@ -10,8 +10,8 @@
       <configuration>
         <option name="HTTP_ADDRESS" value="localhost" />
         <option name="HTTP_PORT" value="8080" />
-        <option name="WAR_DIR" value="C:\Users\F8Full\Documents\GitHub\ludOScity\FindMyBikes\backend\build\exploded-app" />
-        <option name="WEB_APP_DIR" value="C:\Users\F8Full\Documents\GitHub\ludOScity\FindMyBikes\backend\src\main\webapp" />
+        <option name="WAR_DIR" value="C:\Users\F8Full\AppData\Local\GitHub\ludOScity\FindMyBikes\backend\build\exploded-app" />
+        <option name="WEB_APP_DIR" value="C:\Users\F8Full\AppData\Local\GitHub\ludOScity\FindMyBikes\backend\src\main\webapp" />
         <option name="APPENGINE_SDKROOT" value="C:\Users\F8Full\.gradle\appengine-sdk\appengine-java-sdk-1.9.14" />
       </configuration>
     </facet>
@@ -27,8 +27,8 @@
     <output-test url="file://$MODULE_DIR$/build/classes/test" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/build/generated-source/endpoints/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated-source/endpoints/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/endpointsSrc/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/functionalTest/java" isTestSource="true" />
