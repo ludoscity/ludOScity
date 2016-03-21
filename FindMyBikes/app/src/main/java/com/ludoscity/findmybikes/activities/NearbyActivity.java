@@ -100,8 +100,8 @@ public class NearbyActivity extends AppCompatActivity
     private CameraPosition mSavedInstanceCameraPosition;
 
     private static final int[] TABS_ICON_RES_ID = new int[]{
-            R.drawable.ic_pin_a,
-            R.drawable.ic_pin_b
+            R.drawable.ic_loc_to_a,
+            R.drawable.ic_a_to_b
     };
 
 
@@ -181,7 +181,8 @@ public class NearbyActivity extends AppCompatActivity
         for (int i=0; i<mTabLayout.getTabCount() && i<TABS_ICON_RES_ID.length; ++i)
         {
             //noinspection ConstantConditions
-            mTabLayout.getTabAt(i).setIcon(TABS_ICON_RES_ID[i]);
+            mTabLayout.getTabAt(i).setCustomView(R.layout.tab_custom_view);
+            mTabLayout.getTabAt(i).setIcon(ContextCompat.getDrawable(this,TABS_ICON_RES_ID[i]));
         }
 
         mAppBarLayout = (AppBarLayout) findViewById(R.id.action_toolbar_layout);
