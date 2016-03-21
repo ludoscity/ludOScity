@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- used so that fabs can be anchored -->
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,116 +12,111 @@
     android:foreground="?android:attr/selectableItemBackground"
     android:baselineAligned="true">
 
-    <android.support.design.widget.CoordinatorLayout
+    <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <android.support.percent.PercentRelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <!--suppress AndroidDomInspection -->
-            <TextView
-                app:layout_widthPercent="@dimen/proximity_column_width_percent"
-                android:layout_height="match_parent"
-
-
-                android:id="@+id/station_proximity"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:layout_centerVertical="true"
-                android:textStyle="bold"
-                />
-
-            <!--suppress AndroidDomInspection -->
-            <!--app:layout_widthPercent="27%"-->
-            <TextView
-                app:layout_widthPercent="@dimen/name_column_width_default_percent"
-                android:layout_toEndOf="@+id/station_proximity"
-                android:layout_toRightOf="@+id/station_proximity"
-                android:layout_height="match_parent"
-                android:textSize="16sp"
-                android:fontFamily="sans-serif-condensed"
-                android:gravity="center"
-                android:layout_centerVertical="true"
-                android:id="@+id/station_name"
-                android:ellipsize="end"
-
-                style="@style/layout_compat_textview_minheight"
-                />
-
-            <!-- width = 2*fabmini width="40dp" + fabfavorite layout_marginRight="2dp" + fabdirections layout_marginStart="2dp" - fabmini width-->
-            <!-- height = fabmini height="40dp" + fabfavorite layout_marginTop="3dp" + fabdirections layout_marginBottom="3dp"-->
-            <!-- android:background="@color/theme_accent" -->
-            <!-- TODO: precisely measure the correct values from an actual device render pass -->
-            <FrameLayout
-                android:layout_width="44dp"
-                android:layout_height="46dp"
-                android:layout_toEndOf="@+id/station_name"
-                android:layout_toRightOf="@+id/station_name"
-                android:gravity="center"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="24dp"
-                android:layout_marginLeft="24dp"
-                android:id="@+id/fabs_anchor"
-                android:visibility="gone"
-                />
-
-            <!--suppress AndroidDomInspection -->
-            <TextView
-                app:layout_widthPercent="@dimen/availability_column_width_percent"
-                android:layout_height="match_parent"
-                android:layout_toEndOf="@+id/fabs_anchor"
-                android:layout_toRightOf="@+id/fabs_anchor"
-                android:textSize="16sp"
-                android:gravity="center"
-                android:layout_centerVertical="true"
-                android:id="@+id/station_availability"
-                android:textStyle="bold"
-                />
-
-        </android.support.percent.PercentRelativeLayout>
-
-        <!--Here will go my fabs !-->
         <!--suppress AndroidDomInspection -->
-        <!--android:layout_margin="0dp"
-        app:elevation="0dp"
-            app:borderWidth="0dp" are for prelollipop. See how to use style to make the difference automatically-->
-        <android.support.design.widget.FloatingActionButton
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/favorite_fab"
-            android:layout_centerInParent="true"
-            android:clickable="true"
-            android:src="@drawable/ic_action_favorite_outline_24dp"
-            android:visibility="gone"
+        <TextView
+            app:layout_widthPercent="@dimen/proximity_column_width_percent"
+            android:layout_height="match_parent"
 
-            app:fabSize="mini"
-            app:layout_anchor="@id/fabs_anchor"
-            app:layout_anchorGravity="start|center_vertical"
-            app:backgroundTint="@color/theme_primary_dark"
 
-            style="@style/floating_action_button"
+            android:id="@+id/station_proximity"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:textStyle="bold"
             />
 
-        <android.support.design.widget.FloatingActionButton
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/directions_fab"
-            android:layout_centerInParent="true"
-            android:clickable="true"
-            android:src="@drawable/ic_action_maps_directions_24dp"
-            android:visibility="gone"
+        <!--suppress AndroidDomInspection -->
+        <!--app:layout_widthPercent="27%"-->
+        <TextView
+            app:layout_widthPercent="@dimen/name_column_width_default_percent"
+            android:layout_toEndOf="@+id/station_proximity"
+            android:layout_toRightOf="@+id/station_proximity"
+            android:layout_height="match_parent"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-condensed"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:id="@+id/station_name"
+            android:ellipsize="end"
 
-            app:fabSize="mini"
-            app:layout_anchor="@id/fabs_anchor"
-            app:layout_anchorGravity="end|center_vertical"
-            app:backgroundTint="@color/theme_primary_dark"
-
-            style="@style/floating_action_button"
+            style="@style/layout_compat_textview_minheight"
             />
 
-    </android.support.design.widget.CoordinatorLayout>
+        <!-- width = 2*fabmini width="40dp" + fabfavorite layout_marginRight="2dp" + fabdirections layout_marginStart="2dp" - fabmini width-->
+        <!-- height = fabmini height="40dp" + fabfavorite layout_marginTop="3dp" + fabdirections layout_marginBottom="3dp"-->
+        <!-- android:background="@color/theme_accent" -->
+        <!-- TODO: precisely measure the correct values from an actual device render pass -->
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="46dp"
+            android:layout_toEndOf="@+id/station_name"
+            android:layout_toRightOf="@+id/station_name"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginLeft="24dp"
+            android:id="@+id/fabs_anchor"
+            android:visibility="gone"
+            />
+
+        <!--suppress AndroidDomInspection -->
+        <TextView
+            app:layout_widthPercent="@dimen/availability_column_width_percent"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@+id/fabs_anchor"
+            android:layout_toRightOf="@+id/fabs_anchor"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:id="@+id/station_availability"
+            android:textStyle="bold"
+            />
+
+    </android.support.percent.PercentRelativeLayout>
+
+    <!--Here will go my fabs !-->
+    <!--suppress AndroidDomInspection -->
+    <!--android:layout_margin="0dp"
+    app:elevation="0dp"
+        app:borderWidth="0dp" are for prelollipop. See how to use style to make the difference automatically-->
+    <android.support.design.widget.FloatingActionButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/favorite_fab"
+        android:layout_centerInParent="true"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_action_favorite_outline_24dp"
+        android:visibility="gone"
+
+        app:fabSize="mini"
+        app:layout_anchor="@id/fabs_anchor"
+        app:layout_anchorGravity="start|center_vertical"
+        app:backgroundTint="@color/theme_primary_dark"
+
+        style="@style/floating_action_button"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/directions_fab"
+        android:layout_centerInParent="true"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_action_maps_directions_24dp"
+        android:visibility="gone"
+
+        app:fabSize="mini"
+        app:layout_anchor="@id/fabs_anchor"
+        app:layout_anchorGravity="end|center_vertical"
+        app:backgroundTint="@color/theme_primary_dark"
+
+        style="@style/floating_action_button"
+        />
+
+</android.support.design.widget.CoordinatorLayout>
 
 
-</android.support.percent.PercentRelativeLayout>

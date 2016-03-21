@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/time_header_iv"
 
-                android:src="@drawable/ic_walking" />
+                app:srcCompat="@drawable/ic_walking" />
 
             <!-- 24dp is material base icon size -->
             <TextView

@@ -18,7 +18,14 @@ android {
         targetSdkVersion 23
         versionCode 6
         versionName "v1.1.1"
+
+        generatedDensities = []
     }
+    // Flag that tells aapt to keep the attribute ids
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
+    }
+    
     signingConfigs {
         release {
 
@@ -45,10 +52,10 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(path: ':backend', configuration: 'android-endpoints')
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
-    compile 'com.android.support:percent:23.1.1'
-    compile 'com.android.support:recyclerview-v7:23.1.1'
+    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:design:23.2.1'
+    compile 'com.android.support:percent:23.2.1'
+    compile 'com.android.support:recyclerview-v7:23.2.1'
     compile 'com.google.android.gms:play-services-maps:8.4.0'
     compile 'com.google.android.gms:play-services-location:8.4.0'
     compile 'com.google.maps.android:android-maps-utils:0.4'
