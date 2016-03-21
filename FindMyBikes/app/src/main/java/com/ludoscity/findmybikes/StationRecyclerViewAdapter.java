@@ -2,10 +2,10 @@ package com.ludoscity.findmybikes;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.percent.PercentLayoutHelper;
 import android.support.percent.PercentRelativeLayout;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +39,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     private boolean mIsLookingForBikes;
 
     private int mSelectedPos = NO_POSITION;
+
+    private boolean mFabAnimationRequested = false;
 
     //TODO: move those into resources and retrieve them for display in Settings Fragment UI
     //in km/h
@@ -115,6 +117,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         //-anchor fabs to their final position
         FrameLayout mFabsAnchor;
 
+        private Handler mFabAnimHandler = null;
+
         public StationListItemViewHolder(View itemView) {
             super(itemView);
 
@@ -167,12 +171,30 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 mFabsAnchor.setVisibility(View.VISIBLE);
 
                 if (_station.isFavorite(mCtx))
-                    mFavoriteFab.setImageDrawable(ContextCompat.getDrawable(mCtx,R.drawable.ic_action_favorite_24dp));
+                    mFavoriteFab.setImageResource(R.drawable.ic_action_favorite_24dp);
                 else
-                    mFavoriteFab.setImageDrawable(ContextCompat.getDrawable(mCtx,R.drawable.ic_action_favorite_outline_24dp));
+                    mFavoriteFab.setImageResource(R.drawable.ic_action_favorite_outline_24dp);
 
-                mFavoriteFab.setVisibility(View.VISIBLE);
-                mDirectionsFab.setVisibility(View.VISIBLE);
+                if (mFabAnimationRequested){
+                    mFavoriteFab.setVisibility(View.GONE);
+                    mDirectionsFab.setVisibility(View.GONE);
+
+                    mFabAnimHandler = new Handler();
+
+                    mFabAnimHandler.postDelayed(new Runnable() {
+                        public void run() {
+                            mFavoriteFab.show();
+                            mDirectionsFab.show();
+                            mFabAnimHandler = null;
+                        }
+                    }, 50);
+                    mFabAnimationRequested = false;
+                }
+                else if (mFabAnimHandler == null)
+                {
+                    mFavoriteFab.setVisibility(View.VISIBLE);
+                    mDirectionsFab.setVisibility(View.VISIBLE);
+                }
 
                 //manipulating last item column, displaying bikes or docks numbers
                 //padding is direct but didn't give desired results
@@ -243,14 +265,15 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 case R.id.list_item_root:
                     StationRecyclerViewAdapter.this.setSelectionFromName(mName.getText().toString(), true);
                     mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
+                    mFabAnimationRequested = true;
                     break;
                 case R.id.favorite_fab:
                     mListener.onStationListItemClick(StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH);
                     //ordering matters
                     if (getSelected().isFavorite(mCtx))
-                        mFavoriteFab.setImageDrawable(ContextCompat.getDrawable(mCtx,R.drawable.ic_action_favorite_24dp));
+                        mFavoriteFab.setImageResource(R.drawable.ic_action_favorite_24dp);
                     else
-                        mFavoriteFab.setImageDrawable(ContextCompat.getDrawable(mCtx,R.drawable.ic_action_favorite_outline_24dp));
+                        mFavoriteFab.setImageResource(R.drawable.ic_action_favorite_outline_24dp);
                     break;
 
                 case R.id.directions_fab:
@@ -259,6 +282,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             }
         }
     }
+
+    public void requestFabAnimation(){ mFabAnimationRequested = true; }
 
     public void setupStationList(ArrayList<StationItem> toSet){
         String selectedNameBefore = null;

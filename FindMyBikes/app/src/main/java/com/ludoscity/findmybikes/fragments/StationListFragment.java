@@ -168,6 +168,8 @@ public class StationListFragment extends Fragment
 
         int selectedPos = getRecyclerViewAdapter().setSelectionFromName(stationName, false);
 
+        ((StationRecyclerViewAdapter)mStationRecyclerView.getAdapter()).requestFabAnimation();
+
         if (selectedPos != NO_POSITION) {
             mStationRecyclerView.smoothScrollToPosition(selectedPos);
             toReturn = true;
@@ -204,7 +206,7 @@ public class StationListFragment extends Fragment
             else {
                 mProximityHeaderTextView.setVisibility(View.GONE);
                 mProximityHeaderImageView.setVisibility(View.VISIBLE);
-                mProximityHeaderImageView.setImageDrawable(ContextCompat.getDrawable(this.getContext(), R.drawable.ic_walking));
+                mProximityHeaderImageView.setImageResource(R.drawable.ic_walking);
             }
         }
         else {
@@ -222,7 +224,7 @@ public class StationListFragment extends Fragment
             else {
                 mProximityHeaderTextView.setVisibility(View.GONE);
                 mProximityHeaderImageView.setVisibility(View.VISIBLE);
-                mProximityHeaderImageView.setImageDrawable(ContextCompat.getDrawable(this.getContext(), R.drawable.ic_biking));
+                mProximityHeaderImageView.setImageResource(R.drawable.ic_biking);
             }
         }
     }
