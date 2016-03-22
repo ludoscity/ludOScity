@@ -100,8 +100,8 @@ public class NearbyActivity extends AppCompatActivity
     private CameraPosition mSavedInstanceCameraPosition;
 
     private static final int[] TABS_ICON_RES_ID = new int[]{
-            R.drawable.ic_loc_to_a,
-            R.drawable.ic_a_to_b
+            R.drawable.ic_a_bike,
+            R.drawable.ic_bike_b
     };
 
 
