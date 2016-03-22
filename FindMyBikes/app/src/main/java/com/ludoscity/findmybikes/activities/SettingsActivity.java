@@ -13,13 +13,7 @@ import com.ludoscity.findmybikes.fragments.SettingsFragment;
  * Created by F8Full on 2015-08-10.
  * Activity used to display Settings fragment
  */
-public class SettingsActivity extends AppCompatActivity
-        implements SettingsFragment.OnFragmentInteractionListener {
-
-    @Override
-    public void onSettingsFragmentInteraction() {
-
-    }
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

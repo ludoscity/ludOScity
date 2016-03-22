@@ -8,5 +8,5 @@
         android:id="@+id/settings_menu_item"
         app:showAsAction="ifRoom"
         android:title="@string/title_section_settings"
-        android:icon="@drawable/ic_action_action_settings"/>
+        android:icon="@drawable/ic_action_settings_24dp"/>
 </menu>
