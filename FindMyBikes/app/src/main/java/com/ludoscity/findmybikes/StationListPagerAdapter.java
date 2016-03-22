@@ -1,6 +1,5 @@
 package com.ludoscity.findmybikes;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
@@ -18,8 +17,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
 
     private static int NUM_ITEMS = 2;
 
-    public static int ALL_STATIONS = 0;
-    public static int FAVORITE_STATIONS = 1;
+    public static int BIKE_STATIONS = 0;
+    public static int DOCK_STATIONS = 1;
 
     public StationListPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -27,17 +26,17 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Fragment toReturn;
-        if (position == ALL_STATIONS)
+        /*Fragment toReturn;
+        if (position == BIKE_STATIONS)
             toReturn = new StationListFragment();
         else {
             toReturn = new StationListFragment();
             Bundle args = new Bundle();
             args.putInt(StationListFragment.STATION_LIST_ARG_BACKGROUND_RES_ID, R.drawable.ic_favorites_background);
             toReturn.setArguments(args);
-        }
+        }*/
 
-        return toReturn;
+        return new StationListFragment();
     }
 
     @Override
@@ -46,15 +45,15 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
     }
 
     public void setupUIAll(ArrayList<StationItem> nearbyStations, ArrayList<StationItem> favoriteStations,
-                           String noFavoritesString, boolean lookingForBike) {
-        retrieveListFragment(ALL_STATIONS).setupUI(nearbyStations, lookingForBike, "");
-        retrieveListFragment(FAVORITE_STATIONS).setupUI(favoriteStations, lookingForBike, noFavoritesString);
+                           String noFavoritesString) {
+        retrieveListFragment(BIKE_STATIONS).setupUI(nearbyStations, true, "");
+        retrieveListFragment(DOCK_STATIONS).setupUI(new ArrayList<StationItem>(), false, "Pick station");
     }
 
 
     public void setRefreshEnableAll(boolean toSet) {
-        retrieveListFragment(ALL_STATIONS).setRefreshEnable(toSet);
-        retrieveListFragment(FAVORITE_STATIONS).setRefreshEnable(toSet);
+        retrieveListFragment(BIKE_STATIONS).setRefreshEnable(toSet);
+        retrieveListFragment(DOCK_STATIONS).setRefreshEnable(toSet);
     }
 
     private StationListFragment retrieveListFragment(int position){
@@ -71,8 +70,10 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
     }
 
     public void setCurrentUserLatLngForNearby(LatLng currentUserLatLng) {
-        if (isViewPagerReady())
-            retrieveListFragment(ALL_STATIONS).setCurrentUserLatLng(currentUserLatLng);
+        if (isViewPagerReady()) {
+            retrieveListFragment(BIKE_STATIONS).setCurrentUserLatLng(currentUserLatLng);
+            retrieveListFragment(DOCK_STATIONS).setCurrentUserLatLng(currentUserLatLng);
+        }
     }
 
     public boolean highlightStationFromNameForPage(String stationName, int position) {
@@ -83,14 +84,9 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         retrieveListFragment(position).removeStationHighlight();
     }
 
-    public void lookingForBikesAll(boolean lookingForBikes) {
-        retrieveListFragment(ALL_STATIONS).lookingForBikes(lookingForBikes);
-        retrieveListFragment(FAVORITE_STATIONS).lookingForBikes(lookingForBikes);
-    }
-
     public void setRefreshingAll(boolean toSet) {
-        retrieveListFragment(ALL_STATIONS).setRefreshing(toSet);
-        retrieveListFragment(FAVORITE_STATIONS).setRefreshing(toSet);
+        retrieveListFragment(BIKE_STATIONS).setRefreshing(toSet);
+        retrieveListFragment(DOCK_STATIONS).setRefreshing(toSet);
     }
 
     public void removeStationForPage(int position, StationItem station, String stringIfEmpty) {

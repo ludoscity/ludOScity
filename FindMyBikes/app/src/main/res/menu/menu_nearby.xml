@@ -4,17 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     tools:context="com.ludoscity.findmybikes.activities.NearbyActivity">
 
-
-    <item
-        android:id="@+id/bike_parking_switch_menu_item"
-        android:title=""
-        app:showAsAction="always"
-        app:actionLayout="@layout/action_find_bike_parking_switch"
-        />
-
     <item
         android:id="@+id/settings_menu_item"
-        app:showAsAction="never"
+        app:showAsAction="ifRoom"
         android:title="@string/title_section_settings"
         android:icon="@drawable/ic_action_action_settings"/>
 </menu>

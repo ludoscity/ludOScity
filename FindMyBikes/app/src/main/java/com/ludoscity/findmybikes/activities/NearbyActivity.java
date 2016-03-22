@@ -18,7 +18,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.format.DateUtils;
@@ -28,7 +27,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -92,10 +90,6 @@ public class NearbyActivity extends AppCompatActivity
     private CoordinatorLayout mCoordinatorLayout;
 
     private boolean mRefreshMarkers = true;
-    private boolean mLookingForBike = true;
-
-    private MenuItem mParkingSwitch;
-    //TODO: private MenuItem mSettingsMenuItem
 
     private CameraPosition mSavedInstanceCameraPosition;
 
@@ -194,7 +188,6 @@ public class NearbyActivity extends AppCompatActivity
         if (savedInstanceState != null) {
 
             mSavedInstanceCameraPosition = savedInstanceState.getParcelable("saved_camera_pos");
-            mLookingForBike = savedInstanceState.getBoolean("looking_for_bike");
             mStationsNetwork = savedInstanceState.getParcelableArrayList("network_data");
         }
     }
@@ -215,7 +208,6 @@ public class NearbyActivity extends AppCompatActivity
         super.onSaveInstanceState(outState);
 
         outState.putParcelable("saved_camera_pos", mStationMapFragment.getCameraPosition());
-        outState.putBoolean("looking_for_bike", mLookingForBike);
         outState.putParcelableArrayList("network_data", mStationsNetwork);
     }
 
@@ -231,12 +223,6 @@ public class NearbyActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_nearby, menu);
-
-        mParkingSwitch = menu.findItem(R.id.bike_parking_switch_menu_item);
-
-        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setChecked(mLookingForBike);
-
-        setOnClickFindSwitchListener();
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -272,7 +258,7 @@ public class NearbyActivity extends AppCompatActivity
     private void removeFavorite(final StationItem station) {
         station.setFavorite(false, this);
 
-        getListPagerAdapter().removeStationForPage(StationListPagerAdapter.FAVORITE_STATIONS, station, getString(R.string.no_favorites));
+        //getListPagerAdapter().removeStationForPage(StationListPagerAdapter.DOCK_STATIONS, station, getString(R.string.no_favorites));
 
         StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
         if (null == highlightedStation){
@@ -297,7 +283,7 @@ public class NearbyActivity extends AppCompatActivity
     private void addFavorite(final StationItem station) {
         station.setFavorite(true, this);
 
-        getListPagerAdapter().addStationForPage(StationListPagerAdapter.FAVORITE_STATIONS, station);
+        //getListPagerAdapter().addStationForPage(StationListPagerAdapter.DOCK_STATIONS, station);
 
         if (mCoordinatorLayout != null)
             Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
@@ -311,18 +297,6 @@ public class NearbyActivity extends AppCompatActivity
                     })*/.show();
         else //TODO: Rework landscape layout
             Toast.makeText(this, getString(R.string.favorite_added),Toast.LENGTH_SHORT).show();
-    }
-
-    private void setOnClickFindSwitchListener() {
-        ((SwitchCompat)mParkingSwitch.getActionView().findViewById(R.id.action_bar_find_bike_parking_switch)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                getListPagerAdapter().lookingForBikesAll(isChecked);
-                mStationMapFragment.lookingForBikes(isChecked);
-                mLookingForBike = isChecked;
-            }
-        });
     }
 
     private void stopUIRefresh() {
@@ -351,7 +325,7 @@ public class NearbyActivity extends AppCompatActivity
                 if (mStationsNetwork != null && mRefreshMarkers && mRedrawMarkersTask == null) {
 
                     mRedrawMarkersTask = new RedrawMarkersTask();
-                    mRedrawMarkersTask.execute();
+                    mRedrawMarkersTask.execute(mStationListViewPager.getCurrentItem() == StationListPagerAdapter.BIKE_STATIONS);
 
                     mRefreshMarkers = false;
                 }
@@ -363,10 +337,8 @@ public class NearbyActivity extends AppCompatActivity
 
                 if (getListPagerAdapter().isViewPagerReady()){
                     getListPagerAdapter().setupUIAll(mStationsNetwork, DBHelper.getFavoriteStations(this),
-                            getString(R.string.no_favorites), mLookingForBike);
+                            getString(R.string.no_favorites));
 
-                    if (null != mParkingSwitch && !mParkingSwitch.isVisible())
-                        mParkingSwitch.setVisible(true);
                 }
             }
         }
@@ -390,7 +362,7 @@ public class NearbyActivity extends AppCompatActivity
                     //TODO: calling DBHelper.getFavoriteStations can return incomplete result when db is updating
                     //it happens when data is downladed and screen configuration is changed shortly after
                     getListPagerAdapter().setupUIAll(mStationsNetwork, DBHelper.getFavoriteStations(NearbyActivity.this),
-                            getString(R.string.no_favorites), mLookingForBike);
+                            getString(R.string.no_favorites));
                     mPagerReady = true;
                 }
 
@@ -599,7 +571,7 @@ public class NearbyActivity extends AppCompatActivity
                         append(curSelectedStation.getPosition().longitude).
                         append("&dirflg=");
 
-                if (mLookingForBike)
+                if (mStationListViewPager.getCurrentItem() == StationListPagerAdapter.BIKE_STATIONS)
                     builder.append("w");
                 else
                     builder.append("b");
@@ -682,7 +654,7 @@ public class NearbyActivity extends AppCompatActivity
 
     }
 
-    public class RedrawMarkersTask extends AsyncTask<Void, Void, Void> {
+    public class RedrawMarkersTask extends AsyncTask<Boolean, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -692,7 +664,7 @@ public class NearbyActivity extends AppCompatActivity
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Void doInBackground(Boolean... bools) {
 
             //This improves the UX by giving time to the listview to render
             try {
@@ -705,7 +677,7 @@ public class NearbyActivity extends AppCompatActivity
             mStationMapFragment.clearMarkerGfxData();
             //SETUP MARKERS DATA
             for (StationItem item : mStationsNetwork){
-                mStationMapFragment.addMarkerForStationItem(item, mLookingForBike);
+                mStationMapFragment.addMarkerForStationItem(item, bools[0]);
             }
 
             return null;
