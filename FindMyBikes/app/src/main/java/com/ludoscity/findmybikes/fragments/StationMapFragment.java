@@ -34,6 +34,31 @@ public class StationMapFragment extends Fragment
         GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMapClickListener {
 
+    //Used to buffer markers update requests (avoids glitchy anim)
+    private class CustomCancellableCallback implements GoogleMap.CancelableCallback {
+
+        Boolean mLookingForBikeWhenFinished = null;
+        @Override
+        public void onFinish() {
+
+            if (mLookingForBikeWhenFinished != null)
+                updateMarkerAll(mLookingForBikeWhenFinished);
+
+            mAnimCallback = null;
+
+        }
+
+        @Override
+        public void onCancel() {
+
+            if (mLookingForBikeWhenFinished != null)
+                updateMarkerAll(mLookingForBikeWhenFinished);
+
+            mAnimCallback = null;
+
+        }
+    }
+
     public static final String INFOWINDOW_CLICK_PATH = "infowindow_click";
     public static final String MARKER_CLICK_PATH = "marker_click";
     public static final String LOCATION_CHANGED_PATH = "location_changed";
@@ -50,6 +75,7 @@ public class StationMapFragment extends Fragment
     private boolean mInitialCameraSetupDone;
     private boolean mEnforceMaxZoom = false;
     private GoogleMap mGoogleMap = null;
+    private CustomCancellableCallback mAnimCallback = null;
 
     private float mMaxZoom = 16f;
 
@@ -191,6 +217,7 @@ public class StationMapFragment extends Fragment
         }
         else{
             mGoogleMap.setMyLocationEnabled(true);
+            mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
         }
     }
 
@@ -231,14 +258,25 @@ public class StationMapFragment extends Fragment
     }
 
     public void animateCamera(CameraUpdate cameraUpdate) {
-        mGoogleMap.animateCamera(cameraUpdate);
+        mAnimCallback = new CustomCancellableCallback();
+
+        mGoogleMap.animateCamera(cameraUpdate, 850, mAnimCallback);
     }
 
     public void lookingForBikes(boolean lookingForBike) {
 
+        if (mAnimCallback != null){
+            mAnimCallback.mLookingForBikeWhenFinished = lookingForBike;
+        }
+        else
+            updateMarkerAll(lookingForBike);
+    }
+
+    private void updateMarkerAll(boolean lookingForBike){
+
         for (StationMapGfx markerData : mMapMarkersGfxData){
-                markerData.updateMarker(lookingForBike);
-            }
+            markerData.updateMarker(lookingForBike);
+        }
     }
 
     public void resetMarkerSizeAll(){

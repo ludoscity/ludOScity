@@ -463,7 +463,6 @@ public class NearbyActivity extends AppCompatActivity
     }
 
 
-
     @Override
     public void onStationMapFragmentInteraction(Uri uri) {
         //Will be warned of station details click, will make info fragment to replace list fragment
@@ -645,8 +644,11 @@ public class NearbyActivity extends AppCompatActivity
             animateCameraToShowUserAndStation(highlightedStation);
         }
 
-
-
+        if (mStationMapFragment != null)
+            if (position == StationListPagerAdapter.BIKE_STATIONS)
+                mStationMapFragment.lookingForBikes(true);
+            else
+                mStationMapFragment.lookingForBikes(false);
     }
 
     @Override
