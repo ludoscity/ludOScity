@@ -29,7 +29,6 @@ import java.util.ArrayList;
 public class StationMapFragment extends Fragment
         implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
-        GoogleMap.OnMyLocationChangeListener,
         GoogleMap.OnCameraChangeListener,
         GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMapClickListener {
@@ -155,7 +154,6 @@ public class StationMapFragment extends Fragment
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
         mGoogleMap.setOnMarkerClickListener(this);
         mGoogleMap.setOnInfoWindowClickListener(this);
-        mGoogleMap.setOnMyLocationChangeListener(this);
         mGoogleMap.setOnCameraChangeListener(this);
         mGoogleMap.setOnMapClickListener(this);
 
@@ -183,28 +181,18 @@ public class StationMapFragment extends Fragment
         return true;
     }
 
-    @Override
-    public void onMyLocationChange(Location location) {
+    public void onUserLocationChange(Location location) {
         if (location != null) {
             //Log.d("onMyLocationChange", "new location " + location.toString());
             if (!mInitialCameraSetupDone && mGoogleMap != null) {
                 doInitialCameraSetup(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15), true);
             }
-
-            Uri.Builder builder = new Uri.Builder();
-            builder.appendPath(LOCATION_CHANGED_PATH);
-
-            builder.appendQueryParameter(LOCATION_CHANGED_LATITUDE_PARAM, String.valueOf(location.getLatitude()));
-            builder.appendQueryParameter(LOCATION_CHANGED_LONGITUDE_PARAM, String.valueOf(location.getLongitude()));
-
-            if (mListener != null){
-                mListener.onStationMapFragmentInteraction(builder.build());
-            }
         }
     }
 
     public void enableMyLocationCheckingPermission(){
-        if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding

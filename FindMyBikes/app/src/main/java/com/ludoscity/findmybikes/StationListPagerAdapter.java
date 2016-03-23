@@ -69,7 +69,7 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         return toReturn;
     }
 
-    public void setCurrentUserLatLngForNearby(LatLng currentUserLatLng) {
+    public void setCurrentUserLatLng(LatLng currentUserLatLng) {
         if (isViewPagerReady()) {
             retrieveListFragment(BIKE_STATIONS).setCurrentUserLatLng(currentUserLatLng);
             retrieveListFragment(DOCK_STATIONS).setCurrentUserLatLng(currentUserLatLng);

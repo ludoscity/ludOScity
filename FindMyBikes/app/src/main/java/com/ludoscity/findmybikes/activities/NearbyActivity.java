@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -31,6 +32,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.couchbase.lite.CouchbaseLiteException;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -67,7 +73,10 @@ public class NearbyActivity extends AppCompatActivity
         implements StationMapFragment.OnStationMapFragmentInteractionListener,
         StationListFragment.OnStationListFragmentInteractionListener,
         SwipeRefreshLayout.OnRefreshListener,
-        ViewPager.OnPageChangeListener{
+        ViewPager.OnPageChangeListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     private StationMapFragment mStationMapFragment = null;
 
@@ -98,10 +107,15 @@ public class NearbyActivity extends AppCompatActivity
             R.drawable.ic_bike_b
     };
 
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    private boolean mRequestingLocationUpdates = false;
+
 
     @Override
-    public void onStart(){
-        super.onStart();
+    public void onStart() {
+
+        mGoogleApiClient.connect();
 
         if (Utils.Connectivity.isConnected(getApplicationContext()) && !DBHelper.isBikeNetworkIdAvailable(this)) {
 
@@ -127,25 +141,58 @@ public class NearbyActivity extends AppCompatActivity
 
             Log.d("nearbyActivity", mStationsNetwork.size() + " stations loaded from DB");
         }
+
+        super.onStart();
     }
 
     @Override
-    public void onResume(){
+    public void onStop() {
+        mGoogleApiClient.disconnect();
+
+        super.onStop();
+    }
+
+    @Override
+    public void onResume() {
 
         super.onResume();
+
+        if (mGoogleApiClient.isConnected() && !mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
 
         mUpdateRefreshHandler = new Handler();
 
         setupUI();
     }
 
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+        }
+        else {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            mRequestingLocationUpdates = true;
+        }
+    }
+
     @Override
     public void onPause() {
+
+        super.onPause();
 
         cancelDownloadWebTask();
         stopUIRefresh();
 
-        super.onPause();
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+        mRequestingLocationUpdates = false;
     }
 
     @Override
@@ -183,13 +230,32 @@ public class NearbyActivity extends AppCompatActivity
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
 
-        setStatusBarListener();
+        setStatusBarClickListener();
 
         if (savedInstanceState != null) {
 
             mSavedInstanceCameraPosition = savedInstanceState.getParcelable("saved_camera_pos");
             mStationsNetwork = savedInstanceState.getParcelableArrayList("network_data");
+            mRequestingLocationUpdates = savedInstanceState.getBoolean("requesting_location_updates");
+            mCurrentUserLatLng = savedInstanceState.getParcelable("user_location_latlng");
+
         }
+
+        getListPagerAdapter().setCurrentUserLatLng(mCurrentUserLatLng);
+
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     @NonNull
@@ -209,6 +275,8 @@ public class NearbyActivity extends AppCompatActivity
 
         outState.putParcelable("saved_camera_pos", mStationMapFragment.getCameraPosition());
         outState.putParcelableArrayList("network_data", mStationsNetwork);
+        outState.putBoolean("requesting_location_updates", mRequestingLocationUpdates);
+        outState.putParcelable("user_location_latlng", mCurrentUserLatLng);
     }
 
     @Override
@@ -450,7 +518,7 @@ public class NearbyActivity extends AppCompatActivity
         };
     }
 
-    private void setStatusBarListener() {
+    private void setStatusBarClickListener() {
         mStatusBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -471,14 +539,6 @@ public class NearbyActivity extends AppCompatActivity
         if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MAP_READY_PATH))
         {
             setupUI();
-        }
-        //User loc changed
-        else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.LOCATION_CHANGED_PATH))
-        {
-            mCurrentUserLatLng = new LatLng(Double.valueOf(uri.getQueryParameter(StationMapFragment.LOCATION_CHANGED_LATITUDE_PARAM)),
-                    Double.valueOf(uri.getQueryParameter(StationMapFragment.LOCATION_CHANGED_LONGITUDE_PARAM)));
-
-            getListPagerAdapter().setCurrentUserLatLngForNearby(mCurrentUserLatLng);
         }
         //Marker click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
@@ -633,12 +693,13 @@ public class NearbyActivity extends AppCompatActivity
             if (mStationMapFragment != null)
                 mStationMapFragment.resetMarkerSizeAll();
 
-            if (mCurrentUserLatLng != null)
+            if (mCurrentUserLatLng != null && mStationMapFragment != null)
                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
 
 
         }
         else{
+            //Seen java.util.ConcurrentModificationException on app resuming
             mStationMapFragment.oversizeMarkerUniqueForStationName(highlightedStation.getName());
 
             animateCameraToShowUserAndStation(highlightedStation);
@@ -653,6 +714,39 @@ public class NearbyActivity extends AppCompatActivity
 
     @Override
     public void onPageScrollStateChanged(int state) {
+
+    }
+
+    //Google API client
+    @Override
+    public void onConnected(Bundle bundle) {
+        startLocationUpdates();
+
+    }
+
+    //Google API client
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    //Google API client
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+        mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        getListPagerAdapter().setCurrentUserLatLng(mCurrentUserLatLng);
+
+        if (mStationMapFragment != null){
+            mStationMapFragment.onUserLocationChange(location);
+        }
+
 
     }
 
