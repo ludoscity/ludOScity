@@ -162,16 +162,33 @@ public class StationListFragment extends Fragment
         }
     }
 
-    public boolean highlightStationFromName(String stationName) {
+    public void highlightClosestStationWithAvailability(boolean _lookingForBike){
+
+        highlightStationFromName(getRecyclerViewAdapter().getClosestWithAvailabilityStationName(_lookingForBike), true);
+
+    }
+
+    public boolean isRecyclerViewReadyForItemSelection(){
+        return mStationRecyclerView != null && getRecyclerViewAdapter().getCurrentUserLatLng() != null &&
+                ((ScrollingLinearLayoutManager)mStationRecyclerView.getLayoutManager()).findFirstVisibleItemPosition() !=
+                        NO_POSITION;
+    }
+
+    public boolean highlightStationFromName(String _stationName, boolean _overscroll) {
 
         boolean toReturn = false;
 
-        int selectedPos = getRecyclerViewAdapter().setSelectionFromName(stationName, false);
+        int selectedPos = getRecyclerViewAdapter().setSelectionFromName(_stationName, false);
 
         ((StationRecyclerViewAdapter)mStationRecyclerView.getAdapter()).requestFabAnimation();
 
+        //Overscroll is required because of collapsing appbar.
         if (selectedPos != NO_POSITION) {
-            mStationRecyclerView.smoothScrollToPosition(selectedPos);
+            if (!_overscroll)
+                mStationRecyclerView.smoothScrollToPosition(selectedPos);
+            else
+                mStationRecyclerView.smoothScrollToPosition(selectedPos+1);
+
             toReturn = true;
         }
 

@@ -76,8 +76,21 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         }
     }
 
+    public void highlightClosestStationWithAvailability(boolean _lookingForBike){
+        if (isViewPagerReady()){
+            if (_lookingForBike)
+                retrieveListFragment(BIKE_STATIONS).highlightClosestStationWithAvailability(true);
+            else
+                retrieveListFragment(DOCK_STATIONS).highlightClosestStationWithAvailability(false);
+        }
+    }
+
+    public boolean isRecyclerViewReadyForItemSelection(int pageID){
+        return retrieveListFragment(pageID).isRecyclerViewReadyForItemSelection();
+    }
+
     public boolean highlightStationFromNameForPage(String stationName, int position) {
-        return retrieveListFragment(position).highlightStationFromName(stationName);
+        return retrieveListFragment(position).highlightStationFromName(stationName, false);
     }
 
     public void removeStationHighlightForPage(int position) {

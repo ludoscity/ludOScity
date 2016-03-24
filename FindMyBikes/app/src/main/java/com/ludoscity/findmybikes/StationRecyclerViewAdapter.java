@@ -348,6 +348,33 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             notifyItemChanged(selectedBefore);
     }
 
+    public String getClosestWithAvailabilityStationName(boolean _lookingForBike){
+
+        String toReturn = "";
+
+        //TODO : take in account lock status
+        for (StationItem stationItem: mStationList){
+            if (_lookingForBike) {
+                if (stationItem.getFree_bikes() > 0) {
+                    toReturn = stationItem.getName();
+                    break;
+                }
+            }
+            else {
+                if (stationItem.getEmpty_slots() > 0){
+                    toReturn = stationItem.getName();
+                    break;
+                }
+            }
+        }
+
+        //failsafe
+        if (toReturn.length() == 0 && !mStationList.isEmpty())
+            toReturn = mStationList.get(0).getName();
+
+        return toReturn;
+    }
+
 
 
     private int getPositionInList(String stationName){

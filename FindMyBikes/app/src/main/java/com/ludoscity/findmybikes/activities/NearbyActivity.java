@@ -111,6 +111,7 @@ public class NearbyActivity extends AppCompatActivity
     private LocationRequest mLocationRequest;
     private boolean mRequestingLocationUpdates = false;
 
+    private boolean mClosestBikeAutoSelected = false;
 
     @Override
     public void onStart() {
@@ -190,9 +191,12 @@ public class NearbyActivity extends AppCompatActivity
         cancelDownloadWebTask();
         stopUIRefresh();
 
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                mGoogleApiClient, this);
-        mRequestingLocationUpdates = false;
+        if (mGoogleApiClient.isConnected()) {
+
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    mGoogleApiClient, this);
+            mRequestingLocationUpdates = false;
+        }
     }
 
     @Override
@@ -238,7 +242,7 @@ public class NearbyActivity extends AppCompatActivity
             mStationsNetwork = savedInstanceState.getParcelableArrayList("network_data");
             mRequestingLocationUpdates = savedInstanceState.getBoolean("requesting_location_updates");
             mCurrentUserLatLng = savedInstanceState.getParcelable("user_location_latlng");
-
+            mClosestBikeAutoSelected = savedInstanceState.getBoolean("closest_bike_auto_selected");
         }
 
         getListPagerAdapter().setCurrentUserLatLng(mCurrentUserLatLng);
@@ -277,6 +281,7 @@ public class NearbyActivity extends AppCompatActivity
         outState.putParcelableArrayList("network_data", mStationsNetwork);
         outState.putBoolean("requesting_location_updates", mRequestingLocationUpdates);
         outState.putParcelable("user_location_latlng", mCurrentUserLatLng);
+        outState.putBoolean("closest_bike_auto_selected", mClosestBikeAutoSelected);
     }
 
     @Override
@@ -497,6 +502,18 @@ public class NearbyActivity extends AppCompatActivity
                     if (mDownloadWebTask == null)
                         mStatusTextView.setText(String.format(getString(R.string.status_string),
                                 pastStringBuilder.toString(), futureStringBuilder.toString()));
+
+                    if (mDownloadWebTask == null && mRedrawMarkersTask == null &&
+                            !mClosestBikeAutoSelected &&
+                            ((StationListPagerAdapter)mStationListViewPager.getAdapter()).isRecyclerViewReadyForItemSelection(StationListPagerAdapter.BIKE_STATIONS)){
+
+                        ((StationListPagerAdapter) mStationListViewPager.getAdapter()).highlightClosestStationWithAvailability(true);
+                        StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+                        mStationMapFragment.setPinOnStation(true, closestBikeStation.getName());
+                        animateCameraToShowUserAndStation(closestBikeStation);
+
+                        mClosestBikeAutoSelected = true;
+                    }
                 }
 
                 //UI will be refreshed every second
@@ -679,8 +696,7 @@ public class NearbyActivity extends AppCompatActivity
 
             if (mCurrentUserLatLng != null && mStationMapFragment != null)
                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
-        }
-        else{
+        } else {
             mStationMapFragment.setPinOnStation(isLookingForBike(), highlightedStation.getName());
 
             if (isLookingForBike())
@@ -728,8 +744,6 @@ public class NearbyActivity extends AppCompatActivity
         if (mStationMapFragment != null){
             mStationMapFragment.onUserLocationChange(location);
         }
-
-
     }
 
     public class RedrawMarkersTask extends AsyncTask<Boolean, Void, Void> {
@@ -825,6 +839,8 @@ public class NearbyActivity extends AppCompatActivity
             checkAndAskLocationPermission();
 
             mStatusTextView.setText(getString(R.string.searching_wait_location));
+
+            mClosestBikeAutoSelected = false;
 
             if (getListPagerAdapter().isViewPagerReady())
                 getListPagerAdapter().setRefreshingAll(true);
@@ -1083,6 +1099,8 @@ public class NearbyActivity extends AppCompatActivity
             //Cannot do that, for some obscure reason, task gets automatically
             //cancelled when the permission dialog is visible
             //checkAndAskLocationPermission();
+
+            mClosestBikeAutoSelected = false;
 
             if (getListPagerAdapter().isViewPagerReady())
                 getListPagerAdapter().setRefreshingAll(true);
