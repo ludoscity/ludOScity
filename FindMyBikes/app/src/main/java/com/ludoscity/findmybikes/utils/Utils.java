@@ -6,14 +6,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.View;
+
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import java.math.BigDecimal;
 
@@ -23,6 +30,18 @@ import java.math.BigDecimal;
  * Class with static utilities
  */
 public class Utils {
+
+    //workaround from https://code.google.com/p/gmaps-api-issues/issues/detail?id=9011
+    public static BitmapDescriptor getBitmapDescriptor(Context ctx, int id) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(ctx, id);
+        int h = vectorDrawable.getIntrinsicHeight();
+        int w = vectorDrawable.getIntrinsicWidth();
+        vectorDrawable.setBounds(0, 0, w, h);
+        Bitmap bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bm);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bm);
+    }
 
     public static int dpToPx(float toConvert, Context ctx){
         /// Converts 66 dip into its equivalent px

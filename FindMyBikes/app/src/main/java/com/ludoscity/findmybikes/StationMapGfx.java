@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -80,6 +81,8 @@ public class StationMapGfx {
     }
 
     public String getMarkerTitle(){ return marker.getTitle(); }
+
+    public LatLng getMarkerLatLng() { return marker.getPosition(); }
 
     public void updateMarker(boolean isLookingForBikes) {
         if (isLookingForBikes){

@@ -17,12 +17,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.StationMapGfx;
+import com.ludoscity.findmybikes.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -60,12 +63,9 @@ public class StationMapFragment extends Fragment
 
     public static final String INFOWINDOW_CLICK_PATH = "infowindow_click";
     public static final String MARKER_CLICK_PATH = "marker_click";
-    public static final String LOCATION_CHANGED_PATH = "location_changed";
     public static final String MAP_READY_PATH = "map_ready";
     public static final String MAP_CLICK_PATH = "map_click";
 
-    public static final String LOCATION_CHANGED_LATITUDE_PARAM = "location_changed_lat";
-    public static final String LOCATION_CHANGED_LONGITUDE_PARAM = "location_changed_lng";
     public static final String INFOWINDOW_CLICK_MARKER_POS_LAT_PARAM = "infowindow_click_marker_lat";
     public static final String INFOWINDOW_CLICK_MARKER_POS_LNG_PARAM = "infowindow_click_marker_lng";
     public static final String MARKER_CLICK_TITLE_PARAM = "marker_click_title";
@@ -82,6 +82,14 @@ public class StationMapFragment extends Fragment
 
     private OnStationMapFragmentInteractionListener mListener;
 
+    private Marker mMarkerStationA;
+    private Marker mMarkerStationB;
+
+    private final LatLng MONTREAL_LATLNG = new LatLng(45.5087, -73.554);
+
+    //Pin markers can only be restored after mGoogleMap is ready
+    private Bundle mBufferedBundle = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -90,6 +98,8 @@ public class StationMapFragment extends Fragment
 
         if (mGoogleMap == null)
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
+
+        mBufferedBundle = savedInstanceState;
 
         return inflatedView;
     }
@@ -103,6 +113,15 @@ public class StationMapFragment extends Fragment
             getActivity().getFragmentManager().beginTransaction().remove(f).commit();
             mGoogleMap = null;
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean("pin_A_visibility", mMarkerStationA != null && mMarkerStationA.isVisible());
+        outState.putBoolean("pin_B_visibility", mMarkerStationB != null && mMarkerStationB.isVisible());
+        outState.putParcelable("pin_A_latlng", mMarkerStationA != null ? mMarkerStationA.getPosition() : MONTREAL_LATLNG);
+        outState.putParcelable("pin_B_latlng", mMarkerStationB != null ? mMarkerStationB.getPosition() : MONTREAL_LATLNG);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -168,6 +187,14 @@ public class StationMapFragment extends Fragment
     @Override
     public boolean onMarkerClick(Marker marker) {
 
+        if ( (mMarkerStationA != null &&
+                mMarkerStationA.getPosition().latitude == marker.getPosition().latitude &&
+                mMarkerStationA.getPosition().longitude == marker.getPosition().longitude) ||
+                (mMarkerStationB != null &&
+                        mMarkerStationB.getPosition().latitude == marker.getPosition().latitude &&
+                        mMarkerStationB.getPosition().longitude == marker.getPosition().longitude) )
+            return true;
+
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(MARKER_CLICK_PATH);
 
@@ -226,7 +253,40 @@ public class StationMapFragment extends Fragment
 
     public void redrawMarkers() {
 
+        boolean pinAVisible;
+        boolean pinBVisible;
+        LatLng pinALatLng;
+        LatLng pinBLatLng;
+
+        if (mBufferedBundle != null){
+
+            pinAVisible = mBufferedBundle.getBoolean("pin_A_visibility");
+            pinBVisible = mBufferedBundle.getBoolean("pin_B_visibility");
+
+            pinALatLng = mBufferedBundle.getParcelable("pin_A_latlng");
+            pinBLatLng = mBufferedBundle.getParcelable("pin_B_latlng");
+
+            mBufferedBundle = null;
+        } else {
+
+            pinAVisible = mMarkerStationA != null && mMarkerStationA.isVisible();
+            pinBVisible = mMarkerStationB != null && mMarkerStationB.isVisible();
+            pinALatLng = mMarkerStationA != null ? mMarkerStationA.getPosition() : MONTREAL_LATLNG;
+            pinBLatLng = mMarkerStationB != null ? mMarkerStationB.getPosition() : MONTREAL_LATLNG;
+        }
+
         mGoogleMap.clear();
+
+        //There is a bug in the map library with vector drawable, I use a workaround I found in the bug report
+        BitmapDescriptor iconA = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a);//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_a);
+        BitmapDescriptor iconB = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b);//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b);
+
+        mMarkerStationA = mGoogleMap.addMarker(new MarkerOptions().position(pinALatLng)
+                .icon(iconA)
+                .visible(pinAVisible));
+        mMarkerStationB = mGoogleMap.addMarker(new MarkerOptions().position(pinBLatLng)
+                .icon(iconB)
+                .visible(pinBVisible));
 
         for (StationMapGfx markerData : mMapMarkersGfxData){
             markerData.addMarkerToMap(mGoogleMap);
@@ -267,16 +327,20 @@ public class StationMapFragment extends Fragment
         }
     }
 
-    public void resetMarkerSizeAll(){
-        for (StationMapGfx markerData : mMapMarkersGfxData){
-            markerData.setBigOverlay(false);
-        }
-    }
-
-    public void oversizeMarkerUniqueForStationName(String stationName){
+    public void setPinOnStation(boolean _lookingForBike, String _stationName){
 
         for (StationMapGfx markerData : mMapMarkersGfxData){
-            markerData.setBigOverlay(markerData.getMarkerTitle().equalsIgnoreCase(stationName));
+            if (markerData.getMarkerTitle().equalsIgnoreCase(_stationName)) {
+                if (_lookingForBike){
+                    mMarkerStationA.setPosition(markerData.getMarkerLatLng());
+                    mMarkerStationA.setVisible(true);
+                } else {
+                    mMarkerStationB.setPosition(markerData.getMarkerLatLng());
+                    mMarkerStationB.setVisible(true);
+                }
+
+                break;
+            }
         }
     }
 
