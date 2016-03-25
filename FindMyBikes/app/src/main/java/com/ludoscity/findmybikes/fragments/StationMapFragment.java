@@ -84,6 +84,8 @@ public class StationMapFragment extends Fragment
 
     private Marker mMarkerStationA;
     private Marker mMarkerStationB;
+    private BitmapDescriptor mIconABitmapDescriptor;
+    private BitmapDescriptor mIconBBitmapDescriptor;
 
     private final LatLng MONTREAL_LATLNG = new LatLng(45.5087, -73.554);
 
@@ -100,6 +102,9 @@ public class StationMapFragment extends Fragment
             ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapNearby)).getMapAsync(this);
 
         mBufferedBundle = savedInstanceState;
+
+        mIconABitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a);
+        mIconBBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b);
 
         return inflatedView;
     }
@@ -278,8 +283,9 @@ public class StationMapFragment extends Fragment
         mGoogleMap.clear();
 
         //There is a bug in the map library with vector drawable, I use a workaround I found in the bug report
-        BitmapDescriptor iconA = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a);//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_a);
-        BitmapDescriptor iconB = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b);//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b);
+        //https://code.google.com/p/gmaps-api-issues/issues/detail?id=9011
+        BitmapDescriptor iconA = mIconABitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_a);
+        BitmapDescriptor iconB = mIconBBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b);
 
         mMarkerStationA = mGoogleMap.addMarker(new MarkerOptions().position(pinALatLng)
                 .icon(iconA)
