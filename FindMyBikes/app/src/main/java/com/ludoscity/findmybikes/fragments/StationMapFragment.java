@@ -250,6 +250,8 @@ public class StationMapFragment extends Fragment
         mInitialCameraSetupDone = true;
     }
 
+    public LatLng getMarkerALatLng(){ return mMarkerStationA.getPosition(); }
+
     public boolean isMapReady(){return !(mGoogleMap==null);}
 
     public void addMarkerForStationItem(StationItem item, boolean lookingForBike) {
@@ -333,6 +335,7 @@ public class StationMapFragment extends Fragment
         }
     }
 
+    //TODO: if clients have a stationname, maybe they have the station LatLng on hand
     public void setPinOnStation(boolean _lookingForBike, String _stationName){
 
         for (StationMapGfx markerData : mMapMarkersGfxData){

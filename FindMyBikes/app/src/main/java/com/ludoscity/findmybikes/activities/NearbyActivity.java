@@ -310,7 +310,7 @@ public class NearbyActivity extends AppCompatActivity
 
         }else {
 
-            //TODO: Actualy do something so that it doesn't look and feel horribly horribly broken
+            //TODO: Actually do something so that it doesn't look and feel horribly horribly broken
             // permission denied, boo! Disable the
             // functionality that depends on this permission.
         }
@@ -510,7 +510,9 @@ public class NearbyActivity extends AppCompatActivity
                         ((StationListPagerAdapter) mStationListViewPager.getAdapter()).highlightClosestStationWithAvailability(true);
                         StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
                         mStationMapFragment.setPinOnStation(true, closestBikeStation.getName());
-                        animateCameraToShowUserAndStation(closestBikeStation);
+
+                        if (isLookingForBike())
+                            animateCameraToShowUserAndStation(closestBikeStation);
 
                         mClosestBikeAutoSelected = true;
                     }
@@ -654,18 +656,21 @@ public class NearbyActivity extends AppCompatActivity
     }
 
     private void animateCameraToShowUserAndStation(StationItem station) {
-        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-
-        boundsBuilder.include(station.getPosition());
 
         if (mCurrentUserLatLng != null) {
-            boundsBuilder.include(mCurrentUserLatLng);
-
-            mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), Utils.dpToPx(66, this)));
+            animateCameraToShow(station.getPosition(), mCurrentUserLatLng);
         }
         else{
             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(station.getPosition(), 15));
         }
+    }
+
+    private void animateCameraToShow(LatLng _latLng0, LatLng _latLng1){
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+        boundsBuilder.include(_latLng0).include(_latLng1);
+
+        mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), Utils.dpToPx(66, this)));
     }
 
     //Callback from pull-to-refresh
@@ -692,22 +697,32 @@ public class NearbyActivity extends AppCompatActivity
     public void onPageSelected(int position) {
 
         StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(position);
-        if (null == highlightedStation){
 
-            if (mCurrentUserLatLng != null && mStationMapFragment != null)
-                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15));
-        } else {
-            mStationMapFragment.setPinOnStation(isLookingForBike(), highlightedStation.getName());
+        if (position == StationListPagerAdapter.BIKE_STATIONS){
 
-            if (isLookingForBike())
+            //just to be on the safe side
+            if (highlightedStation != null){
+                mStationMapFragment.setPinOnStation(true, highlightedStation.getName());
+
                 animateCameraToShowUserAndStation(highlightedStation);
-        }
 
-        if (mStationMapFragment != null)
-            if (position == StationListPagerAdapter.BIKE_STATIONS)
                 mStationMapFragment.lookingForBikes(true);
-            else
+            }
+        } else {
+
+            if (highlightedStation == null)
+                //TODO: Maybe bounds containing all stations accessible for free ? (needs clustering to look good)
+                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
+            else {
+
+                mStationMapFragment.setPinOnStation(false, highlightedStation.getName());
+
+                animateCameraToShow(mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition());
+
                 mStationMapFragment.lookingForBikes(false);
+
+            }
+        }
     }
 
     @Override
