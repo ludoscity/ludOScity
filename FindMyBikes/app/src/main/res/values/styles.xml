@@ -49,8 +49,17 @@
 
     <!-- API level < 21 (LOLLIPOP) have weird bounding for floating action buttons.
     As i'm in recyclerview, I want them as small as possible. -->
-    <style name="floating_action_button"  parent="Widget.Design.FloatingActionButton">
+    <style name="listitem_floating_action_button"  parent="Widget.Design.FloatingActionButton">
         <item name="android:layout_margin">0dp</item>
+        <item name="elevation">0dp</item>
+        <item name="borderWidth">0dp</item>
+    </style>
+
+    <style name="map_floating_action_button">
+        <item name="android:layout_marginLeft">0dp</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
         <item name="elevation">0dp</item>
         <item name="borderWidth">0dp</item>
     </style>

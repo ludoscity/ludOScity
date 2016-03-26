@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -97,6 +98,9 @@ public class NearbyActivity extends AppCompatActivity
     private TabLayout mTabLayout;
     private AppBarLayout mAppBarLayout;
     private CoordinatorLayout mCoordinatorLayout;
+
+    private FloatingActionButton mPlacePickerFAB;
+    private FloatingActionButton mFavoritePickerFAB;
 
     private boolean mRefreshMarkers = true;
 
@@ -233,6 +237,9 @@ public class NearbyActivity extends AppCompatActivity
         mAppBarLayout = (AppBarLayout) findViewById(R.id.action_toolbar_layout);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
+
+        mPlacePickerFAB = (FloatingActionButton) findViewById(R.id.place_picker_fab);
+        mFavoritePickerFAB = (FloatingActionButton) findViewById(R.id.favorite_picker_fab);
 
         setStatusBarClickListener();
 
@@ -700,6 +707,12 @@ public class NearbyActivity extends AppCompatActivity
 
         if (position == StationListPagerAdapter.BIKE_STATIONS){
 
+            //TODO: rework landscape layout
+            if (mPlacePickerFAB != null)
+                mPlacePickerFAB.hide();
+            if (mFavoritePickerFAB != null)
+                mFavoritePickerFAB.hide();
+
             //just to be on the safe side
             if (highlightedStation != null){
                 mStationMapFragment.setPinOnStation(true, highlightedStation.getName());
@@ -709,6 +722,12 @@ public class NearbyActivity extends AppCompatActivity
                 mStationMapFragment.lookingForBikes(true);
             }
         } else {
+
+            //TODO: rework landscape layout
+            if (mPlacePickerFAB != null)
+                mPlacePickerFAB.show();
+            if (mFavoritePickerFAB != null)
+                mFavoritePickerFAB.show();
 
             if (highlightedStation == null)
                 //TODO: Maybe bounds containing all stations accessible for free ? (needs clustering to look good)

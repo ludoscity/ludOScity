@@ -19,9 +19,16 @@
     </style>
 
     <!-- standard values grabbed from online samples -->
-    <style name="floating_action_button"  parent="Widget.Design.FloatingActionButton">
+    <style name="listitem_floating_action_button"  parent="Widget.Design.FloatingActionButton">
         <item name="elevation">6dp</item>
         <item name="pressedTranslationZ">12dp</item>
+    </style>
+
+    <style name="map_floating_action_button">
+        <item name="android:layout_marginLeft">0dp</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginRight">16dp</item>
+        <item name="android:layout_marginBottom">16dp</item>
     </style>
 
 </resources>

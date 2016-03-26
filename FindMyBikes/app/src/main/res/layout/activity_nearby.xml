@@ -70,17 +70,18 @@
             app:tabGravity="fill"
             app:tabMode="fixed"
             app:tabBackground="@color/background_material_dark"/>
-            <!--TODO: Find how to tint or setup background such as having ripple effect. Can be achieved
-            by deleting the preseding line and removing the default blue from MyCustomTabLayout. It then
-            reverts to ?android:attr/selectableItemBackground, which is white with ripple effect. -->
+        <!--TODO: Find how to tint or setup background such as having ripple effect. Can be achieved
+        by deleting the preseding line and removing the default blue from MyCustomTabLayout. It then
+        reverts to ?android:attr/selectableItemBackground, which is white with ripple effect. -->
 
 
 
         <!-- MAP -->
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="0px"
-            android:layout_weight="6">
+        <android.support.design.widget.CoordinatorLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
             <fragment
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:name="com.ludoscity.findmybikes.fragments.StationMapFragment"
@@ -88,7 +89,45 @@
                 android:layout_height="match_parent"
                 android:id="@+id/station_map_fragment"
                 tools:layout="@layout/fragment_station_map" />
-        </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:orientation="vertical">
+
+
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/place_picker_fab"
+                    android:clickable="true"
+                    app:srcCompat="@drawable/ic_action_maps_directions_24dp"
+
+                    android:visibility="invisible"
+                    app:backgroundTint="@color/theme_primary_dark"
+
+                    style="@style/map_floating_action_button"
+                    />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/favorite_picker_fab"
+                    android:clickable="true"
+                    app:srcCompat="@drawable/ic_action_favorite_outline_24dp"
+
+                    android:visibility="invisible"
+                    app:backgroundTint="@color/theme_primary_dark"
+
+                    style="@style/map_floating_action_button"
+                    />
+            </LinearLayout>
+
+
+        </android.support.design.widget.CoordinatorLayout>
+
+
 
     </LinearLayout>
 

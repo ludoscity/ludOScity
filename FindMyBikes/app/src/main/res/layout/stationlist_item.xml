@@ -97,7 +97,7 @@
         app:layout_anchorGravity="start|center_vertical"
         app:backgroundTint="@color/theme_primary_dark"
 
-        style="@style/floating_action_button"
+        style="@style/listitem_floating_action_button"
         />
 
     <android.support.design.widget.FloatingActionButton
@@ -114,7 +114,7 @@
         app:layout_anchorGravity="end|center_vertical"
         app:backgroundTint="@color/theme_primary_dark"
 
-        style="@style/floating_action_button"
+        style="@style/listitem_floating_action_button"
         />
 
 </android.support.design.widget.CoordinatorLayout>
