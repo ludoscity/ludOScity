@@ -102,7 +102,7 @@
                     android:layout_width="wrap_content"
                     android:id="@+id/place_picker_fab"
                     android:clickable="true"
-                    app:srcCompat="@drawable/ic_action_maps_directions_24dp"
+                    app:srcCompat="@drawable/ic_action_place_picker_24dp"
 
                     android:visibility="invisible"
                     app:backgroundTint="@color/theme_primary_dark"
@@ -115,7 +115,7 @@
                     android:layout_width="wrap_content"
                     android:id="@+id/favorite_picker_fab"
                     android:clickable="true"
-                    app:srcCompat="@drawable/ic_action_favorite_outline_24dp"
+                    app:srcCompat="@drawable/ic_action_favorite_picker_24dp"
 
                     android:visibility="invisible"
                     app:backgroundTint="@color/theme_primary_dark"
