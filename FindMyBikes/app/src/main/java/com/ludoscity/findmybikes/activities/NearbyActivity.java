@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -100,7 +101,8 @@ public class NearbyActivity extends AppCompatActivity
     private CoordinatorLayout mCoordinatorLayout;
 
     private FloatingActionButton mPlacePickerFAB;
-    private FloatingActionButton mFavoritePickerFAB;
+    private FloatingActionButton mFavoriteToggleFAB;
+    private boolean mFavoriteToggled = false;
 
     private boolean mRefreshMarkers = true;
 
@@ -207,6 +209,16 @@ public class NearbyActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null) {
+
+            mSavedInstanceCameraPosition = savedInstanceState.getParcelable("saved_camera_pos");
+            mStationsNetwork = savedInstanceState.getParcelableArrayList("network_data");
+            mRequestingLocationUpdates = savedInstanceState.getBoolean("requesting_location_updates");
+            mCurrentUserLatLng = savedInstanceState.getParcelable("user_location_latlng");
+            mClosestBikeAutoSelected = savedInstanceState.getBoolean("closest_bike_auto_selected");
+            mFavoriteToggled = savedInstanceState.getBoolean("favorite_toggled");
+        }
+
         setContentView(R.layout.activity_nearby);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
 
@@ -239,18 +251,18 @@ public class NearbyActivity extends AppCompatActivity
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
 
         mPlacePickerFAB = (FloatingActionButton) findViewById(R.id.place_picker_fab);
-        mFavoritePickerFAB = (FloatingActionButton) findViewById(R.id.favorite_picker_fab);
+        mFavoriteToggleFAB = (FloatingActionButton) findViewById(R.id.favorite_toggle_fab);
+        mFavoriteToggleFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFavoriteToggled = !mFavoriteToggled;
+                setupFavoriteFab();
+            }
+        });
+
+        setupFavoriteFab();
 
         setStatusBarClickListener();
-
-        if (savedInstanceState != null) {
-
-            mSavedInstanceCameraPosition = savedInstanceState.getParcelable("saved_camera_pos");
-            mStationsNetwork = savedInstanceState.getParcelableArrayList("network_data");
-            mRequestingLocationUpdates = savedInstanceState.getBoolean("requesting_location_updates");
-            mCurrentUserLatLng = savedInstanceState.getParcelable("user_location_latlng");
-            mClosestBikeAutoSelected = savedInstanceState.getBoolean("closest_bike_auto_selected");
-        }
 
         getListPagerAdapter().setCurrentUserLatLng(mCurrentUserLatLng);
 
@@ -267,6 +279,21 @@ public class NearbyActivity extends AppCompatActivity
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    private void setupFavoriteFab() {
+        if (mFavoriteToggled){
+            mFavoriteToggleFAB.setImageResource(R.drawable.ic_action_favorite_toggle_on_24dp);
+            mFavoriteToggleFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.favorite_fab_toggle_on_background)));
+            mPlacePickerFAB.hide();
+        }
+        else {
+            mFavoriteToggleFAB.setImageResource(R.drawable.ic_action_favorite_toggle_off_24dp);
+            mFavoriteToggleFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.theme_primary_dark)));
+
+            if (!isLookingForBike())
+                mPlacePickerFAB.show();
+        }
     }
 
     @NonNull
@@ -289,6 +316,7 @@ public class NearbyActivity extends AppCompatActivity
         outState.putBoolean("requesting_location_updates", mRequestingLocationUpdates);
         outState.putParcelable("user_location_latlng", mCurrentUserLatLng);
         outState.putBoolean("closest_bike_auto_selected", mClosestBikeAutoSelected);
+        outState.putBoolean("favorite_toggled", mFavoriteToggled);
     }
 
     @Override
@@ -409,7 +437,7 @@ public class NearbyActivity extends AppCompatActivity
 
                 if (getListPagerAdapter().isViewPagerReady()){
                     getListPagerAdapter().setupUIAll(mStationsNetwork, DBHelper.getFavoriteStations(this),
-                            getString(R.string.no_favorites));
+                            getString(R.string.tab_b_instructions));
 
                 }
             }
@@ -434,7 +462,7 @@ public class NearbyActivity extends AppCompatActivity
                     //TODO: calling DBHelper.getFavoriteStations can return incomplete result when db is updating
                     //it happens when data is downladed and screen configuration is changed shortly after
                     getListPagerAdapter().setupUIAll(mStationsNetwork, DBHelper.getFavoriteStations(NearbyActivity.this),
-                            getString(R.string.no_favorites));
+                            getString(R.string.tab_b_instructions));
                     mPagerReady = true;
                 }
 
@@ -707,11 +735,17 @@ public class NearbyActivity extends AppCompatActivity
 
         if (position == StationListPagerAdapter.BIKE_STATIONS){
 
+            mFavoriteToggled = false;
+            setupFavoriteFab();
+
+            if (mAppBarLayout != null)
+                mAppBarLayout.setExpanded(true , true);
+
             //TODO: rework landscape layout
             if (mPlacePickerFAB != null)
                 mPlacePickerFAB.hide();
-            if (mFavoritePickerFAB != null)
-                mFavoritePickerFAB.hide();
+            if (mFavoriteToggleFAB != null)
+                mFavoriteToggleFAB.hide();
 
             //just to be on the safe side
             if (highlightedStation != null){
@@ -723,11 +757,14 @@ public class NearbyActivity extends AppCompatActivity
             }
         } else {
 
+            if (mAppBarLayout != null)
+                mAppBarLayout.setExpanded(false , true);
+
             //TODO: rework landscape layout
             if (mPlacePickerFAB != null)
                 mPlacePickerFAB.show();
-            if (mFavoritePickerFAB != null)
-                mFavoritePickerFAB.show();
+            if (mFavoriteToggleFAB != null)
+                mFavoriteToggleFAB.show();
 
             if (highlightedStation == null)
                 //TODO: Maybe bounds containing all stations accessible for free ? (needs clustering to look good)
@@ -737,10 +774,9 @@ public class NearbyActivity extends AppCompatActivity
                 mStationMapFragment.setPinOnStation(false, highlightedStation.getName());
 
                 animateCameraToShow(mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition());
-
-                mStationMapFragment.lookingForBikes(false);
-
             }
+
+            mStationMapFragment.lookingForBikes(false);
         }
     }
 

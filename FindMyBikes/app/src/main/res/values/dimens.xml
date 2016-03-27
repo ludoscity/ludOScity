@@ -5,6 +5,8 @@
     <dimen name="action_toolbar_size">48dp</dimen>
     <dimen name="tablayout_height">40dp</dimen>
 
+    <dimen name="fab_margin">16dp</dimen>
+
     <!-- fabs in recyclerView -->
     <dimen name="station_availability_margin_default">0dp</dimen>
     <!--So I want it offset by half its width minus any padding I wannna put in there

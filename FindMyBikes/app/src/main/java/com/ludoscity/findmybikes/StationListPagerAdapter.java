@@ -45,9 +45,9 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
     }
 
     public void setupUIAll(ArrayList<StationItem> nearbyStations, ArrayList<StationItem> favoriteStations,
-                           String noFavoritesString) {
+                           String _tabBInstructions) {
         retrieveListFragment(BIKE_STATIONS).setupUI(nearbyStations, true, "");
-        retrieveListFragment(DOCK_STATIONS).setupUI(new ArrayList<StationItem>(), false, "Pick station");
+        retrieveListFragment(DOCK_STATIONS).setupUI(new ArrayList<StationItem>(), false, _tabBInstructions);
     }
 
 

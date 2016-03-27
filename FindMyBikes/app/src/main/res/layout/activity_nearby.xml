@@ -113,9 +113,9 @@
                 <android.support.design.widget.FloatingActionButton
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:id="@+id/favorite_picker_fab"
+                    android:id="@+id/favorite_toggle_fab"
                     android:clickable="true"
-                    app:srcCompat="@drawable/ic_action_favorite_picker_24dp"
+                    app:srcCompat="@drawable/ic_action_favorite_toggle_off_24dp"
 
                     android:visibility="invisible"
                     app:backgroundTint="@color/theme_primary_dark"

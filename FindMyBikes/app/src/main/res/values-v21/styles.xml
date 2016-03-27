@@ -27,8 +27,10 @@
     <style name="map_floating_action_button">
         <item name="android:layout_marginLeft">0dp</item>
         <item name="android:layout_marginTop">0dp</item>
-        <item name="android:layout_marginRight">16dp</item>
-        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:layout_marginRight">@dimen/fab_margin</item>
+        <item name="android:layout_marginBottom">@dimen/fab_margin</item>
+        <item name="elevation">6dp</item>
+        <item name="pressedTranslationZ">12dp</item>
     </style>
 
 </resources>
