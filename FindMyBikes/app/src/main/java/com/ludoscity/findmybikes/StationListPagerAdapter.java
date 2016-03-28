@@ -44,10 +44,9 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         return NUM_ITEMS;
     }
 
-    public void setupUIAll(ArrayList<StationItem> nearbyStations, ArrayList<StationItem> favoriteStations,
-                           String _tabBInstructions) {
-        retrieveListFragment(BIKE_STATIONS).setupUI(nearbyStations, true, "");
-        retrieveListFragment(DOCK_STATIONS).setupUI(new ArrayList<StationItem>(), false, _tabBInstructions);
+    public void setupUI(int _pageID, ArrayList<StationItem> _stationsList, String _stringIfEmpty,
+                        LatLng _sortReferenceLatLng, LatLng _distanceReferenceLatLng){
+        retrieveListFragment(_pageID).setupUI(_stationsList, _pageID == BIKE_STATIONS, _stringIfEmpty, _sortReferenceLatLng, _distanceReferenceLatLng);
     }
 
 
@@ -71,8 +70,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
 
     public void setCurrentUserLatLng(LatLng currentUserLatLng) {
         if (isViewPagerReady()) {
-            retrieveListFragment(BIKE_STATIONS).setCurrentUserLatLng(currentUserLatLng);
-            retrieveListFragment(DOCK_STATIONS).setCurrentUserLatLng(currentUserLatLng);
+            retrieveListFragment(BIKE_STATIONS).setDistanceSortReferenceLatLngAndSort(currentUserLatLng);
+            retrieveListFragment(BIKE_STATIONS).setDistanceDisplayReferenceLatLng(currentUserLatLng);
         }
     }
 

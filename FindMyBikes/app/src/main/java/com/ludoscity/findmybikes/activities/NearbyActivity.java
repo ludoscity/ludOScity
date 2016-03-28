@@ -436,8 +436,9 @@ public class NearbyActivity extends AppCompatActivity
                 }
 
                 if (getListPagerAdapter().isViewPagerReady()){
-                    getListPagerAdapter().setupUIAll(mStationsNetwork, DBHelper.getFavoriteStations(this),
-                            getString(R.string.tab_b_instructions));
+
+                    getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "", mCurrentUserLatLng, mCurrentUserLatLng);
+                    getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
 
                 }
             }
@@ -461,8 +462,8 @@ public class NearbyActivity extends AppCompatActivity
                 if (!mPagerReady && getListPagerAdapter().isViewPagerReady()){
                     //TODO: calling DBHelper.getFavoriteStations can return incomplete result when db is updating
                     //it happens when data is downladed and screen configuration is changed shortly after
-                    getListPagerAdapter().setupUIAll(mStationsNetwork, DBHelper.getFavoriteStations(NearbyActivity.this),
-                            getString(R.string.tab_b_instructions));
+                    getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "", mCurrentUserLatLng, mCurrentUserLatLng);
+                    getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
                     mPagerReady = true;
                 }
 
@@ -589,14 +590,20 @@ public class NearbyActivity extends AppCompatActivity
         //Marker click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
 
-            if (mAppBarLayout != null)
-                    mAppBarLayout.setExpanded(false , true);
+            if (isLookingForBike()) {
+                if (mAppBarLayout != null)
+                    mAppBarLayout.setExpanded(false, true);
 
-            if(getListPagerAdapter().highlightStationFromNameForPage(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM),
-                    mTabLayout.getSelectedTabPosition())) {
+                if (getListPagerAdapter().highlightStationFromNameForPage(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM),
+                        mTabLayout.getSelectedTabPosition())) {
 
-                mStationMapFragment.setPinOnStation(isLookingForBike(),
-                        uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
+                    mStationMapFragment.setPinOnStation(isLookingForBike(),
+                            uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
+                }
+            }
+            else {
+                //Replace recyclerview content
+
             }
         }
         //Map click

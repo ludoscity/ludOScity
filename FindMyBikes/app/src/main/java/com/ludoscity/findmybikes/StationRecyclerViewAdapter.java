@@ -32,7 +32,8 @@ import static android.support.v7.widget.RecyclerView.NO_POSITION;
 public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecyclerViewAdapter.StationListItemViewHolder> {
 
     private ArrayList<StationItem> mStationList = new ArrayList<>();
-    private LatLng mCurrentUserLatLng;
+    private LatLng mDistanceSortReferenceLatLng;
+    private LatLng mDistanceDisplayReferenceLatLng;
 
     private Context mCtx;
 
@@ -139,15 +140,15 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             mName.setText(_station.getName());
 
-            if (mCurrentUserLatLng != null) {
+            if (mDistanceDisplayReferenceLatLng != null) {
 
                 String proximityString;
                 if (mIsLookingForBikes){
-                    proximityString = _station.getProximityStringFromLatLng(mCurrentUserLatLng,
+                    proximityString = _station.getProximityStringFromLatLng(mDistanceDisplayReferenceLatLng,
                             DBHelper.getWalkingProximityAsDistance(mCtx), WALKING_AVERAGE_SPEED, mCtx);
                 }
                 else{
-                    proximityString = _station.getProximityStringFromLatLng(mCurrentUserLatLng,
+                    proximityString = _station.getProximityStringFromLatLng(mDistanceDisplayReferenceLatLng,
                             DBHelper.getBikingProximityAsDistance(mCtx), BIKING_AVERAGE_SPEED, mCtx);
                 }
 
@@ -288,7 +289,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
     public void requestFabAnimation(){ mFabAnimationRequested = true; }
 
-    public void setupStationList(ArrayList<StationItem> toSet){
+    public void setupStationList(ArrayList<StationItem> _toSet, LatLng _sortReferenceLatLng,
+                                 LatLng _distanceReferenceLatLng){
         String selectedNameBefore = null;
 
         if (null != getSelected())
@@ -296,31 +298,36 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         //Making a copy as sorting shouldn't interfere with the rest of the code
         mStationList.clear();
-        mStationList.addAll(toSet);
+        mStationList.addAll(_toSet);
 
-        //So that list get sorted before setting selection again
-        if (mCurrentUserLatLng != null) {
-            LatLng buffered = mCurrentUserLatLng;
-            mCurrentUserLatLng = null;
-            setCurrentUserLatLng(buffered, false);
-        }
+        //Forcing sorting so that a currently displayed selection doesn't glitch when set again
+        setDistanceSortReferenceLatLngAndSortIfRequired(_sortReferenceLatLng, true, true);
+
+        mDistanceDisplayReferenceLatLng = _distanceReferenceLatLng;
 
         if (selectedNameBefore != null)
             setSelectionFromName(selectedNameBefore, false);
     }
 
-    public void setCurrentUserLatLng(LatLng currentUserLatLng, boolean notify) {
-        if (mCurrentUserLatLng != currentUserLatLng) {
-            this.mCurrentUserLatLng = currentUserLatLng;
-            sortStationListByClosest();
-            if (notify)
+    public void setDistanceSortReferenceLatLngAndSortIfRequired(LatLng _sortReferenceLatLng, boolean _notify, boolean _forceSort) {
+        if (_forceSort || mDistanceSortReferenceLatLng != _sortReferenceLatLng) {
+            this.mDistanceSortReferenceLatLng = _sortReferenceLatLng;
+            sortStationListByClosestToReference();
+            if (_notify)
                 notifyDataSetChanged();
         }
     }
 
-    public LatLng getCurrentUserLatLng(){
-        return mCurrentUserLatLng;
+    public void setDistanceDisplayReferenceLatLng(LatLng _toSet) { mDistanceDisplayReferenceLatLng = _toSet; }
+
+    public LatLng getSortReferenceLatLng(){
+        return mDistanceSortReferenceLatLng;
     }
+
+    public LatLng getDistanceReferenceLatLng(){
+        return mDistanceDisplayReferenceLatLng;
+    }
+
 
     public int setSelectionFromName(String stationName, boolean unselectOnTwice){
 
@@ -418,18 +425,18 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         }
     }
 
-    public void sortStationListByClosest(){
+    public void sortStationListByClosestToReference(){
 
         String selectedNameBefore = null;
 
         if (null != getSelected())
             selectedNameBefore = getSelected().getName();
 
-        if (mCurrentUserLatLng != null) {
+        if (mDistanceSortReferenceLatLng != null) {
             Collections.sort(mStationList, new Comparator<StationItem>() {
                 @Override
                 public int compare(StationItem lhs, StationItem rhs) {
-                    return (int) (lhs.getMeterFromLatLng(mCurrentUserLatLng) - rhs.getMeterFromLatLng(mCurrentUserLatLng));
+                    return (int) (lhs.getMeterFromLatLng(mDistanceSortReferenceLatLng) - rhs.getMeterFromLatLng(mDistanceSortReferenceLatLng));
                 }
             });
         }

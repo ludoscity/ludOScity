@@ -109,7 +109,8 @@ public class StationListFragment extends Fragment
         super.onSaveInstanceState(outState);
 
         outState.putInt("selected_pos", getRecyclerViewAdapter().getSelectedPos());
-        outState.putParcelable("user_current_LatLng", getRecyclerViewAdapter().getCurrentUserLatLng());
+        outState.putParcelable("sort_reference_LatLng", getRecyclerViewAdapter().getSortReferenceLatLng());
+        outState.putParcelable("distance_reference_latlng", getRecyclerViewAdapter().getDistanceReferenceLatLng());
 
         getRecyclerViewAdapter().saveStationList(outState);
     }
@@ -125,23 +126,23 @@ public class StationListFragment extends Fragment
             if (selectedPos != NO_POSITION)
                 getRecyclerViewAdapter().setSelectedPos(selectedPos, false);
 
-            LatLng currentUserLatLng = savedInstanceState.getParcelable("user_current_LatLng");
-
-            getRecyclerViewAdapter().setCurrentUserLatLng(currentUserLatLng, false);
-
+            LatLng sortReferenceLatLng = savedInstanceState.getParcelable("sort_reference_LatLng");
+            LatLng distanceReferenceLatLng = savedInstanceState.getParcelable("distance_reference_latlng");
             ArrayList<StationItem> stationList = savedInstanceState.getParcelableArrayList("stationitem_arraylist");
-            getRecyclerViewAdapter().setupStationList(stationList);
+
+            getRecyclerViewAdapter().setupStationList(stationList, sortReferenceLatLng, distanceReferenceLatLng);
         }
     }
 
-    public void setupUI(ArrayList<StationItem> stationsNetwork, boolean lookingForBike, String stringIfEmpty) {
+    public void setupUI(ArrayList<StationItem> stationsNetwork, boolean lookingForBike, String stringIfEmpty,
+                        LatLng _sortReferenceLatLng, LatLng _distanceReferenceLatLng) {
 
         if (stationsNetwork != null) {
 
             if (!stationsNetwork.isEmpty()) {
                 mStationRecyclerView.setVisibility(View.VISIBLE);
                 mEmptyListTextView.setVisibility(View.GONE);
-                getRecyclerViewAdapter().setupStationList(stationsNetwork);
+                getRecyclerViewAdapter().setupStationList(stationsNetwork, _sortReferenceLatLng, _distanceReferenceLatLng);
             }
             else{
                 mStationRecyclerView.setVisibility(View.GONE);
@@ -154,13 +155,15 @@ public class StationListFragment extends Fragment
         }
     }
 
-    public void setCurrentUserLatLng(LatLng currentUserLatLng) {
+    public void setDistanceSortReferenceLatLngAndSort(LatLng _toSet) {
 
         if (mRecyclerViewScrollingState == SCROLL_STATE_IDLE) {
 
-            getRecyclerViewAdapter().setCurrentUserLatLng(currentUserLatLng, true);
+            getRecyclerViewAdapter().setDistanceSortReferenceLatLngAndSortIfRequired(_toSet, true, false);
         }
     }
+
+    public void setDistanceDisplayReferenceLatLng(LatLng _toSet) { getRecyclerViewAdapter().setDistanceDisplayReferenceLatLng(_toSet); }
 
     public void highlightClosestStationWithAvailability(boolean _lookingForBike){
 
@@ -169,7 +172,7 @@ public class StationListFragment extends Fragment
     }
 
     public boolean isRecyclerViewReadyForItemSelection(){
-        return mStationRecyclerView != null && getRecyclerViewAdapter().getCurrentUserLatLng() != null &&
+        return mStationRecyclerView != null && getRecyclerViewAdapter().getSortReferenceLatLng() != null &&
                 ((ScrollingLinearLayoutManager)mStationRecyclerView.getLayoutManager()).findFirstVisibleItemPosition() !=
                         NO_POSITION;
     }
