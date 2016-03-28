@@ -159,11 +159,13 @@ public class StationListFragment extends Fragment
 
         if (mRecyclerViewScrollingState == SCROLL_STATE_IDLE) {
 
-            getRecyclerViewAdapter().setDistanceSortReferenceLatLngAndSortIfRequired(_toSet, true, false);
+            getRecyclerViewAdapter().setDistanceSortReferenceLatLngAndSortIfRequired(_toSet, false);
         }
     }
 
-    public void setDistanceDisplayReferenceLatLng(LatLng _toSet) { getRecyclerViewAdapter().setDistanceDisplayReferenceLatLng(_toSet); }
+    public void setDistanceDisplayReferenceLatLng(LatLng _toSet, boolean _notify) {
+        getRecyclerViewAdapter().setDistanceDisplayReferenceLatLng(_toSet, _notify);
+    }
 
     public void highlightClosestStationWithAvailability(boolean _lookingForBike){
 
@@ -281,6 +283,12 @@ public class StationListFragment extends Fragment
         mEmptyListTextView.setVisibility(View.GONE);
         mStationRecyclerView.setVisibility(View.VISIBLE);
         getRecyclerViewAdapter().addItem(toAdd);
+    }
+
+    public void notifyAppBarExpansion() {
+
+        if (getRecyclerViewAdapter().getSelectedPos() > 2)
+            mStationRecyclerView.smoothScrollToPosition(getRecyclerViewAdapter().getSelectedPos()+1);
     }
 
     public interface OnStationListFragmentInteractionListener {

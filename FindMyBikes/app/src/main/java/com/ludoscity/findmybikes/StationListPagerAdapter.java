@@ -70,8 +70,9 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
 
     public void setCurrentUserLatLng(LatLng currentUserLatLng) {
         if (isViewPagerReady()) {
+            //We don't notify as the call to setDistanceSortReferenceLatLngAndSort will do it
+            retrieveListFragment(BIKE_STATIONS).setDistanceDisplayReferenceLatLng(currentUserLatLng, false);
             retrieveListFragment(BIKE_STATIONS).setDistanceSortReferenceLatLngAndSort(currentUserLatLng);
-            retrieveListFragment(BIKE_STATIONS).setDistanceDisplayReferenceLatLng(currentUserLatLng);
         }
     }
 
@@ -107,5 +108,14 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
 
     public void addStationForPage(int position, StationItem station) {
         retrieveListFragment(position).addStation(station);
+    }
+
+    public void notifyAppBarExpansionForPage(int _pageID) {
+        retrieveListFragment(_pageID).notifyAppBarExpansion();
+
+    }
+
+    public void notifyStationAUpdate(LatLng _newALatLng) {
+        retrieveListFragment(DOCK_STATIONS).setDistanceDisplayReferenceLatLng(_newALatLng, true);
     }
 }

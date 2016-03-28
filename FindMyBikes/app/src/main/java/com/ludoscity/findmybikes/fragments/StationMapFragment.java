@@ -252,6 +252,14 @@ public class StationMapFragment extends Fragment
 
     public LatLng getMarkerALatLng(){ return mMarkerStationA.getPosition(); }
 
+    public LatLng getMarkerBLatLng() {
+        LatLng toReturn = null;
+        if (mMarkerStationB != null)
+            toReturn = mMarkerStationB.getPosition();
+
+        return toReturn;
+    }
+
     public boolean isMapReady(){return !(mGoogleMap==null);}
 
     public void addMarkerForStationItem(StationItem item, boolean lookingForBike) {

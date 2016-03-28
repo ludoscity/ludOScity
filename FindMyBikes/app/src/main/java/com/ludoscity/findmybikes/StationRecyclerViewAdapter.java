@@ -264,11 +264,11 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             switch (view.getId()){
                 case R.id.list_item_root:
-                    if (mSelectedPos != StationRecyclerViewAdapter.this.setSelectionFromName(mName.getText().toString(), false) ){
 
-                        mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
-                        mFabAnimationRequested = true;
-                    }
+                    int newlySelectedPos = StationRecyclerViewAdapter.this.setSelectionFromName(mName.getText().toString(), false);
+
+                    mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
+                    mFabAnimationRequested = newlySelectedPos != mSelectedPos;
 
                     break;
                 case R.id.favorite_fab:
@@ -301,7 +301,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         mStationList.addAll(_toSet);
 
         //Forcing sorting so that a currently displayed selection doesn't glitch when set again
-        setDistanceSortReferenceLatLngAndSortIfRequired(_sortReferenceLatLng, true, true);
+        setDistanceSortReferenceLatLngAndSortIfRequired(_sortReferenceLatLng, true);
 
         mDistanceDisplayReferenceLatLng = _distanceReferenceLatLng;
 
@@ -309,16 +309,19 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             setSelectionFromName(selectedNameBefore, false);
     }
 
-    public void setDistanceSortReferenceLatLngAndSortIfRequired(LatLng _sortReferenceLatLng, boolean _notify, boolean _forceSort) {
+    public void setDistanceSortReferenceLatLngAndSortIfRequired(LatLng _sortReferenceLatLng, boolean _forceSort) {
         if (_forceSort || mDistanceSortReferenceLatLng != _sortReferenceLatLng) {
-            this.mDistanceSortReferenceLatLng = _sortReferenceLatLng;
+            mDistanceSortReferenceLatLng = _sortReferenceLatLng;
             sortStationListByClosestToReference();
-            if (_notify)
-                notifyDataSetChanged();
+            notifyDataSetChanged();
         }
     }
 
-    public void setDistanceDisplayReferenceLatLng(LatLng _toSet) { mDistanceDisplayReferenceLatLng = _toSet; }
+    public void setDistanceDisplayReferenceLatLng(LatLng _toSet, boolean _notify) {
+        mDistanceDisplayReferenceLatLng = _toSet;
+        if (_notify)
+            notifyDataSetChanged();
+    }
 
     public LatLng getSortReferenceLatLng(){
         return mDistanceSortReferenceLatLng;
