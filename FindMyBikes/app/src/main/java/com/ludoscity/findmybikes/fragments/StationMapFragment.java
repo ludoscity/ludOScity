@@ -254,7 +254,8 @@ public class StationMapFragment extends Fragment
 
     public LatLng getMarkerBLatLng() {
         LatLng toReturn = null;
-        if (mMarkerStationB != null)
+        if ( mMarkerStationB != null && ( mMarkerStationB.getPosition().latitude != MONTREAL_LATLNG.latitude
+                || mMarkerStationB.getPosition().longitude != MONTREAL_LATLNG.longitude ) )
             toReturn = mMarkerStationB.getPosition();
 
         return toReturn;

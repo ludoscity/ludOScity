@@ -850,6 +850,7 @@ public class NearbyActivity extends AppCompatActivity
 
             if (highlightedStation == null)
                 //TODO: Maybe bounds containing all stations accessible for free ? (needs clustering to look good)
+                //TODO: Seen mStationMapFragment being null on app resuming
                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
             else
                 animateCameraToShow(mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition());
