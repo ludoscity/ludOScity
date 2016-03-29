@@ -103,6 +103,7 @@ public class NearbyActivity extends AppCompatActivity
     private FloatingActionButton mPlacePickerFAB;
     private FloatingActionButton mFavoriteToggleFAB;
     private boolean mFavoriteToggled = false;
+    private FloatingActionButton mClearFAB;
 
     private boolean mRefreshMarkers = true;
 
@@ -257,6 +258,25 @@ public class NearbyActivity extends AppCompatActivity
             public void onClick(View v) {
                 mFavoriteToggled = !mFavoriteToggled;
                 setupFavoriteFab();
+            }
+        });
+        mClearFAB = (FloatingActionButton) findViewById(R.id.clear_fab);
+
+        mClearFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
+
+                getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
+
+                mStationMapFragment.clearMarkerB();
+
+                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
+
+                mFavoriteToggleFAB.show();
+                mPlacePickerFAB.show();
+                mClearFAB.hide();
             }
         });
 
@@ -439,7 +459,7 @@ public class NearbyActivity extends AppCompatActivity
 
                     getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "", mCurrentUserLatLng, mCurrentUserLatLng);
 
-                    LatLng stationBLatLng = mStationMapFragment.getMarkerBLatLng();
+                    LatLng stationBLatLng = mStationMapFragment.getMarkerBVisibleLatLng();
 
                     if (stationBLatLng == null)
                         getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
@@ -470,7 +490,7 @@ public class NearbyActivity extends AppCompatActivity
                     //it happens when data is downladed and screen configuration is changed shortly after
                     getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "", mCurrentUserLatLng, mCurrentUserLatLng);
 
-                    LatLng stationBLatLng = mStationMapFragment.getMarkerBLatLng();
+                    LatLng stationBLatLng = mStationMapFragment.getMarkerBVisibleLatLng();
 
                     if (stationBLatLng == null)
                         getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
@@ -614,7 +634,7 @@ public class NearbyActivity extends AppCompatActivity
                     mStationMapFragment.setPinOnStation(true,
                             uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
 
-                    if (mStationMapFragment.getMarkerBLatLng() != null)
+                    if (mStationMapFragment.getMarkerBVisibleLatLng() != null)
                         getListPagerAdapter().notifyStationAUpdate(mStationMapFragment.getMarkerALatLng());
                 }
             }
@@ -626,11 +646,15 @@ public class NearbyActivity extends AppCompatActivity
                 mStationMapFragment.setPinOnStation(false,
                         uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
 
-                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBLatLng(), 15));
+                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
 
                 //Replace recyclerview content
                 getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
-                        mStationMapFragment.getMarkerBLatLng(),  mStationMapFragment.getMarkerALatLng());
+                        mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerALatLng());
+
+                mClearFAB.show();
+                mFavoriteToggleFAB.hide();
+                mPlacePickerFAB.hide();
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -686,11 +710,15 @@ public class NearbyActivity extends AppCompatActivity
                 animateCameraToShowUserAndStation(clickedStation);
             else{
 
-                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBLatLng(), 15));
+                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
 
                 //Replace recyclerview content
                 getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
-                        mStationMapFragment.getMarkerBLatLng(), mStationMapFragment.getMarkerALatLng());
+                        mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerALatLng());
+
+                mClearFAB.show();
+                mFavoriteToggleFAB.hide();
+                mPlacePickerFAB.hide();
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -829,6 +857,8 @@ public class NearbyActivity extends AppCompatActivity
             if (mFavoriteToggleFAB != null)
                 mFavoriteToggleFAB.hide();
 
+            mClearFAB.hide();
+
             //just to be on the safe side
             if (highlightedStation != null){
                 mStationMapFragment.setPinOnStation(true, highlightedStation.getName());
@@ -840,20 +870,23 @@ public class NearbyActivity extends AppCompatActivity
         } else {
 
             if (mAppBarLayout != null)
-                mAppBarLayout.setExpanded(false , true);
+                mAppBarLayout.setExpanded(false, true);
 
-            //TODO: rework landscape layout
-            if (mPlacePickerFAB != null)
-                mPlacePickerFAB.show();
-            if (mFavoriteToggleFAB != null)
-                mFavoriteToggleFAB.show();
-
-            if (highlightedStation == null)
+            if (highlightedStation == null) {
                 //TODO: Maybe bounds containing all stations accessible for free ? (needs clustering to look good)
                 //TODO: Seen mStationMapFragment being null on app resuming
                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
-            else
+
+                //TODO: rework landscape layout
+                if (mPlacePickerFAB != null)
+                    mPlacePickerFAB.show();
+                if (mFavoriteToggleFAB != null)
+                    mFavoriteToggleFAB.show();
+            }
+            else {
                 animateCameraToShow(mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition());
+                mClearFAB.show();
+            }
 
 
             mStationMapFragment.lookingForBikes(false);

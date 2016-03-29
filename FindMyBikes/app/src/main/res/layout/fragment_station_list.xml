@@ -28,34 +28,12 @@
         android:paddingBottom="3dp">
 
         <!--suppress AndroidDomInspection -->
-        <FrameLayout
+        <ImageView
             app:layout_widthPercent="@dimen/proximity_column_width_percent"
             android:layout_height="wrap_content"
-            android:id="@+id/imageview_textview_proximity_header_container"
-            >
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/time_header_iv"
-
-                app:srcCompat="@drawable/ic_walking" />
-
-            <!-- 24dp is material base icon size -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="24dp"
-                android:id="@+id/time_header_tv"
-
-                android:textSize="16sp"
-                android:gravity="center"
-                android:text="@string/distance"
-                android:singleLine="true"
-                android:textStyle="bold"
-                android:ellipsize="end"
-                android:textColor="@color/primary_text_default_material_dark"
-                />
-        </FrameLayout>
+            android:src="@drawable/ic_a_bike"
+            android:gravity="center"
+            android:id="@+id/proximity_header" />
 
         <!--suppress AndroidDomInspection -->
         <TextView
@@ -67,8 +45,8 @@
             android:singleLine="true"
             android:textColor="@color/primary_text_default_material_dark"
             android:id="@+id/name_header"
-            android:layout_toEndOf="@+id/imageview_textview_proximity_header_container"
-            android:layout_toRightOf="@+id/imageview_textview_proximity_header_container"
+            android:layout_toEndOf="@+id/proximity_header"
+            android:layout_toRightOf="@+id/proximity_header"
             />
 
         <!--suppress AndroidDomInspection -->

@@ -18,7 +18,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
-import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.DividerItemDecoration;
 import com.ludoscity.findmybikes.utils.ScrollingLinearLayoutManager;
 
@@ -40,7 +39,6 @@ public class StationListFragment extends Fragment
     private int mRecyclerViewScrollingState = SCROLL_STATE_IDLE;
     private TextView mEmptyListTextView;
     private ImageView mProximityHeaderImageView;
-    private TextView mProximityHeaderTextView;
     private TextView mAvailabilityTextView;
 
     private OnStationListFragmentInteractionListener mListener;
@@ -73,15 +71,13 @@ public class StationListFragment extends Fragment
         mSwipeRefreshLayout.setColorSchemeResources(R.color.stationlist_refresh_spinner_green, R.color.stationlist_refresh_spinner_yellow, R.color.stationlist_refresh_spinner_red);
 
         mAvailabilityTextView = (TextView) inflatedView.findViewById(R.id.availability_header);
-        mProximityHeaderImageView = (ImageView) inflatedView.findViewById(R.id.time_header_iv);
-        mProximityHeaderTextView = (TextView) inflatedView.findViewById(R.id.time_header_tv);
+        mProximityHeaderImageView = (ImageView) inflatedView.findViewById(R.id.proximity_header);
 
         Bundle args = getArguments();
         if (args != null){
 
             mStationRecyclerView.setBackground(ContextCompat.getDrawable(this.getContext(), args.getInt(STATION_LIST_ARG_BACKGROUND_RES_ID)));
             mProximityHeaderImageView.setVisibility(View.GONE);
-            mProximityHeaderTextView.setVisibility(View.GONE);
         }
 
         return inflatedView;
@@ -218,17 +214,11 @@ public class StationListFragment extends Fragment
             mAvailabilityTextView.setText(getString(R.string.bikes));
 
             if (getArguments()!= null){
-                mProximityHeaderTextView.setVisibility(View.GONE);
-                mProximityHeaderImageView.setVisibility(View.GONE);
-            }
-            else if (DBHelper.getWalkingProximityAsDistance(this.getContext())){
-                mProximityHeaderTextView.setVisibility(View.VISIBLE);
                 mProximityHeaderImageView.setVisibility(View.GONE);
             }
             else {
-                mProximityHeaderTextView.setVisibility(View.GONE);
                 mProximityHeaderImageView.setVisibility(View.VISIBLE);
-                mProximityHeaderImageView.setImageResource(R.drawable.ic_walking);
+                mProximityHeaderImageView.setImageResource(R.drawable.ic_loc_walk);
             }
         }
         else {
@@ -236,17 +226,11 @@ public class StationListFragment extends Fragment
             mAvailabilityTextView.setText(getString(R.string.parking));
 
             if (getArguments()!= null){
-                mProximityHeaderTextView.setVisibility(View.GONE);
-                mProximityHeaderImageView.setVisibility(View.GONE);
-            }
-            else if (DBHelper.getBikingProximityAsDistance(this.getContext())){
-                mProximityHeaderTextView.setVisibility(View.VISIBLE);
                 mProximityHeaderImageView.setVisibility(View.GONE);
             }
             else {
-                mProximityHeaderTextView.setVisibility(View.GONE);
                 mProximityHeaderImageView.setVisibility(View.VISIBLE);
-                mProximityHeaderImageView.setImageResource(R.drawable.ic_biking);
+                mProximityHeaderImageView.setImageResource(R.drawable.ic_a_bike);
             }
         }
     }

@@ -252,14 +252,15 @@ public class StationMapFragment extends Fragment
 
     public LatLng getMarkerALatLng(){ return mMarkerStationA.getPosition(); }
 
-    public LatLng getMarkerBLatLng() {
+    public LatLng getMarkerBVisibleLatLng() {
         LatLng toReturn = null;
-        if ( mMarkerStationB != null && ( mMarkerStationB.getPosition().latitude != MONTREAL_LATLNG.latitude
-                || mMarkerStationB.getPosition().longitude != MONTREAL_LATLNG.longitude ) )
+        if ( mMarkerStationB != null && mMarkerStationB.isVisible() )
             toReturn = mMarkerStationB.getPosition();
 
         return toReturn;
     }
+
+    public void clearMarkerB() { mMarkerStationB.setVisible(false); }
 
     public boolean isMapReady(){return !(mGoogleMap==null);}
 
