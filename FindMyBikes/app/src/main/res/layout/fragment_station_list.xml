@@ -31,7 +31,7 @@
         <ImageView
             app:layout_widthPercent="@dimen/proximity_column_width_percent"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_a_bike"
+            app:srcCompat="@drawable/ic_a_bike"
             android:gravity="center"
             android:id="@+id/proximity_header" />
 

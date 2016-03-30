@@ -103,8 +103,8 @@ public class StationMapFragment extends Fragment
 
         mBufferedBundle = savedInstanceState;
 
-        mIconABitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a);
-        mIconBBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b);
+        mIconABitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a_map);
+        mIconBBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b_map);
 
         return inflatedView;
     }
@@ -250,19 +250,34 @@ public class StationMapFragment extends Fragment
         mInitialCameraSetupDone = true;
     }
 
-    public LatLng getMarkerALatLng(){ return mMarkerStationA.getPosition(); }
-
-    public LatLng getMarkerBVisibleLatLng() {
+    public LatLng getMarkerALatLng(){
         LatLng toReturn = null;
-        if ( mMarkerStationB != null && mMarkerStationB.isVisible() )
-            toReturn = mMarkerStationB.getPosition();
+
+        if (mMarkerStationA != null)
+            toReturn = mMarkerStationA.getPosition();
+        else if (mBufferedBundle != null)
+            toReturn = mBufferedBundle.getParcelable("pin_A_latlng");
 
         return toReturn;
     }
 
+    public LatLng getMarkerBVisibleLatLng() {
+        LatLng toReturn = null;
+        if ( mMarkerStationB != null  ) {
+            if (mMarkerStationB.isVisible())
+                toReturn = mMarkerStationB.getPosition();
+        }
+        else if (mBufferedBundle != null && mBufferedBundle.getBoolean("pin_B_visibility") )
+                toReturn = mBufferedBundle.getParcelable("pin_B_latlng");
+
+        return toReturn;
+    }
+
+    public boolean isRestoring() { return mBufferedBundle != null; }
+
     public void clearMarkerB() { mMarkerStationB.setVisible(false); }
 
-    public boolean isMapReady(){return !(mGoogleMap==null);}
+    public boolean isMapReady(){ return mGoogleMap != null; }
 
     public void addMarkerForStationItem(StationItem item, boolean lookingForBike) {
         mMapMarkersGfxData.add(new StationMapGfx(item, lookingForBike));
@@ -296,8 +311,8 @@ public class StationMapFragment extends Fragment
 
         //There is a bug in the map library with vector drawable, I use a workaround I found in the bug report
         //https://code.google.com/p/gmaps-api-issues/issues/detail?id=9011
-        BitmapDescriptor iconA = mIconABitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_a);
-        BitmapDescriptor iconB = mIconBBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b);
+        BitmapDescriptor iconA = mIconABitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_a_map);
+        BitmapDescriptor iconB = mIconBBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b_map);
 
         mMarkerStationA = mGoogleMap.addMarker(new MarkerOptions().position(pinALatLng)
                 .icon(iconA)

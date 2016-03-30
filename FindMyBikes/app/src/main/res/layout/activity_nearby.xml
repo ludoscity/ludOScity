@@ -23,7 +23,7 @@
 
             <!-- STATUS BAR -->
             <LinearLayout
-                android:id="@+id/statusBar"
+                android:id="@+id/app_status_bar"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:orientation="horizontal"
@@ -65,11 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/tablayout_height"
 
-            style="@style/MyCustomTabLayout"
-
-            app:tabGravity="fill"
-            app:tabMode="fixed"
-            app:tabBackground="@color/background_material_dark"/>
+            style="@style/MyCustomTabLayout" />
         <!--TODO: Find how to tint or setup background such as having ripple effect. Can be achieved
         by deleting the preseding line and removing the default blue from MyCustomTabLayout. It then
         reverts to ?android:attr/selectableItemBackground, which is white with ripple effect. -->

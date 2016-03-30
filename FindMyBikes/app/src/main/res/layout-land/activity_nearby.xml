@@ -1,90 +1,129 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:clipChildren="false"
     tools:context=".BaseActivity">
 
-    <include
-        android:id="@+id/toolbar_main"
-        layout="@layout/toolbar" />
-
-    <FrameLayout android:id="@+id/main_content"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_main">
+        android:layout_height="wrap_content"
+        android:id="@+id/action_toolbar_layout">
 
+        <include
+            android:id="@+id/toolbar_main"
+            layout="@layout/toolbar" />
+
+    </android.support.design.widget.AppBarLayout>
+
+
+
+
+    <!--suppress AndroidDomInspection -->
+    <LinearLayout
+
+        android:layout_height="fill_parent"
+        app:layout_widthPercent="45%"
+        android:orientation="vertical"
+        android:layout_below="@+id/action_toolbar_layout"
+        android:id="@+id/start_column_land">
+
+        <!-- LAST UPDATED -->
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/app_status_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-
-            <LinearLayout
+            android:layout_height="0px"
+            android:layout_weight="1.8"
+            android:orientation="horizontal"
+            android:background="@color/theme_primary_dark">
+            <TextView
+                android:id="@+id/status_textView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation = "horizontal">
-
-                <LinearLayout
-                    android:layout_width="0px"
-                    android:layout_height="fill_parent"
-                    android:orientation="vertical"
-                    android:layout_weight="8">
-
-                    <android.support.design.widget.TabLayout
-                        android:id="@+id/sliding_tabs"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/tablayout_height"
-                        app:tabGravity="fill"
-                        style="@style/MyCustomTabLayout"
-                        app:tabMode="fixed" />
-
-                    <!-- VIEWPAGER -->
-                    <android.support.v4.view.ViewPager
-                        android:layout_width="fill_parent"
-                        android:layout_height="0px"
-                        android:layout_weight="10"
-                        android:id="@+id/station_list_viewpager">
-                    </android.support.v4.view.ViewPager>
-
-                    <!-- LAST UPDATED -->
-                    <LinearLayout
-                        android:id="@+id/statusBar"
-                        android:layout_height="0px"
-                        android:layout_width="fill_parent"
-                        android:layout_weight="1.5"
-                        android:orientation="horizontal"
-                        android:background="@color/background_material_dark">
-                        <TextView
-                            android:id="@+id/status_textView"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:textColor="@color/light_gray"
-                            android:text="@string/fromCitibik_es"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- MAP -->
-                <FrameLayout
-                    android:layout_height="fill_parent"
-                    android:layout_width="0px"
-                    android:layout_weight="9">
-                    <fragment
-                        xmlns:android="http://schemas.android.com/apk/res/android"
-                        android:name="com.ludoscity.findmybikes.fragments.StationMapFragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:id="@+id/station_map_fragment"
-                        tools:layout="@layout/fragment_station_map" />
-                </FrameLayout>
-            </LinearLayout>
-
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/theme_textcolor_primary"
+                android:text="@string/fromCitibik_es"/>
         </LinearLayout>
 
-    </FrameLayout>
+        <!-- VIEWPAGER -->
+        <android.support.v4.view.ViewPager
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="10"
+            android:id="@+id/station_list_viewpager">
+        </android.support.v4.view.ViewPager>
 
-</RelativeLayout>
+        <android.support.design.widget.TabLayout
+            android:id="@+id/sliding_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/tablayout_height"
+
+            style="@style/MyCustomTabLayout" />
+    </LinearLayout>
+
+    <!-- MAP -->
+    <!--suppress AndroidDomInspection -->
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_height="match_parent"
+        app:layout_widthPercent="55%"
+        android:layout_below="@+id/action_toolbar_layout"
+        android:layout_toRightOf="@id/start_column_land"
+        android:layout_toEndOf="@id/start_column_land">
+        <fragment
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:name="com.ludoscity.findmybikes.fragments.StationMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/station_map_fragment"
+            tools:layout="@layout/fragment_station_map" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:orientation="vertical">
+
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:id="@+id/place_picker_fab"
+                android:clickable="true"
+                app:srcCompat="@drawable/ic_action_place_picker_24dp"
+
+                android:visibility="invisible"
+                app:backgroundTint="@color/theme_primary_dark"
+
+                style="@style/map_floating_action_button"
+                />
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:id="@+id/favorite_toggle_fab"
+                android:clickable="true"
+                app:srcCompat="@drawable/ic_action_favorite_toggle_off_24dp"
+
+                android:visibility="invisible"
+                app:backgroundTint="@color/theme_primary_dark"
+
+                style="@style/map_floating_action_button"
+                />
+        </LinearLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/clear_fab"
+            android:clickable="true"
+            app:srcCompat="@drawable/ic_action_clear_24dp"
+
+            android:visibility="invisible"
+            android:layout_gravity="bottom|end"
+
+            style="@style/map_floating_action_button"
+            />
+    </android.support.design.widget.CoordinatorLayout>
+</android.support.percent.PercentRelativeLayout>

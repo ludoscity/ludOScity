@@ -107,8 +107,10 @@ public class StationListFragment extends Fragment
         outState.putInt("selected_pos", getRecyclerViewAdapter().getSelectedPos());
         outState.putParcelable("sort_reference_LatLng", getRecyclerViewAdapter().getSortReferenceLatLng());
         outState.putParcelable("distance_reference_latlng", getRecyclerViewAdapter().getDistanceReferenceLatLng());
+        outState.putString("string_if_empty", mEmptyListTextView.getText().toString());
 
         getRecyclerViewAdapter().saveStationList(outState);
+        getRecyclerViewAdapter().saveLookingForBike(outState);
     }
 
     @Override
@@ -126,7 +128,8 @@ public class StationListFragment extends Fragment
             LatLng distanceReferenceLatLng = savedInstanceState.getParcelable("distance_reference_latlng");
             ArrayList<StationItem> stationList = savedInstanceState.getParcelableArrayList("stationitem_arraylist");
 
-            getRecyclerViewAdapter().setupStationList(stationList, sortReferenceLatLng, distanceReferenceLatLng);
+            setupUI(stationList, savedInstanceState.getBoolean("looking_for_bike"), savedInstanceState.getString("string_if_empty"),
+                    sortReferenceLatLng, distanceReferenceLatLng);
         }
     }
 
@@ -138,15 +141,14 @@ public class StationListFragment extends Fragment
             if (!stationsNetwork.isEmpty()) {
                 mStationRecyclerView.setVisibility(View.VISIBLE);
                 mEmptyListTextView.setVisibility(View.GONE);
-                getRecyclerViewAdapter().setupStationList(stationsNetwork, _sortReferenceLatLng, _distanceReferenceLatLng);
             }
             else{
                 mStationRecyclerView.setVisibility(View.GONE);
                 mEmptyListTextView.setText(stringIfEmpty);
                 mEmptyListTextView.setVisibility(View.VISIBLE);
-
             }
 
+            getRecyclerViewAdapter().setupStationList(stationsNetwork, _sortReferenceLatLng, _distanceReferenceLatLng);
             lookingForBikes(lookingForBike);
         }
     }
@@ -223,7 +225,7 @@ public class StationListFragment extends Fragment
         }
         else {
 
-            mAvailabilityTextView.setText(getString(R.string.parking));
+            mAvailabilityTextView.setText(getString(R.string.docks));
 
             if (getArguments()!= null){
                 mProximityHeaderImageView.setVisibility(View.GONE);
@@ -271,7 +273,8 @@ public class StationListFragment extends Fragment
 
     public void notifyAppBarExpansion() {
 
-        if (getRecyclerViewAdapter().getSelectedPos() > 2)
+        if (getRecyclerViewAdapter().getSelectedPos() >=
+                ((LinearLayoutManager)mStationRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition())
             mStationRecyclerView.smoothScrollToPosition(getRecyclerViewAdapter().getSelectedPos()+1);
     }
 

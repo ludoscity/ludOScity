@@ -106,12 +106,13 @@ public class NearbyActivity extends AppCompatActivity
     private FloatingActionButton mClearFAB;
 
     private boolean mRefreshMarkers = true;
+    private boolean mRefreshTabs = true;
 
     private CameraPosition mSavedInstanceCameraPosition;
 
     private static final int[] TABS_ICON_RES_ID = new int[]{
-            R.drawable.ic_a_bike,
-            R.drawable.ic_bike_b
+            R.drawable.ic_pin_a_tab,
+            R.drawable.ic_pin_b_tab
     };
 
     private GoogleApiClient mGoogleApiClient;
@@ -171,7 +172,9 @@ public class NearbyActivity extends AppCompatActivity
 
         mUpdateRefreshHandler = new Handler();
 
-        setupUI();
+        mUpdateRefreshRunnableCode = createUpdateRefreshRunnableCode();
+
+        mUpdateRefreshHandler.post(mUpdateRefreshRunnableCode);
     }
 
     private void startLocationUpdates() {
@@ -183,8 +186,7 @@ public class NearbyActivity extends AppCompatActivity
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-        }
-        else {
+        } else {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             mRequestingLocationUpdates = true;
         }
@@ -218,6 +220,7 @@ public class NearbyActivity extends AppCompatActivity
             mCurrentUserLatLng = savedInstanceState.getParcelable("user_location_latlng");
             mClosestBikeAutoSelected = savedInstanceState.getBoolean("closest_bike_auto_selected");
             mFavoriteToggled = savedInstanceState.getBoolean("favorite_toggled");
+            mRefreshTabs = savedInstanceState.getBoolean("refresh_tabs");
         }
 
         setContentView(R.layout.activity_nearby);
@@ -229,7 +232,7 @@ public class NearbyActivity extends AppCompatActivity
 
         // Update Bar
         mStatusTextView = (TextView) findViewById(R.id.status_textView);
-        mStatusBar = findViewById(R.id.statusBar);
+        mStatusBar = findViewById(R.id.app_status_bar);
 
         mStationListViewPager = (ViewPager)findViewById(R.id.station_list_viewpager);
         mStationListViewPager.setAdapter(new StationListPagerAdapter(getSupportFragmentManager()));
@@ -337,6 +340,7 @@ public class NearbyActivity extends AppCompatActivity
         outState.putParcelable("user_location_latlng", mCurrentUserLatLng);
         outState.putBoolean("closest_bike_auto_selected", mClosestBikeAutoSelected);
         outState.putBoolean("favorite_toggled", mFavoriteToggled);
+        outState.putBoolean("refresh_tabs", mRefreshTabs);
     }
 
     @Override
@@ -427,17 +431,7 @@ public class NearbyActivity extends AppCompatActivity
         }
     }
 
-    //Safe to call from multiple point in code, refreshing the UI elements with the most recent data available
-    //Takes care of map readyness check
-    //Safely updates everything based on checking the last update timestamp
-    private void setupUI(){
-
-        if (mUpdateRefreshRunnableCode == null && mUpdateRefreshHandler != null) {
-
-            mUpdateRefreshRunnableCode = createUpdateRefreshRunnableCode();
-
-            mUpdateRefreshHandler.post(mUpdateRefreshRunnableCode);
-        }
+    private void refreshMap(){
 
         if (DBHelper.isBikeNetworkIdAvailable(this)){
 
@@ -454,21 +448,22 @@ public class NearbyActivity extends AppCompatActivity
                     mStationMapFragment.doInitialCameraSetup(CameraUpdateFactory.newCameraPosition(mSavedInstanceCameraPosition), false);
                     mSavedInstanceCameraPosition = null;
                 }
-
-                if (getListPagerAdapter().isViewPagerReady()){
-
-                    getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "", mCurrentUserLatLng, mCurrentUserLatLng);
-
-                    LatLng stationBLatLng = mStationMapFragment.getMarkerBVisibleLatLng();
-
-                    if (stationBLatLng == null)
-                        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
-                    else
-                        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
-                                stationBLatLng, mStationMapFragment.getMarkerALatLng());
-                }
             }
         }
+    }
+
+    private void setupTabPages() {
+        getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "", mCurrentUserLatLng, mCurrentUserLatLng);
+
+        LatLng stationBLatLng = mStationMapFragment.getMarkerBVisibleLatLng();
+
+        if (stationBLatLng == null)
+            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
+        else
+            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
+                    stationBLatLng, mStationMapFragment.getMarkerALatLng());
+
+        mRefreshTabs = false;
     }
 
     private Runnable createUpdateRefreshRunnableCode(){
@@ -485,18 +480,12 @@ public class NearbyActivity extends AppCompatActivity
 
                 long now = System.currentTimeMillis();
 
-                if (!mPagerReady && getListPagerAdapter().isViewPagerReady()){
+                if (!mPagerReady && getListPagerAdapter().isViewPagerReady() || ( mRefreshTabs && getListPagerAdapter().isViewPagerReady()) ){
                     //TODO: calling DBHelper.getFavoriteStations can return incomplete result when db is updating
                     //it happens when data is downladed and screen configuration is changed shortly after
-                    getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "", mCurrentUserLatLng, mCurrentUserLatLng);
-
-                    LatLng stationBLatLng = mStationMapFragment.getMarkerBVisibleLatLng();
-
-                    if (stationBLatLng == null)
-                        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
-                    else
-                        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
-                                stationBLatLng, mStationMapFragment.getMarkerALatLng());
+                    //When restoring, we don't need to setup everything rom here
+                    if (!mStationMapFragment.isRestoring())
+                        setupTabPages();
 
                     mPagerReady = true;
                 }
@@ -575,9 +564,9 @@ public class NearbyActivity extends AppCompatActivity
 
                     if (mDownloadWebTask == null && mRedrawMarkersTask == null &&
                             !mClosestBikeAutoSelected &&
-                            ((StationListPagerAdapter)mStationListViewPager.getAdapter()).isRecyclerViewReadyForItemSelection(StationListPagerAdapter.BIKE_STATIONS)){
+                            getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.BIKE_STATIONS)){
 
-                        ((StationListPagerAdapter) mStationListViewPager.getAdapter()).highlightClosestStationWithAvailability(true);
+                        getListPagerAdapter().highlightClosestStationWithAvailability(true);
                         StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
                         mStationMapFragment.setPinOnStation(true, closestBikeStation.getName());
 
@@ -619,7 +608,7 @@ public class NearbyActivity extends AppCompatActivity
         //Map ready
         if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MAP_READY_PATH))
         {
-            setupUI();
+            refreshMap();
         }
         //Marker click
         else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
@@ -837,59 +826,68 @@ public class NearbyActivity extends AppCompatActivity
     }
 
     @Override
-    public void onPageSelected(int position) {
+    public void onPageSelected(final int position) {
 
-        StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(position);
+        //Happens on screen orientation change
+        if (mStationMapFragment == null){
+            Handler handler = new Handler();
 
-        if (position == StationListPagerAdapter.BIKE_STATIONS){
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    onPageSelected(position);
 
-            mFavoriteToggled = false;
-            setupFavoriteFab();
+                }
+            }, 1000); //second long delay gives a nice UX with camera animation
+        }
+        else {
 
-            if (mAppBarLayout != null) {
+            StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(position);
+
+            if (position == StationListPagerAdapter.BIKE_STATIONS) {
+
+                mFavoriteToggled = false;
+                setupFavoriteFab();
+
+
                 mAppBarLayout.setExpanded(true, true);
                 getListPagerAdapter().notifyAppBarExpansionForPage(position);
-            }
 
-            //TODO: rework landscape layout
-            if (mPlacePickerFAB != null)
                 mPlacePickerFAB.hide();
-            if (mFavoriteToggleFAB != null)
                 mFavoriteToggleFAB.hide();
 
-            mClearFAB.hide();
+                mClearFAB.hide();
 
-            //just to be on the safe side
-            if (highlightedStation != null){
-                mStationMapFragment.setPinOnStation(true, highlightedStation.getName());
+                //just to be on the safe side
+                if (highlightedStation != null ) {
 
-                animateCameraToShowUserAndStation(highlightedStation);
+                    mStationMapFragment.setPinOnStation(true, highlightedStation.getName());
 
-                mStationMapFragment.lookingForBikes(true);
-            }
-        } else {
+                    animateCameraToShowUserAndStation(highlightedStation);
 
-            if (mAppBarLayout != null)
+                    mStationMapFragment.lookingForBikes(true);
+                }
+            } else {
+
+
                 mAppBarLayout.setExpanded(false, true);
 
-            if (highlightedStation == null) {
-                //TODO: Maybe bounds containing all stations accessible for free ? (needs clustering to look good)
-                //TODO: Seen mStationMapFragment being null on app resuming
-                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
+                if (mStationMapFragment.getMarkerBVisibleLatLng() == null) {
+                    //TODO: Maybe bounds containing all stations accessible for free ? (needs clustering to look good)
+                    mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
 
-                //TODO: rework landscape layout
-                if (mPlacePickerFAB != null)
                     mPlacePickerFAB.show();
-                if (mFavoriteToggleFAB != null)
                     mFavoriteToggleFAB.show();
-            }
-            else {
-                animateCameraToShow(mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition());
-                mClearFAB.show();
-            }
+                } else {
 
+                    animateCameraToShow(mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition());
 
-            mStationMapFragment.lookingForBikes(false);
+                    mClearFAB.show();
+
+                }
+
+                mStationMapFragment.lookingForBikes(false);
+            }
         }
     }
 
@@ -1143,6 +1141,8 @@ public class NearbyActivity extends AppCompatActivity
 
             alertDialog.show();
 
+            mStationMapFragment.clearMarkerB();
+
             mDownloadWebTask = new DownloadWebTask();
             mDownloadWebTask.execute();
 
@@ -1321,7 +1321,8 @@ public class NearbyActivity extends AppCompatActivity
 
             DBHelper.saveLastUpdateTimestampAsNow(getApplicationContext());
             mRefreshMarkers = true;
-            setupUI();
+            mRefreshTabs = true;
+            refreshMap();
             Log.d("nearbyFragment", mStationsNetwork.size() + " stations downloaded from citibik.es");
 
             new SaveNetworkToDatabaseTask().execute();

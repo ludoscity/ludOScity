@@ -37,7 +37,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
     private Context mCtx;
 
-    private boolean mIsLookingForBikes;
+    private boolean mIsLookingForBike;
 
     private int mSelectedPos = NO_POSITION;
 
@@ -52,6 +52,10 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
     public void saveStationList(Bundle outState) {
         outState.putParcelableArrayList("stationitem_arraylist", mStationList);
+    }
+
+    public void saveLookingForBike(Bundle outState) {
+        outState.putBoolean("looking_for_bike", mIsLookingForBike);
     }
 
     public boolean removeItem(StationItem toRemove) {
@@ -143,7 +147,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             if (mDistanceDisplayReferenceLatLng != null) {
 
                 String proximityString;
-                if (mIsLookingForBikes){
+                if (mIsLookingForBike){
                     proximityString = _station.getProximityStringFromLatLng(mDistanceDisplayReferenceLatLng,
                             DBHelper.getWalkingProximityAsDistance(mCtx), WALKING_AVERAGE_SPEED, mCtx);
                 }
@@ -235,7 +239,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 mAvailability.requestLayout();
             }
 
-            if (mIsLookingForBikes) {
+            if (mIsLookingForBike) {
                 mAvailability.setText(String.valueOf(_station.getFree_bikes()));
                 setBackgroundColor(_selected, _station.getFree_bikes());
 
@@ -422,8 +426,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     }
 
     public void lookingForBikesNotify(boolean isLookingForBikes) {
-        if (mIsLookingForBikes != isLookingForBikes){
-            mIsLookingForBikes = isLookingForBikes;
+        if (mIsLookingForBike != isLookingForBikes){
+            mIsLookingForBike = isLookingForBikes;
             notifyDataSetChanged();
         }
     }

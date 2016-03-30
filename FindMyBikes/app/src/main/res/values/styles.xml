@@ -37,8 +37,10 @@
         <item name="tabIndicatorHeight">5dp</item>
         <item name="tabPaddingTop">6dp</item>
         <item name="tabPaddingBottom">6dp</item>
-        <item name="tabBackground">?attr/colorPrimaryDark</item>
+        <item name="tabBackground">@color/background_material_dark</item>
         <item name="tabTextAppearance">@style/MyCustomTabTextAppearance</item>
+        <item name="tabMode">fixed</item>
+        <item name="tabGravity">fill</item>
         <!--<item name="tabSelectedTextColor">@color/abc_primary_text_material_dark</item>-->
     </style>
     <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">
