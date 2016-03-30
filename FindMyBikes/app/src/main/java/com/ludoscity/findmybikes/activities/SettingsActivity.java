@@ -7,7 +7,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.ludoscity.findmybikes.R;
-import com.ludoscity.findmybikes.fragments.SettingsFragment;
 
 /**
  * Created by F8Full on 2015-08-10.
@@ -26,10 +25,6 @@ public class SettingsActivity extends AppCompatActivity {
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Display the fragment as the main content.
-        getFragmentManager().beginTransaction()
-                .replace(R.id.main_content, new SettingsFragment())
-                .commit();
     }
 
     @Override
