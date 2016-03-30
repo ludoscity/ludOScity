@@ -90,7 +90,7 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
     }
 
     public boolean highlightStationFromNameForPage(String stationName, int position) {
-        return retrieveListFragment(position).highlightStationFromName(stationName, false);
+        return retrieveListFragment(position).highlightStationFromName(stationName);
     }
 
     public void removeStationHighlightForPage(int position) {
@@ -110,12 +110,11 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         retrieveListFragment(position).addStation(station);
     }
 
-    public void notifyAppBarExpansionForPage(int _pageID) {
-        retrieveListFragment(_pageID).notifyAppBarExpansion();
-
-    }
-
     public void notifyStationAUpdate(LatLng _newALatLng) {
         retrieveListFragment(DOCK_STATIONS).setDistanceDisplayReferenceLatLng(_newALatLng, true);
+    }
+
+    public void smoothScrollHighlightedInViewForPage(int _pageID, boolean _appBarExpanded) {
+        retrieveListFragment(_pageID).smoothScrollSelectionInView(_appBarExpanded);
     }
 }

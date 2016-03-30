@@ -567,6 +567,7 @@ public class NearbyActivity extends AppCompatActivity
                             getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.BIKE_STATIONS)){
 
                         getListPagerAdapter().highlightClosestStationWithAvailability(true);
+                        getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, isAppBarExpanded());
                         StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
                         mStationMapFragment.setPinOnStation(true, closestBikeStation.getName());
 
@@ -620,6 +621,8 @@ public class NearbyActivity extends AppCompatActivity
                 if (getListPagerAdapter().highlightStationFromNameForPage(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM),
                         StationListPagerAdapter.BIKE_STATIONS)) {
 
+                    getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, isAppBarExpanded());
+
                     mStationMapFragment.setPinOnStation(true,
                             uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
 
@@ -654,6 +657,7 @@ public class NearbyActivity extends AppCompatActivity
                             //highlight B station in list
                             getListPagerAdapter().highlightStationFromNameForPage(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM),
                                     StationListPagerAdapter.DOCK_STATIONS);
+                            getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
                         } else
                             handler.postDelayed(this, 10);
                     }
@@ -718,6 +722,7 @@ public class NearbyActivity extends AppCompatActivity
                             //highlight B station in list
                             getListPagerAdapter().highlightStationFromNameForPage(clickedStation.getName(),
                                     StationListPagerAdapter.DOCK_STATIONS);
+                            getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
                         } else
                             handler.postDelayed(this, 10);
                     }
@@ -787,6 +792,10 @@ public class NearbyActivity extends AppCompatActivity
         }
     }
 
+    private boolean isAppBarExpanded(){
+        return mAppBarLayout.getHeight() - mAppBarLayout.getBottom() == 0;
+    }
+
     private void animateCameraToShowUserAndStation(StationItem station) {
 
         if (mCurrentUserLatLng != null) {
@@ -851,7 +860,7 @@ public class NearbyActivity extends AppCompatActivity
 
 
                 mAppBarLayout.setExpanded(true, true);
-                getListPagerAdapter().notifyAppBarExpansionForPage(position);
+                getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, true);
 
                 mPlacePickerFAB.hide();
                 mFavoriteToggleFAB.hide();
@@ -879,6 +888,8 @@ public class NearbyActivity extends AppCompatActivity
                     mPlacePickerFAB.show();
                     mFavoriteToggleFAB.show();
                 } else {
+
+                    getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, false);
 
                     animateCameraToShow(mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition());
 

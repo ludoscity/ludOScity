@@ -167,7 +167,7 @@ public class StationListFragment extends Fragment
 
     public void highlightClosestStationWithAvailability(boolean _lookingForBike){
 
-        highlightStationFromName(getRecyclerViewAdapter().getClosestWithAvailabilityStationName(_lookingForBike), true);
+        highlightStationFromName(getRecyclerViewAdapter().getClosestWithAvailabilityStationName(_lookingForBike));
 
     }
 
@@ -177,25 +177,13 @@ public class StationListFragment extends Fragment
                         NO_POSITION;
     }
 
-    public boolean highlightStationFromName(String _stationName, boolean _overscroll) {
-
-        boolean toReturn = false;
+    public boolean highlightStationFromName(String _stationName) {
 
         int selectedPos = getRecyclerViewAdapter().setSelectionFromName(_stationName, false);
 
         ((StationRecyclerViewAdapter)mStationRecyclerView.getAdapter()).requestFabAnimation();
 
-        //Overscroll is required because of collapsing appbar.
-        if (selectedPos != NO_POSITION) {
-            if (!_overscroll)
-                mStationRecyclerView.smoothScrollToPosition(selectedPos);
-            else
-                mStationRecyclerView.smoothScrollToPosition(selectedPos+1);
-
-            toReturn = true;
-        }
-
-        return toReturn;
+        return selectedPos != NO_POSITION;
     }
 
     public StationItem getHighlightedStation(){
@@ -271,11 +259,13 @@ public class StationListFragment extends Fragment
         getRecyclerViewAdapter().addItem(toAdd);
     }
 
-    public void notifyAppBarExpansion() {
-
-        if (getRecyclerViewAdapter().getSelectedPos() >=
-                ((LinearLayoutManager)mStationRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition())
+    public void smoothScrollSelectionInView(boolean _appBarExpanded) {
+        if (_appBarExpanded && getRecyclerViewAdapter().getSelectedPos() >=
+                ((LinearLayoutManager)mStationRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition()){
             mStationRecyclerView.smoothScrollToPosition(getRecyclerViewAdapter().getSelectedPos()+1);
+        }
+        else
+            mStationRecyclerView.smoothScrollToPosition(getRecyclerViewAdapter().getSelectedPos());
     }
 
     public interface OnStationListFragmentInteractionListener {
