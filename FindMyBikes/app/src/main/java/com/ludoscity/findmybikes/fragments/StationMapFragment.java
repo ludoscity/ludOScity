@@ -192,10 +192,10 @@ public class StationMapFragment extends Fragment
     @Override
     public boolean onMarkerClick(Marker marker) {
 
-        if ( (mMarkerStationA != null &&
+        if ( (mMarkerStationA.isVisible() &&
                 mMarkerStationA.getPosition().latitude == marker.getPosition().latitude &&
                 mMarkerStationA.getPosition().longitude == marker.getPosition().longitude) ||
-                (mMarkerStationB != null &&
+                (mMarkerStationB.isVisible() &&
                         mMarkerStationB.getPosition().latitude == marker.getPosition().latitude &&
                         mMarkerStationB.getPosition().longitude == marker.getPosition().longitude) )
             return true;
