@@ -32,5 +32,6 @@
         <item name="elevation">6dp</item>
         <item name="pressedTranslationZ">12dp</item>
     </style>
+    <style name="map_floating_action_button_top" parent="map_floating_action_button"/>
 
 </resources>

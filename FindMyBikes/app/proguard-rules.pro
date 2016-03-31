@@ -15,3 +15,5 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+#for sheet fab library
+#-keep class io.codetail.animation.arcanimator.** { *; }

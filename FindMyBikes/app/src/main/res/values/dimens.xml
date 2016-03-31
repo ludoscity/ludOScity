@@ -7,6 +7,13 @@
 
     <dimen name="fab_margin">16dp</dimen>
 
+    <dimen name="sheet_width">210dp</dimen>
+    <dimen name="sheet_spacing">10dp</dimen>
+    <dimen name="fab_sheet_elevation">0dp</dimen>
+
+    <dimen name="dummy_fab_height">62dp</dimen>
+    <dimen name="dummy_fab_width">56dp</dimen>
+
     <!-- fabs in recyclerView -->
     <dimen name="station_availability_margin_default">0dp</dimen>
     <!--So I want it offset by half its width minus any padding I wannna put in there

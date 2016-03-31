@@ -43,6 +43,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.gordonwong.materialsheetfab.MaterialSheetFab;
+import com.gordonwong.materialsheetfab.MaterialSheetFabEventListener;
+import com.ludoscity.findmybikes.Fab;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.RootApplication;
 import com.ludoscity.findmybikes.StationItem;
@@ -101,8 +104,8 @@ public class NearbyActivity extends AppCompatActivity
     private CoordinatorLayout mCoordinatorLayout;
 
     private FloatingActionButton mPlacePickerFAB;
-    private FloatingActionButton mFavoriteToggleFAB;
-    private boolean mFavoriteToggled = false;
+    private MaterialSheetFab mMaterialSheetFab;
+    private boolean mFavoriteSheetVisible = false;
     private FloatingActionButton mClearFAB;
 
     private boolean mRefreshMarkers = true;
@@ -219,7 +222,7 @@ public class NearbyActivity extends AppCompatActivity
             mRequestingLocationUpdates = savedInstanceState.getBoolean("requesting_location_updates");
             mCurrentUserLatLng = savedInstanceState.getParcelable("user_location_latlng");
             mClosestBikeAutoSelected = savedInstanceState.getBoolean("closest_bike_auto_selected");
-            mFavoriteToggled = savedInstanceState.getBoolean("favorite_toggled");
+            mFavoriteSheetVisible = savedInstanceState.getBoolean("favorite_sheet_visible");
             mRefreshTabs = savedInstanceState.getBoolean("refresh_tabs");
         }
 
@@ -255,35 +258,8 @@ public class NearbyActivity extends AppCompatActivity
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
 
         mPlacePickerFAB = (FloatingActionButton) findViewById(R.id.place_picker_fab);
-        mFavoriteToggleFAB = (FloatingActionButton) findViewById(R.id.favorite_toggle_fab);
-        mFavoriteToggleFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mFavoriteToggled = !mFavoriteToggled;
-                setupFavoriteFab();
-            }
-        });
-        mClearFAB = (FloatingActionButton) findViewById(R.id.clear_fab);
-
-        mClearFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
-
-                getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
-
-                mStationMapFragment.clearMarkerB();
-
-                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
-
-                mFavoriteToggleFAB.show();
-                mPlacePickerFAB.show();
-                mClearFAB.hide();
-            }
-        });
-
         setupFavoriteFab();
+        setupClearFab();
 
         setStatusBarClickListener();
 
@@ -304,32 +280,6 @@ public class NearbyActivity extends AppCompatActivity
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    private void setupFavoriteFab() {
-        if (mFavoriteToggled){
-            mFavoriteToggleFAB.setImageResource(R.drawable.ic_action_favorite_toggle_on_24dp);
-            mFavoriteToggleFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.favorite_fab_toggle_on_background)));
-            mPlacePickerFAB.hide();
-        }
-        else {
-            mFavoriteToggleFAB.setImageResource(R.drawable.ic_action_favorite_toggle_off_24dp);
-            mFavoriteToggleFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.theme_primary_dark)));
-
-            if (!isLookingForBike())
-                mPlacePickerFAB.show();
-        }
-    }
-
-    @NonNull
-    private String getActionbarTitle() {
-        String titleToSet = getTitle().toString();
-
-        if (DBHelper.isBikeNetworkIdAvailable(this))
-        {
-            titleToSet = DBHelper.getBikeNetworkName(this);
-        }
-        return titleToSet;
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -339,7 +289,7 @@ public class NearbyActivity extends AppCompatActivity
         outState.putBoolean("requesting_location_updates", mRequestingLocationUpdates);
         outState.putParcelable("user_location_latlng", mCurrentUserLatLng);
         outState.putBoolean("closest_bike_auto_selected", mClosestBikeAutoSelected);
-        outState.putBoolean("favorite_toggled", mFavoriteToggled);
+        outState.putBoolean("favorite_sheet_visible", mMaterialSheetFab.isSheetVisible());
         outState.putBoolean("refresh_tabs", mRefreshTabs);
     }
 
@@ -421,6 +371,64 @@ public class NearbyActivity extends AppCompatActivity
                     })*/.show();
         else //TODO: Rework landscape layout
             Toast.makeText(this, getString(R.string.favorite_added),Toast.LENGTH_SHORT).show();
+    }
+
+    private void setupFavoriteFab() {
+
+        Fab mFavoritePickerFAB = (Fab) findViewById(R.id.favorite_picker_fab);
+        View sheetView = findViewById(R.id.fab_sheet);
+        View overlay = findViewById(R.id.overlay);
+        int sheetColor = ContextCompat.getColor(this, R.color.cardview_light_background);
+        int fabColor = ContextCompat.getColor(this, R.color.theme_primary_dark);
+
+        //Caused by: java.lang.NullPointerException (sheetView)
+        // Create material sheet FAB
+        mMaterialSheetFab = new MaterialSheetFab<>(mFavoritePickerFAB, sheetView, overlay, sheetColor, fabColor);
+
+        mMaterialSheetFab.setEventListener(new MaterialSheetFabEventListener() {
+            @Override
+            public void onShowSheet() {
+
+                mPlacePickerFAB.hide();
+            }
+
+            @Override
+            public void onSheetHidden() {
+                if (!isLookingForBike())
+                    mPlacePickerFAB.show();
+            }
+        });
+    }
+
+    private void setupClearFab() {
+        mClearFAB = (FloatingActionButton) findViewById(R.id.clear_fab);
+
+        mClearFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
+
+                getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
+
+                mStationMapFragment.clearMarkerB();
+
+                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
+
+                mMaterialSheetFab.showFab();
+                mPlacePickerFAB.show();
+                mClearFAB.hide();
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mMaterialSheetFab.isSheetVisible()) {
+            mMaterialSheetFab.hideSheet();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void stopUIRefresh() {
@@ -645,7 +653,7 @@ public class NearbyActivity extends AppCompatActivity
                         mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerALatLng());
 
                 mClearFAB.show();
-                mFavoriteToggleFAB.hide();
+                mMaterialSheetFab.hideSheetThenFab();
                 mPlacePickerFAB.hide();
 
                 final Handler handler = new Handler();
@@ -710,7 +718,7 @@ public class NearbyActivity extends AppCompatActivity
                         mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerALatLng());
 
                 mClearFAB.show();
-                mFavoriteToggleFAB.hide();
+                mMaterialSheetFab.hideSheetThenFab();
                 mPlacePickerFAB.hide();
 
                 final Handler handler = new Handler();
@@ -855,16 +863,11 @@ public class NearbyActivity extends AppCompatActivity
 
             if (position == StationListPagerAdapter.BIKE_STATIONS) {
 
-                mFavoriteToggled = false;
-                setupFavoriteFab();
-
-
                 mAppBarLayout.setExpanded(true, true);
                 getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, true);
 
                 mPlacePickerFAB.hide();
-                mFavoriteToggleFAB.hide();
-
+                mMaterialSheetFab.hideSheetThenFab();
                 mClearFAB.hide();
 
                 //just to be on the safe side
@@ -885,8 +888,12 @@ public class NearbyActivity extends AppCompatActivity
                     //TODO: Maybe bounds containing all stations accessible for free ? (needs clustering to look good)
                     mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
 
-                    mPlacePickerFAB.show();
-                    mFavoriteToggleFAB.show();
+                    if (mFavoriteSheetVisible)
+                        mMaterialSheetFab.showSheet();
+                    else {
+                        mMaterialSheetFab.showFab();
+                        mPlacePickerFAB.show();
+                    }
                 } else {
 
                     getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, false);
