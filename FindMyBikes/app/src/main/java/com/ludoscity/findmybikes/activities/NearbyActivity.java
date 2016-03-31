@@ -289,7 +289,7 @@ public class NearbyActivity extends AppCompatActivity
         outState.putBoolean("requesting_location_updates", mRequestingLocationUpdates);
         outState.putParcelable("user_location_latlng", mCurrentUserLatLng);
         outState.putBoolean("closest_bike_auto_selected", mClosestBikeAutoSelected);
-        outState.putBoolean("favorite_sheet_visible", mMaterialSheetFab.isSheetVisible());
+        outState.putBoolean("favorite_sheet_visible", mFavoriteSheetVisible);
         outState.putBoolean("refresh_tabs", mRefreshTabs);
     }
 
@@ -390,12 +390,15 @@ public class NearbyActivity extends AppCompatActivity
             public void onShowSheet() {
 
                 mPlacePickerFAB.hide();
+                mFavoriteSheetVisible = true;
             }
 
             @Override
             public void onSheetHidden() {
                 if (!isLookingForBike())
                     mPlacePickerFAB.show();
+
+                mFavoriteSheetVisible = false;
             }
         });
     }
