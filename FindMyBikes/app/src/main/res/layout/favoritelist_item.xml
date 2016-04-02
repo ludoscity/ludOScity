@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/favoritelist_item_root">
+
+    <!--suppress AndroidDomInspection -->
+    <TextView
+        app:layout_widthPercent="@dimen/favorite_name_width"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/favorite_item_min_height"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
+        android:layout_centerVertical="true"
+        android:id="@+id/favorite_name"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/edit_favorite_name_fab"
+        android:layout_centerInParent="true"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_action_edit_24dp"
+
+        app:fabSize="mini"
+        app:layout_anchorGravity="start|center_vertical"
+        app:backgroundTint="@color/theme_primary_dark"
+        android:layout_toEndOf="@+id/favorite_name"
+        android:layout_toRightOf="@+id/favorite_name"
+
+        style="@style/listitem_floating_action_button"
+        />
+</android.support.percent.PercentRelativeLayout>

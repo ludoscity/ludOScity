@@ -130,7 +130,7 @@ public class StationItem implements Parcelable, ClusterItem {
     }
 
     public void setFavorite(Boolean b, Context ctx){
-        DBHelper.updateFavorite(b, id, ctx);
+        DBHelper.updateFavorite(b, id, name, ctx);
     }
 
     public boolean isLocked() {

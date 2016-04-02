@@ -15,21 +15,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.ludoscity.findmybikes.FavoriteItem;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
 import com.ludoscity.findmybikes.StationItem;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by F8Full on 2015-04-02.
@@ -49,7 +49,7 @@ public class DBHelper {
 
     private static final String PREF_CURRENT_BIKE_NETWORK_ID = "current_bike_network_id";
 
-    private static final String PREF_SUFFIX_FAVORITES_SET = "_favorites";
+    private static final String PREF_SUFFIX_FAVORITES_JSONARRAY = "_favorites";
     private static final String PREF_SUFFIX_WEBTASK_LAST_TIMESTAMP_MS = "_last_refresh_timestamp";
     private static final String PREF_SUFFIX_NETWORK_NAME = "_network_name";
     private static final String PREF_SUFFIX_NETWORK_HREF = "_network_href";
@@ -343,30 +343,19 @@ public class DBHelper {
         return stationsNetwork;
     }
 
-    public static ArrayList<StationItem> getFavoriteStations(Context ctx) {
+    public static ArrayList<FavoriteItem> getFavoriteItems(Context _ctx){
+        ArrayList<FavoriteItem> toReturn = new ArrayList<>();
 
-        ArrayList<StationItem> toReturn = new ArrayList<>();
+        SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
         try {
+            JSONArray favoritesJSONArray = new JSONArray(sp.getString(
+                    buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, _ctx), "[]" ));
 
-            List<QueryRow> allStations;
-            allStations = getAllStations();
-            SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
-
-            Set<String> favorites = sp.getStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), new HashSet<String>());
-
-            for (QueryRow qr : allStations) {
-                Document d = qr.getDocument();
-
-                Map<String, Object> properties = d.getProperties();
-
-                //noinspection SuspiciousMethodCalls
-                if (favorites.contains(properties.get("id")))
-                {
-                    toReturn.add(createStationItem(d));
-                }
+            for (int i=0; i<favoritesJSONArray.length(); i+=2){
+                toReturn.add(new FavoriteItem(favoritesJSONArray.getString(i), favoritesJSONArray.getString(i+1)));
             }
-        } catch (CouchbaseLiteException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -379,34 +368,88 @@ public class DBHelper {
 
         SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        Set<String> favorites = sp.getStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), new HashSet<String>());
+        try {
+            JSONArray favoritesJSONArray = new JSONArray(sp.getString(
+                    buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, ctx), "[]" ));
 
-        if (favorites.contains(id))
-            toReturn = true;
-
+            for (int i=0; i<favoritesJSONArray.length(); ++i){
+                if (favoritesJSONArray.getString(i).equalsIgnoreCase(id)){
+                    toReturn = true;
+                    break;
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         return toReturn;
     }
 
-    public static void updateFavorite(final Boolean isFavorite, String id, Context ctx) {
+    public static void updateFavorite(final Boolean isFavorite, String id, String displayName, Context ctx) {
 
         SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        Set<String> oldFavorites = sp.getStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), new HashSet<String>());
+        //JSONArray favoriteJSONArray;
+        //contains id followed by favorite display name
+        try {
+            JSONArray oldFavoriteJSONArray = new JSONArray(sp.getString(
+                    buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, ctx), "[]" ));
+            JSONArray newFavoriteJSONArray;
+
+            int existingIndex = -1;
+
+            for (int i=0; i<oldFavoriteJSONArray.length(); i+=2){
+                if (oldFavoriteJSONArray.getString(i).equalsIgnoreCase(id)){
+                    existingIndex = i;
+                    break;
+                }
+            }
+
+            if (isFavorite){
+                if (existingIndex == -1) {
+                    oldFavoriteJSONArray.put(id);
+                    oldFavoriteJSONArray.put(displayName);
+                }
+                else{
+
+                    oldFavoriteJSONArray.put(existingIndex + 1, displayName);
+                }
+
+                newFavoriteJSONArray = oldFavoriteJSONArray;
+            }
+            else{
+                //Requires API 19
+                //oldFavoriteJSONArray.remove(existingIndex);
+                newFavoriteJSONArray = new JSONArray();
+                for (int i=0; i<oldFavoriteJSONArray.length(); ++i){
+                    if (i != existingIndex && i != existingIndex+1)
+                        newFavoriteJSONArray.put(oldFavoriteJSONArray.getString(i));
+                }
+            }
+
+            sp.edit().putString(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, ctx), newFavoriteJSONArray.toString()).apply();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+        //Set<String> oldFavorites = sp.getStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), new HashSet<String>());
 
         /*http://developer.android.com/reference/android/content/SharedPreferences.html#getStringSet(java.lang.String, java.util.Set)
 
         Note that you must not modify the set instance returned by this call.
         The consistency of the stored data is not guaranteed if you do, nor is your ability to modify the instance at all.*/
 
-        Set<String> newFavorites = new HashSet<>(oldFavorites);
+        //Set<String> newFavorites = new HashSet<>(oldFavorites);
 
-        if (isFavorite)
-            newFavorites.add(id);
-        else
-            newFavorites.remove(id);
+        //if (isFavorite)
+        //    newFavorites.add(id);
+        //else
+        //    newFavorites.remove(id);
 
-        sp.edit().putStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), newFavorites).apply();
+        //sp.edit().putStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), newFavorites).apply();
 
         /*Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getExistingDocument(id);
 

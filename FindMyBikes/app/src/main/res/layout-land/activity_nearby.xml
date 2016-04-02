@@ -143,34 +143,9 @@
             android:orientation="vertical">
 
             <!-- Sheet that contains your items -->
-            <android.support.v7.widget.CardView
-                android:id="@+id/fab_sheet"
-                style="@style/Widget.MaterialSheetFab.Sheet">
+            <include
+                layout="@layout/favorites_sheet" />
 
-                <!-- Sheet items -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <!-- Recording -->
-                    <TextView
-                        android:id="@+id/fab_sheet_item_recording"
-                        android:layout_width="@dimen/sheet_width"
-                        android:layout_height="wrap_content"
-
-                        android:text="machin" />
-
-                    <!-- Reminder -->
-                    <TextView
-                        android:id="@+id/fab_sheet_item_reminder"
-                        android:layout_width="@dimen/sheet_width"
-                        android:layout_height="wrap_content"
-
-                        android:text="truc" />
-
-                </LinearLayout>
-            </android.support.v7.widget.CardView>
         </io.codetail.widget.RevealLinearLayout>
     </android.support.design.widget.CoordinatorLayout>
 </android.support.percent.PercentRelativeLayout>

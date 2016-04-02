@@ -21,6 +21,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.format.DateUtils;
@@ -46,6 +48,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.gordonwong.materialsheetfab.MaterialSheetFabEventListener;
 import com.ludoscity.findmybikes.Fab;
+import com.ludoscity.findmybikes.FavoriteItem;
+import com.ludoscity.findmybikes.FavoriteRecyclerViewAdapter;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.RootApplication;
 import com.ludoscity.findmybikes.StationItem;
@@ -58,6 +62,8 @@ import com.ludoscity.findmybikes.citybik_es.model.Station;
 import com.ludoscity.findmybikes.fragments.StationListFragment;
 import com.ludoscity.findmybikes.fragments.StationMapFragment;
 import com.ludoscity.findmybikes.helpers.DBHelper;
+import com.ludoscity.findmybikes.utils.DividerItemDecoration;
+import com.ludoscity.findmybikes.utils.ScrollingLinearLayoutManager;
 import com.ludoscity.findmybikes.utils.Utils;
 
 import java.io.IOException;
@@ -77,6 +83,7 @@ import retrofit2.Response;
 public class NearbyActivity extends AppCompatActivity
         implements StationMapFragment.OnStationMapFragmentInteractionListener,
         StationListFragment.OnStationListFragmentInteractionListener,
+        FavoriteRecyclerViewAdapter.OnFavoriteListItemClickListener,
         SwipeRefreshLayout.OnRefreshListener,
         ViewPager.OnPageChangeListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -107,6 +114,8 @@ public class NearbyActivity extends AppCompatActivity
     private MaterialSheetFab mMaterialSheetFab;
     private boolean mFavoriteSheetVisible = false;
     private FloatingActionButton mClearFAB;
+
+    private FavoriteRecyclerViewAdapter mFavoriteRecyclerViewAdapter;
 
     private boolean mRefreshMarkers = true;
     private boolean mRefreshTabs = true;
@@ -265,6 +274,8 @@ public class NearbyActivity extends AppCompatActivity
 
         getListPagerAdapter().setCurrentUserLatLng(mCurrentUserLatLng);
 
+        setupFavoriteSheet();
+
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -278,6 +289,32 @@ public class NearbyActivity extends AppCompatActivity
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    private void setupFavoriteSheet() {
+
+        RecyclerView favoriteRecyclerView = (RecyclerView) findViewById(R.id.favorites_sheet_recyclerview);
+
+        favoriteRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+        favoriteRecyclerView.setLayoutManager(new ScrollingLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false, 300));
+
+        mFavoriteRecyclerViewAdapter = new FavoriteRecyclerViewAdapter(this, this);
+
+        ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(this);
+        setupFavoriteListFeedback(favoriteList.isEmpty());
+        mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
+        favoriteRecyclerView.setAdapter(mFavoriteRecyclerViewAdapter);
+    }
+
+    private void setupFavoriteListFeedback(boolean _noFavorite) {
+        if (_noFavorite){
+            findViewById(R.id.empty_favorite_list_text).setVisibility(View.VISIBLE);
+            findViewById(R.id.favorites_sheet_content).setVisibility(View.GONE);
+        }
+        else{
+            findViewById(R.id.empty_favorite_list_text).setVisibility(View.GONE);
+            findViewById(R.id.favorites_sheet_content).setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -339,6 +376,9 @@ public class NearbyActivity extends AppCompatActivity
 
     private void removeFavorite(final StationItem station) {
         station.setFavorite(false, this);
+        ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(this);
+        setupFavoriteListFeedback(favoriteList.isEmpty());
+        mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
         if (mCoordinatorLayout != null)
             Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
@@ -356,6 +396,9 @@ public class NearbyActivity extends AppCompatActivity
 
     private void addFavorite(final StationItem station) {
         station.setFavorite(true, this);
+        ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(this);
+        setupFavoriteListFeedback(favoriteList.isEmpty());
+        mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
         //getListPagerAdapter().addStationForPage(StationListPagerAdapter.DOCK_STATIONS, station);
 
@@ -946,6 +989,11 @@ public class NearbyActivity extends AppCompatActivity
         if (mStationMapFragment != null){
             mStationMapFragment.onUserLocationChange(location);
         }
+    }
+
+    @Override
+    public void onFavoriteListItemClick(String _path) {
+
     }
 
     public class RedrawMarkersTask extends AsyncTask<Boolean, Void, Void> {
