@@ -275,7 +275,10 @@ public class StationMapFragment extends Fragment
 
     public boolean isRestoring() { return mBufferedBundle != null; }
 
-    public void clearMarkerB() { mMarkerStationB.setVisible(false); }
+    public void clearMarkerB() {
+        if (mMarkerStationB != null)
+            mMarkerStationB.setVisible(false);
+    }
 
     public boolean isMapReady(){ return mGoogleMap != null; }
 
