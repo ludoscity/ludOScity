@@ -36,7 +36,19 @@
             android:id="@+id/proximity_header" />
 
         <!--suppress AndroidDomInspection -->
-        <TextView
+        <FrameLayout
+            app:layout_widthPercent="@dimen/name_column_width_default_percent"
+            android:layout_height="wrap_content"
+
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:id="@+id/name_header"
+            android:layout_toEndOf="@+id/proximity_header"
+            android:layout_toRightOf="@+id/proximity_header"
+            />
+
+        <!--suppress AndroidDomInspection -->
+        <!--<TextView
             app:layout_widthPercent="@dimen/name_column_width_default_percent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
@@ -48,7 +60,7 @@
             android:id="@+id/name_header"
             android:layout_toEndOf="@+id/proximity_header"
             android:layout_toRightOf="@+id/proximity_header"
-            />
+            /> -->
 
         <!--suppress AndroidDomInspection -->
         <TextView
