@@ -10,4 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:id="@+id/attributions_text"
+        android:background="@color/theme_window_background"
+        android:layout_gravity="bottom|center"/>
+
 </FrameLayout>

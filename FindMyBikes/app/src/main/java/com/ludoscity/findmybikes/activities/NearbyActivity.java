@@ -36,10 +36,14 @@ import android.widget.Toast;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -109,8 +113,9 @@ public class NearbyActivity extends AppCompatActivity
     private AppBarLayout mAppBarLayout;
     private CoordinatorLayout mCoordinatorLayout;
 
+    int PLACE_PICKER_REQUEST = 1;
     private FloatingActionButton mPlacePickerFAB;
-    private MaterialSheetFab mMaterialSheetFab;
+    private MaterialSheetFab mFavoritesSheetFab;
     private boolean mFavoriteSheetVisible = false;
     private FloatingActionButton mClearFAB;
 
@@ -266,6 +271,25 @@ public class NearbyActivity extends AppCompatActivity
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
 
         mPlacePickerFAB = (FloatingActionButton) findViewById(R.id.place_picker_fab);
+        mPlacePickerFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+                builder.setLatLngBounds(mStationMapFragment.getCameraLatLngBounds());
+
+                try {
+                    startActivityForResult(builder.build(NearbyActivity.this), PLACE_PICKER_REQUEST);
+                    mPlacePickerFAB.hide();
+                    mFavoritesSheetFab.hideSheetThenFab();
+
+                } catch (GooglePlayServicesRepairableException e) {
+                    Log.d("mPlacePickerFAB onClick", "oops", e);
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    Log.d("mPlacePickerFAB onClick", "oops", e);
+                }
+            }
+        });
         setupFavoriteFab();
         setupClearFab();
 
@@ -288,6 +312,33 @@ public class NearbyActivity extends AppCompatActivity
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+
+                final Place place = PlacePicker.getPlace(this, data);
+
+                final Handler handler = new Handler();
+
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (NearbyActivity.this.getListPagerAdapter().isViewPagerReady()) {
+                            setupBTabSelectionClosestDock(place);
+                        }
+                        else
+                            handler.postDelayed(this,10);
+                    }
+                },50);
+            }
+            else {
+                mPlacePickerFAB.show();
+                mFavoritesSheetFab.showFab();
+            }
+        }
     }
 
     private void setupFavoriteSheet() {
@@ -425,9 +476,9 @@ public class NearbyActivity extends AppCompatActivity
 
         //Caused by: java.lang.NullPointerException (sheetView)
         // Create material sheet FAB
-        mMaterialSheetFab = new MaterialSheetFab<>(mFavoritePickerFAB, sheetView, overlay, sheetColor, fabColor);
+        mFavoritesSheetFab = new MaterialSheetFab<>(mFavoritePickerFAB, sheetView, overlay, sheetColor, fabColor);
 
-        mMaterialSheetFab.setEventListener(new MaterialSheetFabEventListener() {
+        mFavoritesSheetFab.setEventListener(new MaterialSheetFabEventListener() {
             @Override
             public void onShowSheet() {
 
@@ -451,26 +502,15 @@ public class NearbyActivity extends AppCompatActivity
         mClearFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
-
-                getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
-
-                mStationMapFragment.clearMarkerB();
-
-                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
-
-                mMaterialSheetFab.showFab();
-                mPlacePickerFAB.show();
-                mClearFAB.hide();
+                clearBTab();
             }
         });
     }
 
     @Override
     public void onBackPressed() {
-        if (mMaterialSheetFab.isSheetVisible()) {
-            mMaterialSheetFab.hideSheet();
+        if (mFavoritesSheetFab.isSheetVisible()) {
+            mFavoritesSheetFab.hideSheet();
         } else {
             super.onBackPressed();
         }
@@ -506,15 +546,15 @@ public class NearbyActivity extends AppCompatActivity
     }
 
     private void setupTabPages() {
+        //Tab A
         getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "", mCurrentUserLatLng, mCurrentUserLatLng);
 
         LatLng stationBLatLng = mStationMapFragment.getMarkerBVisibleLatLng();
-
+        //Tab B
         if (stationBLatLng == null)
             getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
         else
-            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
-                    stationBLatLng, mStationMapFragment.getMarkerALatLng());
+            setupBTabSelection(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS).getId());
 
         mRefreshTabs = false;
     }
@@ -573,8 +613,18 @@ public class NearbyActivity extends AppCompatActivity
                     if (Utils.Connectivity.isConnected(getApplicationContext())) {
 
                         getListPagerAdapter().setRefreshEnableAll(true);
+                        if (!mPlacePickerFAB.isEnabled()) {
+                            mPlacePickerFAB.setEnabled(true);
+                            mPlacePickerFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.theme_primary_dark));
+                            mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
+                        }
 
                         if (DBHelper.isBikeNetworkIdAvailable(getApplicationContext())) {
+
+                            if (difference >= NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.outdated_data_warning_time_min) * 60 * 1000)
+                                mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this,R.color.theme_accent));
+                            else
+                                mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
 
                             if (!DBHelper.getAutoUpdate(getApplicationContext())) {
                                 futureStringBuilder.append(getString(R.string.pull_to_refresh));
@@ -609,6 +659,9 @@ public class NearbyActivity extends AppCompatActivity
                         futureStringBuilder.append(getString(R.string.no_connectivity));
 
                         getListPagerAdapter().setRefreshEnableAll(false);
+                        mPlacePickerFAB.setEnabled(false);
+                        mPlacePickerFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.light_gray));
+                        mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this,R.color.theme_accent));
                     }
 
                     if (mDownloadWebTask == null)
@@ -695,39 +748,96 @@ public class NearbyActivity extends AppCompatActivity
         }
     }
 
-    private void setupBTabSelection(final String _selectedStationId) {
+    private void setupBTabSelectionClosestDock(final Place _from){
+        setupBTabSelection(null, _from);
+    }
+
+    private void setupBTabSelection(final String _selectedStationId){
+        setupBTabSelection(_selectedStationId, null);
+    }
+
+    //Both parameters shouldn't be null at the same time
+    private void setupBTabSelection(final String _selectedStationId, final Place _targetDestination) {
         //Remove any previous selection
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
 
-        mStationMapFragment.setPinOnStation(false, _selectedStationId);
+        if (!mStationMapFragment.isPickedPlaceMarkerVisible()) {
 
-        mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
+            LatLng sortRef = _targetDestination != null ? _targetDestination.getLatLng() : getLatLngForStation(_selectedStationId);
+            //Replace recyclerview content
+            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
+                    sortRef, mStationMapFragment.getMarkerALatLng());
 
-        //Replace recyclerview content
-        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
-                mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerALatLng());
+            mClearFAB.show();
+            mFavoritesSheetFab.hideSheetThenFab();
+            mPlacePickerFAB.hide();
 
-        mClearFAB.show();
-        mMaterialSheetFab.hideSheetThenFab();
-        mPlacePickerFAB.hide();
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
+                    if (getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.DOCK_STATIONS)) {
+                        //highlight B station in list
+                        if (_selectedStationId != null) {
+                            getListPagerAdapter().highlightStationForPage(_selectedStationId, StationListPagerAdapter.DOCK_STATIONS);
+                            mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
+                        }
+                        else {
+                            mStationMapFragment.setPinOnStation(false, getListPagerAdapter().highlightClosestStationWithAvailability(false));
+                            animateCameraToShow(_targetDestination.getLatLng(), mStationMapFragment.getMarkerBVisibleLatLng());
+                        }
 
-                if (getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.DOCK_STATIONS)) {
-                    //highlight B station in list
-                    getListPagerAdapter().highlightStationForPage(_selectedStationId, StationListPagerAdapter.DOCK_STATIONS);
-                    getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
-                } else
-                    handler.postDelayed(this, 10);
-            }
-        }, 10);
+                        getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
+                    } else
+                        handler.postDelayed(this, 10);
+                }
+            }, 10);
+        }
+        else {
+
+            animateCameraToShow(getLatLngForStation(_selectedStationId), mStationMapFragment.getMarkerPickedPlaceVisibleLatLng());
+            getListPagerAdapter().highlightStationForPage(_selectedStationId, StationListPagerAdapter.DOCK_STATIONS);
+            getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
+        }
+
+        if (_selectedStationId != null)
+            mStationMapFragment.setPinOnStation(false, _selectedStationId);
+        else
+            mStationMapFragment.setPinForPickedPlace(_targetDestination.getName().toString(),
+                    _targetDestination.getLatLng(), _targetDestination.getAttributions());
+    }
+
+    private void clearBTab(){
+        getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
+
+        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
+
+        mStationMapFragment.clearMarkerB();
+        mStationMapFragment.clearMarkerPickedPlace();
+
+        mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
+
+        mFavoritesSheetFab.showFab();
+        mPlacePickerFAB.show();
+        mClearFAB.hide();
     }
 
     private boolean isLookingForBike() {
         return mStationListViewPager.getCurrentItem() == StationListPagerAdapter.BIKE_STATIONS;
+    }
+
+    private LatLng getLatLngForStation(String _stationId){
+        LatLng toReturn = null;
+
+        for(StationItem station : mStationsNetwork){
+            if (station.getId().equalsIgnoreCase(_stationId)){
+                toReturn = station.getPosition();
+                break;
+            }
+        }
+
+        return toReturn;
     }
 
     private void cancelDownloadWebTask() {
@@ -758,34 +868,8 @@ public class NearbyActivity extends AppCompatActivity
                 if (mStationMapFragment.getMarkerBVisibleLatLng() != null)
                     getListPagerAdapter().notifyStationAUpdate(mStationMapFragment.getMarkerALatLng());
             }
-            else{
-
-                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
-
-                //Replace recyclerview content
-                getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
-                        mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerALatLng());
-
-                mClearFAB.show();
-                mMaterialSheetFab.hideSheetThenFab();
-                mPlacePickerFAB.hide();
-
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        if (getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.DOCK_STATIONS)) {
-                            //highlight B station in list
-                            getListPagerAdapter().highlightStationForPage(clickedStation.getId(),
-                                    StationListPagerAdapter.DOCK_STATIONS);
-                            getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
-                        } else
-                            handler.postDelayed(this, 10);
-                    }
-                }, 10);
-
-            }
+            else
+                setupBTabSelection(clickedStation.getId());
         }
         else if (uri.getPath().equalsIgnoreCase("/"+ StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH)){
 
@@ -916,7 +1000,7 @@ public class NearbyActivity extends AppCompatActivity
                 getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, true);
 
                 mPlacePickerFAB.hide();
-                mMaterialSheetFab.hideSheetThenFab();
+                mFavoritesSheetFab.hideSheetThenFab();
                 mClearFAB.hide();
 
                 //just to be on the safe side
@@ -938,9 +1022,9 @@ public class NearbyActivity extends AppCompatActivity
                     mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
 
                     if (mFavoriteSheetVisible)
-                        mMaterialSheetFab.showSheet();
+                        mFavoritesSheetFab.showSheet();
                     else {
-                        mMaterialSheetFab.showFab();
+                        mFavoritesSheetFab.showFab();
                         mPlacePickerFAB.show();
                     }
                 } else {
@@ -996,6 +1080,7 @@ public class NearbyActivity extends AppCompatActivity
 
     @Override
     public void onFavoriteListItemClick(String _stationID) {
+        mStationMapFragment.clearMarkerPickedPlace();
         setupBTabSelection(_stationID);
     }
 

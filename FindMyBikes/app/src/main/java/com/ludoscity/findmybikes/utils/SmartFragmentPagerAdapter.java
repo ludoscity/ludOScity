@@ -42,7 +42,7 @@ public abstract class SmartFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     public boolean isViewPagerReady() {
-        boolean toReturn = !(registeredFragments.size() == 0);
+        boolean toReturn = registeredFragments.size() != 0;
 
         for (int i=0; i<registeredFragments.size(); ++i){
             if (registeredFragments.get(i) == null){

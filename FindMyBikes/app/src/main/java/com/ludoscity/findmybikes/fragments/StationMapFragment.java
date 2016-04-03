@@ -8,9 +8,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,6 +22,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.ludoscity.findmybikes.R;
@@ -86,6 +89,10 @@ public class StationMapFragment extends Fragment
     private Marker mMarkerStationB;
     private BitmapDescriptor mIconABitmapDescriptor;
     private BitmapDescriptor mIconBBitmapDescriptor;
+    private Marker mMarkerPickedPlace;
+    private BitmapDescriptor mIconPickedPlaceBitmapDescriptor;
+
+    private TextView mAttributionsText;
 
     private final LatLng MONTREAL_LATLNG = new LatLng(45.5087, -73.554);
 
@@ -105,6 +112,9 @@ public class StationMapFragment extends Fragment
 
         mIconABitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a_map);
         mIconBBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b_map);
+        mIconPickedPlaceBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_picked_place);
+
+        mAttributionsText = (TextView) inflatedView.findViewById(R.id.attributions_text);
 
         return inflatedView;
     }
@@ -126,6 +136,10 @@ public class StationMapFragment extends Fragment
         outState.putBoolean("pin_B_visibility", mMarkerStationB != null && mMarkerStationB.isVisible());
         outState.putParcelable("pin_A_latlng", mMarkerStationA != null ? mMarkerStationA.getPosition() : MONTREAL_LATLNG);
         outState.putParcelable("pin_B_latlng", mMarkerStationB != null ? mMarkerStationB.getPosition() : MONTREAL_LATLNG);
+
+        outState.putBoolean("pin_picked_place_visibility", mMarkerPickedPlace != null && mMarkerPickedPlace.isVisible());
+        outState.putParcelable("pin_picked_place_latlng", mMarkerPickedPlace != null ? mMarkerPickedPlace.getPosition() : MONTREAL_LATLNG);
+        outState.putString("picked_place_name", mMarkerPickedPlace != null ? mMarkerPickedPlace.getTitle() : "");
         super.onSaveInstanceState(outState);
     }
 
@@ -192,12 +206,18 @@ public class StationMapFragment extends Fragment
     @Override
     public boolean onMarkerClick(Marker marker) {
 
+        if (isPickedPlaceMarkerVisible())
+            mMarkerPickedPlace.showInfoWindow();
+
         if ( (mMarkerStationA.isVisible() &&
                 mMarkerStationA.getPosition().latitude == marker.getPosition().latitude &&
                 mMarkerStationA.getPosition().longitude == marker.getPosition().longitude) ||
-                (mMarkerStationB.isVisible() &&
-                        mMarkerStationB.getPosition().latitude == marker.getPosition().latitude &&
-                        mMarkerStationB.getPosition().longitude == marker.getPosition().longitude) )
+            (mMarkerStationB.isVisible() &&
+                mMarkerStationB.getPosition().latitude == marker.getPosition().latitude &&
+                mMarkerStationB.getPosition().longitude == marker.getPosition().longitude) ||
+            (mMarkerPickedPlace.isVisible() &&
+                mMarkerPickedPlace.getPosition().latitude == marker.getPosition().latitude &&
+                mMarkerPickedPlace.getPosition().longitude == marker.getPosition().longitude) )
             return true;
 
         Uri.Builder builder = new Uri.Builder();
@@ -273,6 +293,26 @@ public class StationMapFragment extends Fragment
         return toReturn;
     }
 
+    public boolean isPickedPlaceMarkerVisible(){
+        return mMarkerPickedPlace != null && mMarkerPickedPlace.isVisible();
+    }
+
+    public LatLng getMarkerPickedPlaceVisibleLatLng() {
+        LatLng toReturn = null;
+        if ( mMarkerPickedPlace != null  ) {
+            if (mMarkerPickedPlace.isVisible())
+                toReturn = mMarkerPickedPlace.getPosition();
+        }
+        else if (mBufferedBundle != null && mBufferedBundle.getBoolean("pin_picked_place_visibility") )
+            toReturn = mBufferedBundle.getParcelable("pin_picked_place_latlng");
+
+        return toReturn;
+    }
+
+    public LatLngBounds getCameraLatLngBounds() {
+        return mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
+    }
+
     public boolean isRestoring() { return mBufferedBundle != null; }
 
     public void clearMarkerB() {
@@ -290,24 +330,36 @@ public class StationMapFragment extends Fragment
 
         boolean pinAVisible;
         boolean pinBVisible;
+        boolean pinPickedPlaceVisible;
         LatLng pinALatLng;
         LatLng pinBLatLng;
+        LatLng pinPickedPlaceLatLng;
+
+        String pickedPlaceName;
 
         if (mBufferedBundle != null){
 
             pinAVisible = mBufferedBundle.getBoolean("pin_A_visibility");
             pinBVisible = mBufferedBundle.getBoolean("pin_B_visibility");
+            pinPickedPlaceVisible = mBufferedBundle.getBoolean("pin_picked_place_visibility");
 
             pinALatLng = mBufferedBundle.getParcelable("pin_A_latlng");
             pinBLatLng = mBufferedBundle.getParcelable("pin_B_latlng");
+            pinPickedPlaceLatLng = mBufferedBundle.getParcelable("pin_picked_place_latlng");
+
+            pickedPlaceName = mBufferedBundle.getString("picked_place_name");
 
             mBufferedBundle = null;
         } else {
 
             pinAVisible = mMarkerStationA != null && mMarkerStationA.isVisible();
             pinBVisible = mMarkerStationB != null && mMarkerStationB.isVisible();
+            pinPickedPlaceVisible = mMarkerPickedPlace != null && mMarkerPickedPlace.isVisible();
             pinALatLng = mMarkerStationA != null ? mMarkerStationA.getPosition() : MONTREAL_LATLNG;
             pinBLatLng = mMarkerStationB != null ? mMarkerStationB.getPosition() : MONTREAL_LATLNG;
+            pinPickedPlaceLatLng = mMarkerPickedPlace != null ? mMarkerPickedPlace.getPosition() : MONTREAL_LATLNG;
+
+            pickedPlaceName = mMarkerPickedPlace != null ? mMarkerPickedPlace.getTitle() : "";
         }
 
         mGoogleMap.clear();
@@ -316,6 +368,7 @@ public class StationMapFragment extends Fragment
         //https://code.google.com/p/gmaps-api-issues/issues/detail?id=9011
         BitmapDescriptor iconA = mIconABitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_a_map);
         BitmapDescriptor iconB = mIconBBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b_map);
+        BitmapDescriptor iconPickedPlace = mIconPickedPlaceBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b_map);
 
         mMarkerStationA = mGoogleMap.addMarker(new MarkerOptions().position(pinALatLng)
                 .icon(iconA)
@@ -323,6 +376,12 @@ public class StationMapFragment extends Fragment
         mMarkerStationB = mGoogleMap.addMarker(new MarkerOptions().position(pinBLatLng)
                 .icon(iconB)
                 .visible(pinBVisible));
+        mMarkerPickedPlace = mGoogleMap.addMarker(new MarkerOptions().position(pinPickedPlaceLatLng)
+                .icon(iconPickedPlace)
+                .visible(pinPickedPlaceVisible)
+                .title(pickedPlaceName));
+
+        mMarkerPickedPlace.showInfoWindow();
 
         for (StationMapGfx markerData : mMapMarkersGfxData){
             markerData.addMarkerToMap(mGoogleMap);
@@ -381,8 +440,32 @@ public class StationMapFragment extends Fragment
         }
     }
 
+    public void setPinForPickedPlace(String _placeName, LatLng _placePosition, CharSequence _attributions){
+
+        mMarkerPickedPlace.setTitle(_placeName);
+        mMarkerPickedPlace.setPosition(_placePosition);
+        mMarkerPickedPlace.setVisible(true);
+        mMarkerPickedPlace.showInfoWindow();
+
+        if (_attributions != null) {
+            mAttributionsText.setText(Html.fromHtml(_attributions.toString()));
+            mAttributionsText.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public  void clearMarkerPickedPlace(){
+        if(mMarkerPickedPlace != null)
+            mMarkerPickedPlace.setVisible(false);
+
+        mAttributionsText.setVisibility(View.GONE);
+        mAttributionsText.setText("");
+    }
+
     @Override
     public void onMapClick(LatLng latLng) {
+
+        if (mMarkerPickedPlace != null && mMarkerPickedPlace.isVisible())
+            mMarkerPickedPlace.showInfoWindow();
 
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(MAP_CLICK_PATH);

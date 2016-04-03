@@ -43,7 +43,7 @@ public class StationListFragment extends Fragment
 
     private OnStationListFragmentInteractionListener mListener;
 
-    private StationRecyclerViewAdapter getRecyclerViewAdapter(){
+    private StationRecyclerViewAdapter getStationRecyclerViewAdapter(){
         return (StationRecyclerViewAdapter)mStationRecyclerView.getAdapter();
     }
 
@@ -104,13 +104,13 @@ public class StationListFragment extends Fragment
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt("selected_pos", getRecyclerViewAdapter().getSelectedPos());
-        outState.putParcelable("sort_reference_LatLng", getRecyclerViewAdapter().getSortReferenceLatLng());
-        outState.putParcelable("distance_reference_latlng", getRecyclerViewAdapter().getDistanceReferenceLatLng());
+        outState.putInt("selected_pos", getStationRecyclerViewAdapter().getSelectedPos());
+        outState.putParcelable("sort_reference_LatLng", getStationRecyclerViewAdapter().getSortReferenceLatLng());
+        outState.putParcelable("distance_reference_latlng", getStationRecyclerViewAdapter().getDistanceReferenceLatLng());
         outState.putString("string_if_empty", mEmptyListTextView.getText().toString());
 
-        getRecyclerViewAdapter().saveStationList(outState);
-        getRecyclerViewAdapter().saveLookingForBike(outState);
+        getStationRecyclerViewAdapter().saveStationList(outState);
+        getStationRecyclerViewAdapter().saveLookingForBike(outState);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class StationListFragment extends Fragment
             int selectedPos = savedInstanceState.getInt("selected_pos");
 
             if (selectedPos != NO_POSITION)
-                getRecyclerViewAdapter().setSelectedPos(selectedPos, false);
+                getStationRecyclerViewAdapter().setSelectedPos(selectedPos, false);
 
             LatLng sortReferenceLatLng = savedInstanceState.getParcelable("sort_reference_LatLng");
             LatLng distanceReferenceLatLng = savedInstanceState.getParcelable("distance_reference_latlng");
@@ -148,7 +148,7 @@ public class StationListFragment extends Fragment
                 mEmptyListTextView.setVisibility(View.VISIBLE);
             }
 
-            getRecyclerViewAdapter().setupStationList(stationsNetwork, _sortReferenceLatLng, _distanceReferenceLatLng);
+            getStationRecyclerViewAdapter().setupStationList(stationsNetwork, _sortReferenceLatLng, _distanceReferenceLatLng);
             lookingForBikes(lookingForBike);
         }
     }
@@ -157,29 +157,33 @@ public class StationListFragment extends Fragment
 
         if (mRecyclerViewScrollingState == SCROLL_STATE_IDLE) {
 
-            getRecyclerViewAdapter().setDistanceSortReferenceLatLngAndSortIfRequired(_toSet, false);
+            getStationRecyclerViewAdapter().setDistanceSortReferenceLatLngAndSortIfRequired(_toSet, false);
         }
     }
 
     public void setDistanceDisplayReferenceLatLng(LatLng _toSet, boolean _notify) {
-        getRecyclerViewAdapter().setDistanceDisplayReferenceLatLng(_toSet, _notify);
+        getStationRecyclerViewAdapter().setDistanceDisplayReferenceLatLng(_toSet, _notify);
     }
 
-    public void highlightClosestStationWithAvailability(boolean _lookingForBike){
+    public String highlightClosestStationWithAvailability(boolean _lookingForBike){
 
-        highlightStation(getRecyclerViewAdapter().getClosestStationWithAvailability(_lookingForBike));
+        String closestWithAvailability = getStationRecyclerViewAdapter().getClosestStationWithAvailability(_lookingForBike);
+
+        highlightStation(closestWithAvailability);
+
+        return closestWithAvailability;
 
     }
 
     public boolean isRecyclerViewReadyForItemSelection(){
-        return mStationRecyclerView != null && getRecyclerViewAdapter().getSortReferenceLatLng() != null &&
+        return mStationRecyclerView != null && getStationRecyclerViewAdapter().getSortReferenceLatLng() != null &&
                 ((ScrollingLinearLayoutManager)mStationRecyclerView.getLayoutManager()).findFirstVisibleItemPosition() !=
                         NO_POSITION;
     }
 
     public boolean highlightStation(String _stationId) {
 
-        int selectedPos = getRecyclerViewAdapter().setSelection(_stationId, false);
+        int selectedPos = getStationRecyclerViewAdapter().setSelection(_stationId, false);
 
         ((StationRecyclerViewAdapter)mStationRecyclerView.getAdapter()).requestFabAnimation();
 
@@ -188,16 +192,16 @@ public class StationListFragment extends Fragment
 
     public StationItem getHighlightedStation(){
 
-        return getRecyclerViewAdapter().getSelected();
+        return getStationRecyclerViewAdapter().getSelected();
     }
 
     public void removeStationHighlight(){
-        getRecyclerViewAdapter().clearSelection();
+        getStationRecyclerViewAdapter().clearSelection();
     }
 
     public void lookingForBikes(boolean lookingForBike) {
 
-        getRecyclerViewAdapter().lookingForBikesNotify(lookingForBike);
+        getStationRecyclerViewAdapter().lookingForBikesNotify(lookingForBike);
 
         if (lookingForBike) {
 
@@ -246,7 +250,7 @@ public class StationListFragment extends Fragment
     }
 
     public void removeStation(StationItem toRemove, String stringIfEmpty) {
-        if (getRecyclerViewAdapter().removeItem(toRemove)){
+        if (getStationRecyclerViewAdapter().removeItem(toRemove)){
             mStationRecyclerView.setVisibility(View.GONE);
             mEmptyListTextView.setText(stringIfEmpty);
             mEmptyListTextView.setVisibility(View.VISIBLE);
@@ -256,16 +260,16 @@ public class StationListFragment extends Fragment
     public void addStation(StationItem toAdd) {
         mEmptyListTextView.setVisibility(View.GONE);
         mStationRecyclerView.setVisibility(View.VISIBLE);
-        getRecyclerViewAdapter().addItem(toAdd);
+        getStationRecyclerViewAdapter().addItem(toAdd);
     }
 
     public void smoothScrollSelectionInView(boolean _appBarExpanded) {
-        if (_appBarExpanded && getRecyclerViewAdapter().getSelectedPos() >=
+        if (_appBarExpanded && getStationRecyclerViewAdapter().getSelectedPos() >=
                 ((LinearLayoutManager)mStationRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition()){
-            mStationRecyclerView.smoothScrollToPosition(getRecyclerViewAdapter().getSelectedPos()+1);
+            mStationRecyclerView.smoothScrollToPosition(getStationRecyclerViewAdapter().getSelectedPos()+1);
         }
         else
-            mStationRecyclerView.smoothScrollToPosition(getRecyclerViewAdapter().getSelectedPos());
+            mStationRecyclerView.smoothScrollToPosition(getStationRecyclerViewAdapter().getSelectedPos());
     }
 
     public interface OnStationListFragmentInteractionListener {
