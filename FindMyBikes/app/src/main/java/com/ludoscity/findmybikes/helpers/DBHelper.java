@@ -17,8 +17,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ludoscity.findmybikes.FavoriteItem;
 import com.ludoscity.findmybikes.R;
-import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
 import com.ludoscity.findmybikes.StationItem;
+import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
 import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
 
 import org.json.JSONArray;
@@ -343,6 +343,8 @@ public class DBHelper {
         return stationsNetwork;
     }
 
+    //TODO: Add validation of IDs to handle the case were a favorite station been removed
+    //Replace edit fab with red delete one
     public static ArrayList<FavoriteItem> getFavoriteItems(Context _ctx){
         ArrayList<FavoriteItem> toReturn = new ArrayList<>();
 

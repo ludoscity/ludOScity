@@ -364,10 +364,10 @@ public class StationMapFragment extends Fragment
     }
 
     //TODO: if clients have a stationname, maybe they have the station LatLng on hand
-    public void setPinOnStation(boolean _lookingForBike, String _stationName){
+    public void setPinOnStation(boolean _lookingForBike, String _stationId){
 
         for (StationMapGfx markerData : mMapMarkersGfxData){
-            if (markerData.getMarkerTitle().equalsIgnoreCase(_stationName)) {
+            if (markerData.getMarkerTitle().equalsIgnoreCase(_stationId)) {
                 if (_lookingForBike){
                     mMarkerStationA.setPosition(markerData.getMarkerLatLng());
                     mMarkerStationA.setVisible(true);

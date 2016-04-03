@@ -37,7 +37,7 @@ public class StationMapGfx {
         //Marker setup
         markerOptions = new MarkerOptions()
                 .position(item.getPosition())
-                .title(item.getName())
+                .title(item.getId())
                 .alpha(0)
                 .anchor(0.5f,0.5f)
                 .infoWindowAnchor(0.5f,0.5f);

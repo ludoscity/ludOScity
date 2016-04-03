@@ -59,7 +59,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     }
 
     public boolean removeItem(StationItem toRemove) {
-        int positionToRemove = getPositionInList(toRemove.getName());
+        int positionToRemove = getStationItemPositionInList(toRemove.getId());
 
         if ( positionToRemove == mSelectedPos)
             mSelectedPos = NO_POSITION;
@@ -123,6 +123,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         FrameLayout mFabsAnchor;
 
         private Handler mFabAnimHandler = null;
+        private String mStationId;
 
         public StationListItemViewHolder(View itemView) {
             super(itemView);
@@ -141,6 +142,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         }
 
         public void bindStation(StationItem _station, boolean _selected){
+
+            mStationId = _station.getId();
 
             mName.setText(_station.getName());
 
@@ -269,7 +272,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             switch (view.getId()){
                 case R.id.list_item_root:
 
-                    int newlySelectedPos = StationRecyclerViewAdapter.this.setSelectionFromName(mName.getText().toString(), false);
+                    int newlySelectedPos = StationRecyclerViewAdapter.this.setSelection(mStationId, false);
 
                     mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
                     mFabAnimationRequested = newlySelectedPos != mSelectedPos;
@@ -295,10 +298,10 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
     public void setupStationList(ArrayList<StationItem> _toSet, LatLng _sortReferenceLatLng,
                                  LatLng _distanceReferenceLatLng){
-        String selectedNameBefore = null;
+        String selectedIdBefore = null;
 
         if (null != getSelected())
-            selectedNameBefore = getSelected().getName();
+            selectedIdBefore = getSelected().getId();
 
         //Making a copy as sorting shouldn't interfere with the rest of the code
         mStationList.clear();
@@ -309,8 +312,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         mDistanceDisplayReferenceLatLng = _distanceReferenceLatLng;
 
-        if (selectedNameBefore != null)
-            setSelectionFromName(selectedNameBefore, false);
+        if (selectedIdBefore != null)
+            setSelection(selectedIdBefore, false);
     }
 
     public void setDistanceSortReferenceLatLngAndSortIfRequired(LatLng _sortReferenceLatLng, boolean _forceSort) {
@@ -336,9 +339,9 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     }
 
 
-    public int setSelectionFromName(String stationName, boolean unselectOnTwice){
+    public int setSelection(String _stationId, boolean unselectOnTwice){
 
-        return setSelectedPos(getPositionInList(stationName), unselectOnTwice);
+        return setSelectedPos(getStationItemPositionInList(_stationId), unselectOnTwice);
     }
 
     public StationItem getSelected(){
@@ -362,7 +365,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             notifyItemChanged(selectedBefore);
     }
 
-    public String getClosestWithAvailabilityStationName(boolean _lookingForBike){
+    public String getClosestStationWithAvailability(boolean _lookingForBike){
 
         String toReturn = "";
 
@@ -370,13 +373,13 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         for (StationItem stationItem: mStationList){
             if (_lookingForBike) {
                 if (stationItem.getFree_bikes() > 0) {
-                    toReturn = stationItem.getName();
+                    toReturn = stationItem.getId();
                     break;
                 }
             }
             else {
                 if (stationItem.getEmpty_slots() > 0){
-                    toReturn = stationItem.getName();
+                    toReturn = stationItem.getId();
                     break;
                 }
             }
@@ -384,20 +387,20 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         //failsafe
         if (toReturn.length() == 0 && !mStationList.isEmpty())
-            toReturn = mStationList.get(0).getName();
+            toReturn = mStationList.get(0).getId();
 
         return toReturn;
     }
 
 
 
-    private int getPositionInList(String stationName){
+    private int getStationItemPositionInList(String _stationId){
 
         int toReturn = NO_POSITION;
 
         int i=0;
         for (StationItem stationItem: mStationList){
-            if (stationItem.getName().equals(stationName)) {
+            if (stationItem.getId().equals(_stationId)) {
                 toReturn = i;
                 break;
             }
@@ -434,10 +437,10 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
     public void sortStationListByClosestToReference(){
 
-        String selectedNameBefore = null;
+        String selectedIdBefore = null;
 
         if (null != getSelected())
-            selectedNameBefore = getSelected().getName();
+            selectedIdBefore = getSelected().getId();
 
         if (mDistanceSortReferenceLatLng != null) {
             Collections.sort(mStationList, new Comparator<StationItem>() {
@@ -448,7 +451,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             });
         }
 
-        if (selectedNameBefore != null)
-            setSelectionFromName(selectedNameBefore, false);
+        if (selectedIdBefore != null)
+            setSelection(selectedIdBefore, false);
     }
 }

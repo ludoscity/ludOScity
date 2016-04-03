@@ -1,10 +1,12 @@
 package com.ludoscity.findmybikes;
 
 import android.content.Context;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 /**
  * Created by F8Full on 2016-03-31.
  * Adapter for the RecyclerView displaying favorites station in a sheet
+ * Also allows edition
  */
 public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRecyclerViewAdapter.FavoriteListItemViewHolder> {
 
@@ -22,7 +25,8 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
     private ArrayList<FavoriteItem> mFavoriteList = new ArrayList<>();
 
     public interface OnFavoriteListItemClickListener {
-        void onFavoriteListItemClick(String _path);
+        void onFavoriteListItemClick(String _stationId);
+        void onFavoristeListItemEditDone(String _stationId, String _newName );
     }
 
     public FavoriteRecyclerViewAdapter(OnFavoriteListItemClickListener _listener, Context _ctx){
@@ -57,29 +61,117 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         return mFavoriteList.size();
     }
 
-    public class FavoriteListItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class FavoriteListItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnFocusChangeListener {
 
         TextView mName;
+        String mStationId;
+        FloatingActionButton mEditFab;
+        FloatingActionButton mDoneFab;
+
+        boolean mEditing = false;
+        String mNameBuffer;
 
         public FavoriteListItemViewHolder(View itemView) {
             super(itemView);
 
             mName = (TextView) itemView.findViewById(R.id.favorite_name);
+            mEditFab = (FloatingActionButton) itemView.findViewById(R.id.favorite_name_edit_fab);
+            mDoneFab = (FloatingActionButton) itemView.findViewById(R.id.favorite_name_done_fab);
 
-            itemView.setOnClickListener(this);
+            mName.setOnClickListener(this);
+            mEditFab.setOnClickListener(this);
+            mDoneFab.setOnClickListener(this);
         }
 
         public void bindFavorite(FavoriteItem _favorite){
             mName.setText(_favorite.getDisplayName());
+            mStationId = _favorite.getStationId();
         }
 
         @Override
         public void onClick(View v) {
 
             switch (v.getId()){
-                case R.id.favoritelist_item_root:
-                    mListener.onFavoriteListItemClick("clicked");
+                case R.id.favorite_name:
+                    if (!mEditing)
+                        mListener.onFavoriteListItemClick(mStationId);
+                    else //User pressed back to hide keyboard
+                        showSoftInput();
                     break;
+
+                case R.id.favorite_name_edit_fab:
+                    mEditing = true;
+                    setupEditMode(true);
+                    break;
+
+                case R.id.favorite_name_done_fab:
+                    mEditing = false;
+                    setupEditMode(false);
+                    mListener.onFavoristeListItemEditDone(mStationId, mName.getText().toString());
+                    break;
+            }
+        }
+
+        private void setupEditMode(boolean _editing) {
+            if (_editing)
+            {
+                mEditFab.hide();
+                mDoneFab.show();
+
+                mName.setCursorVisible(true);
+                mName.setOnFocusChangeListener(this);
+                mName.setTextIsSelectable(true);
+                mName.setFocusableInTouchMode(true);
+                mName.requestFocus();
+
+                //API level 21+
+                //mName.setShowSoftInputOnFocus(true);
+
+                showSoftInput();
+            }
+            else {
+                hideSoftInput();
+
+                mName.setCursorVisible(false);
+                mName.setOnFocusChangeListener(null);
+                mName.setTextIsSelectable(false);
+                mName.setFocusableInTouchMode(false);
+
+                mName.setText(mName.getText().toString().trim());
+
+                mDoneFab.hide();
+                mEditFab.show();
+            }
+        }
+
+        private void showSoftInput() {
+            InputMethodManager imm = (InputMethodManager) mCtx.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(mName, InputMethodManager.SHOW_FORCED);
+        }
+
+        private void hideSoftInput() {
+            InputMethodManager imm = (InputMethodManager) mCtx.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(mName.getWindowToken(), 0);
+        }
+
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+
+            TextView vTV = (TextView)v;
+
+            if (hasFocus){
+
+                mNameBuffer = vTV.getText().toString();
+
+            } else {
+
+                if (mEditing) {
+                    //Editing mode wasn't left from clicking done fab, restoring original name
+                    vTV.setText(mNameBuffer);
+
+                    mEditing = false;
+                    setupEditMode(false);
+                }
             }
         }
     }

@@ -6,15 +6,15 @@ package com.ludoscity.findmybikes;
  */
 public class FavoriteItem {
 
-    private String mId;
+    private String mStationId;
     private String mDisplayName;
 
-    public FavoriteItem(String _id, String _name){
-        mId = _id;
+    public FavoriteItem(String _stationId, String _name){
+        mStationId = _stationId;
         mDisplayName = _name;
     }
 
-    public String getDisplayName() {
-        return mDisplayName;
-    }
+    public String getDisplayName() { return mDisplayName; }
+
+    public String getStationId() { return mStationId; }
 }

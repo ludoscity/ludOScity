@@ -89,8 +89,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         return retrieveListFragment(pageID).isRecyclerViewReadyForItemSelection();
     }
 
-    public boolean highlightStationFromNameForPage(String stationName, int position) {
-        return retrieveListFragment(position).highlightStationFromName(stationName);
+    public boolean highlightStationForPage(String _stationId, int _pagePosition) {
+        return retrieveListFragment(_pagePosition).highlightStation(_stationId);
     }
 
     public void removeStationHighlightForPage(int position) {

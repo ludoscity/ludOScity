@@ -2,9 +2,9 @@
 <android.support.percent.PercentRelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/favoritelist_item_root">
+    android:layout_height="wrap_content">
 
     <!--suppress AndroidDomInspection -->
     <TextView
@@ -18,14 +18,17 @@
         android:id="@+id/favorite_name"
         android:ellipsize="end"
         android:maxLines="3"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        />
+        android:selectAllOnFocus="true"
+        android:imeOptions="flagNoExtractUi"
+
+        tools:ignore="TextViewEdits"
+        android:inputType="text|textMultiLine|textCapWords|textNoSuggestions"/>
+        <!-- TODO: See if I could get an EditView with desired look and feel -->
 
     <android.support.design.widget.FloatingActionButton
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:id="@+id/edit_favorite_name_fab"
+        android:id="@+id/favorite_name_edit_fab"
         android:layout_centerInParent="true"
         android:clickable="true"
         app:srcCompat="@drawable/ic_action_edit_24dp"
@@ -35,6 +38,24 @@
         app:backgroundTint="@color/theme_primary_dark"
         android:layout_toEndOf="@+id/favorite_name"
         android:layout_toRightOf="@+id/favorite_name"
+
+        style="@style/listitem_floating_action_button"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/favorite_name_done_fab"
+        android:layout_centerInParent="true"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_action_done_24dp"
+
+        app:fabSize="mini"
+        app:layout_anchorGravity="start|center_vertical"
+        android:layout_toEndOf="@+id/favorite_name"
+        android:layout_toRightOf="@+id/favorite_name"
+
+        android:visibility="gone"
 
         style="@style/listitem_floating_action_button"
         />

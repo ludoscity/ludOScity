@@ -167,7 +167,7 @@ public class StationListFragment extends Fragment
 
     public void highlightClosestStationWithAvailability(boolean _lookingForBike){
 
-        highlightStationFromName(getRecyclerViewAdapter().getClosestWithAvailabilityStationName(_lookingForBike));
+        highlightStation(getRecyclerViewAdapter().getClosestStationWithAvailability(_lookingForBike));
 
     }
 
@@ -177,9 +177,9 @@ public class StationListFragment extends Fragment
                         NO_POSITION;
     }
 
-    public boolean highlightStationFromName(String _stationName) {
+    public boolean highlightStation(String _stationId) {
 
-        int selectedPos = getRecyclerViewAdapter().setSelectionFromName(_stationName, false);
+        int selectedPos = getRecyclerViewAdapter().setSelection(_stationId, false);
 
         ((StationRecyclerViewAdapter)mStationRecyclerView.getAdapter()).requestFabAnimation();
 
