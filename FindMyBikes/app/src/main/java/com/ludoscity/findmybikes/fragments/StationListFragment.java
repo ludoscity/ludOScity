@@ -140,11 +140,9 @@ public class StationListFragment extends Fragment
     public void setupUI(ArrayList<StationItem> stationsNetwork, boolean lookingForBike, String stringIfEmpty,
                         LatLng _sortReferenceLatLng, LatLng _distanceReferenceLatLng) {
 
-        boolean restoreEmptyStringGone = getStationRecyclerViewAdapter().getItemCount()== 0 &&
-                mEmptyListTextView.getVisibility() == View.GONE;
-
         if (stationsNetwork != null) {
 
+            //TODO: fix glitch when coming back from place widget
             if (!stationsNetwork.isEmpty()) {
                 mStationRecyclerView.setVisibility(View.VISIBLE);
                 mEmptyListTextView.setVisibility(View.GONE);
@@ -152,10 +150,7 @@ public class StationListFragment extends Fragment
             else{
                 mStationRecyclerView.setVisibility(View.GONE);
                 mEmptyListTextView.setText(stringIfEmpty);
-                if (!restoreEmptyStringGone)
-                    mEmptyListTextView.setVisibility(View.VISIBLE);
-                else
-                    mEmptyListTextView.setVisibility(View.GONE);
+                mEmptyListTextView.setVisibility(View.VISIBLE);
             }
 
             getStationRecyclerViewAdapter().setupStationList(stationsNetwork, _sortReferenceLatLng, _distanceReferenceLatLng);
