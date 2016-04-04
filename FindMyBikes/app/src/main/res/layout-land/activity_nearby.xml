@@ -20,7 +20,7 @@
     <LinearLayout
 
         android:layout_height="fill_parent"
-        app:layout_widthPercent="45%"
+        app:layout_widthPercent="@dimen/main_layout_list_section"
         android:orientation="vertical"
         android:layout_below="@+id/action_toolbar_layout"
         android:id="@+id/start_column_land">
@@ -64,7 +64,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_height="match_parent"
-        app:layout_widthPercent="55%"
+        app:layout_widthPercent="@dimen/main_layout_map_section"
         android:layout_below="@+id/action_toolbar_layout"
         android:layout_toRightOf="@id/start_column_land"
         android:layout_toEndOf="@id/start_column_land">
@@ -148,4 +148,19 @@
 
         </io.codetail.widget.RevealLinearLayout>
     </android.support.design.widget.CoordinatorLayout>
+
+    <!-- Circular reveal container for the place picker load screen -->
+    <io.codetail.widget.RevealFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!--TODO: AppBar is on top of it -->
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/theme_window_background"
+            android:id="@+id/place_picker_load_screen"
+            android:visibility="invisible"/>
+
+    </io.codetail.widget.RevealFrameLayout>
 </android.support.percent.PercentRelativeLayout>

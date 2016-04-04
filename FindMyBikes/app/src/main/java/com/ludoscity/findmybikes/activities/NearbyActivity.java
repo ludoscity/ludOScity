@@ -1,12 +1,14 @@
 package com.ludoscity.findmybikes.activities;
 
 import android.Manifest;
+import android.animation.Animator;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -31,6 +33,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,6 +82,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.codetail.animation.SupportAnimator;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -112,6 +119,7 @@ public class NearbyActivity extends AppCompatActivity
     private TabLayout mTabLayout;
     private AppBarLayout mAppBarLayout;
     private CoordinatorLayout mCoordinatorLayout;
+    private ProgressBar mPlacePickerLoadScreen;
 
     int PLACE_PICKER_REQUEST = 1;
     private FloatingActionButton mPlacePickerFAB;
@@ -130,6 +138,9 @@ public class NearbyActivity extends AppCompatActivity
             R.drawable.ic_pin_a_tab,
             R.drawable.ic_pin_b_tab
     };
+
+    private static final int PLACE_PICKER_LOAD_CIRCULAR_REVEAL_DURATION = 1000;
+    private static final int PLACE_PICKER_INTENT_FIRING_DELAY = 1500;
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -271,25 +282,10 @@ public class NearbyActivity extends AppCompatActivity
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
 
         mPlacePickerFAB = (FloatingActionButton) findViewById(R.id.place_picker_fab);
-        mPlacePickerFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
-                builder.setLatLngBounds(mStationMapFragment.getCameraLatLngBounds());
+        mPlacePickerLoadScreen = (ProgressBar) findViewById(R.id.place_picker_load_screen);
 
-                try {
-                    startActivityForResult(builder.build(NearbyActivity.this), PLACE_PICKER_REQUEST);
-                    mPlacePickerFAB.hide();
-                    mFavoritesSheetFab.hideSheetThenFab();
-
-                } catch (GooglePlayServicesRepairableException e) {
-                    Log.d("mPlacePickerFAB onClick", "oops", e);
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    Log.d("mPlacePickerFAB onClick", "oops", e);
-                }
-            }
-        });
+        setupPlacePickerFab();
         setupFavoriteFab();
         setupClearFab();
 
@@ -314,9 +310,57 @@ public class NearbyActivity extends AppCompatActivity
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
+    private void setupPlacePickerFab() {
+
+        mPlacePickerFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int[] fabLocation = new int[2];
+                mPlacePickerFAB.getLocationOnScreen(fabLocation);
+
+                //Reveal load screen
+                startCircularRevealAnim(mPlacePickerLoadScreen, fabLocation[0] + (mPlacePickerFAB.getWidth() / 2),
+                        fabLocation[1],
+                        Math.max(mPlacePickerFAB.getWidth(), mPlacePickerFAB.getHeight()) / 2,
+                        Math.max(mPlacePickerLoadScreen.getWidth(), mPlacePickerLoadScreen.getHeight()),
+                        PLACE_PICKER_LOAD_CIRCULAR_REVEAL_DURATION,
+                        AnimationUtils.loadInterpolator(NearbyActivity.this,
+                                R.interpolator.msf_interpolator)
+                );
+
+                //Fire intent
+                //Delay is introduced because as place picker start time varies wildly,
+                //things could look glitched when it performs very well.
+                //I prefer wasting a second for a better UX
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+                        builder.setLatLngBounds(mStationMapFragment.getCameraLatLngBounds());
+
+                        try {
+                            startActivityForResult(builder.build(NearbyActivity.this), PLACE_PICKER_REQUEST);
+
+                        } catch (GooglePlayServicesRepairableException e) {
+                            Log.d("mPlacePickerFAB onClick", "oops", e);
+                        } catch (GooglePlayServicesNotAvailableException e) {
+                            Log.d("mPlacePickerFAB onClick", "oops", e);
+                        }
+                    }
+                }, PLACE_PICKER_INTENT_FIRING_DELAY);
+            }
+        });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST) {
+
+            mPlacePickerLoadScreen.setVisibility(View.INVISIBLE);
+
             if (resultCode == RESULT_OK) {
 
                 final Place place = PlacePicker.getPlace(this, data);
@@ -953,6 +997,36 @@ public class NearbyActivity extends AppCompatActivity
         boundsBuilder.include(_latLng0).include(_latLng1);
 
         mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), Utils.dpToPx(66, this)));
+    }
+
+    private void startCircularRevealAnim(View view, int centerX, int centerY, float startRadius,
+                                           float endRadius, long duration, Interpolator interpolator) {
+        // Use native circular reveal on Android 5.0+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Native circular reveal uses coordinates relative to the view
+            int relativeCenterX = (int) (centerX - view.getX());
+            int relativeCenterY = (int) (centerY - view.getY());
+            // Setup animation
+            Animator anim = ViewAnimationUtils.createCircularReveal(view, relativeCenterX,
+                    relativeCenterY, startRadius, endRadius);
+            anim.setDuration(duration);
+            anim.setInterpolator(interpolator);
+
+            // Start animation
+            mPlacePickerLoadScreen.setVisibility(View.VISIBLE);
+            anim.start();
+        }else {
+            // Circular reveal library uses absolute coordinates
+            // Setup animation
+            SupportAnimator anim = io.codetail.animation.ViewAnimationUtils
+                    .createCircularReveal(view, centerX, centerY, startRadius, endRadius);
+            anim.setDuration((int) duration);
+            anim.setInterpolator(interpolator);
+
+            // Start animation
+            mPlacePickerLoadScreen.setVisibility(View.VISIBLE);
+            anim.start();
+        }
     }
 
     //Callback from pull-to-refresh

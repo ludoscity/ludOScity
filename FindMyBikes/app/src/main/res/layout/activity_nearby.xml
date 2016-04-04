@@ -9,7 +9,7 @@
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:id="@+id/appbar_coordinator"
-        app:layout_heightPercent="45%">
+        app:layout_heightPercent="@dimen/main_layout_list_section">
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
@@ -51,7 +51,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        app:layout_heightPercent="55%"
+        app:layout_heightPercent="@dimen/main_layout_map_section"
         android:layout_below="@id/appbar_coordinator"
         >
 
@@ -157,4 +157,18 @@
             </io.codetail.widget.RevealLinearLayout>
         </android.support.design.widget.CoordinatorLayout>
     </LinearLayout>
+
+    <!-- Circular reveal container for the place picker load screen -->
+    <io.codetail.widget.RevealFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/theme_window_background"
+            android:id="@+id/place_picker_load_screen"
+            android:visibility="invisible"/>
+
+    </io.codetail.widget.RevealFrameLayout>
 </android.support.percent.PercentRelativeLayout>
