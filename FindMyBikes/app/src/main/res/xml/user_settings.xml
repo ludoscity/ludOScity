@@ -3,13 +3,13 @@
     <CheckBoxPreference
         android:key="@string/pref_walking_proximity_key"
         android:title="@string/pref_walking_proximity_title"
-        android:summaryOff="@string/pref_walking_proximity_time"
+        android:summaryOff="@string/pref_walking_proximity_duration"
         android:summaryOn="@string/pref_proximity_distance"
         android:defaultValue="false" />
     <CheckBoxPreference
         android:key="@string/pref_biking_proximity_key"
         android:title="@string/pref_biking_proximity_title"
-        android:summaryOff="@string/pref_biking_proximity_time"
+        android:summaryOff="@string/pref_biking_proximity_duration"
         android:summaryOn="@string/pref_proximity_distance"
         android:defaultValue="false" />
     <CheckBoxPreference

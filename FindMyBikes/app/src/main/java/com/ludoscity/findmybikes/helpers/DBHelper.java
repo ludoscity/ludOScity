@@ -132,7 +132,7 @@ public class DBHelper {
 
     public static void saveBikeNetworkBounds(LatLngBounds bounds, Context ctx){
 
-        if (!bounds.equals(getBikeNetworkBounds(ctx))){
+        if (!bounds.equals(getBikeNetworkBounds(ctx, 0))){
 
             SharedPreferences.Editor editor = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE).edit();
 
@@ -149,21 +149,30 @@ public class DBHelper {
         }
     }
 
-    public static LatLngBounds getBikeNetworkBounds(Context ctx){
+    public static LatLngBounds getBikeNetworkBounds(Context _ctx, double _paddingKms){
 
-        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+        SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
-        LatLng southwest = new LatLng(
-                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_SW_LATITUDE, ctx), 0)),
-                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_SW_LONGITUDE, ctx), 0))
+        LatLng southwestRaw = new LatLng(
+                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_SW_LATITUDE, _ctx), 0)),
+                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_SW_LONGITUDE, _ctx), 0))
         );
 
-        LatLng northeast = new LatLng(
-                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_NE_LATITUDE, ctx), 0)),
-                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_NE_LONGITUDE, ctx), 0))
+        LatLng northeastRaw = new LatLng(
+                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_NE_LATITUDE, _ctx), 0)),
+                Double.longBitsToDouble(sp.getLong(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_BOUNDS_NE_LONGITUDE, _ctx), 0))
         );
 
-        return new LatLngBounds(southwest, northeast);
+        //http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
+        //http://stackoverflow.com/questions/29478463/offset-latlng-by-some-amount-of-meters-in-android
+        //Latitude : easy, 1 degree = 111111m (historically because of the French :D)
+        //Longitude : 1 degree = 111111 * cos (latitude)m
+        LatLng southwestPadded = new LatLng(southwestRaw.latitude - (_paddingKms*1000.d) / 111111.d,
+                southwestRaw.longitude - (_paddingKms*1000.d) / 111111.d * Math.cos(southwestRaw.latitude)  );
+        LatLng northeastPadded = new LatLng(northeastRaw.latitude + (_paddingKms*1000.d) / 111111.d,
+                northeastRaw.longitude + (_paddingKms*1000.d) / 111111.d * Math.cos(northeastRaw.latitude)  );
+
+        return new LatLngBounds(southwestPadded, northeastPadded);
     }
 
     private static String buildNetworkSpecificKey(String suffix, Context ctx){

@@ -1,14 +1,12 @@
 package com.ludoscity.findmybikes.activities;
 
 import android.Manifest;
-import android.animation.Animator;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -33,9 +31,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
-import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,7 +44,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -82,7 +77,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.codetail.animation.SupportAnimator;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -119,10 +113,10 @@ public class NearbyActivity extends AppCompatActivity
     private TabLayout mTabLayout;
     private AppBarLayout mAppBarLayout;
     private CoordinatorLayout mCoordinatorLayout;
-    private ProgressBar mPlacePickerLoadScreen;
+    private ProgressBar mPlaceAutocompleteLoadingProgressBar;
 
-    int PLACE_PICKER_REQUEST = 1;
-    private FloatingActionButton mPlacePickerFAB;
+    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private FloatingActionButton mSearchFAB;
     private MaterialSheetFab mFavoritesSheetFab;
     private boolean mFavoriteSheetVisible = false;
     private FloatingActionButton mClearFAB;
@@ -138,9 +132,6 @@ public class NearbyActivity extends AppCompatActivity
             R.drawable.ic_pin_a_tab,
             R.drawable.ic_pin_b_tab
     };
-
-    private static final int PLACE_PICKER_LOAD_CIRCULAR_REVEAL_DURATION = 1000;
-    private static final int PLACE_PICKER_INTENT_FIRING_DELAY = 1500;
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -239,6 +230,8 @@ public class NearbyActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        boolean autoCompleteLoadingProgressBarVisible = false;
+
         if (savedInstanceState != null) {
 
             mSavedInstanceCameraPosition = savedInstanceState.getParcelable("saved_camera_pos");
@@ -247,6 +240,7 @@ public class NearbyActivity extends AppCompatActivity
             mCurrentUserLatLng = savedInstanceState.getParcelable("user_location_latlng");
             mClosestBikeAutoSelected = savedInstanceState.getBoolean("closest_bike_auto_selected");
             mFavoriteSheetVisible = savedInstanceState.getBoolean("favorite_sheet_visible");
+            autoCompleteLoadingProgressBarVisible = savedInstanceState.getBoolean("place_autocomplete_loading");
             mRefreshTabs = savedInstanceState.getBoolean("refresh_tabs");
         }
 
@@ -281,11 +275,12 @@ public class NearbyActivity extends AppCompatActivity
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
 
-        mPlacePickerFAB = (FloatingActionButton) findViewById(R.id.place_picker_fab);
+        mSearchFAB = (FloatingActionButton) findViewById(R.id.search_fab);
+        mPlaceAutocompleteLoadingProgressBar = (ProgressBar) findViewById(R.id.place_autocomplete_loading);
+        if (autoCompleteLoadingProgressBarVisible)
+            mPlaceAutocompleteLoadingProgressBar.setVisibility(View.VISIBLE);
 
-        mPlacePickerLoadScreen = (ProgressBar) findViewById(R.id.place_picker_load_screen);
-
-        setupPlacePickerFab();
+        setupSearchFab();
         setupFavoriteFab();
         setupClearFab();
 
@@ -310,60 +305,52 @@ public class NearbyActivity extends AppCompatActivity
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    private void setupPlacePickerFab() {
+    private void setupSearchFab() {
 
-        mPlacePickerFAB.setOnClickListener(new View.OnClickListener() {
+        mSearchFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                int[] fabLocation = new int[2];
-                mPlacePickerFAB.getLocationOnScreen(fabLocation);
+                if (mPlaceAutocompleteLoadingProgressBar.getVisibility() != View.GONE)
+                    return;
 
-                //Reveal load screen
-                startCircularRevealAnim(mPlacePickerLoadScreen, fabLocation[0] + (mPlacePickerFAB.getWidth() / 2),
-                        fabLocation[1],
-                        Math.max(mPlacePickerFAB.getWidth(), mPlacePickerFAB.getHeight()) / 2,
-                        Math.max(mPlacePickerLoadScreen.getWidth(), mPlacePickerLoadScreen.getHeight()),
-                        PLACE_PICKER_LOAD_CIRCULAR_REVEAL_DURATION,
-                        AnimationUtils.loadInterpolator(NearbyActivity.this,
-                                R.interpolator.msf_interpolator)
-                );
+                try {
 
-                //Fire intent
-                //Delay is introduced because as place picker start time varies wildly,
-                //things could look glitched when it performs very well.
-                //I prefer wasting a second for a better UX
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                            .setBoundsBias(DBHelper.getBikeNetworkBounds(NearbyActivity.this,
+                                    NearbyActivity.this.getResources().getInteger(R.integer.average_biking_speed_kmh)))
+                            .build(NearbyActivity.this);
 
-                        builder.setLatLngBounds(mStationMapFragment.getCameraLatLngBounds());
+                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
 
-                        try {
-                            startActivityForResult(builder.build(NearbyActivity.this), PLACE_PICKER_REQUEST);
 
-                        } catch (GooglePlayServicesRepairableException e) {
-                            Log.d("mPlacePickerFAB onClick", "oops", e);
-                        } catch (GooglePlayServicesNotAvailableException e) {
-                            Log.d("mPlacePickerFAB onClick", "oops", e);
-                        }
-                    }
-                }, PLACE_PICKER_INTENT_FIRING_DELAY);
+                    mFavoritesSheetFab.hideSheetThenFab();
+                    mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.light_gray));
+
+                    mPlaceAutocompleteLoadingProgressBar.setVisibility(View.VISIBLE);
+
+                    getListPagerAdapter().hideEmptyString(StationListPagerAdapter.DOCK_STATIONS);
+
+                } catch (GooglePlayServicesRepairableException e) {
+                    Log.d("mPlacePickerFAB onClick", "oops", e);
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    Log.d("mPlacePickerFAB onClick", "oops", e);
+                }
             }
         });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLACE_PICKER_REQUEST) {
 
-            mPlacePickerLoadScreen.setVisibility(View.INVISIBLE);
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE){
 
-            if (resultCode == RESULT_OK) {
+            mPlaceAutocompleteLoadingProgressBar.setVisibility(View.GONE);
+            mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.theme_primary_dark));
 
-                final Place place = PlacePicker.getPlace(this, data);
+            if (resultCode == RESULT_OK){
+                mSearchFAB.hide();
+                final Place place = PlaceAutocomplete.getPlace(this, data);
 
                 final Handler handler = new Handler();
 
@@ -377,10 +364,12 @@ public class NearbyActivity extends AppCompatActivity
                             handler.postDelayed(this,10);
                     }
                 },50);
-            }
-            else {
-                mPlacePickerFAB.show();
+            } else {
+
                 mFavoritesSheetFab.showFab();
+                mSearchFAB.show();
+
+                getListPagerAdapter().showEmptyString(StationListPagerAdapter.DOCK_STATIONS);
             }
         }
     }
@@ -421,6 +410,7 @@ public class NearbyActivity extends AppCompatActivity
         outState.putParcelable("user_location_latlng", mCurrentUserLatLng);
         outState.putBoolean("closest_bike_auto_selected", mClosestBikeAutoSelected);
         outState.putBoolean("favorite_sheet_visible", mFavoriteSheetVisible);
+        outState.putBoolean("place_autocomplete_loading", mPlaceAutocompleteLoadingProgressBar.getVisibility() == View.VISIBLE);
         outState.putBoolean("refresh_tabs", mRefreshTabs);
     }
 
@@ -526,14 +516,14 @@ public class NearbyActivity extends AppCompatActivity
             @Override
             public void onShowSheet() {
 
-                mPlacePickerFAB.hide();
+                mSearchFAB.hide();
                 mFavoriteSheetVisible = true;
             }
 
             @Override
             public void onSheetHidden() {
                 if (!isLookingForBike() && mStationMapFragment.getMarkerBVisibleLatLng() == null)
-                    mPlacePickerFAB.show();
+                    mSearchFAB.show();
 
                 mFavoriteSheetVisible = false;
             }
@@ -657,9 +647,9 @@ public class NearbyActivity extends AppCompatActivity
                     if (Utils.Connectivity.isConnected(getApplicationContext())) {
 
                         getListPagerAdapter().setRefreshEnableAll(true);
-                        if (!mPlacePickerFAB.isEnabled()) {
-                            mPlacePickerFAB.setEnabled(true);
-                            mPlacePickerFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.theme_primary_dark));
+                        if (!mSearchFAB.isEnabled()) {
+                            mSearchFAB.setEnabled(true);
+                            mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.theme_primary_dark));
                             mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
                         }
 
@@ -703,8 +693,8 @@ public class NearbyActivity extends AppCompatActivity
                         futureStringBuilder.append(getString(R.string.no_connectivity));
 
                         getListPagerAdapter().setRefreshEnableAll(false);
-                        mPlacePickerFAB.setEnabled(false);
-                        mPlacePickerFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.light_gray));
+                        mSearchFAB.setEnabled(false);
+                        mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.light_gray));
                         mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this,R.color.theme_accent));
                     }
 
@@ -814,7 +804,7 @@ public class NearbyActivity extends AppCompatActivity
 
             mClearFAB.show();
             mFavoritesSheetFab.hideSheetThenFab();
-            mPlacePickerFAB.hide();
+            mSearchFAB.hide();
 
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -863,7 +853,7 @@ public class NearbyActivity extends AppCompatActivity
         mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
 
         mFavoritesSheetFab.showFab();
-        mPlacePickerFAB.show();
+        mSearchFAB.show();
         mClearFAB.hide();
     }
 
@@ -934,6 +924,7 @@ public class NearbyActivity extends AppCompatActivity
             }
         }
         else if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_DIRECTIONS_FAB_CLICK_PATH)){
+            //http://stackoverflow.com/questions/6205827/how-to-open-standard-google-map-application-from-my-application
 
             final StationItem curSelectedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
 
@@ -950,12 +941,14 @@ public class NearbyActivity extends AppCompatActivity
                     builder.append(mStationMapFragment.getMarkerALatLng().latitude).
                             append(",").
                             append(mStationMapFragment.getMarkerALatLng().longitude);
+                            //.append("+(A)"); Labeling doesn't work :'(
                 }
 
                         builder.append("&daddr=").
                         append(curSelectedStation.getPosition().latitude).
                         append(",").
                         append(curSelectedStation.getPosition().longitude).
+                        //append("B"). Labeling doesn't work :'(
                         append("&dirflg=");
 
                 if (isLookingForBike())
@@ -997,36 +990,6 @@ public class NearbyActivity extends AppCompatActivity
         boundsBuilder.include(_latLng0).include(_latLng1);
 
         mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), Utils.dpToPx(66, this)));
-    }
-
-    private void startCircularRevealAnim(View view, int centerX, int centerY, float startRadius,
-                                           float endRadius, long duration, Interpolator interpolator) {
-        // Use native circular reveal on Android 5.0+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Native circular reveal uses coordinates relative to the view
-            int relativeCenterX = (int) (centerX - view.getX());
-            int relativeCenterY = (int) (centerY - view.getY());
-            // Setup animation
-            Animator anim = ViewAnimationUtils.createCircularReveal(view, relativeCenterX,
-                    relativeCenterY, startRadius, endRadius);
-            anim.setDuration(duration);
-            anim.setInterpolator(interpolator);
-
-            // Start animation
-            mPlacePickerLoadScreen.setVisibility(View.VISIBLE);
-            anim.start();
-        }else {
-            // Circular reveal library uses absolute coordinates
-            // Setup animation
-            SupportAnimator anim = io.codetail.animation.ViewAnimationUtils
-                    .createCircularReveal(view, centerX, centerY, startRadius, endRadius);
-            anim.setDuration((int) duration);
-            anim.setInterpolator(interpolator);
-
-            // Start animation
-            mPlacePickerLoadScreen.setVisibility(View.VISIBLE);
-            anim.start();
-        }
     }
 
     //Callback from pull-to-refresh
@@ -1073,7 +1036,7 @@ public class NearbyActivity extends AppCompatActivity
                 mAppBarLayout.setExpanded(true, true);
                 getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, true);
 
-                mPlacePickerFAB.hide();
+                mSearchFAB.hide();
                 mFavoritesSheetFab.hideSheetThenFab();
                 mClearFAB.hide();
 
@@ -1097,9 +1060,14 @@ public class NearbyActivity extends AppCompatActivity
 
                     if (mFavoriteSheetVisible)
                         mFavoritesSheetFab.showSheet();
+                    else if (mPlaceAutocompleteLoadingProgressBar.getVisibility() != View.GONE){
+                        mFavoritesSheetFab.hideSheetThenFab();
+                        mSearchFAB.show();
+                        mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.light_gray));
+                    }
                     else {
                         mFavoritesSheetFab.showFab();
-                        mPlacePickerFAB.show();
+                        mSearchFAB.show();
                     }
                 } else {
 
@@ -1425,7 +1393,7 @@ public class NearbyActivity extends AppCompatActivity
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            if (mCurrentUserLatLng != null && !DBHelper.getBikeNetworkBounds(NearbyActivity.this).contains(mCurrentUserLatLng)){
+            if (mCurrentUserLatLng != null && !DBHelper.getBikeNetworkBounds(NearbyActivity.this, 0).contains(mCurrentUserLatLng)){
 
                 getListPagerAdapter().removeStationHighlightForPage(mTabLayout.getSelectedTabPosition());
 

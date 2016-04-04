@@ -108,6 +108,7 @@ public class StationListFragment extends Fragment
         outState.putParcelable("sort_reference_LatLng", getStationRecyclerViewAdapter().getSortReferenceLatLng());
         outState.putParcelable("distance_reference_latlng", getStationRecyclerViewAdapter().getDistanceReferenceLatLng());
         outState.putString("string_if_empty", mEmptyListTextView.getText().toString());
+        outState.putBoolean("empty_string_visible", mEmptyListTextView.getVisibility() == View.VISIBLE);
 
         getStationRecyclerViewAdapter().saveStationList(outState);
         getStationRecyclerViewAdapter().saveLookingForBike(outState);
@@ -128,6 +129,9 @@ public class StationListFragment extends Fragment
             LatLng distanceReferenceLatLng = savedInstanceState.getParcelable("distance_reference_latlng");
             ArrayList<StationItem> stationList = savedInstanceState.getParcelableArrayList("stationitem_arraylist");
 
+            if (!savedInstanceState.getBoolean("empty_string_visible"))
+                mEmptyListTextView.setVisibility(View.GONE);
+
             setupUI(stationList, savedInstanceState.getBoolean("looking_for_bike"), savedInstanceState.getString("string_if_empty"),
                     sortReferenceLatLng, distanceReferenceLatLng);
         }
@@ -135,6 +139,9 @@ public class StationListFragment extends Fragment
 
     public void setupUI(ArrayList<StationItem> stationsNetwork, boolean lookingForBike, String stringIfEmpty,
                         LatLng _sortReferenceLatLng, LatLng _distanceReferenceLatLng) {
+
+        boolean restoreEmptyStringGone = getStationRecyclerViewAdapter().getItemCount()== 0 &&
+                mEmptyListTextView.getVisibility() == View.GONE;
 
         if (stationsNetwork != null) {
 
@@ -145,12 +152,23 @@ public class StationListFragment extends Fragment
             else{
                 mStationRecyclerView.setVisibility(View.GONE);
                 mEmptyListTextView.setText(stringIfEmpty);
-                mEmptyListTextView.setVisibility(View.VISIBLE);
+                if (!restoreEmptyStringGone)
+                    mEmptyListTextView.setVisibility(View.VISIBLE);
+                else
+                    mEmptyListTextView.setVisibility(View.GONE);
             }
 
             getStationRecyclerViewAdapter().setupStationList(stationsNetwork, _sortReferenceLatLng, _distanceReferenceLatLng);
             lookingForBikes(lookingForBike);
         }
+    }
+
+    public void hideEmptyString(){
+        mEmptyListTextView.setVisibility(View.GONE);
+    }
+
+    public void showEmptyString(){
+        mEmptyListTextView.setVisibility(View.VISIBLE);
     }
 
     public void setDistanceSortReferenceLatLngAndSort(LatLng _toSet) {

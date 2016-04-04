@@ -43,11 +43,6 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
     private boolean mFabAnimationRequested = false;
 
-    //TODO: move those into resources and retrieve them for display in Settings Fragment UI
-    //in km/h
-    private static float WALKING_AVERAGE_SPEED = 4.0f;
-    private static float BIKING_AVERAGE_SPEED = 12.0f;
-
     private OnStationListItemClickListener mListener;
 
     public void saveStationList(Bundle outState) {
@@ -152,11 +147,15 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 String proximityString;
                 if (mIsLookingForBike){
                     proximityString = _station.getProximityStringFromLatLng(mDistanceDisplayReferenceLatLng,
-                            DBHelper.getWalkingProximityAsDistance(mCtx), WALKING_AVERAGE_SPEED, mCtx);
+                            DBHelper.getWalkingProximityAsDistance(mCtx),
+                            mCtx.getResources().getInteger(R.integer.average_walking_speed_kmh),
+                            mCtx);
                 }
                 else{
                     proximityString = _station.getProximityStringFromLatLng(mDistanceDisplayReferenceLatLng,
-                            DBHelper.getBikingProximityAsDistance(mCtx), BIKING_AVERAGE_SPEED, mCtx);
+                            DBHelper.getBikingProximityAsDistance(mCtx),
+                            mCtx.getResources().getInteger(R.integer.average_biking_speed_kmh),
+                            mCtx);
                 }
 
                 mProximity.setVisibility(View.VISIBLE);

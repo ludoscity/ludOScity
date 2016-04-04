@@ -38,12 +38,16 @@
     <string name="pref_manual_refresh_mode_all">Every 5 minutes + pull to refresh.</string>
     <string name="pref_refresh_options_key" translatable="false">pref_refresh_options</string>
     <string name="pref_walking_proximity_title">Walking proximity</string>
-    <string name="pref_walking_proximity_time">Time. (As the crow flies, at 4km/h)</string>
+    <!-- TODO: figure this shit out -->
+    <!--<string name="pref_walking_proximity_duration">Time. (As the crow flies, at %1$dkm/h)</string>-->
+    <string name="pref_walking_proximity_duration">Duration. (As the crow flies, at 4km/h)</string>
     <string name="pref_proximity_distance">Distance. (As the crow flies)</string>
     <string name="pref_walking_proximity_key" translatable="false">pref_walking_proximity_key</string>
     <string name="pref_biking_proximity_key" translatable="false">pref_biking_proximity_key</string>
     <string name="pref_biking_proximity_title">Biking proximity</string>
-    <string name="pref_biking_proximity_time">Time. (As the crow flies, at 12km/h)</string>
+    <!-- TODO: figure this shit out -->
+    <!--<string name="pref_biking_proximity_duration">Time. (As the crow flies, at %1$dkm/h)</string>-->
+    <string name="pref_biking_proximity_duration">Duration. (As the crow flies, at 10km/h)</string>
     <string name="hour_symbol">h</string>
     <string name="undo"><b>UNDO</b></string>
     <string name="no_favorite">No favorite</string>

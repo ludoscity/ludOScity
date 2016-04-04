@@ -49,6 +49,13 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         retrieveListFragment(_pageID).setupUI(_stationsList, _pageID == BIKE_STATIONS, _stringIfEmpty, _sortReferenceLatLng, _distanceReferenceLatLng);
     }
 
+    public void hideEmptyString(int _pageId){
+        retrieveListFragment(_pageId).hideEmptyString();
+    }
+
+    public void showEmptyString(int _pageId){
+        retrieveListFragment(_pageId).showEmptyString();
+    }
 
     public void setRefreshEnableAll(boolean toSet) {
         retrieveListFragment(BIKE_STATIONS).setRefreshEnable(toSet);
