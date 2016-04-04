@@ -27,7 +27,7 @@
             android:layout_width="@dimen/sheet_width"
             android:textSize="16sp"
             android:gravity="center"
-            android:text="@string/title_section_favorites"
+            android:text="@string/favorites_sheet_header"
             android:singleLine="true"
             android:textColor="@color/primary_text_default_material_dark"
             android:background="@color/theme_primary_dark"

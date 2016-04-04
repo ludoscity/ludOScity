@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Vélocalise</string>
-    <string name="title_section_favorites">Favoris</string>
+    <string name="favorites_sheet_header">Favoris - %1$s</string>
     <string name="title_section_settings">Paramètres</string>
     <string name="title_section_nearby">À proximité</string>
     <string name="navigation_drawer_open">Ouvrir navigation drawer</string>
@@ -43,5 +43,5 @@
     <string name="pref_biking_proximity_title">Proximité à vélo</string>
     <string name="hour_symbol">h</string>
     <string name="undo"><b>ANNULER</b></string>
-    <string name="no_favorite">Aucun favori</string>
+    <string name="no_favorite">Aucun favori pour %1$s</string>
 </resources>

@@ -391,10 +391,14 @@ public class NearbyActivity extends AppCompatActivity
 
     private void setupFavoriteListFeedback(boolean _noFavorite) {
         if (_noFavorite){
+            ((TextView)findViewById(R.id.empty_favorite_list_text)).setText(
+                    String.format(getResources().getString(R.string.no_favorite), DBHelper.getBikeNetworkName(this)));
             findViewById(R.id.empty_favorite_list_text).setVisibility(View.VISIBLE);
             findViewById(R.id.favorites_sheet_content).setVisibility(View.GONE);
         }
         else{
+            ((TextView)findViewById(R.id.favorites_sheet_header)).setText(
+                    String.format(getResources().getString(R.string.favorites_sheet_header), DBHelper.getBikeNetworkName(this)));
             findViewById(R.id.empty_favorite_list_text).setVisibility(View.GONE);
             findViewById(R.id.favorites_sheet_content).setVisibility(View.VISIBLE);
         }
@@ -1329,6 +1333,7 @@ public class NearbyActivity extends AppCompatActivity
 
             //noinspection ConstantConditions
             getSupportActionBar().setSubtitle(DBHelper.getBikeNetworkName(NearbyActivity.this));
+            setupFavoriteSheet();
 
             AlertDialog alertDialog = new AlertDialog.Builder(NearbyActivity.this).create();
             //alertDialog.setTitle(getString(R.string.network_found_title));

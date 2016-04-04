@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">FindMyBikes</string>
-    <string name="title_section_favorites">Favorites</string>
+    <string name="favorites_sheet_header">Favorites - %1$s</string>
     <string name="title_section_nearby">Nearby</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -50,5 +50,5 @@
     <string name="pref_biking_proximity_duration">Duration. (As the crow flies, at 10km/h)</string>
     <string name="hour_symbol">h</string>
     <string name="undo"><b>UNDO</b></string>
-    <string name="no_favorite">No favorite</string>
+    <string name="no_favorite">No favorite for %1$s</string>
 </resources>

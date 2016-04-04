@@ -425,6 +425,8 @@ public class StationMapFragment extends Fragment
     //TODO: if clients have a stationname, maybe they have the station LatLng on hand
     public void setPinOnStation(boolean _lookingForBike, String _stationId){
 
+        //Seen concurrentmodification exception on app resuming after long hibernation
+        //TODO: investigate access to mMapMarkersGfxData
         for (StationMapGfx markerData : mMapMarkersGfxData){
             if (markerData.getMarkerTitle().equalsIgnoreCase(_stationId)) {
                 if (_lookingForBike){
