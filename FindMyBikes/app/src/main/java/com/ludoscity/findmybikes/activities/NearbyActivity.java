@@ -611,7 +611,8 @@ public class NearbyActivity extends AppCompatActivity
 
                 long now = System.currentTimeMillis();
 
-                if (!mPagerReady && getListPagerAdapter().isViewPagerReady() || ( mRefreshTabs && getListPagerAdapter().isViewPagerReady()) ){
+                if ( mRedrawMarkersTask == null && getListPagerAdapter().isViewPagerReady() &&
+                        (!mPagerReady || mRefreshTabs ) ){
                     //TODO: calling DBHelper.getFavoriteStations can return incomplete result when db is updating
                     //it happens when data is downladed and screen configuration is changed shortly after
                     //When restoring, we don't need to setup everything rom here
@@ -1020,7 +1021,8 @@ public class NearbyActivity extends AppCompatActivity
     public void onPageSelected(final int position) {
 
         //Happens on screen orientation change
-        if (mStationMapFragment == null){
+        if (mStationMapFragment == null ||
+                (mStationMapFragment.getMarkerBVisibleLatLng() != null && getListPagerAdapter().getHighlightedStationForPage(position) == null)){
             Handler handler = new Handler();
 
             handler.postDelayed(new Runnable() {
