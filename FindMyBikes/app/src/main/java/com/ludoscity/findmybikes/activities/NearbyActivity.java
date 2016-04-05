@@ -129,8 +129,8 @@ public class NearbyActivity extends AppCompatActivity
     private CameraPosition mSavedInstanceCameraPosition;
 
     private static final int[] TABS_ICON_RES_ID = new int[]{
-            R.drawable.ic_pin_a_tab,
-            R.drawable.ic_pin_b_tab
+            R.drawable.ic_pin_a_36dp_white,
+            R.drawable.ic_pin_b_36dp_white
     };
 
     private GoogleApiClient mGoogleApiClient;

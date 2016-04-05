@@ -110,9 +110,9 @@ public class StationMapFragment extends Fragment
 
         mBufferedBundle = savedInstanceState;
 
-        mIconABitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a_map);
-        mIconBBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b_map);
-        mIconPickedPlaceBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_picked_place);
+        mIconABitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a_36dp_black);
+        mIconBBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b_36dp_black);
+        mIconPickedPlaceBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_search_24dp);
 
         mAttributionsText = (TextView) inflatedView.findViewById(R.id.attributions_text);
 
@@ -194,6 +194,7 @@ public class StationMapFragment extends Fragment
         mGoogleMap.setOnInfoWindowClickListener(this);
         mGoogleMap.setOnCameraChangeListener(this);
         mGoogleMap.setOnMapClickListener(this);
+        //mGoogleMap.setPadding(Utils.dpToPx(100.f, getContext()), 0, 0, 0);
 
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(MAP_READY_PATH);
@@ -366,9 +367,9 @@ public class StationMapFragment extends Fragment
 
         //There is a bug in the map library with vector drawable, I use a workaround I found in the bug report
         //https://code.google.com/p/gmaps-api-issues/issues/detail?id=9011
-        BitmapDescriptor iconA = mIconABitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_a_map);
-        BitmapDescriptor iconB = mIconBBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b_map);
-        BitmapDescriptor iconPickedPlace = mIconPickedPlaceBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b_map);
+        BitmapDescriptor iconA = mIconABitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_a_36dp_black);
+        BitmapDescriptor iconB = mIconBBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b_36dp_black);
+        BitmapDescriptor iconPickedPlace = mIconPickedPlaceBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b_36dp_black);
 
         mMarkerStationA = mGoogleMap.addMarker(new MarkerOptions().position(pinALatLng)
                 .icon(iconA)

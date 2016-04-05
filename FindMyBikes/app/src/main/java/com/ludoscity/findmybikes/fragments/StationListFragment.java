@@ -2,6 +2,7 @@ package com.ludoscity.findmybikes.fragments;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +21,7 @@ import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
 import com.ludoscity.findmybikes.utils.DividerItemDecoration;
 import com.ludoscity.findmybikes.utils.ScrollingLinearLayoutManager;
+import com.ludoscity.findmybikes.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -38,7 +40,9 @@ public class StationListFragment extends Fragment
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mRecyclerViewScrollingState = SCROLL_STATE_IDLE;
     private TextView mEmptyListTextView;
-    private ImageView mProximityHeaderImageView;
+    private View mProximityHeader;
+    private ImageView mProximityHeaderFromImageView;
+    private ImageView mProximityHeaderToImageView;
     private TextView mAvailabilityTextView;
 
     private OnStationListFragmentInteractionListener mListener;
@@ -71,13 +75,15 @@ public class StationListFragment extends Fragment
         mSwipeRefreshLayout.setColorSchemeResources(R.color.stationlist_refresh_spinner_green, R.color.stationlist_refresh_spinner_yellow, R.color.stationlist_refresh_spinner_red);
 
         mAvailabilityTextView = (TextView) inflatedView.findViewById(R.id.availability_header);
-        mProximityHeaderImageView = (ImageView) inflatedView.findViewById(R.id.proximity_header);
+        mProximityHeader = inflatedView.findViewById(R.id.proximity_header);
+        mProximityHeaderFromImageView = (ImageView) inflatedView.findViewById(R.id.proximity_header_from);
+        mProximityHeaderToImageView = (ImageView) inflatedView.findViewById(R.id.proximity_header_to);
 
         Bundle args = getArguments();
         if (args != null){
 
             mStationRecyclerView.setBackground(ContextCompat.getDrawable(this.getContext(), args.getInt(STATION_LIST_ARG_BACKGROUND_RES_ID)));
-            mProximityHeaderImageView.setVisibility(View.GONE);
+            mProximityHeader.setVisibility(View.GONE);
         }
 
         return inflatedView;
@@ -221,11 +227,20 @@ public class StationListFragment extends Fragment
             mAvailabilityTextView.setText(getString(R.string.bikes));
 
             if (getArguments()!= null){
-                mProximityHeaderImageView.setVisibility(View.GONE);
+                mProximityHeader.setVisibility(View.GONE);
             }
             else {
-                mProximityHeaderImageView.setVisibility(View.VISIBLE);
-                mProximityHeaderImageView.setImageResource(R.drawable.ic_loc_walk);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    mProximityHeaderFromImageView.setPaddingRelative(0,0, Utils.dpToPx(1.f,getContext()),0);
+                } else {
+                    mProximityHeaderFromImageView.setPadding(0,0, Utils.dpToPx(1.f,getContext()),0);
+                }
+
+                mProximityHeaderFromImageView.setImageResource(R.drawable.ic_my_location_24dp);
+                mProximityHeaderToImageView.setImageResource(R.drawable.ic_walking_24dp_white);
+
+                mProximityHeader.setVisibility(View.VISIBLE);
             }
         }
         else {
@@ -233,11 +248,20 @@ public class StationListFragment extends Fragment
             mAvailabilityTextView.setText(getString(R.string.docks));
 
             if (getArguments()!= null){
-                mProximityHeaderImageView.setVisibility(View.GONE);
+                mProximityHeader.setVisibility(View.GONE);
             }
             else {
-                mProximityHeaderImageView.setVisibility(View.VISIBLE);
-                mProximityHeaderImageView.setImageResource(R.drawable.ic_a_bike);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    mProximityHeaderToImageView.setPaddingRelative(Utils.dpToPx(3.f,getContext()),0,0,0);
+                } else {
+                    mProximityHeaderToImageView.setPadding(Utils.dpToPx(3.f,getContext()),0,0,0);
+                }
+
+                mProximityHeaderFromImageView.setImageResource(R.drawable.ic_pin_a_24dp_white);
+                mProximityHeaderToImageView.setImageResource(R.drawable.ic_biking_24dp_white);
+
+                mProximityHeader.setVisibility(View.VISIBLE);
             }
         }
     }
