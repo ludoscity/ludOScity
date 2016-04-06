@@ -315,6 +315,10 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             setSelection(selectedIdBefore, false);
     }
 
+    public LatLng getDistanceDisplayReference(){
+        return mDistanceDisplayReferenceLatLng;
+    }
+
     public void setDistanceSortReferenceLatLngAndSortIfRequired(LatLng _sortReferenceLatLng, boolean _forceSort) {
         if (_forceSort || mDistanceSortReferenceLatLng != _sortReferenceLatLng) {
             mDistanceSortReferenceLatLng = _sortReferenceLatLng;

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
     <RelativeLayout
 
-        android:layout_width="wrap_content"
+        android:layout_width="125dp"
         android:layout_height="wrap_content"
         android:paddingTop="2dp"
         android:paddingBottom="3dp"
@@ -18,11 +18,7 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-
             android:layout_height="40dp"
-
-
-
             android:id="@+id/trip_details_loc_to_a"
             android:paddingTop="1dp"
             android:paddingBottom="3dp">
@@ -70,20 +66,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/trip_details_loc_to_a_string"
+                android:id="@+id/trip_details_proximity_a"
                 android:layout_toEndOf="@id/trip_details_pin_a"
                 android:layout_toRightOf="@id/trip_details_pin_a"
                 android:layout_centerVertical="true"
                 android:fontFamily="droid-sans-mono"
                 android:textSize="12sp"
-                android:text="~05min"
+                android:text="~XXmin"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_dummy_plus_sign"
-                android:layout_toEndOf="@id/trip_details_loc_to_a_string"
-                android:layout_toRightOf="@id/trip_details_loc_to_a_string"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:fontFamily="droid-sans-mono"
                 android:textStyle="bold"
@@ -91,8 +87,6 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginLeft="4dp"
                 android:text="+"
-                android:layout_marginRight="-4dp"
-                android:layout_marginEnd="-4dp"
                 android:textColor="@color/theme_textcolor_primary"
                 />
 
@@ -149,29 +143,27 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/trip_details_a_to_b_string"
+                android:id="@+id/trip_details_proximity_b"
                 android:layout_toEndOf="@id/trip_details_pin_b"
                 android:layout_toRightOf="@id/trip_details_pin_b"
                 android:layout_centerVertical="true"
                 android:fontFamily="droid-sans-mono"
                 android:textStyle="bold"
                 android:textSize="12sp"
-                android:text="~22min"
+                android:text="~XXmin"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_a_to_b_plus_sign"
-                android:layout_toEndOf="@id/trip_details_a_to_b_string"
-                android:layout_toRightOf="@id/trip_details_a_to_b_string"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:fontFamily="droid-sans-mono"
                 android:textStyle="bold"
                 android:textSize="22sp"
                 android:layout_marginStart="3.5dp"
                 android:layout_marginLeft="3.5dp"
-                android:layout_marginRight="-4dp"
-                android:layout_marginEnd="-4dp"
                 android:text="+"
                 />
 
@@ -228,28 +220,26 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/trip_details_b_to_search_string"
+                android:id="@+id/trip_details_proximity_search"
                 android:layout_toEndOf="@id/trip_details_pin_search"
                 android:layout_toRightOf="@id/trip_details_pin_search"
                 android:layout_centerVertical="true"
                 android:fontFamily="droid-sans-mono"
                 android:textSize="12sp"
-                android:text="~07min"
+                android:text="~XXmin"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_b_to_search_plus_sign"
-                android:layout_toEndOf="@id/trip_details_b_to_search_string"
-                android:layout_toRightOf="@id/trip_details_b_to_search_string"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:fontFamily="droid-sans-mono"
                 android:textStyle="bold"
                 android:textSize="22sp"
                 android:layout_marginStart="4dp"
                 android:layout_marginLeft="4dp"
-                android:layout_marginRight="-4dp"
-                android:layout_marginEnd="-4dp"
                 android:text="+"
                 />
 
@@ -274,39 +264,25 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/trip_details_total_string"
-
+                android:id="@+id/trip_details_proximity_total"
                 android:textStyle="bold"
                 android:fontFamily="droid-sans-mono"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-
-                android:text="~34min"
+                android:text="~XXmin"
                 />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                android:layout_toEndOf="@id/trip_details_total_string"
-                android:layout_toRightOf="@id/trip_details_total_string"
+                android:layout_toEndOf="@id/trip_details_proximity_total"
+                android:layout_toRightOf="@id/trip_details_proximity_total"
                 android:fontFamily="droid-sans-mono"
-
                 android:layout_marginStart="4dp"
                 android:layout_marginLeft="4dp"
-
-
                 android:textStyle="bold"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-
                 android:text="="
                 />
-
-
-
-
         </RelativeLayout>
-
-
-
     </RelativeLayout>
 </android.support.v7.widget.CardView>

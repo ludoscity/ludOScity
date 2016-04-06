@@ -159,11 +159,11 @@ public class StationItem implements Parcelable, ClusterItem {
         dest.writeString(timestamp);
     }
 
-    public String getProximityStringFromLatLng(LatLng currentUserLatLng, boolean _asDistance, float _speedKmh, Context _ctx) {
+    public String getProximityStringFromLatLng(LatLng _targetLatLng, boolean _asDistance, float _speedKmh, Context _ctx) {
 
         String toReturn;
 
-        int distance = (int) getMeterFromLatLng(currentUserLatLng);
+        int distance = (int) getMeterFromLatLng(_targetLatLng);
 
         if (_asDistance) {
             if (distance < 1000)

@@ -128,4 +128,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
     public void smoothScrollHighlightedInViewForPage(int _pageID, boolean _appBarExpanded) {
         retrieveListFragment(_pageID).smoothScrollSelectionInView(_appBarExpanded);
     }
+
+    public LatLng getDistanceDisplayReferenceForPage(int _pageID){
+        return retrieveListFragment(_pageID).getDistanceDisplayReference();
+    }
 }

@@ -31,7 +31,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -114,6 +117,12 @@ public class NearbyActivity extends AppCompatActivity
     private AppBarLayout mAppBarLayout;
     private CoordinatorLayout mCoordinatorLayout;
     private ProgressBar mPlaceAutocompleteLoadingProgressBar;
+    private TextView mTripDetailsProximityA;
+    private TextView mTripDetailsProximityB;
+    private TextView mTripDetailsProximitySearch;
+    private TextView mTripDetailsProximityTotal;
+    private FrameLayout mTripDetailsSumSeparator;
+    private View mTripDetailsBToSearchRow;
 
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private FloatingActionButton mSearchFAB;
@@ -274,6 +283,13 @@ public class NearbyActivity extends AppCompatActivity
         mAppBarLayout = (AppBarLayout) findViewById(R.id.action_toolbar_layout);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
+
+        mTripDetailsProximityA = (TextView) findViewById(R.id.trip_details_proximity_a);
+        mTripDetailsProximityB = (TextView) findViewById(R.id.trip_details_proximity_b);
+        mTripDetailsProximitySearch = (TextView) findViewById(R.id.trip_details_proximity_search);
+        mTripDetailsProximityTotal = (TextView) findViewById(R.id.trip_details_proximity_total);
+        mTripDetailsSumSeparator = (FrameLayout) findViewById(R.id.trip_details_sum_separator);
+        mTripDetailsBToSearchRow = findViewById(R.id.trip_details_b_to_search);
 
         mSearchFAB = (FloatingActionButton) findViewById(R.id.search_fab);
         mPlaceAutocompleteLoadingProgressBar = (ProgressBar) findViewById(R.id.place_autocomplete_loading);
@@ -771,8 +787,10 @@ public class NearbyActivity extends AppCompatActivity
                     mStationMapFragment.setPinOnStation(true,
                             uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM));
 
-                    if (mStationMapFragment.getMarkerBVisibleLatLng() != null)
+                    if (mStationMapFragment.getMarkerBVisibleLatLng() != null) {
                         getListPagerAdapter().notifyStationAUpdate(mStationMapFragment.getMarkerALatLng());
+                        setupTripDetailsWidget();
+                    }
                 }
             }
             else {
@@ -821,9 +839,9 @@ public class NearbyActivity extends AppCompatActivity
                         if (_selectedStationId != null) {
                             getListPagerAdapter().highlightStationForPage(_selectedStationId, StationListPagerAdapter.DOCK_STATIONS);
                             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
-                        }
-                        else {
+                        } else {
                             mStationMapFragment.setPinOnStation(false, getListPagerAdapter().highlightClosestStationWithAvailability(false));
+                            setupTripDetailsWidget();
                             animateCameraToShow(_targetDestination.getLatLng(), mStationMapFragment.getMarkerBVisibleLatLng());
                         }
 
@@ -840,11 +858,107 @@ public class NearbyActivity extends AppCompatActivity
             getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
         }
 
-        if (_selectedStationId != null)
+        if (_selectedStationId != null) {
             mStationMapFragment.setPinOnStation(false, _selectedStationId);
+            setupTripDetailsWidget();
+        }
         else
             mStationMapFragment.setPinForPickedPlace(_targetDestination.getName().toString(),
                     _targetDestination.getLatLng(), _targetDestination.getAttributions());
+    }
+
+    //Assumption here is that there is an A and a B station selected (or soon will be)
+    private void setupTripDetailsWidget() {
+
+        final Handler handler = new Handler();    //Need to wait for list selection
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS) != null) {
+                    boolean totalOver1h = false;
+
+                    int locToAMinutes = 0;
+                    int AToBMinutes = 0;
+                    int BToSearchMinutes = 0;
+
+                    StationItem selectedStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+                    String rawProximityString = selectedStation.getProximityStringFromLatLng(mCurrentUserLatLng,
+                            false, getResources().getInteger(R.integer.average_walking_speed_kmh), NearbyActivity.this);//getListPagerAdapter().getSelectedStationProximityStringForPage(StationListPagerAdapter.BIKE_STATIONS);
+
+                    String formattedProximityString = getTripDetailsWdigetFormattedString(rawProximityString);
+                    if (formattedProximityString.startsWith(">"))
+                        totalOver1h = true;
+                    else if (!formattedProximityString.startsWith("<"))
+                        locToAMinutes = Integer.valueOf(formattedProximityString.substring(1,3));
+
+                    mTripDetailsProximityA.setText(formattedProximityString);
+
+
+                    selectedStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS);
+                    rawProximityString = selectedStation.getProximityStringFromLatLng(getListPagerAdapter().getDistanceDisplayReferenceForPage(StationListPagerAdapter.DOCK_STATIONS),
+                            false, getResources().getInteger(R.integer.average_biking_speed_kmh), NearbyActivity.this);//getListPagerAdapter().getSelectedStationProximityStringForPage(StationListPagerAdapter.DOCK_STATIONS);
+
+                    formattedProximityString = getTripDetailsWdigetFormattedString(rawProximityString);
+                    if (formattedProximityString.startsWith(">"))
+                        totalOver1h = true;
+                    else if (!formattedProximityString.startsWith("<"))
+                        AToBMinutes = Integer.valueOf(formattedProximityString.substring(1,3));
+
+                    mTripDetailsProximityB.setText(formattedProximityString);
+
+
+                    if (mStationMapFragment.getMarkerPickedPlaceVisibleLatLng() == null) {
+                        mTripDetailsBToSearchRow.setVisibility(View.GONE);
+                        ViewGroup.LayoutParams param = mTripDetailsSumSeparator.getLayoutParams();
+                        ((RelativeLayout.LayoutParams) param).addRule(RelativeLayout.BELOW, R.id.trip_details_a_to_b);
+                    } else {
+
+                        rawProximityString = selectedStation.getProximityStringFromLatLng(mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(),
+                                false, getResources().getInteger(R.integer.average_walking_speed_kmh), NearbyActivity.this);
+                        formattedProximityString = getTripDetailsWdigetFormattedString(rawProximityString);
+
+                        if (formattedProximityString.startsWith(">"))
+                            totalOver1h = true;
+                        else if (!formattedProximityString.startsWith("<"))
+                            BToSearchMinutes = Integer.valueOf(formattedProximityString.substring(1,3));
+
+                        mTripDetailsProximitySearch.setText(formattedProximityString);
+
+                        mTripDetailsBToSearchRow.setVisibility(View.VISIBLE);
+                        ViewGroup.LayoutParams param = mTripDetailsSumSeparator.getLayoutParams();
+                        ((RelativeLayout.LayoutParams) param).addRule(RelativeLayout.BELOW, R.id.trip_details_b_to_search);
+                    }
+
+                    int total = 0;
+
+                    if (!totalOver1h) {
+                        total = locToAMinutes + AToBMinutes + BToSearchMinutes;
+                        if (total >= 60)
+                            totalOver1h = true;
+                    }
+
+                    if (totalOver1h)
+                        mTripDetailsProximityTotal.setText("> 1h");
+                    else
+                        mTripDetailsProximityTotal.setText("~" + total + getResources().getString(R.string.min));
+
+                } else
+                    handler.postDelayed(this, 10);
+            }
+        }, 10);
+    }
+
+    private String getTripDetailsWdigetFormattedString(String _poximityString){
+
+        String toReturn;
+
+        if (_poximityString.length() == 5)   //'~1min' .. '~9min'
+            toReturn = "~0" + _poximityString.substring(1); //'~01min' .. '~09min'
+        else
+            toReturn = _poximityString;
+
+        return toReturn;
     }
 
     private void clearBTab(){
@@ -900,12 +1014,14 @@ public class NearbyActivity extends AppCompatActivity
             //if (mAppBarLayout != null)
             //    mAppBarLayout.setExpanded(true , true);
 
-            mStationMapFragment.setPinOnStation(isLookingForBike(), clickedStation.getId());
-
             if (isLookingForBike()) {
                 animateCameraToShowUserAndStation(clickedStation);
-                if (mStationMapFragment.getMarkerBVisibleLatLng() != null)
+                if (mStationMapFragment.getMarkerBVisibleLatLng() != null) {
                     getListPagerAdapter().notifyStationAUpdate(mStationMapFragment.getMarkerALatLng());
+                    setupTripDetailsWidget();
+                }
+
+                mStationMapFragment.setPinOnStation(true, clickedStation.getId());
             }
             else
                 setupBTabSelection(clickedStation.getId());
@@ -1123,6 +1239,10 @@ public class NearbyActivity extends AppCompatActivity
 
         if (mStationMapFragment != null){
             mStationMapFragment.onUserLocationChange(location);
+            if (mStationMapFragment.getMarkerBVisibleLatLng() != null)
+                setupTripDetailsWidget();
+
+            //TODO: Scroll highlighted station for current tab if new sorting ejects it from view
         }
     }
 

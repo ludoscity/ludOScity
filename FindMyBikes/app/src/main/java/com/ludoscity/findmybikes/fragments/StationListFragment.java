@@ -194,6 +194,10 @@ public class StationListFragment extends Fragment
 
     }
 
+    public LatLng getDistanceDisplayReference(){
+        return getStationRecyclerViewAdapter().getDistanceDisplayReference();
+    }
+
     public boolean isRecyclerViewReadyForItemSelection(){
         return mStationRecyclerView != null && getStationRecyclerViewAdapter().getSortReferenceLatLng() != null &&
                 ((ScrollingLinearLayoutManager)mStationRecyclerView.getLayoutManager()).findFirstVisibleItemPosition() !=
