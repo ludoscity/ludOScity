@@ -112,7 +112,7 @@ public class StationMapFragment extends Fragment
 
         mIconABitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a_36dp_black);
         mIconBBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b_36dp_black);
-        mIconPickedPlaceBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_search_24dp);
+        mIconPickedPlaceBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_search_24dp_black);
 
         mAttributionsText = (TextView) inflatedView.findViewById(R.id.attributions_text);
 

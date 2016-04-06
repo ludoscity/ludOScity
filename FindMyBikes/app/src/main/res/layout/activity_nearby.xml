@@ -80,7 +80,7 @@
                 android:id="@+id/station_map_fragment"
                 tools:layout="@layout/fragment_station_map" />
 
-            <!-- <FrameLayout
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|start">
@@ -88,7 +88,7 @@
                 <include
                     layout="@layout/trip_details"/>
 
-            </FrameLayout> -->
+            </FrameLayout>
 
             <!-- Can't put both fab in a linear layout cause it breaks sheet library-->
             <LinearLayout
