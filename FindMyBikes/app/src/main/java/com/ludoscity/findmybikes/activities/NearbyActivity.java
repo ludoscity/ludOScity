@@ -1,12 +1,15 @@
 package com.ludoscity.findmybikes.activities;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -31,7 +34,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -101,6 +107,8 @@ public class NearbyActivity extends AppCompatActivity
 
     private Handler mUpdateRefreshHandler = null;
     private Runnable mUpdateRefreshRunnableCode = null;
+
+    private Interpolator mCircularRevealInterpolator;
 
     private DownloadWebTask mDownloadWebTask = null;
     private RedrawMarkersTask mRedrawMarkersTask = null;
@@ -343,6 +351,8 @@ public class NearbyActivity extends AppCompatActivity
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        mCircularRevealInterpolator = AnimationUtils.loadInterpolator(this, R.interpolator.msf_interpolator);
     }
 
     private void setupSearchFab() {
@@ -580,7 +590,8 @@ public class NearbyActivity extends AppCompatActivity
         mClearFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setTripDetailsWidgetVisibility(false);
+                mStationMapFragment.setMapPadding(0);
+                hideTripDetailsWidget();
                 clearBTab();
             }
         });
@@ -814,7 +825,7 @@ public class NearbyActivity extends AppCompatActivity
 
                     if (mStationMapFragment.getMarkerBVisibleLatLng() != null) {
                         getListPagerAdapter().notifyStationAUpdate(mStationMapFragment.getMarkerALatLng());
-                        setupTripDetailsWidgetAndShow();
+                        hideSetupShowTripDetailsWidget();
                     }
                 }
             }
@@ -843,7 +854,15 @@ public class NearbyActivity extends AppCompatActivity
         //Remove any previous selection
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
 
-        setupTripDetailsWidgetAndShow();
+        if (mTripDetailsWidget.getVisibility() == View.INVISIBLE){
+            mStationMapFragment.setMapPadding((int) getResources().getDimension(R.dimen.trip_details_widget_width));
+            setupTripDetailsWidget();
+            showTripDetailsWidget();
+        }
+        else{
+            hideSetupShowTripDetailsWidget();
+        }
+
 
         if (!mStationMapFragment.isPickedPlaceMarkerVisible()) {
 
@@ -893,9 +912,7 @@ public class NearbyActivity extends AppCompatActivity
     }
 
     //Assumption here is that there is an A and a B station selected (or soon will be)
-    private void setupTripDetailsWidgetAndShow() {
-
-        mStationMapFragment.setMapPadding((int)getResources().getDimension(R.dimen.trip_details_widget_width) );
+    private void setupTripDetailsWidget() {
 
         final Handler handler = new Handler();    //Need to wait for list selection
 
@@ -970,8 +987,6 @@ public class NearbyActivity extends AppCompatActivity
                     else
                         mTripDetailsProximityTotal.setText("~" + total + getResources().getString(R.string.min));
 
-                    NearbyActivity.this.setTripDetailsWidgetVisibility(true);
-
                 } else
                     handler.postDelayed(this, 10);
             }
@@ -988,6 +1003,87 @@ public class NearbyActivity extends AppCompatActivity
             toReturn = _poximityString;
 
         return toReturn;
+    }
+
+    //For reusable Animators (which most Animators are, apart from the one-shot animator produced by createCircularReveal()
+    private Animator buildTripDetailsWidgetAnimators(boolean _show, long _duration){
+
+        Animator toReturn = null;
+
+        // Use native circular reveal on Android 5.0+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            // Native circular reveal uses coordinates relative to the view
+            int revealStartX = 0;
+            int revealStartY = mTripDetailsWidget.getHeight();
+
+            int radiusMin = 0;
+            int radiusMax = (int)Math.hypot(mTripDetailsWidget.getHeight(), mTripDetailsWidget.getWidth());
+
+            if (_show)
+            {
+                toReturn = ViewAnimationUtils.createCircularReveal(mTripDetailsWidget, revealStartX,
+                                revealStartY, radiusMin, radiusMax);
+            } else {
+                toReturn = ViewAnimationUtils.createCircularReveal(mTripDetailsWidget, revealStartX,
+                        revealStartY, radiusMax, radiusMin);
+            }
+
+            toReturn.setDuration(_duration);
+            toReturn.setInterpolator(mCircularRevealInterpolator);
+        }
+
+        return toReturn;
+    }
+
+    private void showTripDetailsWidget(){
+
+        mTripDetailsWidget.setVisibility(View.VISIBLE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            buildTripDetailsWidgetAnimators(true, 850).start();
+        }
+    }
+
+    private void hideSetupShowTripDetailsWidget(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            Animator hideAnimator = buildTripDetailsWidgetAnimators(false, 850/2);
+
+            hideAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    setupTripDetailsWidget();
+                    buildTripDetailsWidgetAnimators(true, 850/2).start();
+                }
+            });
+
+            hideAnimator.start();
+        }
+        else{
+            setupTripDetailsWidget();
+        }
+    }
+
+    private void hideTripDetailsWidget(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Animator hideAnimator = buildTripDetailsWidgetAnimators(false, 850);
+            // make the view invisible when the animation is done
+            hideAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    mTripDetailsWidget.setVisibility(View.INVISIBLE);
+                }
+            });
+            hideAnimator.start();
+        }
+        else
+            mTripDetailsWidget.setVisibility(View.INVISIBLE);
     }
 
     private void clearBTab(){
@@ -1184,8 +1280,10 @@ public class NearbyActivity extends AppCompatActivity
 
             if (position == StationListPagerAdapter.BIKE_STATIONS) {
 
-                if (mStationMapFragment.getMarkerBVisibleLatLng() == null)
-                    setTripDetailsWidgetVisibility(false);
+                if (mStationMapFragment.getMarkerBVisibleLatLng() == null) {
+                    mStationMapFragment.setMapPadding(0);
+                    hideTripDetailsWidget();
+                }
 
                 mAppBarLayout.setExpanded(true, true);
                 getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, true);
@@ -1225,24 +1323,17 @@ public class NearbyActivity extends AppCompatActivity
                 } else {
 
                     getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, false);
-                    mStationMapFragment.setMapPadding((int)getResources().getDimension(R.dimen.trip_details_widget_width) );
-                    setTripDetailsWidgetVisibility(true);
+                    mStationMapFragment.setMapPadding((int) getResources().getDimension(R.dimen.trip_details_widget_width));
+
+                    if (mTripDetailsWidget.getVisibility() == View.INVISIBLE)
+                        showTripDetailsWidget();
+
                     animateCameraToShow(mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition());
                     mClearFAB.show();
                 }
 
                 mStationMapFragment.lookingForBikes(false);
             }
-        }
-    }
-
-    private void setTripDetailsWidgetVisibility(boolean _toSet){
-        if (_toSet){
-            mTripDetailsWidget.setVisibility(View.VISIBLE);
-        }
-        else{
-            mStationMapFragment.setMapPadding(0);
-            mTripDetailsWidget.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -1280,7 +1371,7 @@ public class NearbyActivity extends AppCompatActivity
         if (mStationMapFragment != null){
             mStationMapFragment.onUserLocationChange(location);
             if (mStationMapFragment.getMarkerBVisibleLatLng() != null && mTripDetailsWidget.getVisibility() == View.VISIBLE)
-                setupTripDetailsWidgetAndShow();
+                setupTripDetailsWidget();
 
             //TODO: Scroll highlighted station for current tab if new sorting ejects it from view
         }
