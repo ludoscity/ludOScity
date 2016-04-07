@@ -27,8 +27,8 @@
     <style name="map_floating_action_button_end_aligned">
         <item name="android:layout_marginStart">0dp</item>
         <item name="android:layout_marginTop">0dp</item>
-        <item name="android:layout_marginEnd">@dimen/end_aligned_fab_margin</item>
-        <item name="android:layout_marginBottom">@dimen/end_aligned_fab_margin</item>
+        <item name="android:layout_marginEnd">@dimen/end_aligned_fab_margin_end</item>
+        <item name="android:layout_marginBottom">@dimen/end_aligned_fab_margin_bottom</item>
         <item name="elevation">6dp</item>
         <item name="pressedTranslationZ">12dp</item>
     </style>

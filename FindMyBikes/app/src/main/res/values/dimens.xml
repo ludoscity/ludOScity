@@ -5,7 +5,8 @@
     <dimen name="action_toolbar_size">48dp</dimen>
     <dimen name="tablayout_height">40dp</dimen>
 
-    <dimen name="end_aligned_fab_margin">16dp</dimen>
+    <dimen name="end_aligned_fab_margin_end">16dp</dimen>
+    <dimen name="end_aligned_fab_margin_bottom">@dimen/end_aligned_fab_margin_end</dimen>
     <!-- need extra margin on left aligned map button to clear Google logo -->
     <dimen name="start_aligned_fab_margin_bottom">21dp</dimen>
     <dimen name="start_aligned_fab_margin_start">5dp</dimen>
@@ -19,6 +20,11 @@
     <dimen name="dummy_fab_height">62dp</dimen>
     <dimen name="dummy_fab_width">56dp</dimen>
 
+    <dimen name="map_fab_padding">72dp</dimen> <!-- fab_width + end_aligned_fab_margin_end -->
+    <dimen name="camera_fab_padding">@dimen/map_fab_padding</dimen>
+    <dimen name="camera_ab_pin_padding">39dp</dimen> <!-- pin size + 3dp of padding -->
+    <dimen name="camera_search_infowindow_padding">50dp</dimen>
+
     <dimen name="trip_details_widget_width">128dp</dimen>
 
     <!-- fabs in recyclerView -->
@@ -30,6 +36,7 @@
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">240dp</dimen>
+
 
 
 </resources>

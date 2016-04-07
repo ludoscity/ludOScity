@@ -73,6 +73,8 @@ public class StationMapFragment extends Fragment
     public static final String INFOWINDOW_CLICK_MARKER_POS_LNG_PARAM = "infowindow_click_marker_lng";
     public static final String MARKER_CLICK_TITLE_PARAM = "marker_click_title";
 
+    private static int CURRENT_MAP_PADDING_LEFT = 0;
+    private static int CURRENT_MAP_PADDING_RIGHT = 0;
 
     private boolean mInitialCameraSetupDone;
     private boolean mEnforceMaxZoom = false;
@@ -293,8 +295,14 @@ public class StationMapFragment extends Fragment
         return toReturn;
     }
 
-    public void setMapPadding(int _paddingPx){
-        mGoogleMap.setPadding(_paddingPx, 0, 0, 0);
+    public void setMapPaddingLeft(int _paddingPx){
+        CURRENT_MAP_PADDING_LEFT = _paddingPx;
+        mGoogleMap.setPadding(CURRENT_MAP_PADDING_LEFT, 0, CURRENT_MAP_PADDING_RIGHT, 0);
+    }
+
+    public void setMapPaddingRight(int _paddingPx){
+        CURRENT_MAP_PADDING_RIGHT = _paddingPx;
+        mGoogleMap.setPadding(CURRENT_MAP_PADDING_LEFT, 0, CURRENT_MAP_PADDING_RIGHT, 0);
     }
 
     public boolean isPickedPlaceMarkerVisible(){

@@ -612,7 +612,8 @@ public class NearbyActivity extends AppCompatActivity
         mClearFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mStationMapFragment.setMapPadding(0);
+                mStationMapFragment.setMapPaddingLeft(0);
+                mStationMapFragment.setMapPaddingRight(0);
                 hideTripDetailsWidget();
                 clearBTab();
             }
@@ -791,7 +792,9 @@ public class NearbyActivity extends AppCompatActivity
                         mStationMapFragment.setPinOnStation(true, closestBikeStation.getId());
 
                         if (isLookingForBike()) {
-                            mDirectionsLocToAFab.show();
+                            if (mTripDetailsWidget.getVisibility() == View.INVISIBLE) {
+                                mDirectionsLocToAFab.show();
+                            }
                             animateCameraToShowUserAndStation(closestBikeStation);
                         }
 
@@ -879,7 +882,7 @@ public class NearbyActivity extends AppCompatActivity
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
 
         if (mTripDetailsWidget.getVisibility() == View.INVISIBLE){
-            mStationMapFragment.setMapPadding((int) getResources().getDimension(R.dimen.trip_details_widget_width));
+            mStationMapFragment.setMapPaddingLeft((int) getResources().getDimension(R.dimen.trip_details_widget_width));
             setupTripDetailsWidget();
             showTripDetailsWidget();
         }
@@ -895,6 +898,7 @@ public class NearbyActivity extends AppCompatActivity
             getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
                     sortRef, mStationMapFragment.getMarkerALatLng());
 
+            mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
             mClearFAB.show();
             mFavoritesSheetFab.hideSheetThenFab();
             mSearchFAB.hide();
@@ -911,7 +915,7 @@ public class NearbyActivity extends AppCompatActivity
                             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                         } else {
                             mStationMapFragment.setPinOnStation(false, getListPagerAdapter().highlightClosestStationWithAvailability(false));
-                            animateCameraToShow(_targetDestination.getLatLng(), mStationMapFragment.getMarkerBVisibleLatLng());
+                            animateCameraToShow((int)getResources().getDimension(R.dimen.camera_ab_pin_padding), _targetDestination.getLatLng(), mStationMapFragment.getMarkerBVisibleLatLng(), null);
                         }
 
                         getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
@@ -922,7 +926,11 @@ public class NearbyActivity extends AppCompatActivity
         }
         else {
 
-            animateCameraToShow(getLatLngForStation(_selectedStationId), mStationMapFragment.getMarkerPickedPlaceVisibleLatLng());
+            animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
+                    getLatLngForStation(_selectedStationId),
+                    mStationMapFragment.getMarkerBVisibleLatLng(),
+                    mStationMapFragment.getMarkerPickedPlaceVisibleLatLng());
+
             getListPagerAdapter().highlightStationForPage(_selectedStationId, StationListPagerAdapter.DOCK_STATIONS);
             getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
         }
@@ -1247,19 +1255,22 @@ public class NearbyActivity extends AppCompatActivity
     private void animateCameraToShowUserAndStation(StationItem station) {
 
         if (mCurrentUserLatLng != null) {
-            animateCameraToShow(station.getPosition(), mCurrentUserLatLng);
+            animateCameraToShow((int)getResources().getDimension(R.dimen.camera_fab_padding), station.getPosition(), mCurrentUserLatLng, null);
         }
         else{
             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(station.getPosition(), 15));
         }
     }
 
-    private void animateCameraToShow(LatLng _latLng0, LatLng _latLng1){
+    private void animateCameraToShow(int _cameraPaddingPx, LatLng _latLng0, LatLng _latLng1, LatLng _latLng2){
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
         boundsBuilder.include(_latLng0).include(_latLng1);
 
-        mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), Utils.dpToPx(66, this)));
+        if (_latLng2 != null)
+            boundsBuilder.include(_latLng2);
+
+        mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), _cameraPaddingPx)); //Pin icon is 36 dp
     }
 
     //Callback from pull-to-refresh
@@ -1306,7 +1317,7 @@ public class NearbyActivity extends AppCompatActivity
             if (position == StationListPagerAdapter.BIKE_STATIONS) {
 
                 if (mStationMapFragment.getMarkerBVisibleLatLng() == null) {
-                    mStationMapFragment.setMapPadding(0);
+                    mStationMapFragment.setMapPaddingLeft(0);
                     hideTripDetailsWidget();
                     mDirectionsLocToAFab.show();
                 }
@@ -1350,13 +1361,24 @@ public class NearbyActivity extends AppCompatActivity
                 } else {
 
                     getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, false);
-                    mStationMapFragment.setMapPadding((int) getResources().getDimension(R.dimen.trip_details_widget_width));
+                    mStationMapFragment.setMapPaddingLeft((int) getResources().getDimension(R.dimen.trip_details_widget_width));
 
-                    if (mTripDetailsWidget.getVisibility() == View.INVISIBLE)
+                    if (mTripDetailsWidget.getVisibility() == View.INVISIBLE) {
                         showTripDetailsWidget();
+                    }
 
-                    animateCameraToShow(mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition());
+                    mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
                     mClearFAB.show();
+
+                    LatLng searchLatLng = mStationMapFragment.getMarkerPickedPlaceVisibleLatLng();
+                    int cameraPadding;
+
+                    if (searchLatLng == null)
+                        cameraPadding = (int)getResources().getDimension(R.dimen.camera_ab_pin_padding);
+                    else
+                        cameraPadding = (int)getResources().getDimension(R.dimen.camera_search_infowindow_padding);
+
+                    animateCameraToShow(cameraPadding, mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition(), searchLatLng);
                 }
 
                 mStationMapFragment.lookingForBikes(false);
