@@ -109,7 +109,6 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         TextView mAvailability;
 
         FloatingActionButton mFavoriteFab;
-        FloatingActionButton mDirectionsFab;
 
         //This View is gone by default. It becomes visible when a row in the recycler View is tapped
         //It's used in two ways
@@ -128,12 +127,10 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             mAvailability = (TextView) itemView.findViewById(R.id.station_availability);
 
             mFavoriteFab = (FloatingActionButton) itemView.findViewById(R.id.favorite_fab);
-            mDirectionsFab = (FloatingActionButton) itemView.findViewById(R.id.directions_fab);
             mFabsAnchor = (FrameLayout) itemView.findViewById(R.id.fabs_anchor);
             itemView.setOnClickListener(this);
 
             mFavoriteFab.setOnClickListener(this);
-            mDirectionsFab.setOnClickListener(this);
         }
 
         public void bindStation(StationItem _station, boolean _selected){
@@ -184,14 +181,12 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
                 if (mFabAnimationRequested){
                     mFavoriteFab.setVisibility(View.GONE);
-                    mDirectionsFab.setVisibility(View.GONE);
 
                     mFabAnimHandler = new Handler();
 
                     mFabAnimHandler.postDelayed(new Runnable() {
                         public void run() {
                             mFavoriteFab.show();
-                            mDirectionsFab.show();
                             mFabAnimHandler = null;
                         }
                     }, 50);
@@ -200,9 +195,9 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 else if (mFabAnimHandler == null)
                 {
                     mFavoriteFab.setVisibility(View.VISIBLE);
-                    mDirectionsFab.setVisibility(View.VISIBLE);
                 }
 
+                //TODO: use this to rework landscape layout
                 //manipulating last item column, displaying bikes or docks numbers
                 //padding is direct but didn't give desired results
                 //mAvailability.setPadding(Utils.dpToPx(20,mCtx), 0,0,0);
@@ -212,9 +207,9 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 //but uses the *middle* of the sprite
                 //So I want it offset by half its width minus any padding I wannna put in there
                 //40/2 - 4 = 20 - 4 = 16.
-                PercentRelativeLayout.LayoutParams availParams =(PercentRelativeLayout.LayoutParams) mAvailability.getLayoutParams();
+                /*PercentRelativeLayout.LayoutParams availParams =(PercentRelativeLayout.LayoutParams) mAvailability.getLayoutParams();
                 availParams.setMargins((int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_left_selected), 0, 0, 0);
-                mAvailability.requestLayout();
+                mAvailability.requestLayout();*/
 
             }
             else{
@@ -227,18 +222,18 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 //Hidding two fabs and their anchor
                 mFabsAnchor.setVisibility(View.GONE);
                 mFavoriteFab.setVisibility(View.GONE);
-                mDirectionsFab.setVisibility(View.GONE);
 
+                //TODO: use this to rework landscape layout
                 //margins, not padding. Set to 0 when item is not selected (hidden fabs)
                 //mAvailability.setPadding(0, 0, 0, 0);
                 //see if(_selected)
-                PercentRelativeLayout.LayoutParams availParams =(PercentRelativeLayout.LayoutParams) mAvailability.getLayoutParams();
+                /*PercentRelativeLayout.LayoutParams availParams =(PercentRelativeLayout.LayoutParams) mAvailability.getLayoutParams();
                 //availParams.setMargins(0,0,0,0);
                 availParams.setMargins((int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default),
                         (int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default),
                         (int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default),
                         (int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default));
-                mAvailability.requestLayout();
+                mAvailability.requestLayout();*/
             }
 
             if (mIsLookingForBike) {
@@ -284,10 +279,6 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                         mFavoriteFab.setImageResource(R.drawable.ic_action_favorite_24dp);
                     else
                         mFavoriteFab.setImageResource(R.drawable.ic_action_favorite_outline_24dp);
-                    break;
-
-                case R.id.directions_fab:
-                    mListener.onStationListItemClick(StationListFragment.STATION_LIST_DIRECTIONS_FAB_CLICK_PATH);
                     break;
             }
         }

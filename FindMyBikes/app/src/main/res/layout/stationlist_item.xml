@@ -57,8 +57,8 @@
             android:layout_toRightOf="@+id/station_name"
             android:gravity="center"
             android:layout_centerVertical="true"
-            android:layout_marginStart="24dp"
-            android:layout_marginLeft="24dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginEnd="3dp"
             android:id="@+id/fabs_anchor"
             android:visibility="gone"
             />
@@ -94,29 +94,11 @@
 
         app:fabSize="mini"
         app:layout_anchor="@id/fabs_anchor"
-        app:layout_anchorGravity="start|center_vertical"
-        app:backgroundTint="@color/theme_primary_dark"
-
-        style="@style/listitem_floating_action_button"
-        />
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:id="@+id/directions_fab"
-        android:layout_centerInParent="true"
-        android:clickable="true"
-        app:srcCompat="@drawable/ic_action_maps_directions_24dp"
-        android:visibility="gone"
-
-        app:fabSize="mini"
-        app:layout_anchor="@id/fabs_anchor"
         app:layout_anchorGravity="end|center_vertical"
         app:backgroundTint="@color/theme_primary_dark"
 
         style="@style/listitem_floating_action_button"
         />
-
 </android.support.design.widget.CoordinatorLayout>
 
 

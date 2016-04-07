@@ -134,6 +134,7 @@ public class NearbyActivity extends AppCompatActivity
     private View mTripDetailsBToSearchRow;
 
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private FloatingActionButton mDirectionsLocToAFab;
     private FloatingActionButton mSearchFAB;
     private MaterialSheetFab mFavoritesSheetFab;
     private boolean mFavoriteSheetVisible = false;
@@ -302,10 +303,12 @@ public class NearbyActivity extends AppCompatActivity
         mTripDetailsBToSearchRow = findViewById(R.id.trip_details_b_to_search);
 
         mSearchFAB = (FloatingActionButton) findViewById(R.id.search_fab);
+        mDirectionsLocToAFab = (FloatingActionButton) findViewById(R.id.directions_loc_to_a_fab);
         mPlaceAutocompleteLoadingProgressBar = (ProgressBar) findViewById(R.id.place_autocomplete_loading);
         if (autoCompleteLoadingProgressBarVisible)
             mPlaceAutocompleteLoadingProgressBar.setVisibility(View.VISIBLE);
 
+        setupDirectionsLocToAFab();
         setupSearchFab();
         setupFavoriteFab();
         setupClearFab();
@@ -353,6 +356,25 @@ public class NearbyActivity extends AppCompatActivity
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         mCircularRevealInterpolator = AnimationUtils.loadInterpolator(this, R.interpolator.msf_interpolator);
+    }
+
+    private void setupDirectionsLocToAFab() {
+        mDirectionsLocToAFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StationItem curSelectedStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+
+                // Seen NullPointerException in crash report.
+                if (null != curSelectedStation) {
+
+                    LatLng tripLegOrigin = isLookingForBike() ? mCurrentUserLatLng : mStationMapFragment.getMarkerALatLng();
+                    LatLng tripLegDestination = curSelectedStation.getPosition();
+                    boolean walkMode = isLookingForBike();
+
+                    launchGoogleMapsForDirections(tripLegOrigin, tripLegDestination, walkMode);
+                }
+            }
+        });
     }
 
     private void setupSearchFab() {
@@ -768,8 +790,10 @@ public class NearbyActivity extends AppCompatActivity
                         StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
                         mStationMapFragment.setPinOnStation(true, closestBikeStation.getId());
 
-                        if (isLookingForBike())
+                        if (isLookingForBike()) {
+                            mDirectionsLocToAFab.show();
                             animateCameraToShowUserAndStation(closestBikeStation);
+                        }
 
                         mClosestBikeAutoSelected = true;
                     }
@@ -1278,11 +1302,13 @@ public class NearbyActivity extends AppCompatActivity
 
             StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(position);
 
+            //A TAB
             if (position == StationListPagerAdapter.BIKE_STATIONS) {
 
                 if (mStationMapFragment.getMarkerBVisibleLatLng() == null) {
                     mStationMapFragment.setMapPadding(0);
                     hideTripDetailsWidget();
+                    mDirectionsLocToAFab.show();
                 }
 
                 mAppBarLayout.setExpanded(true, true);
@@ -1301,7 +1327,7 @@ public class NearbyActivity extends AppCompatActivity
 
                     mStationMapFragment.lookingForBikes(true);
                 }
-            } else {
+            } else { //B TAB
 
                 mAppBarLayout.setExpanded(false, true);
 
@@ -1317,6 +1343,7 @@ public class NearbyActivity extends AppCompatActivity
                         mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.light_gray));
                     }
                     else {
+                        mDirectionsLocToAFab.hide();
                         mFavoritesSheetFab.showFab();
                         mSearchFAB.show();
                     }

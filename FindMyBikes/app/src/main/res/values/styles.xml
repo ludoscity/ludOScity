@@ -70,17 +70,27 @@
         <item name="borderWidth">0dp</item>
     </style>
 
-    <style name="map_floating_action_button">
+    <style name="map_floating_action_button_end_aligned">
         <item name="android:layout_marginLeft">0dp</item>
         <item name="android:layout_marginTop">0dp</item>
-        <item name="android:layout_marginRight">@dimen/fab_margin</item>
+        <item name="android:layout_marginRight">@dimen/end_aligned_fab_margin</item>
         <item name="android:layout_marginBottom">8dp</item>
         <item name="elevation">0dp</item>
         <item name="borderWidth">0dp</item>
     </style>
-    <style name="map_floating_action_button_top" parent="map_floating_action_button">
+    <style name="map_floating_action_button_top" parent="map_floating_action_button_end_aligned">
         <!-- parent -6dp-->
         <item name="android:layout_marginRight">10dp</item>
+    </style>
+
+    <!-- this breaks RTL on device API 17-21 -->
+    <style name="map_floating_action_button_start_aligned">
+        <item name="android:layout_marginLeft">@dimen/start_aligned_fab_margin_start</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginRight">0dp</item>
+        <item name="android:layout_marginBottom">@dimen/start_aligned_fab_margin_bottom</item>
+        <item name="elevation">0dp</item>
+        <item name="borderWidth">0dp</item>
     </style>
 
     <!-- on API < 21, this is used so that unselected single line items have same

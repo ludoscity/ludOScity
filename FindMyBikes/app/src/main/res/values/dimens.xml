@@ -5,7 +5,10 @@
     <dimen name="action_toolbar_size">48dp</dimen>
     <dimen name="tablayout_height">40dp</dimen>
 
-    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="end_aligned_fab_margin">16dp</dimen>
+    <!-- need extra margin on left aligned map button to clear Google logo -->
+    <dimen name="start_aligned_fab_margin_bottom">21dp</dimen>
+    <dimen name="start_aligned_fab_margin_start">5dp</dimen>
 
     <dimen name="sheet_width">210dp</dimen>
     <dimen name="sheet_spacing">10dp</dimen>
