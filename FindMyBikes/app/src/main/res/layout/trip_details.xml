@@ -3,10 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:id="@+id/trip_details"
+    android:visibility="invisible"
+    >
     <RelativeLayout
 
-        android:layout_width="125dp"
+        android:layout_width="@dimen/trip_details_widget_width"
         android:layout_height="wrap_content"
         android:paddingTop="2dp"
         android:paddingBottom="3dp"
@@ -55,13 +58,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_pin_a"
-                android:layout_marginLeft="-12dp"
-                android:layout_marginStart="-12dp"
-                android:elevation="13dp"
+                android:layout_marginLeft="-9dp"
+                android:layout_marginStart="-9dp"
+                android:elevation="1dp"
                 android:layout_toEndOf="@id/trip_details_directions_loc_to_a"
                 android:layout_toRightOf="@id/trip_details_directions_loc_to_a"
                 android:layout_alignBottom="@id/trip_details_directions_loc_to_a"
-                app:srcCompat="@drawable/ic_pin_a_24dp_theme_primary_dark"/>
+                app:srcCompat="@drawable/ic_pin_a_24dp_black"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -131,14 +134,14 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:elevation="13dp"
-                android:layout_marginLeft="-12dp"
-                android:layout_marginStart="-12dp"
+                android:elevation="1dp"
+                android:layout_marginLeft="-9dp"
+                android:layout_marginStart="-9dp"
                 android:id="@+id/trip_details_pin_b"
                 android:layout_toEndOf="@id/trip_details_directions_a_to_b"
                 android:layout_toRightOf="@id/trip_details_directions_a_to_b"
                 android:layout_alignBottom="@id/trip_details_directions_a_to_b"
-                app:srcCompat="@drawable/ic_pin_b_24dp_theme_primary_dark"/>
+                app:srcCompat="@drawable/ic_pin_b_24dp_black"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -193,7 +196,7 @@
             <android.support.design.widget.FloatingActionButton
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:id="@+id/trip_details_directions_loc_to_search"
+                android:id="@+id/trip_details_directions_b_to_search"
                 android:layout_toEndOf="@id/trip_details_walk_search"
                 android:layout_toRightOf="@id/trip_details_walk_search"
                 android:clickable="true"
@@ -208,14 +211,14 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="-12dp"
-                android:layout_marginStart="-12dp"
-                android:elevation="13dp"
+                android:layout_marginLeft="-9dp"
+                android:layout_marginStart="-9dp"
+                android:elevation="3dp"
                 android:id="@+id/trip_details_pin_search"
-                android:layout_toEndOf="@id/trip_details_directions_loc_to_search"
-                android:layout_toRightOf="@id/trip_details_directions_loc_to_search"
-                android:layout_alignBottom="@id/trip_details_directions_loc_to_search"
-                app:srcCompat="@drawable/ic_pin_search_24dp_theme_primary_dark"/>
+                android:layout_toEndOf="@id/trip_details_directions_b_to_search"
+                android:layout_toRightOf="@id/trip_details_directions_b_to_search"
+                android:layout_alignBottom="@id/trip_details_directions_b_to_search"
+                app:srcCompat="@drawable/ic_pin_search_24dp_black"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -246,7 +249,7 @@
         </RelativeLayout>
 
         <FrameLayout
-            android:layout_width="119dp"
+            android:layout_width="match_parent"
             android:layout_height="3dp"
             android:id="@+id/trip_details_sum_separator"
             android:layout_below="@id/trip_details_b_to_search"

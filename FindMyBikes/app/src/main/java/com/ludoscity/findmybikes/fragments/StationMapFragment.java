@@ -194,7 +194,6 @@ public class StationMapFragment extends Fragment
         mGoogleMap.setOnInfoWindowClickListener(this);
         mGoogleMap.setOnCameraChangeListener(this);
         mGoogleMap.setOnMapClickListener(this);
-        //mGoogleMap.setPadding(Utils.dpToPx(100.f, getContext()), 0, 0, 0);
 
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(MAP_READY_PATH);
@@ -292,6 +291,10 @@ public class StationMapFragment extends Fragment
                 toReturn = mBufferedBundle.getParcelable("pin_B_latlng");
 
         return toReturn;
+    }
+
+    public void setMapPadding(int _paddingPx){
+        mGoogleMap.setPadding(_paddingPx, 0, 0, 0);
     }
 
     public boolean isPickedPlaceMarkerVisible(){

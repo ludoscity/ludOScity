@@ -117,6 +117,7 @@ public class NearbyActivity extends AppCompatActivity
     private AppBarLayout mAppBarLayout;
     private CoordinatorLayout mCoordinatorLayout;
     private ProgressBar mPlaceAutocompleteLoadingProgressBar;
+    private View mTripDetailsWidget;
     private TextView mTripDetailsProximityA;
     private TextView mTripDetailsProximityB;
     private TextView mTripDetailsProximitySearch;
@@ -284,6 +285,7 @@ public class NearbyActivity extends AppCompatActivity
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
 
+        mTripDetailsWidget = findViewById(R.id.trip_details);
         mTripDetailsProximityA = (TextView) findViewById(R.id.trip_details_proximity_a);
         mTripDetailsProximityB = (TextView) findViewById(R.id.trip_details_proximity_b);
         mTripDetailsProximitySearch = (TextView) findViewById(R.id.trip_details_proximity_search);
@@ -305,6 +307,28 @@ public class NearbyActivity extends AppCompatActivity
         getListPagerAdapter().setCurrentUserLatLng(mCurrentUserLatLng);
 
         setupFavoriteSheet();
+
+        //noinspection ConstantConditions
+        findViewById(R.id.trip_details_directions_loc_to_a).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchGoogleMapsForDirections(mCurrentUserLatLng, mStationMapFragment.getMarkerALatLng(), true);
+            }
+        });
+        //noinspection ConstantConditions
+        findViewById(R.id.trip_details_directions_a_to_b).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchGoogleMapsForDirections(mStationMapFragment.getMarkerALatLng(), mStationMapFragment.getMarkerBVisibleLatLng(), false);
+            }
+        });
+        //noinspection ConstantConditions
+        findViewById(R.id.trip_details_directions_b_to_search).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchGoogleMapsForDirections(mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(), true);
+            }
+        });
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -556,6 +580,7 @@ public class NearbyActivity extends AppCompatActivity
         mClearFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setTripDetailsWidgetVisibility(false);
                 clearBTab();
             }
         });
@@ -789,7 +814,7 @@ public class NearbyActivity extends AppCompatActivity
 
                     if (mStationMapFragment.getMarkerBVisibleLatLng() != null) {
                         getListPagerAdapter().notifyStationAUpdate(mStationMapFragment.getMarkerALatLng());
-                        setupTripDetailsWidget();
+                        setupTripDetailsWidgetAndShow();
                     }
                 }
             }
@@ -818,6 +843,8 @@ public class NearbyActivity extends AppCompatActivity
         //Remove any previous selection
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
 
+        setupTripDetailsWidgetAndShow();
+
         if (!mStationMapFragment.isPickedPlaceMarkerVisible()) {
 
             LatLng sortRef = _targetDestination != null ? _targetDestination.getLatLng() : getLatLngForStation(_selectedStationId);
@@ -841,7 +868,6 @@ public class NearbyActivity extends AppCompatActivity
                             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                         } else {
                             mStationMapFragment.setPinOnStation(false, getListPagerAdapter().highlightClosestStationWithAvailability(false));
-                            setupTripDetailsWidget();
                             animateCameraToShow(_targetDestination.getLatLng(), mStationMapFragment.getMarkerBVisibleLatLng());
                         }
 
@@ -860,7 +886,6 @@ public class NearbyActivity extends AppCompatActivity
 
         if (_selectedStationId != null) {
             mStationMapFragment.setPinOnStation(false, _selectedStationId);
-            setupTripDetailsWidget();
         }
         else
             mStationMapFragment.setPinForPickedPlace(_targetDestination.getName().toString(),
@@ -868,7 +893,9 @@ public class NearbyActivity extends AppCompatActivity
     }
 
     //Assumption here is that there is an A and a B station selected (or soon will be)
-    private void setupTripDetailsWidget() {
+    private void setupTripDetailsWidgetAndShow() {
+
+        mStationMapFragment.setMapPadding((int)getResources().getDimension(R.dimen.trip_details_widget_width) );
 
         final Handler handler = new Handler();    //Need to wait for list selection
 
@@ -890,7 +917,7 @@ public class NearbyActivity extends AppCompatActivity
                     if (formattedProximityString.startsWith(">"))
                         totalOver1h = true;
                     else if (!formattedProximityString.startsWith("<"))
-                        locToAMinutes = Integer.valueOf(formattedProximityString.substring(1,3));
+                        locToAMinutes = Integer.valueOf(formattedProximityString.substring(1, 3));
 
                     mTripDetailsProximityA.setText(formattedProximityString);
 
@@ -903,7 +930,7 @@ public class NearbyActivity extends AppCompatActivity
                     if (formattedProximityString.startsWith(">"))
                         totalOver1h = true;
                     else if (!formattedProximityString.startsWith("<"))
-                        AToBMinutes = Integer.valueOf(formattedProximityString.substring(1,3));
+                        AToBMinutes = Integer.valueOf(formattedProximityString.substring(1, 3));
 
                     mTripDetailsProximityB.setText(formattedProximityString);
 
@@ -921,7 +948,7 @@ public class NearbyActivity extends AppCompatActivity
                         if (formattedProximityString.startsWith(">"))
                             totalOver1h = true;
                         else if (!formattedProximityString.startsWith("<"))
-                            BToSearchMinutes = Integer.valueOf(formattedProximityString.substring(1,3));
+                            BToSearchMinutes = Integer.valueOf(formattedProximityString.substring(1, 3));
 
                         mTripDetailsProximitySearch.setText(formattedProximityString);
 
@@ -942,6 +969,8 @@ public class NearbyActivity extends AppCompatActivity
                         mTripDetailsProximityTotal.setText("> 1h");
                     else
                         mTripDetailsProximityTotal.setText("~" + total + getResources().getString(R.string.min));
+
+                    NearbyActivity.this.setTripDetailsWidgetVisibility(true);
 
                 } else
                     handler.postDelayed(this, 10);
@@ -1015,11 +1044,12 @@ public class NearbyActivity extends AppCompatActivity
             //    mAppBarLayout.setExpanded(true , true);
 
             if (isLookingForBike()) {
-                animateCameraToShowUserAndStation(clickedStation);
+
                 if (mStationMapFragment.getMarkerBVisibleLatLng() != null) {
                     getListPagerAdapter().notifyStationAUpdate(mStationMapFragment.getMarkerALatLng());
-                    setupTripDetailsWidget();
                 }
+
+                animateCameraToShowUserAndStation(clickedStation);
 
                 mStationMapFragment.setPinOnStation(true, clickedStation.getId());
             }
@@ -1051,43 +1081,42 @@ public class NearbyActivity extends AppCompatActivity
 
             // Seen NullPointerException in crash report.
             if (null != curSelectedStation) {
-                StringBuilder builder = new StringBuilder("http://maps.google.com/maps?&saddr=");
 
-                if (isLookingForBike()){
-                    builder.append(mCurrentUserLatLng.latitude).
-                            append(",").
-                            append(mCurrentUserLatLng.longitude);
-                }
-                else{
-                    builder.append(mStationMapFragment.getMarkerALatLng().latitude).
-                            append(",").
-                            append(mStationMapFragment.getMarkerALatLng().longitude);
-                            //.append("+(A)"); Labeling doesn't work :'(
-                }
+                LatLng tripLegOrigin = isLookingForBike() ? mCurrentUserLatLng : mStationMapFragment.getMarkerALatLng();
+                LatLng tripLegDestination = curSelectedStation.getPosition();
+                boolean walkMode = isLookingForBike();
 
-                        builder.append("&daddr=").
-                        append(curSelectedStation.getPosition().latitude).
-                        append(",").
-                        append(curSelectedStation.getPosition().longitude).
-                        //append("B"). Labeling doesn't work :'(
-                        append("&dirflg=");
-
-                if (isLookingForBike())
-                    builder.append("w");
-                else
-                    builder.append("b");
-
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(builder.toString()));
-                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-                if (getPackageManager().queryIntentActivities(intent, 0).size() > 0) {
-                    startActivity(intent); // launch the map activity
-                } else {
-                    //TODO: replace by Snackbar
-                    Toast.makeText(this, getString(R.string.google_maps_not_installed), Toast.LENGTH_LONG).show();
-
-                }
+                launchGoogleMapsForDirections(tripLegOrigin, tripLegDestination, walkMode);
             }
+        }
+    }
 
+    private void launchGoogleMapsForDirections(LatLng _origin, LatLng _destination, boolean _walking) {
+        StringBuilder builder = new StringBuilder("http://maps.google.com/maps?&saddr=");
+
+        builder.append(_origin.latitude).
+                append(",").
+                append(_origin.longitude);
+
+        builder.append("&daddr=").
+            append(_destination.latitude).
+            append(",").
+            append(_destination.longitude).
+            //append("B"). Labeling doesn't work :'(
+            append("&dirflg=");
+
+        if (_walking)
+            builder.append("w");
+        else
+            builder.append("b");
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(builder.toString()));
+        intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+        if (getPackageManager().queryIntentActivities(intent, 0).size() > 0) {
+            startActivity(intent); // launch the map activity
+        } else {
+            //TODO: replace by Snackbar
+            Toast.makeText(this, getString(R.string.google_maps_not_installed), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1155,6 +1184,9 @@ public class NearbyActivity extends AppCompatActivity
 
             if (position == StationListPagerAdapter.BIKE_STATIONS) {
 
+                if (mStationMapFragment.getMarkerBVisibleLatLng() == null)
+                    setTripDetailsWidgetVisibility(false);
+
                 mAppBarLayout.setExpanded(true, true);
                 getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, true);
 
@@ -1172,7 +1204,6 @@ public class NearbyActivity extends AppCompatActivity
                     mStationMapFragment.lookingForBikes(true);
                 }
             } else {
-
 
                 mAppBarLayout.setExpanded(false, true);
 
@@ -1194,15 +1225,24 @@ public class NearbyActivity extends AppCompatActivity
                 } else {
 
                     getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, false);
-
+                    mStationMapFragment.setMapPadding((int)getResources().getDimension(R.dimen.trip_details_widget_width) );
+                    setTripDetailsWidgetVisibility(true);
                     animateCameraToShow(mStationMapFragment.getMarkerALatLng(), highlightedStation.getPosition());
-
                     mClearFAB.show();
-
                 }
 
                 mStationMapFragment.lookingForBikes(false);
             }
+        }
+    }
+
+    private void setTripDetailsWidgetVisibility(boolean _toSet){
+        if (_toSet){
+            mTripDetailsWidget.setVisibility(View.VISIBLE);
+        }
+        else{
+            mStationMapFragment.setMapPadding(0);
+            mTripDetailsWidget.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -1239,8 +1279,8 @@ public class NearbyActivity extends AppCompatActivity
 
         if (mStationMapFragment != null){
             mStationMapFragment.onUserLocationChange(location);
-            if (mStationMapFragment.getMarkerBVisibleLatLng() != null)
-                setupTripDetailsWidget();
+            if (mStationMapFragment.getMarkerBVisibleLatLng() != null && mTripDetailsWidget.getVisibility() == View.VISIBLE)
+                setupTripDetailsWidgetAndShow();
 
             //TODO: Scroll highlighted station for current tab if new sorting ejects it from view
         }

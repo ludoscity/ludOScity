@@ -16,6 +16,8 @@
     <dimen name="dummy_fab_height">62dp</dimen>
     <dimen name="dummy_fab_width">56dp</dimen>
 
+    <dimen name="trip_details_widget_width">128dp</dimen>
+
     <!-- fabs in recyclerView -->
     <dimen name="station_availability_margin_default">0dp</dimen>
     <!--So I want it offset by half its width minus any padding I wannna put in there
