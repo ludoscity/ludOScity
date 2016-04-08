@@ -667,7 +667,7 @@ public class NearbyActivity extends AppCompatActivity
         if (stationBLatLng == null)
             getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
         else
-            setupBTabSelection(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS).getId());
+            setupBTabSelection(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS).getId(), isLookingForBike());
 
         mRefreshTabs = false;
     }
@@ -859,7 +859,7 @@ public class NearbyActivity extends AppCompatActivity
             else {
                 //B Tab, looking for dock
                 final String clickedStationId = uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM);
-                setupBTabSelection(clickedStationId);
+                setupBTabSelection(clickedStationId, false);
             }
         }
         //Map click
@@ -869,24 +869,27 @@ public class NearbyActivity extends AppCompatActivity
     }
 
     private void setupBTabSelectionClosestDock(final Place _from){
-        setupBTabSelection(null, _from);
+        setupBTabSelection(null, _from, false);
     }
 
-    private void setupBTabSelection(final String _selectedStationId){
-        setupBTabSelection(_selectedStationId, null);
+    private void setupBTabSelection(final String _selectedStationId, boolean _silent){
+        setupBTabSelection(_selectedStationId, null, _silent);
     }
 
-    //Both parameters shouldn't be null at the same time
-    private void setupBTabSelection(final String _selectedStationId, final Place _targetDestination) {
+    //Both _selectedStationId and _targetDestination shouldn't be null at the same time
+    // silent parameter is used when the UI shouldn't be impacted
+    private void setupBTabSelection(final String _selectedStationId, final Place _targetDestination, final boolean _silent) {
         //Remove any previous selection
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
 
-        if (mTripDetailsWidget.getVisibility() == View.INVISIBLE){
+        if (!_silent && mTripDetailsWidget.getVisibility() == View.INVISIBLE){
             mStationMapFragment.setMapPaddingLeft((int) getResources().getDimension(R.dimen.trip_details_widget_width));
             setupTripDetailsWidget();
             showTripDetailsWidget();
         }
-        else{
+        else{   //Widget is visible, silent parameter is ignored because widget needs refresh
+            //TODO: find a more elegant solution than this damn _silent boolean, which is a hackfix - probably a refactor by splitting method in pieces
+            //and call them independently as required from client
             hideSetupShowTripDetailsWidget();
         }
 
@@ -898,10 +901,12 @@ public class NearbyActivity extends AppCompatActivity
             getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
                     sortRef, mStationMapFragment.getMarkerALatLng());
 
-            mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
-            mClearFAB.show();
-            mFavoritesSheetFab.hideSheetThenFab();
-            mSearchFAB.hide();
+            if (!_silent) {
+                mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
+                mClearFAB.show();
+                mFavoritesSheetFab.hideSheetThenFab();
+                mSearchFAB.hide();
+            }
 
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -912,10 +917,15 @@ public class NearbyActivity extends AppCompatActivity
                         //highlight B station in list
                         if (_selectedStationId != null) {
                             getListPagerAdapter().highlightStationForPage(_selectedStationId, StationListPagerAdapter.DOCK_STATIONS);
-                            mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
+                            if (!_silent)
+                                mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                         } else {
                             mStationMapFragment.setPinOnStation(false, getListPagerAdapter().highlightClosestStationWithAvailability(false));
-                            animateCameraToShow((int)getResources().getDimension(R.dimen.camera_ab_pin_padding), _targetDestination.getLatLng(), mStationMapFragment.getMarkerBVisibleLatLng(), null);
+                            if(!_silent)
+                                animateCameraToShow((int)getResources().getDimension(R.dimen.camera_ab_pin_padding),
+                                        _targetDestination.getLatLng(),
+                                        mStationMapFragment.getMarkerBVisibleLatLng(),
+                                        null);
                         }
 
                         getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
@@ -926,10 +936,11 @@ public class NearbyActivity extends AppCompatActivity
         }
         else {
 
-            animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
-                    getLatLngForStation(_selectedStationId),
-                    mStationMapFragment.getMarkerBVisibleLatLng(),
-                    mStationMapFragment.getMarkerPickedPlaceVisibleLatLng());
+            if (!_silent)
+                animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
+                        getLatLngForStation(_selectedStationId),
+                        mStationMapFragment.getMarkerBVisibleLatLng(),
+                        mStationMapFragment.getMarkerPickedPlaceVisibleLatLng());
 
             getListPagerAdapter().highlightStationForPage(_selectedStationId, StationListPagerAdapter.DOCK_STATIONS);
             getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
@@ -1182,7 +1193,7 @@ public class NearbyActivity extends AppCompatActivity
                 mStationMapFragment.setPinOnStation(true, clickedStation.getId());
             }
             else
-                setupBTabSelection(clickedStation.getId());
+                setupBTabSelection(clickedStation.getId(), false);
         }
         else if (uri.getPath().equalsIgnoreCase("/"+ StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH)){
 
@@ -1255,7 +1266,11 @@ public class NearbyActivity extends AppCompatActivity
     private void animateCameraToShowUserAndStation(StationItem station) {
 
         if (mCurrentUserLatLng != null) {
-            animateCameraToShow((int)getResources().getDimension(R.dimen.camera_fab_padding), station.getPosition(), mCurrentUserLatLng, null);
+            if (mTripDetailsWidget.getVisibility() != View.VISIBLE) //Directions to A fab is visible
+                animateCameraToShow((int)getResources().getDimension(R.dimen.camera_fab_padding), station.getPosition(), mCurrentUserLatLng, null);
+            else    //Map id padded on the left and interface is clear on the right
+                animateCameraToShow((int)getResources().getDimension(R.dimen.camera_ab_pin_padding), station.getPosition(), mCurrentUserLatLng, null);
+
         }
         else{
             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(station.getPosition(), 15));
@@ -1328,6 +1343,7 @@ public class NearbyActivity extends AppCompatActivity
                 mSearchFAB.hide();
                 mFavoritesSheetFab.hideSheetThenFab();
                 mClearFAB.hide();
+                mStationMapFragment.setMapPaddingRight(0);
 
                 //just to be on the safe side
                 if (highlightedStation != null ) {
@@ -1429,7 +1445,7 @@ public class NearbyActivity extends AppCompatActivity
     @Override
     public void onFavoriteListItemClick(String _stationID) {
         mStationMapFragment.clearMarkerPickedPlace();
-        setupBTabSelection(_stationID);
+        setupBTabSelection(_stationID, false);
     }
 
     @Override
