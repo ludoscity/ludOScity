@@ -700,6 +700,11 @@ public class NearbyActivity extends AppCompatActivity
                     mPagerReady = true;
                 }
 
+                if ( DBHelper.isDataCorrupted(NearbyActivity.this) && mPagerReady && mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null){
+                    mDownloadWebTask = new DownloadWebTask();
+                    mDownloadWebTask.execute();
+                }
+
                 //Update not already in progress
                 if (mPagerReady && mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null) {
 
@@ -1686,6 +1691,15 @@ public class NearbyActivity extends AppCompatActivity
 
     //TODO: NOT use an asynchtask for this long running database operation
     public class SaveNetworkToDatabaseTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            DBHelper.notifyBeginSavingStations(NearbyActivity.this);
+        }
+
+
         @Override
         protected Void doInBackground(Void... params) {
 
@@ -1703,9 +1717,7 @@ public class NearbyActivity extends AppCompatActivity
             }
 
             try {
-                //TODO: This strategy of deleting everything and re adding is broken
-                //when screen orientation changes happen while it's saving stations
-                //Anyone using DBHelper at that time get fed partial results
+                //TODO: This is ugly.
                 //This process shouldn't use an asynctask anyway as it's long running :/
                 DBHelper.deleteAllStations();
 
@@ -1721,6 +1733,8 @@ public class NearbyActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+            DBHelper.notifyEndSavingStations(NearbyActivity.this);
 
             if (mCurrentUserLatLng != null && !DBHelper.getBikeNetworkBounds(NearbyActivity.this, 0).contains(mCurrentUserLatLng)){
 

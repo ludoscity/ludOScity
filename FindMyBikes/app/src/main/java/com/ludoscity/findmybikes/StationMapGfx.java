@@ -86,23 +86,29 @@ public class StationMapGfx {
 
     public void updateMarker(boolean isLookingForBikes) {
         if (isLookingForBikes){
-            if (mItem.getFree_bikes() == 0)
-                groundOverlay.setImage(redIcon);
-            else if (mItem.getFree_bikes() < 3)
-                groundOverlay.setImage(yellowIcon);
-                // check if the overlay is not already green
-            else if (mItem.getEmpty_slots() < 3)
-                // overlay isn't green yet
-                groundOverlay.setImage(greenIcon);
+            if (!mItem.isLocked()) {
+                if (mItem.getFree_bikes() == 0)
+                    groundOverlay.setImage(redIcon);
+                else if (mItem.getFree_bikes() < 3)
+                    groundOverlay.setImage(yellowIcon);
+                    // check if the overlay is not already green
+                else if (mItem.getEmpty_slots() < 3)
+                    // overlay isn't green yet
+                    groundOverlay.setImage(greenIcon);
+            } else
+                groundOverlay.setImage(greyIcon);
         } else {
-            if (mItem.getEmpty_slots() == 0)
-                groundOverlay.setImage(redIcon);
-            else if (mItem.getEmpty_slots() < 3)
-                groundOverlay.setImage(yellowIcon);
-                // check if the overlay is not already green
-            else if (mItem.getFree_bikes() < 3)
-                // overlay isn't green yet
-                groundOverlay.setImage(greenIcon);
+            if (!mItem.isLocked()) {
+                if (mItem.getEmpty_slots() == 0)
+                    groundOverlay.setImage(redIcon);
+                else if (mItem.getEmpty_slots() < 3)
+                    groundOverlay.setImage(yellowIcon);
+                    // check if the overlay is not already green
+                else if (mItem.getFree_bikes() < 3)
+                    // overlay isn't green yet
+                    groundOverlay.setImage(greenIcon);
+            } else
+                groundOverlay.setImage(greyIcon);
         }
     }
 

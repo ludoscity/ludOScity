@@ -44,8 +44,12 @@ public class DBHelper {
 
     private static Manager mManager = null;
     private static final String mTRACKS_DB_NAME = "tracksdb";
-    private static final String mSTATIONS_DB_NAME = "stationsdb";
     private static boolean mGotTracks;
+
+    private static final String mSTATIONS_DB_NAME = "stationsdb";
+
+    private static final String PREF_LAST_SAVE_CORRUPTED = "last_save_corrupted";
+    private static boolean mSaving = false;
 
     public static final String SHARED_PREF_FILENAME = "FindMyBikes_prefs";
     public static final String SHARED_PREF_VERSION_CODE = "FindMyBikes_prefs_version_code";
@@ -74,19 +78,22 @@ public class DBHelper {
         int currentVersionCode = pinfo.versionCode;
 
         if (sharedPrefVersion != currentVersionCode){
-            if (sharedPrefVersion == 0 && currentVersionCode >= 8){
-                SharedPreferences settings;
-                SharedPreferences.Editor editor;
+            SharedPreferences settings;
+            SharedPreferences.Editor editor;
 
-                settings = context.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
-                editor = settings.edit();
+            settings = context.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+            editor = settings.edit();
+
+            if (sharedPrefVersion == 0 && currentVersionCode >= 8){
+                //Because the way favorites are saved changed
 
                 editor.clear();
                 editor.commit(); //I do want commit and not apply
 
-                editor.putInt(SHARED_PREF_VERSION_CODE, currentVersionCode);
-                editor.apply();
             }
+
+            editor.putInt(SHARED_PREF_VERSION_CODE, currentVersionCode);
+            editor.apply();
         }
     }
 
@@ -219,9 +226,28 @@ public class DBHelper {
         return mGotTracks;
     }
 
-    /*public static Manager get() {
-        return mManager;
-    }*/
+    public static void notifyBeginSavingStations(Context _ctx){
+
+        mSaving = true;
+
+        _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE).edit()
+                .putBoolean(PREF_LAST_SAVE_CORRUPTED, true).apply();
+    }
+
+    public static void notifyEndSavingStations(Context _ctx){
+
+        _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE).edit()
+                .putBoolean(PREF_LAST_SAVE_CORRUPTED, false).apply();
+
+        mSaving = false;
+    }
+
+    public static boolean isDataCorrupted(Context _ctx) {
+
+        return !mSaving && _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE)
+                .getBoolean(PREF_LAST_SAVE_CORRUPTED, false);
+
+    }
 
     public static void saveTrack(Track toSave) throws CouchbaseLiteException, JSONException {
         Document doc = mManager.getDatabase(mTRACKS_DB_NAME).getDocument(toSave.getKeyTimeUTC());
