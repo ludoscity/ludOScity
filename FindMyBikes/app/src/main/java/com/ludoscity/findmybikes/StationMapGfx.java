@@ -70,7 +70,7 @@ public class StationMapGfx {
 
     public void setBigOverlay(boolean toSet){
         if (toSet)
-            groundOverlay.setDimensions(2.0f*OVERLAY_SIZE_BASE);
+            groundOverlay.setDimensions(2.0f * OVERLAY_SIZE_BASE);
         else
             groundOverlay.setDimensions(OVERLAY_SIZE_BASE);
     }
@@ -104,5 +104,13 @@ public class StationMapGfx {
                 // overlay isn't green yet
                 groundOverlay.setImage(greenIcon);
         }
+    }
+
+    public void hide() {
+        groundOverlay.setVisible(false);
+    }
+
+    public void show() {
+        groundOverlay.setVisible(true);
     }
 }

@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">FindMyBikes</string>
-    <string name="favorites_sheet_header">Favorites - %1$s</string>
+    <string name="favorites_sheet_header">Favorites - &lt;b>%1$s&lt;/b></string>
     <string name="title_section_nearby">Nearby</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -16,7 +16,7 @@
     <string name="station">Station</string>
     <string name="bikes">Bikes</string>
     <string name="docks">Docks</string>
-    <string name="tab_b_instructions">Tap station, pick favorite or search</string>
+    <string name="tab_b_instructions">Pick favorite, search or scroll map and tap station</string>
     <string name="downloading">Downloading data…</string>
     <string name="nextUpdate">Next update</string>
     <string name="no_connectivity">No connectivity</string>
@@ -50,5 +50,5 @@
     <string name="pref_biking_proximity_duration">Duration. (As the crow flies, at 10km/h)</string>
     <string name="hour_symbol">h</string>
     <string name="undo"><b>UNDO</b></string>
-    <string name="no_favorite">No favorite for %1$s</string>
+    <string name="no_favorite">No favorite for &lt;b>%1$s&lt;/b></string>
 </resources>

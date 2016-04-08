@@ -49,6 +49,8 @@ public class StationMapFragment extends Fragment
             if (mLookingForBikeWhenFinished != null)
                 updateMarkerAll(mLookingForBikeWhenFinished);
 
+            showAllStations();
+
             mAnimCallback = null;
 
         }
@@ -58,6 +60,8 @@ public class StationMapFragment extends Fragment
 
             if (mLookingForBikeWhenFinished != null)
                 updateMarkerAll(mLookingForBikeWhenFinished);
+
+            showAllStations();
 
             mAnimCallback = null;
 
@@ -196,6 +200,7 @@ public class StationMapFragment extends Fragment
         mGoogleMap.setOnInfoWindowClickListener(this);
         mGoogleMap.setOnCameraChangeListener(this);
         mGoogleMap.setOnMapClickListener(this);
+        mGoogleMap.getUiSettings().setZoomGesturesEnabled(false);
 
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(MAP_READY_PATH);
@@ -239,7 +244,7 @@ public class StationMapFragment extends Fragment
         if (location != null) {
             //Log.d("onMyLocationChange", "new location " + location.toString());
             if (!mInitialCameraSetupDone && mGoogleMap != null) {
-                doInitialCameraSetup(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15), true);
+                doInitialCameraSetup(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15), false);
             }
         }
     }
@@ -265,7 +270,7 @@ public class StationMapFragment extends Fragment
 
     public void doInitialCameraSetup(CameraUpdate cameraUpdate, boolean animate){
         if (animate)
-            mGoogleMap.animateCamera(cameraUpdate);
+            animateCamera(cameraUpdate);
         else
             mGoogleMap.moveCamera(cameraUpdate);
 
@@ -303,6 +308,10 @@ public class StationMapFragment extends Fragment
     public void setMapPaddingRight(int _paddingPx){
         CURRENT_MAP_PADDING_RIGHT = _paddingPx;
         mGoogleMap.setPadding(CURRENT_MAP_PADDING_LEFT, 0, CURRENT_MAP_PADDING_RIGHT, 0);
+    }
+
+    public void setScrollGesturesEnabled(boolean _toSet){
+        mGoogleMap.getUiSettings().setScrollGesturesEnabled(_toSet);
     }
 
     public boolean isPickedPlaceMarkerVisible(){
@@ -415,7 +424,23 @@ public class StationMapFragment extends Fragment
     public void animateCamera(CameraUpdate cameraUpdate) {
         mAnimCallback = new CustomCancellableCallback();
 
+        hideAllStations();
+
         mGoogleMap.animateCamera(cameraUpdate, 850, mAnimCallback);
+    }
+
+    private void hideAllStations() {
+
+        for (StationMapGfx markerData : mMapMarkersGfxData){
+            markerData.hide();
+        }
+    }
+
+    private void showAllStations() {
+
+        for (StationMapGfx markerData : mMapMarkersGfxData){
+            markerData.show();
+        }
     }
 
     public void lookingForBikes(boolean lookingForBike) {
@@ -429,6 +454,7 @@ public class StationMapFragment extends Fragment
 
     private void updateMarkerAll(boolean lookingForBike){
 
+        //TODO: seen java.util.ConcurrentModificationException
         for (StationMapGfx markerData : mMapMarkersGfxData){
             markerData.updateMarker(lookingForBike);
         }

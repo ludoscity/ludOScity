@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Vélocalise</string>
-    <string name="favorites_sheet_header">Favoris - %1$s</string>
+    <string name="favorites_sheet_header">Favoris - &lt;b>%1$s&lt;/b></string>
     <string name="title_section_settings">Paramètres</string>
     <string name="title_section_nearby">À proximité</string>
     <string name="navigation_drawer_open">Ouvrir navigation drawer</string>
@@ -15,7 +15,7 @@
     <string name="min">min</string>
     <string name="moments">À l\'instant</string>
     <string name="nextUpdate">Prochaine màj</string>
-    <string name="tab_b_instructions">Cliquez sur une station, choisissez un favori ou utilisez la recherche</string>
+    <string name="tab_b_instructions">Choisissez un favori, utilisez la recherche ou déplacez la carte et cliquez sur une station</string>
     <string name="docks">Ancrages</string>
     <string name="favorite_removed">Favori supprimé</string>
     <string name="station">Station</string>
@@ -43,5 +43,5 @@
     <string name="pref_biking_proximity_title">Proximité à vélo</string>
     <string name="hour_symbol">h</string>
     <string name="undo"><b>ANNULER</b></string>
-    <string name="no_favorite">Aucun favori pour %1$s</string>
+    <string name="no_favorite">Aucun favori pour &lt;b>%1$s&lt;/b></string>
 </resources>

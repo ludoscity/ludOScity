@@ -132,4 +132,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
     public LatLng getDistanceDisplayReferenceForPage(int _pageID){
         return retrieveListFragment(_pageID).getDistanceDisplayReference();
     }
+
+    public boolean isHighlightedVisibleInRecyclerView() {
+        return retrieveListFragment(BIKE_STATIONS).isHighlightedVisibleInRecyclerView();
+    }
 }

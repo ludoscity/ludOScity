@@ -305,12 +305,21 @@ public class StationListFragment extends Fragment
     }
 
     public void smoothScrollSelectionInView(boolean _appBarExpanded) {
-        if (_appBarExpanded && getStationRecyclerViewAdapter().getSelectedPos() >=
-                ((LinearLayoutManager)mStationRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition()){
-            mStationRecyclerView.smoothScrollToPosition(getStationRecyclerViewAdapter().getSelectedPos()+1);
+        //Not very proud of the defensive coding but some code path which are required do call this in invalid contexts
+        if (getStationRecyclerViewAdapter().getSelectedPos() != NO_POSITION) {
+            if (_appBarExpanded && getStationRecyclerViewAdapter().getSelectedPos() >=
+                    ((LinearLayoutManager) mStationRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition()) {
+                mStationRecyclerView.smoothScrollToPosition(getStationRecyclerViewAdapter().getSelectedPos() + 1);
+            } else
+                mStationRecyclerView.smoothScrollToPosition(getStationRecyclerViewAdapter().getSelectedPos());
         }
-        else
-            mStationRecyclerView.smoothScrollToPosition(getStationRecyclerViewAdapter().getSelectedPos());
+    }
+
+    public boolean isHighlightedVisibleInRecyclerView() {
+        return  getStationRecyclerViewAdapter().getSelectedPos() <
+                        ((LinearLayoutManager)mStationRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition()-1 && //Minus 1 is for appbar
+                getStationRecyclerViewAdapter().getSelectedPos() >=
+                        ((LinearLayoutManager)mStationRecyclerView.getLayoutManager()).findFirstVisibleItemPosition();
     }
 
     public interface OnStationListFragmentInteractionListener {
