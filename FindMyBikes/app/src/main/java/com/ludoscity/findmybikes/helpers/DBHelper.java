@@ -2,6 +2,8 @@ package com.ludoscity.findmybikes.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -46,6 +48,7 @@ public class DBHelper {
     private static boolean mGotTracks;
 
     public static final String SHARED_PREF_FILENAME = "FindMyBikes_prefs";
+    public static final String SHARED_PREF_VERSION_CODE = "FindMyBikes_prefs_version_code";
 
     private static final String PREF_CURRENT_BIKE_NETWORK_ID = "current_bike_network_id";
 
@@ -61,9 +64,30 @@ public class DBHelper {
 
     private DBHelper() {}
 
-    public static void init(Context context) throws IOException, CouchbaseLiteException {
+    public static void init(Context context) throws IOException, CouchbaseLiteException, PackageManager.NameNotFoundException {
         mManager = new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS);
         mGotTracks = !getAllTracks().isEmpty();
+
+        //Check for SharedPreferences versioning
+        int sharedPrefVersion = context.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE).getInt(SHARED_PREF_VERSION_CODE, 0);
+        PackageInfo pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+        int currentVersionCode = pinfo.versionCode;
+
+        if (sharedPrefVersion != currentVersionCode){
+            if (sharedPrefVersion == 0 && currentVersionCode >= 8){
+                SharedPreferences settings;
+                SharedPreferences.Editor editor;
+
+                settings = context.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+                editor = settings.edit();
+
+                editor.clear();
+                editor.commit(); //I do want commit and not apply
+
+                editor.putInt(SHARED_PREF_VERSION_CODE, currentVersionCode);
+                editor.apply();
+            }
+        }
     }
 
     public static boolean getAutoUpdate(Context ctx){

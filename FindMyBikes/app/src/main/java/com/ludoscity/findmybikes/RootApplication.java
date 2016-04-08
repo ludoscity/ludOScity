@@ -1,6 +1,7 @@
 package com.ludoscity.findmybikes;
 
 import android.app.Application;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -32,6 +33,8 @@ public class RootApplication extends Application {
         try {
             DBHelper.init(this);
         } catch (IOException | CouchbaseLiteException e) {
+            Log.d(TAG, "Error initializing database", e);
+        } catch (PackageManager.NameNotFoundException e) {
             Log.d(TAG, "Error initializing database", e);
         }
 
