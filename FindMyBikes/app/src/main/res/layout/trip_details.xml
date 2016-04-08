@@ -29,22 +29,20 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/trip_details_walk_a"
+                android:id="@+id/trip_details_from_loc"
                 android:layout_marginRight="-8dp"
                 android:layout_marginEnd="-8dp"
-                android:layout_marginLeft="-4dp"
-                android:layout_marginStart="-4dp"
-                android:elevation="13dp"
+                android:elevation="1dp"
                 android:layout_alignParentBottom="true"
-                app:srcCompat="@drawable/ic_walk_circled_24dp_theme_primary_dark"/>
+                app:srcCompat="@drawable/ic_my_location_24dp_black"/>
 
             <!--TODO: Use rounded ImageButton instead of those convenient but costly fabs -->
             <android.support.design.widget.FloatingActionButton
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:id="@+id/trip_details_directions_loc_to_a"
-                android:layout_toEndOf="@id/trip_details_walk_a"
-                android:layout_toRightOf="@id/trip_details_walk_a"
+                android:layout_toEndOf="@id/trip_details_from_loc"
+                android:layout_toRightOf="@id/trip_details_from_loc"
                 android:clickable="true"
                 app:srcCompat="@drawable/ic_action_maps_directions_24dp"
 
@@ -57,7 +55,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/trip_details_pin_a"
+                android:id="@+id/trip_details_to_pin_a"
                 android:layout_marginLeft="-9dp"
                 android:layout_marginStart="-9dp"
                 android:elevation="1dp"
@@ -70,8 +68,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_proximity_a"
-                android:layout_toEndOf="@id/trip_details_pin_a"
-                android:layout_toRightOf="@id/trip_details_pin_a"
+                android:layout_toEndOf="@id/trip_details_to_pin_a"
+                android:layout_toRightOf="@id/trip_details_to_pin_a"
                 android:layout_centerVertical="true"
                 android:fontFamily="droid-sans-mono"
                 android:textSize="12sp"
@@ -106,22 +104,20 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/trip_details_bike_b"
+                android:id="@+id/trip_details_from_pin_a"
                 android:layout_marginRight="-8dp"
                 android:layout_marginEnd="-8dp"
-                android:layout_marginLeft="-4dp"
-                android:layout_marginStart="-4dp"
-                android:elevation="13dp"
+                android:elevation="1dp"
                 android:layout_alignParentBottom="true"
-                app:srcCompat="@drawable/ic_bike_circled_24dp_theme_primary_dark"/>
+                app:srcCompat="@drawable/ic_pin_a_24dp_black"/>
 
             <!--TODO: Use rounded ImageButton instead of those convenient but costly fabs -->
             <android.support.design.widget.FloatingActionButton
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:id="@+id/trip_details_directions_a_to_b"
-                android:layout_toEndOf="@id/trip_details_bike_b"
-                android:layout_toRightOf="@id/trip_details_bike_b"
+                android:layout_toEndOf="@id/trip_details_from_pin_a"
+                android:layout_toRightOf="@id/trip_details_from_pin_a"
                 android:clickable="true"
                 app:srcCompat="@drawable/ic_action_maps_directions_24dp"
 
@@ -137,7 +133,7 @@
                 android:elevation="1dp"
                 android:layout_marginLeft="-9dp"
                 android:layout_marginStart="-9dp"
-                android:id="@+id/trip_details_pin_b"
+                android:id="@+id/trip_details_to_pin_b"
                 android:layout_toEndOf="@id/trip_details_directions_a_to_b"
                 android:layout_toRightOf="@id/trip_details_directions_a_to_b"
                 android:layout_alignBottom="@id/trip_details_directions_a_to_b"
@@ -147,8 +143,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_proximity_b"
-                android:layout_toEndOf="@id/trip_details_pin_b"
-                android:layout_toRightOf="@id/trip_details_pin_b"
+                android:layout_toEndOf="@id/trip_details_to_pin_b"
+                android:layout_toRightOf="@id/trip_details_to_pin_b"
                 android:layout_centerVertical="true"
                 android:fontFamily="droid-sans-mono"
                 android:textStyle="bold"
@@ -183,22 +179,20 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/trip_details_walk_search"
+                android:id="@+id/trip_details_from_pin_b"
                 android:layout_marginRight="-8dp"
                 android:layout_marginEnd="-8dp"
-                android:layout_marginLeft="-4dp"
-                android:layout_marginStart="-4dp"
-                android:elevation="13dp"
+                android:elevation="1dp"
                 android:layout_alignParentBottom="true"
-                app:srcCompat="@drawable/ic_walk_circled_24dp_theme_primary_dark"/>
+                app:srcCompat="@drawable/ic_pin_b_24dp_black"/>
 
             <!--TODO: Use rounded ImageButton instead of those convenient but costly fabs -->
             <android.support.design.widget.FloatingActionButton
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:id="@+id/trip_details_directions_b_to_search"
-                android:layout_toEndOf="@id/trip_details_walk_search"
-                android:layout_toRightOf="@id/trip_details_walk_search"
+                android:layout_toEndOf="@id/trip_details_from_pin_b"
+                android:layout_toRightOf="@id/trip_details_from_pin_b"
                 android:clickable="true"
                 app:srcCompat="@drawable/ic_action_maps_directions_24dp"
 
@@ -214,7 +208,7 @@
                 android:layout_marginLeft="-9dp"
                 android:layout_marginStart="-9dp"
                 android:elevation="3dp"
-                android:id="@+id/trip_details_pin_search"
+                android:id="@+id/trip_details_to_search"
                 android:layout_toEndOf="@id/trip_details_directions_b_to_search"
                 android:layout_toRightOf="@id/trip_details_directions_b_to_search"
                 android:layout_alignBottom="@id/trip_details_directions_b_to_search"
@@ -224,8 +218,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_proximity_search"
-                android:layout_toEndOf="@id/trip_details_pin_search"
-                android:layout_toRightOf="@id/trip_details_pin_search"
+                android:layout_toEndOf="@id/trip_details_to_search"
+                android:layout_toRightOf="@id/trip_details_to_search"
                 android:layout_centerVertical="true"
                 android:fontFamily="droid-sans-mono"
                 android:textSize="12sp"

@@ -241,7 +241,7 @@ public class StationListFragment extends Fragment
                     mProximityHeaderFromImageView.setPadding(0,0, Utils.dpToPx(1.f,getContext()),0);
                 }
 
-                mProximityHeaderFromImageView.setImageResource(R.drawable.ic_my_location_24dp);
+                mProximityHeaderFromImageView.setImageResource(R.drawable.ic_my_location_24dp_white);
                 mProximityHeaderToImageView.setImageResource(R.drawable.ic_walking_24dp_white);
 
                 mProximityHeader.setVisibility(View.VISIBLE);
