@@ -84,12 +84,23 @@ public class DBHelper {
             settings = context.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
             editor = settings.edit();
 
+            boolean cleared = false;
+
             if (sharedPrefVersion == 0 && currentVersionCode >= 8){
                 //Because the way favorites are saved changed
 
                 editor.clear();
                 editor.commit(); //I do want commit and not apply
+                cleared = true;
 
+            }
+            if (!cleared && sharedPrefVersion <= 10 && currentVersionCode >= 11 ){
+                //Removed settings
+                editor.remove(context.getString(R.string.pref_walking_proximity_key));
+                editor.remove(context.getString(R.string.pref_biking_proximity_key));
+                //change default value for auto update setting
+                editor.putBoolean(context.getString(R.string.pref_refresh_options_key), false);
+                editor.apply();
             }
 
             editor.putInt(SHARED_PREF_VERSION_CODE, currentVersionCode);
@@ -100,19 +111,7 @@ public class DBHelper {
     public static boolean getAutoUpdate(Context ctx){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
 
-        return sp.getBoolean(ctx.getString(R.string.pref_refresh_options_key), true);
-    }
-
-    public static boolean getWalkingProximityAsDistance(Context _ctx){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(_ctx);
-
-        return sp.getBoolean(_ctx.getString(R.string.pref_walking_proximity_key), false);
-    }
-
-    public static boolean getBikingProximityAsDistance(Context _ctx){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(_ctx);
-
-        return sp.getBoolean(_ctx.getString(R.string.pref_biking_proximity_key), false);
+        return sp.getBoolean(ctx.getString(R.string.pref_refresh_options_key), false);
     }
 
     public static long getLastUpdateTimestamp(Context ctx){

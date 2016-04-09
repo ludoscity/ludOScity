@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.fragments.StationListFragment;
-import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.Utils;
 
 import java.util.ArrayList;
@@ -144,13 +143,13 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 String proximityString;
                 if (mIsLookingForBike){
                     proximityString = _station.getProximityStringFromLatLng(mDistanceDisplayReferenceLatLng,
-                            DBHelper.getWalkingProximityAsDistance(mCtx),
+                            false,
                             mCtx.getResources().getInteger(R.integer.average_walking_speed_kmh),
                             mCtx);
                 }
                 else{
                     proximityString = _station.getProximityStringFromLatLng(mDistanceDisplayReferenceLatLng,
-                            DBHelper.getBikingProximityAsDistance(mCtx),
+                            false,
                             mCtx.getResources().getInteger(R.integer.average_biking_speed_kmh),
                             mCtx);
                 }

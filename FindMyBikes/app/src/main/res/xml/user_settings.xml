@@ -1,22 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
-        android:key="@string/pref_walking_proximity_key"
-        android:title="@string/pref_walking_proximity_title"
-        android:summaryOff="@string/pref_walking_proximity_duration"
-        android:summaryOn="@string/pref_proximity_distance"
-        android:defaultValue="false" />
-    <CheckBoxPreference
-        android:key="@string/pref_biking_proximity_key"
-        android:title="@string/pref_biking_proximity_title"
-        android:summaryOff="@string/pref_biking_proximity_duration"
-        android:summaryOn="@string/pref_proximity_distance"
-        android:defaultValue="false" />
-    <CheckBoxPreference
         android:key="@string/pref_refresh_options_key"
         android:title="@string/pref_manual_refresh_mode"
         android:summaryOff="@string/pref_manual_refresh_mode_manual"
         android:summaryOn="@string/pref_manual_refresh_mode_all"
-        android:defaultValue="true" />
-
+        android:defaultValue="false" />
 </PreferenceScreen>
