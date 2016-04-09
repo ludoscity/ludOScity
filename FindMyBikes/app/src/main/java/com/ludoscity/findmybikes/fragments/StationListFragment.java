@@ -241,7 +241,7 @@ public class StationListFragment extends Fragment
                     mProximityHeaderFromImageView.setPadding(0,0, Utils.dpToPx(1.f,getContext()),0);
                 }
 
-                mProximityHeaderFromImageView.setImageResource(R.drawable.ic_my_location_24dp_white);
+                mProximityHeaderFromImageView.setVisibility(View.GONE);
                 mProximityHeaderToImageView.setImageResource(R.drawable.ic_walking_24dp_white);
 
                 mProximityHeader.setVisibility(View.VISIBLE);
@@ -262,6 +262,7 @@ public class StationListFragment extends Fragment
                     mProximityHeaderToImageView.setPadding(Utils.dpToPx(3.f,getContext()),0,0,0);
                 }
 
+                mProximityHeaderFromImageView.setVisibility(View.VISIBLE);
                 mProximityHeaderFromImageView.setImageResource(R.drawable.ic_pin_a_24dp_white);
                 mProximityHeaderToImageView.setImageResource(R.drawable.ic_biking_24dp_white);
 
