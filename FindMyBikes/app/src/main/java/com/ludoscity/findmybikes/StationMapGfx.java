@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.ludoscity.findmybikes.utils.Utils;
 
 /**
  * Created by F8Full on 2015-07-12.
@@ -23,14 +24,18 @@ public class StationMapGfx {
     private Marker marker;
     private GroundOverlay groundOverlay;
 
-    private static final BitmapDescriptor redIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_red);
-    private static final BitmapDescriptor greyIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_grey);
-    private static final BitmapDescriptor greenIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_green);
-    private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.station_icon_yellow);
+    private static final BitmapDescriptor redIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_station_64px_red);
+    private static final BitmapDescriptor greyIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_station_64px_grey);
+    private static final BitmapDescriptor greenIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_station_64px_green);
+    private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_station_64px_yellow);
 
-    private static final float OVERLAY_SIZE_BASE = 50;
+    //For linear mappig of zoom level to oberlay size. Empirically determined.
+    private static float minZoom = 13.75f;
+    private static float maxZoom = 21;
+    private static float minOverlaySize = 2;
+    private static float maxOverlaySize = 90;
 
-    public StationMapGfx(StationItem item, boolean lookingForBike){
+    public StationMapGfx(StationItem item, boolean lookingForBike, float _zoom){
 
         mItem = item;
 
@@ -42,9 +47,14 @@ public class StationMapGfx {
                 .anchor(0.5f,0.5f)
                 .infoWindowAnchor(0.5f,0.5f);
 
+        //hackfix so that green icon is not oversized
+        //TODO: figure this mapping out
+        if (_zoom > 18)
+            _zoom = 21;
+
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
         groundOverlayOptions = new GroundOverlayOptions()
-                .position(item.getPosition(), OVERLAY_SIZE_BASE)
+                .position(item.getPosition(), Utils.map(_zoom, minZoom, maxZoom, maxOverlaySize, minOverlaySize))
                 .transparency(0.1f);
         if (item.isLocked())
             groundOverlayOptions.image(greyIcon);
@@ -66,13 +76,6 @@ public class StationMapGfx {
                     groundOverlayOptions.image(greenIcon);
             }
         }
-    }
-
-    public void setBigOverlay(boolean toSet){
-        if (toSet)
-            groundOverlay.setDimensions(2.0f * OVERLAY_SIZE_BASE);
-        else
-            groundOverlay.setDimensions(OVERLAY_SIZE_BASE);
     }
 
     public void addMarkerToMap(GoogleMap map){
@@ -116,7 +119,13 @@ public class StationMapGfx {
         groundOverlay.setVisible(false);
     }
 
-    public void show() {
+    public void show(float _zoom) {
+        //hackfix so that green icon is not oversized
+        //TODO: figure this mapping out
+        if (_zoom > 18)
+            _zoom = 21;
+        float size = Utils.map(_zoom, minZoom, maxZoom, maxOverlaySize, minOverlaySize);
+        groundOverlay.setDimensions(size);
         groundOverlay.setVisible(true);
     }
 }

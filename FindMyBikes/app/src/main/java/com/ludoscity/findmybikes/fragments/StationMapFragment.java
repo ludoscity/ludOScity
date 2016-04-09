@@ -49,7 +49,7 @@ public class StationMapFragment extends Fragment
             if (mLookingForBikeWhenFinished != null)
                 updateMarkerAll(mLookingForBikeWhenFinished);
 
-            showAllStations();
+            showAllStations(mGoogleMap.getCameraPosition().zoom);
 
             mAnimCallback = null;
 
@@ -61,7 +61,8 @@ public class StationMapFragment extends Fragment
             if (mLookingForBikeWhenFinished != null)
                 updateMarkerAll(mLookingForBikeWhenFinished);
 
-            showAllStations();
+
+            showAllStations(mGoogleMap.getCameraPosition().zoom);
 
             mAnimCallback = null;
 
@@ -86,6 +87,7 @@ public class StationMapFragment extends Fragment
     private CustomCancellableCallback mAnimCallback = null;
 
     private float mMaxZoom = 16f;
+    private float mSavedZoom = 0;
 
     private ArrayList<StationMapGfx> mMapMarkersGfxData = new ArrayList<>();
 
@@ -200,6 +202,7 @@ public class StationMapFragment extends Fragment
         mGoogleMap.setOnInfoWindowClickListener(this);
         mGoogleMap.setOnCameraChangeListener(this);
         mGoogleMap.setOnMapClickListener(this);
+        //héhéhé, feel the power of design !!
         mGoogleMap.getUiSettings().setZoomGesturesEnabled(false);
 
         Uri.Builder builder = new Uri.Builder();
@@ -343,8 +346,10 @@ public class StationMapFragment extends Fragment
 
     public boolean isMapReady(){ return mGoogleMap != null; }
 
+    public void saveCameraZoom() { mSavedZoom = mGoogleMap.getCameraPosition().zoom; }
+
     public void addMarkerForStationItem(StationItem item, boolean lookingForBike) {
-        mMapMarkersGfxData.add(new StationMapGfx(item, lookingForBike));
+        mMapMarkersGfxData.add(new StationMapGfx(item, lookingForBike, mSavedZoom));
     }
 
     public void redrawMarkers() {
@@ -436,10 +441,10 @@ public class StationMapFragment extends Fragment
         }
     }
 
-    private void showAllStations() {
+    private void showAllStations(float _zoom) {
 
         for (StationMapGfx markerData : mMapMarkersGfxData){
-            markerData.show();
+            markerData.show(_zoom);
         }
     }
 

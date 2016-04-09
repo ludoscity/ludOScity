@@ -72,7 +72,10 @@ public class StationListFragment extends Fragment
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) inflatedView.findViewById(R.id.station_list_swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener((SwipeRefreshLayout.OnRefreshListener) getActivity());
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.stationlist_refresh_spinner_green, R.color.stationlist_refresh_spinner_yellow, R.color.stationlist_refresh_spinner_red);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.stationlist_refresh_spinner_red,
+                R.color.stationlist_refresh_spinner_yellow,
+                R.color.stationlist_refresh_spinner_grey,
+                R.color.stationlist_refresh_spinner_green);
 
         mAvailabilityTextView = (TextView) inflatedView.findViewById(R.id.availability_header);
         mProximityHeader = inflatedView.findViewById(R.id.proximity_header);

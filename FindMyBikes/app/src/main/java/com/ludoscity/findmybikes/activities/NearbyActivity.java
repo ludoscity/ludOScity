@@ -1472,6 +1472,7 @@ public class NearbyActivity extends AppCompatActivity
             super.onPreExecute();
 
             mStatusTextView.setText(getString(R.string.refreshing));
+            mStationMapFragment.saveCameraZoom();
         }
 
         @Override
