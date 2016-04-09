@@ -13,7 +13,7 @@ import com.ludoscity.findmybikes.utils.Utils;
 /**
  * Created by F8Full on 2015-07-12.
  * This class is intended to retain the nescessary components to create and display a marker on a Google map
- * It's been created when StationItem was rendered jesonable
+ * It's been created when StationItem was rendered jsonable
  */
 public class StationMapGfx {
 
@@ -30,9 +30,9 @@ public class StationMapGfx {
     private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_station_64px_yellow);
 
     //For linear mappig of zoom level to oberlay size. Empirically determined.
-    private static float minZoom = 13.75f;
-    private static float maxZoom = 21;
-    private static float minOverlaySize = 2;
+    private static float maxZoomOut = 13.75f;
+    private static float maxZoomIn = 21;
+    private static float minOverlaySize = 1;
     private static float maxOverlaySize = 90;
 
     public StationMapGfx(StationItem item, boolean lookingForBike, float _zoom){
@@ -47,14 +47,9 @@ public class StationMapGfx {
                 .anchor(0.5f,0.5f)
                 .infoWindowAnchor(0.5f,0.5f);
 
-        //hackfix so that green icon is not oversized
-        //TODO: figure this mapping out
-        if (_zoom > 18)
-            _zoom = 21;
-
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
         groundOverlayOptions = new GroundOverlayOptions()
-                .position(item.getPosition(), Utils.map(_zoom, minZoom, maxZoom, maxOverlaySize, minOverlaySize))
+                .position(item.getPosition(), Utils.map(_zoom, maxZoomOut, maxZoomIn, maxOverlaySize, minOverlaySize))
                 .transparency(0.1f);
         if (item.isLocked())
             groundOverlayOptions.image(greyIcon);
@@ -120,12 +115,8 @@ public class StationMapGfx {
     }
 
     public void show(float _zoom) {
-        //hackfix so that green icon is not oversized
-        //TODO: figure this mapping out
-        if (_zoom > 18)
-            _zoom = 21;
-        float size = Utils.map(_zoom, minZoom, maxZoom, maxOverlaySize, minOverlaySize);
-        groundOverlay.setDimensions(size);
+
+        groundOverlay.setDimensions(Utils.map(_zoom, maxZoomOut, maxZoomIn, maxOverlaySize, minOverlaySize));
         groundOverlay.setVisible(true);
     }
 }
