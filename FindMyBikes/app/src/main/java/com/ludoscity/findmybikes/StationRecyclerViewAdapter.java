@@ -359,34 +359,44 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             notifyItemChanged(selectedBefore);
     }
 
-    public String getClosestStationWithAvailability(boolean _lookingForBike){
+    private StationItem getClosestStationItemWithAvailability(boolean _lookingForBike){
 
-        String toReturn = "";
+        StationItem toReturn = null;
 
-        //TODO : take in account lock status
         for (StationItem stationItem: mStationList){
             if (_lookingForBike) {
-                if (stationItem.getFree_bikes() > 0) {
-                    toReturn = stationItem.getId();
-                    break;
-                }
+                if (!stationItem.isLocked())
+                    if (stationItem.getFree_bikes() > 0) {
+                        toReturn = stationItem;
+                        break;
+                    }
             }
-            else {
+            else {  //A locked station accepts bike returns
                 if (stationItem.getEmpty_slots() > 0){
-                    toReturn = stationItem.getId();
+                    toReturn = stationItem;
                     break;
                 }
             }
         }
 
         //failsafe
-        if (toReturn.length() == 0 && !mStationList.isEmpty())
-            toReturn = mStationList.get(0).getId();
+        if (toReturn == null && !mStationList.isEmpty())
+            toReturn = mStationList.get(0);
 
         return toReturn;
     }
 
+    public String getClosestStationWithAvailability(boolean _lookingForBike){
+        return getClosestStationItemWithAvailability(_lookingForBike).getId();
+    }
 
+    public LatLng getClosestAvailabilityLatLng(boolean _lookingForBike){
+        StationItem closest = getClosestStationItemWithAvailability(_lookingForBike);
+        if (closest != null)
+            return closest.getPosition();
+
+        return null;
+    }
 
     private int getStationItemPositionInList(String _stationId){
 

@@ -33,9 +33,9 @@ public class StationMapGfx {
     private static float maxZoomOut = 13.75f;
     private static float maxZoomIn = 21;
     private static float minOverlaySize = 1;
-    private static float maxOverlaySize = 90;
+    private static float maxOverlaySize = 50;
 
-    public StationMapGfx(StationItem item, boolean lookingForBike, float _zoom){
+    public StationMapGfx(StationItem item, boolean lookingForBike){
 
         mItem = item;
 
@@ -49,8 +49,9 @@ public class StationMapGfx {
 
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
         groundOverlayOptions = new GroundOverlayOptions()
-                .position(item.getPosition(), Utils.map(_zoom, maxZoomOut, maxZoomIn, maxOverlaySize, minOverlaySize))
-                .transparency(0.1f);
+                .position(item.getPosition(), maxOverlaySize)
+                .transparency(0.1f)
+                .visible(false);
         if (item.isLocked())
             groundOverlayOptions.image(greyIcon);
         else{

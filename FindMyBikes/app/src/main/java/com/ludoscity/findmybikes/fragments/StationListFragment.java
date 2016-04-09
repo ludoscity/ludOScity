@@ -197,6 +197,10 @@ public class StationListFragment extends Fragment
 
     }
 
+    public LatLng getClosestAvailabilityLatLng(boolean _lookingForBike){
+        return getStationRecyclerViewAdapter().getClosestAvailabilityLatLng(_lookingForBike);
+    }
+
     public LatLng getDistanceDisplayReference(){
         return getStationRecyclerViewAdapter().getDistanceDisplayReference();
     }

@@ -75,6 +75,10 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         return toReturn;
     }
 
+    public LatLng getClosestBikeLatLng(){
+        return retrieveListFragment(BIKE_STATIONS).getClosestAvailabilityLatLng(true);
+    }
+
     public void setCurrentUserLatLng(LatLng currentUserLatLng) {
         if (isViewPagerReady()) {
             //We don't notify as the call to setDistanceSortReferenceLatLngAndSort will do it

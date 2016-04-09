@@ -49,7 +49,7 @@ public class StationMapFragment extends Fragment
             if (mLookingForBikeWhenFinished != null)
                 updateMarkerAll(mLookingForBikeWhenFinished);
 
-            showAllStations(mGoogleMap.getCameraPosition().zoom);
+            showAllStations();
 
             mAnimCallback = null;
 
@@ -62,7 +62,7 @@ public class StationMapFragment extends Fragment
                 updateMarkerAll(mLookingForBikeWhenFinished);
 
 
-            showAllStations(mGoogleMap.getCameraPosition().zoom);
+            showAllStations();
 
             mAnimCallback = null;
 
@@ -87,7 +87,6 @@ public class StationMapFragment extends Fragment
     private CustomCancellableCallback mAnimCallback = null;
 
     private float mMaxZoom = 16f;
-    private float mSavedZoom = 0;
 
     private ArrayList<StationMapGfx> mMapMarkersGfxData = new ArrayList<>();
 
@@ -346,10 +345,8 @@ public class StationMapFragment extends Fragment
 
     public boolean isMapReady(){ return mGoogleMap != null; }
 
-    public void saveCameraZoom() { mSavedZoom = mGoogleMap.getCameraPosition().zoom; }
-
     public void addMarkerForStationItem(StationItem item, boolean lookingForBike) {
-        mMapMarkersGfxData.add(new StationMapGfx(item, lookingForBike, mSavedZoom));
+        mMapMarkersGfxData.add(new StationMapGfx(item, lookingForBike));
     }
 
     public void redrawMarkers() {
@@ -434,17 +431,17 @@ public class StationMapFragment extends Fragment
         mGoogleMap.animateCamera(cameraUpdate, 850, mAnimCallback);
     }
 
-    private void hideAllStations() {
+    public void hideAllStations() {
 
         for (StationMapGfx markerData : mMapMarkersGfxData){
             markerData.hide();
         }
     }
 
-    private void showAllStations(float _zoom) {
+    public void showAllStations() {
 
         for (StationMapGfx markerData : mMapMarkersGfxData){
-            markerData.show(_zoom);
+            markerData.show(mGoogleMap.getCameraPosition().zoom);
         }
     }
 

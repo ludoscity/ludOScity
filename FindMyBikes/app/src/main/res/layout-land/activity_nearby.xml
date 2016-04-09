@@ -156,6 +156,19 @@
         <android.support.design.widget.FloatingActionButton
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:id="@+id/autoselect_closest_bike"
+            android:clickable="true"
+            app:srcCompat="@drawable/ic_action_closest_bike_24dp_white"
+
+            android:visibility="invisible"
+            android:layout_gravity="bottom|end"
+
+            style="@style/map_floating_action_button_end_aligned"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
             android:id="@+id/clear_fab"
             android:clickable="true"
             app:srcCompat="@drawable/ic_action_clear_24dp"

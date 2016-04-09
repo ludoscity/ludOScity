@@ -139,6 +139,7 @@ public class NearbyActivity extends AppCompatActivity
     private MaterialSheetFab mFavoritesSheetFab;
     private boolean mFavoriteSheetVisible = false;
     private FloatingActionButton mClearFAB;
+    private FloatingActionButton mAutoSelectBikeFab;
 
     private FavoriteRecyclerViewAdapter mFavoriteRecyclerViewAdapter;
 
@@ -312,6 +313,7 @@ public class NearbyActivity extends AppCompatActivity
         setupSearchFab();
         setupFavoriteFab();
         setupClearFab();
+        setupAutoselectBikeFab();
 
         setStatusBarClickListener();
 
@@ -356,6 +358,17 @@ public class NearbyActivity extends AppCompatActivity
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         mCircularRevealInterpolator = AnimationUtils.loadInterpolator(this, R.interpolator.msf_interpolator);
+    }
+
+    private void setupAutoselectBikeFab() {
+        mAutoSelectBikeFab = (FloatingActionButton) findViewById(R.id.autoselect_closest_bike);
+
+        mAutoSelectBikeFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mClosestBikeAutoSelected = false;
+            }
+        });
     }
 
     private void setupDirectionsLocToAFab() {
@@ -806,6 +819,8 @@ public class NearbyActivity extends AppCompatActivity
                             animateCameraToShowUserAndStation(closestBikeStation);
                         }
 
+                        mAutoSelectBikeFab.hide();
+                        mStationMapFragment.setMapPaddingRight(0);
                         mClosestBikeAutoSelected = true;
                     }
                 }
@@ -931,7 +946,7 @@ public class NearbyActivity extends AppCompatActivity
                         } else {
                             mStationMapFragment.setPinOnStation(false, getListPagerAdapter().highlightClosestStationWithAvailability(false));
                             if(!_silent)
-                                animateCameraToShow((int)getResources().getDimension(R.dimen.camera_ab_pin_padding),
+                                animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
                                         _targetDestination.getLatLng(),
                                         mStationMapFragment.getMarkerBVisibleLatLng(),
                                         null);
@@ -1358,6 +1373,11 @@ public class NearbyActivity extends AppCompatActivity
                 mClearFAB.hide();
                 mStationMapFragment.setMapPaddingRight(0);
 
+                if (!isStationAClosestBike()){
+                    mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
+                    mAutoSelectBikeFab.show();
+                }
+
                 //just to be on the safe side
                 if (highlightedStation != null ) {
 
@@ -1369,12 +1389,14 @@ public class NearbyActivity extends AppCompatActivity
                 }
             } else { //B TAB
 
+                mAutoSelectBikeFab.hide();
+                mStationMapFragment.setMapPaddingRight(0);
+
                 mStationMapFragment.setScrollGesturesEnabled(true);
 
                 mAppBarLayout.setExpanded(false, true);
 
                 if (mStationMapFragment.getMarkerBVisibleLatLng() == null) {
-                    //TODO: Maybe bounds containing all stations accessible for free ? (needs clustering to look good)
                     mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13.75f));
 
                     if (mFavoriteSheetVisible)
@@ -1389,6 +1411,9 @@ public class NearbyActivity extends AppCompatActivity
                         mFavoritesSheetFab.showFab();
                         mSearchFAB.show();
                     }
+
+                    mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
+
                 } else {
 
                     getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, false);
@@ -1451,6 +1476,31 @@ public class NearbyActivity extends AppCompatActivity
 
         if (highlightedStationAVisibleInRecyclerViewBefore && !getListPagerAdapter().isHighlightedVisibleInRecyclerView())
             getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, true);
+
+        if (!isStationAClosestBike()){
+            if (mStationMapFragment.getMarkerBVisibleLatLng() == null){
+                //TODO: this piece of code fights with the user if no station B is selected
+                //Solution : implement occasional / regular modes and have the setting impact this
+                mClosestBikeAutoSelected = false;
+            }
+            else if (isLookingForBike()) {
+                mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
+                mAutoSelectBikeFab.show();
+                animateCameraToShowUserAndStation(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS));
+            }
+        } else{
+            mAutoSelectBikeFab.hide();
+            mStationMapFragment.setMapPaddingRight(0);
+        }
+    }
+    private boolean isStationAClosestBike(){
+
+        LatLng ALatLng = mStationMapFragment.getMarkerALatLng();
+        LatLng closestBikeLatLng = getListPagerAdapter().getClosestBikeLatLng();
+
+        return closestBikeLatLng != null &&
+                ALatLng.latitude == closestBikeLatLng.latitude &&
+                ALatLng.longitude == closestBikeLatLng.longitude;
     }
 
     @Override
@@ -1472,7 +1522,7 @@ public class NearbyActivity extends AppCompatActivity
             super.onPreExecute();
 
             mStatusTextView.setText(getString(R.string.refreshing));
-            mStationMapFragment.saveCameraZoom();
+            mStationMapFragment.hideAllStations();
         }
 
         @Override
@@ -1502,6 +1552,7 @@ public class NearbyActivity extends AppCompatActivity
             mRefreshMarkers = true;
 
             mRedrawMarkersTask = null;
+            mStationMapFragment.showAllStations();
         }
 
         @Override
@@ -1518,6 +1569,7 @@ public class NearbyActivity extends AppCompatActivity
             }
 
             mRedrawMarkersTask = null;
+            mStationMapFragment.showAllStations();
         }
     }
 
@@ -1559,8 +1611,6 @@ public class NearbyActivity extends AppCompatActivity
             checkAndAskLocationPermission();
 
             mStatusTextView.setText(getString(R.string.searching_wait_location));
-
-            mClosestBikeAutoSelected = false;
 
             if (getListPagerAdapter().isViewPagerReady())
                 getListPagerAdapter().setRefreshingAll(true);
@@ -1660,6 +1710,8 @@ public class NearbyActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Map<String,String> backgroundResults) {
             super.onPostExecute(backgroundResults);
+
+            mClosestBikeAutoSelected = false;
 
             //noinspection ConstantConditions
             getSupportActionBar().setSubtitle(DBHelper.getBikeNetworkName(NearbyActivity.this));
@@ -1831,8 +1883,6 @@ public class NearbyActivity extends AppCompatActivity
             //Cannot do that, for some obscure reason, task gets automatically
             //cancelled when the permission dialog is visible
             //checkAndAskLocationPermission();
-
-            mClosestBikeAutoSelected = false;
 
             if (getListPagerAdapter().isViewPagerReady())
                 getListPagerAdapter().setRefreshingAll(true);
