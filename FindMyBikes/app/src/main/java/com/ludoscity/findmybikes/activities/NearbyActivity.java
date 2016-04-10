@@ -637,6 +637,14 @@ public class NearbyActivity extends AppCompatActivity
     public void onBackPressed() {
         if (mFavoritesSheetFab.isSheetVisible()) {
             mFavoritesSheetFab.hideSheet();
+        } else if(mStationMapFragment.getMarkerBVisibleLatLng() != null){
+
+            mStationMapFragment.setMapPaddingLeft(0);
+            if (!isLookingForBike())
+                mStationMapFragment.setMapPaddingRight(0);
+            hideTripDetailsWidget();
+            clearBTab();
+
         } else {
             super.onBackPressed();
         }
@@ -685,6 +693,7 @@ public class NearbyActivity extends AppCompatActivity
         mRefreshTabs = false;
     }
 
+    //TODO : This clearly turned into spaghetti. At least extract methods.
     private Runnable createUpdateRefreshRunnableCode(){
         return new Runnable() {
 
@@ -803,7 +812,8 @@ public class NearbyActivity extends AppCompatActivity
                         mStatusTextView.setText(String.format(getString(R.string.status_string),
                                 pastStringBuilder.toString(), futureStringBuilder.toString()));
 
-                    if (mDownloadWebTask == null && mRedrawMarkersTask == null &&
+                    //pulling the trigger on auto select
+                    if (mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null &&
                             !mClosestBikeAutoSelected &&
                             getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.BIKE_STATIONS)){
 
@@ -816,12 +826,31 @@ public class NearbyActivity extends AppCompatActivity
                             if (mTripDetailsWidget.getVisibility() == View.INVISIBLE) {
                                 mDirectionsLocToAFab.show();
                             }
+
+                            mAutoSelectBikeFab.hide();
+                            mStationMapFragment.setMapPaddingRight(0);
+
                             animateCameraToShowUserAndStation(closestBikeStation);
                         }
 
-                        mAutoSelectBikeFab.hide();
-                        mStationMapFragment.setMapPaddingRight(0);
                         mClosestBikeAutoSelected = true;
+                    }
+
+                    //Checking if station is closest bike
+                    if (mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null){
+
+                        if (!isStationAClosestBike()){
+                            if (mStationMapFragment.getMarkerBVisibleLatLng() == null){
+                                //TODO: this piece of code fights with the user if no station B is selected
+                                //Solution : implement occasional / regular modes and have the setting impact this
+                                mClosestBikeAutoSelected = false;
+                            }
+                            else if (isLookingForBike() && mAutoSelectBikeFab.getVisibility() != View.VISIBLE) {
+                                mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
+                                mAutoSelectBikeFab.show();
+                                animateCameraToShowUserAndStation(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS));
+                            }
+                        }
                     }
                 }
 
@@ -1163,11 +1192,16 @@ public class NearbyActivity extends AppCompatActivity
         mStationMapFragment.clearMarkerB();
         mStationMapFragment.clearMarkerPickedPlace();
 
-        mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
-
-        mFavoritesSheetFab.showFab();
-        mSearchFAB.show();
-        mClearFAB.hide();
+        if (!isLookingForBike()) {
+            mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
+            mFavoritesSheetFab.showFab();
+            mSearchFAB.show();
+            mClearFAB.hide();
+        }
+        else{
+            StationItem highlightedStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+            animateCameraToShowUserAndStation(highlightedStation);
+        }
     }
 
     private boolean isLookingForBike() {
@@ -1477,22 +1511,8 @@ public class NearbyActivity extends AppCompatActivity
         if (highlightedStationAVisibleInRecyclerViewBefore && !getListPagerAdapter().isHighlightedVisibleInRecyclerView())
             getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, true);
 
-        if (!isStationAClosestBike()){
-            if (mStationMapFragment.getMarkerBVisibleLatLng() == null){
-                //TODO: this piece of code fights with the user if no station B is selected
-                //Solution : implement occasional / regular modes and have the setting impact this
-                mClosestBikeAutoSelected = false;
-            }
-            else if (isLookingForBike()) {
-                mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
-                mAutoSelectBikeFab.show();
-                animateCameraToShowUserAndStation(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS));
-            }
-        } else{
-            mAutoSelectBikeFab.hide();
-            mStationMapFragment.setMapPaddingRight(0);
-        }
     }
+
     private boolean isStationAClosestBike(){
 
         LatLng ALatLng = mStationMapFragment.getMarkerALatLng();
