@@ -1,27 +1,18 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.ludoscity.findmybikes.fragments.StationListFragment"
-    android:id="@+id/station_list_layout"
-    android:orientation="vertical">
+    android:id="@+id/station_list_layout">
 
-
-    <!-- EMPTY LIST TEXT -->
-    <TextView
-        android:visibility="gone"
-        android:id="@+id/empty_list_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textSize="28sp"
-        android:gravity="center"/>
 
     <!-- COLUMN HEADERS -->
     <android.support.percent.PercentRelativeLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/station_list_headers"
         android:background="@color/background_material_dark"
         android:paddingTop="3dp"
         android:paddingBottom="3dp">
@@ -102,10 +93,31 @@
             android:textColor="@color/primary_text_default_material_dark"
             />
     </android.support.percent.PercentRelativeLayout>
+    <!-- EMPTY LIST TEXT -->
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/empty_list_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="28sp"
+        android:gravity="center"
+        android:background="@color/theme_window_background"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/b_tab_closest_bike_text"
+        android:visibility="gone"
+        android:textSize="14sp"
+        android:layout_alignParentBottom="true"
+        android:text="Closest bike available at station : Laurier / de Lanaudière"
+        />
 
     <!-- PULL TO REFRESH -->
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/station_list_swipe_refresh_layout"
+        android:layout_below="@+id/station_list_headers"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
@@ -118,6 +130,6 @@
 
 
 
-</LinearLayout>
+</RelativeLayout>
 
 

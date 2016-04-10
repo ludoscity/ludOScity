@@ -9,6 +9,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +42,7 @@ public class StationListFragment extends Fragment
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int mRecyclerViewScrollingState = SCROLL_STATE_IDLE;
     private TextView mEmptyListTextView;
+    private TextView mClosestBikeTextView;
     private View mProximityHeader;
     private ImageView mProximityHeaderFromImageView;
     private ImageView mProximityHeaderToImageView;
@@ -57,6 +60,7 @@ public class StationListFragment extends Fragment
         // Inflate the layout for this fragment
         View inflatedView =  inflater.inflate(R.layout.fragment_station_list, container, false);
         mEmptyListTextView = (TextView) inflatedView.findViewById(R.id.empty_list_text);
+        mClosestBikeTextView = (TextView) inflatedView.findViewById(R.id.b_tab_closest_bike_text);
         mStationRecyclerView = (RecyclerView) inflatedView.findViewById(R.id.station_list_recyclerview);
         mStationRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
         //mStationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -117,6 +121,8 @@ public class StationListFragment extends Fragment
         outState.putParcelable("sort_reference_LatLng", getStationRecyclerViewAdapter().getSortReferenceLatLng());
         outState.putParcelable("distance_reference_latlng", getStationRecyclerViewAdapter().getDistanceReferenceLatLng());
         outState.putString("string_if_empty", mEmptyListTextView.getText().toString());
+        //TODO : Figure out how to retrieve Spannable and serialize it
+        outState.putString("closest_bike_string", mClosestBikeTextView.getText().toString());
         outState.putBoolean("empty_string_visible", mEmptyListTextView.getVisibility() == View.VISIBLE);
 
         getStationRecyclerViewAdapter().saveStationList(outState);
@@ -138,16 +144,22 @@ public class StationListFragment extends Fragment
             LatLng distanceReferenceLatLng = savedInstanceState.getParcelable("distance_reference_latlng");
             ArrayList<StationItem> stationList = savedInstanceState.getParcelableArrayList("stationitem_arraylist");
 
-            if (!savedInstanceState.getBoolean("empty_string_visible"))
+            if (!savedInstanceState.getBoolean("empty_string_visible")) {
                 mEmptyListTextView.setVisibility(View.GONE);
+                mClosestBikeTextView.setVisibility(View.GONE);
+            }
 
-            setupUI(stationList, savedInstanceState.getBoolean("looking_for_bike"), savedInstanceState.getString("string_if_empty"),
+            setupUI(stationList, savedInstanceState.getBoolean("looking_for_bike"),
+                    savedInstanceState.getString("string_if_empty"),
+                    savedInstanceState.getString("closest_bike_string"),
                     sortReferenceLatLng, distanceReferenceLatLng);
+
+            setClosestBikeString(Html.fromHtml(savedInstanceState.getString("closest_bike_string")));
         }
     }
 
     public void setupUI(ArrayList<StationItem> stationsNetwork, boolean lookingForBike, String stringIfEmpty,
-                        LatLng _sortReferenceLatLng, LatLng _distanceReferenceLatLng) {
+                        String _closestBikeString, LatLng _sortReferenceLatLng, LatLng _distanceReferenceLatLng) {
 
         if (stationsNetwork != null) {
 
@@ -155,11 +167,14 @@ public class StationListFragment extends Fragment
             if (!stationsNetwork.isEmpty()) {
                 mStationRecyclerView.setVisibility(View.VISIBLE);
                 mEmptyListTextView.setVisibility(View.GONE);
+                mClosestBikeTextView.setVisibility(View.GONE);
             }
             else{
                 mStationRecyclerView.setVisibility(View.GONE);
                 mEmptyListTextView.setText(stringIfEmpty);
+                mClosestBikeTextView.setText(_closestBikeString);
                 mEmptyListTextView.setVisibility(View.VISIBLE);
+                mClosestBikeTextView.setVisibility(View.VISIBLE);
             }
 
             getStationRecyclerViewAdapter().setupStationList(stationsNetwork, _sortReferenceLatLng, _distanceReferenceLatLng);
@@ -169,10 +184,16 @@ public class StationListFragment extends Fragment
 
     public void hideEmptyString(){
         mEmptyListTextView.setVisibility(View.GONE);
+        mClosestBikeTextView.setVisibility(View.GONE);
     }
 
     public void showEmptyString(){
         mEmptyListTextView.setVisibility(View.VISIBLE);
+        mClosestBikeTextView.setVisibility(View.VISIBLE);
+    }
+
+    public void setClosestBikeString(Spanned _toSet){
+        mClosestBikeTextView.setText(_toSet);
     }
 
     public void setDistanceSortReferenceLatLngAndSort(LatLng _toSet) {
@@ -296,20 +317,6 @@ public class StationListFragment extends Fragment
 
     public void setRefreshEnable(boolean toSet) {
         mSwipeRefreshLayout.setEnabled(toSet);
-    }
-
-    public void removeStation(StationItem toRemove, String stringIfEmpty) {
-        if (getStationRecyclerViewAdapter().removeItem(toRemove)){
-            mStationRecyclerView.setVisibility(View.GONE);
-            mEmptyListTextView.setText(stringIfEmpty);
-            mEmptyListTextView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    public void addStation(StationItem toAdd) {
-        mEmptyListTextView.setVisibility(View.GONE);
-        mStationRecyclerView.setVisibility(View.VISIBLE);
-        getStationRecyclerViewAdapter().addItem(toAdd);
     }
 
     public void smoothScrollSelectionInView(boolean _appBarExpanded) {

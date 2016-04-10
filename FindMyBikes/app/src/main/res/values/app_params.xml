@@ -17,6 +17,9 @@
 
     <item name="outdated_data_warning_time_min" type="integer">15</item>
 
+    <item name="camera_animation_duration" type="integer">850</item>
+
+
     <!-- Must be copied to string resources for settings display, I could make it work in SettingsFragment-->
     <!-- TODO: figure this shit out -->
     <item name="average_walking_speed_kmh" type="integer">4</item>

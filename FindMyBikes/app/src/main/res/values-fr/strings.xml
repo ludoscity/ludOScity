@@ -14,7 +14,7 @@
     <string name="min">min</string>
     <string name="moments">À l\'instant</string>
     <string name="nextUpdate">Prochaine màj</string>
-    <string name="tab_b_instructions">Choisissez un favori, utilisez la recherche ou déplacez la carte et cliquez sur une station</string>
+    <string name="b_tab_question">Où puis-je vous enmmener ?</string>
     <string name="docks">Ancrages</string>
     <string name="favorite_removed">Favori supprimé</string>
     <string name="station">Station</string>
@@ -40,4 +40,5 @@
     <string name="hour_symbol">h</string>
     <string name="undo"><b>ANNULER</b></string>
     <string name="no_favorite">Aucun favori pour &lt;b>%1$s&lt;/b></string>
+    <string name="b_tab_closest_bike">Vélo le plus proche disponible à la station A :&lt;br>&lt;b>%1$s&lt;/b></string>
 </resources>

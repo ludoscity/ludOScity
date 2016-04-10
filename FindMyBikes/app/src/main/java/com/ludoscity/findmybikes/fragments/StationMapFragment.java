@@ -428,7 +428,7 @@ public class StationMapFragment extends Fragment
 
         hideAllStations();
 
-        mGoogleMap.animateCamera(cameraUpdate, 850, mAnimCallback);
+        mGoogleMap.animateCamera(cameraUpdate, getResources().getInteger(R.integer.camera_animation_duration), mAnimCallback);
     }
 
     public void hideAllStations() {

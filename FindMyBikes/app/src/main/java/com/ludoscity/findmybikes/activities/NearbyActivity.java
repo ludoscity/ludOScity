@@ -686,7 +686,7 @@ public class NearbyActivity extends AppCompatActivity
         LatLng stationBLatLng = mStationMapFragment.getMarkerBVisibleLatLng();
         //Tab B
         if (stationBLatLng == null)
-            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
+            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.b_tab_question), null, null);
         else
             setupBTabSelection(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS).getId(), isLookingForBike());
 
@@ -710,10 +710,8 @@ public class NearbyActivity extends AppCompatActivity
 
                 if ( mRedrawMarkersTask == null && getListPagerAdapter().isViewPagerReady() &&
                         (!mPagerReady || mRefreshTabs ) ){
-                    //TODO: calling DBHelper.getFavoriteStations can return incomplete result when db is updating
-                    //it happens when data is downladed and screen configuration is changed shortly after
-                    //When restoring, we don't need to setup everything rom here
-                    if (!mStationMapFragment.isRestoring()) {
+                    //When restoring, we don't need to setup everything from here
+                    if (!mStationMapFragment.isRestoring()) { //TODO figure out how to properly determine restoration
                         setupTabPages();
                         if(isLookingForBike())  //onPageSelected is called by framework on B tab restoration
                             onPageSelected(StationListPagerAdapter.BIKE_STATIONS);
@@ -821,6 +819,8 @@ public class NearbyActivity extends AppCompatActivity
                         getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, isAppBarExpanded());
                         StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
                         mStationMapFragment.setPinOnStation(true, closestBikeStation.getId());
+                        getListPagerAdapter().setClosestBikeString(
+                                Html.fromHtml(String.format(getResources().getString(R.string.b_tab_closest_bike), closestBikeStation.getName())));
 
                         if (isLookingForBike()) {
                             if (mTripDetailsWidget.getVisibility() == View.INVISIBLE) {
@@ -830,7 +830,19 @@ public class NearbyActivity extends AppCompatActivity
                             mAutoSelectBikeFab.hide();
                             mStationMapFragment.setMapPaddingRight(0);
 
-                            animateCameraToShowUserAndStation(closestBikeStation);
+                            mStationListViewPager.setCurrentItem(StationListPagerAdapter.DOCK_STATIONS, true);
+                            //TODO : work on proper regular user mode
+                            mFavoritesSheetFab.showFab();
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mFavoritesSheetFab.showSheet();
+                                }
+                            }, 500);    //eurk ! Figure workaround library limitations. Link it to fab animation
+
+
+                            //animateCameraToShowUserAndStation(closestBikeStation, getResources().getInteger(R.integer.camera_animation_duration_default), true);
                         }
 
                         mClosestBikeAutoSelected = true;
@@ -888,7 +900,8 @@ public class NearbyActivity extends AppCompatActivity
             refreshMap();
         }
         //Marker click
-        else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
+        else if (isLookingForBike() && mStationMapFragment.getMarkerBVisibleLatLng() != null &&
+                uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
 
             if (isLookingForBike()) {
                 if (mAppBarLayout != null)
@@ -1140,7 +1153,7 @@ public class NearbyActivity extends AppCompatActivity
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-            buildTripDetailsWidgetAnimators(true, 850, 0).start();
+            buildTripDetailsWidgetAnimators(true, getResources().getInteger(R.integer.camera_animation_duration), 0).start();
         }
     }
 
@@ -1148,14 +1161,14 @@ public class NearbyActivity extends AppCompatActivity
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-            Animator hideAnimator = buildTripDetailsWidgetAnimators(false, 850/2, .23f);
+            Animator hideAnimator = buildTripDetailsWidgetAnimators(false, getResources().getInteger(R.integer.camera_animation_duration)/2, .23f);
 
             hideAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     setupTripDetailsWidget();
-                    buildTripDetailsWidgetAnimators(true, 850/2, .23f).start();
+                    buildTripDetailsWidgetAnimators(true, getResources().getInteger(R.integer.camera_animation_duration)/2, .23f).start();
                 }
             });
 
@@ -1169,7 +1182,7 @@ public class NearbyActivity extends AppCompatActivity
     private void hideTripDetailsWidget(){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Animator hideAnimator = buildTripDetailsWidgetAnimators(false, 850, 0);
+            Animator hideAnimator = buildTripDetailsWidgetAnimators(false, getResources().getInteger(R.integer.camera_animation_duration), 0);
             // make the view invisible when the animation is done
             hideAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -1187,7 +1200,7 @@ public class NearbyActivity extends AppCompatActivity
     private void clearBTab(){
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
 
-        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.tab_b_instructions), null, null);
+        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.b_tab_question), null, null);
 
         mStationMapFragment.clearMarkerB();
         mStationMapFragment.clearMarkerPickedPlace();
@@ -1232,7 +1245,8 @@ public class NearbyActivity extends AppCompatActivity
     @Override
     public void onStationListFragmentInteraction(final Uri uri) {
 
-        if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
+        if ((isLookingForBike() && mStationMapFragment.getMarkerBVisibleLatLng() != null) &&
+                uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
         {
             //if null, means the station was clicked twice, hence unchecked
             final StationItem clickedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
@@ -1426,6 +1440,7 @@ public class NearbyActivity extends AppCompatActivity
                 mAutoSelectBikeFab.hide();
                 mStationMapFragment.setMapPaddingRight(0);
 
+                //TODO: Should I lock that for regular users ?
                 mStationMapFragment.setScrollGesturesEnabled(true);
 
                 mAppBarLayout.setExpanded(false, true);
