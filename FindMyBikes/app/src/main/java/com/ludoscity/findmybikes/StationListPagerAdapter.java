@@ -137,4 +137,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
     public void setClosestBikeString(Spanned _toSet) {
         retrieveListFragment(DOCK_STATIONS).setClosestBikeString(_toSet);
     }
+
+    public void setClickResponsivenessForPage(int _pageID, boolean _toSet) {
+        retrieveListFragment(_pageID).setResponsivenessToClick(_toSet);
+    }
 }

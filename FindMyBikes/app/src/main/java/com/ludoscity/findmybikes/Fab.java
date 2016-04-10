@@ -3,8 +3,6 @@ package com.ludoscity.findmybikes;
 import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
-//import android.view.animation.AnimationUtils;
-//import android.view.animation.Interpolator;
 
 import com.gordonwong.materialsheetfab.AnimatedFab;
 
@@ -14,6 +12,8 @@ import com.gordonwong.materialsheetfab.AnimatedFab;
  */
 public class Fab extends FloatingActionButton implements AnimatedFab {
     //private static final int FAB_ANIM_DURATION = 200;
+
+    private boolean mIsShowAnimationRunning = false;
 
     public Fab(Context context) {
         super(context);
@@ -27,10 +27,20 @@ public class Fab extends FloatingActionButton implements AnimatedFab {
         super(context, attrs, defStyleAttr);
     }
 
+    public boolean isShowRunning(){ return mIsShowAnimationRunning; }
+
     @Override
     public void show(float translationX, float translationY) {
 
-        show();
+        mIsShowAnimationRunning = true;
+
+        show(new OnVisibilityChangedListener(){
+            @Override
+            public void onShown(FloatingActionButton fab) {
+                mIsShowAnimationRunning = false;
+                super.onShown(fab);
+            }
+        });
         // Set FAB's translation
         /*setTranslation(translationX, translationY);
 

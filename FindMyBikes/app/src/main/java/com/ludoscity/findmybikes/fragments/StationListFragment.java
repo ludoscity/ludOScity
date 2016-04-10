@@ -337,6 +337,10 @@ public class StationListFragment extends Fragment
                         ((LinearLayoutManager)mStationRecyclerView.getLayoutManager()).findFirstVisibleItemPosition();
     }
 
+    public void setResponsivenessToClick(boolean _toSet) {
+        getStationRecyclerViewAdapter().setClickResponsiveness(_toSet);
+    }
+
     public interface OnStationListFragmentInteractionListener {
 
         void onStationListFragmentInteraction(Uri uri);

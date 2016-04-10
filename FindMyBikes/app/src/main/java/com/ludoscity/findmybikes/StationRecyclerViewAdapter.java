@@ -43,6 +43,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     private boolean mFabAnimationRequested = false;
 
     private OnStationListItemClickListener mListener;
+    private boolean mRespondToClick = true;
 
     public void saveStationList(Bundle outState) {
         outState.putParcelableArrayList("stationitem_arraylist", mStationList);
@@ -69,6 +70,10 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         mStationList.add(toAdd);
 
         notifyDataSetChanged();
+    }
+
+    public void setClickResponsiveness(boolean _toSet) {
+        mRespondToClick = _toSet;
     }
 
     public interface OnStationListItemClickListener {
@@ -261,6 +266,9 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         @Override
         public void onClick(View view) {
+
+            if (!mRespondToClick)
+                return;
 
             switch (view.getId()){
                 case R.id.list_item_root:
