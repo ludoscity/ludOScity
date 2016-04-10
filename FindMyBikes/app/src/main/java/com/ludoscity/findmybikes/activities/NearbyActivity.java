@@ -1225,6 +1225,9 @@ public class NearbyActivity extends AppCompatActivity
         mStationMapFragment.clearMarkerB();
         mStationMapFragment.clearMarkerPickedPlace();
 
+        //A TAB
+        getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, false);
+
         if (!isLookingForBike()) {
             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
             mFavoritesSheetFab.showFab();

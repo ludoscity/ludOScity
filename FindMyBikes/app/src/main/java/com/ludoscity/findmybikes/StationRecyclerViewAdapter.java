@@ -267,11 +267,11 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         @Override
         public void onClick(View view) {
 
-            if (!mRespondToClick)
-                return;
-
             switch (view.getId()){
                 case R.id.list_item_root:
+
+                    if (!mRespondToClick)
+                        return;
 
                     int newlySelectedPos = StationRecyclerViewAdapter.this.setSelection(mStationId, false);
 
