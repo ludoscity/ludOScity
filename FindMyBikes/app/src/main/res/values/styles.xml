@@ -41,6 +41,7 @@
         <item name="tabTextAppearance">@style/MyCustomTabTextAppearance</item>
         <item name="tabMode">fixed</item>
         <item name="tabGravity">fill</item>
+        <item name="tabMaxWidth">0dp</item>
         <!--<item name="tabSelectedTextColor">@color/abc_primary_text_material_dark</item>-->
     </style>
     <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">
