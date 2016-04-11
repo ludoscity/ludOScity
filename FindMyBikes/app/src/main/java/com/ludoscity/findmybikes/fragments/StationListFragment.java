@@ -34,6 +34,7 @@ public class StationListFragment extends Fragment
             implements StationRecyclerViewAdapter.OnStationListItemClickListener{
 
     public static final String STATION_LIST_ITEM_CLICK_PATH = "station_list_item_click";
+    public static final String STATION_LIST_INACTIVE_ITEM_CLICK_PATH = "station_list_inactive_item_click";
     public static final String STATION_LIST_FAVORITE_FAB_CLICK_PATH = "station_list_fav_fab_click";
     public static final String STATION_LIST_STATION_RECAP_FAVORITE_FAB_CLICK_PATH = "station_list_station_recap_fav_fab_click";
     public static final String STATION_LIST_DIRECTIONS_FAB_CLICK_PATH = "station_list_dir_fab_click";
@@ -235,8 +236,6 @@ public class StationListFragment extends Fragment
             mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.station_recap_yellow));
         else
             mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.station_recap_green));
-
-        showStationRecap();
     }
 
     public void setDistanceSortReferenceLatLngAndSort(LatLng _toSet) {

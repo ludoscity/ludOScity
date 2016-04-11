@@ -435,8 +435,6 @@ public class NearbyActivity extends AppCompatActivity
             mPlaceAutocompleteLoadingProgressBar.setVisibility(View.GONE);
             mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.theme_primary_dark));
 
-            getListPagerAdapter().showStationRecap(StationListPagerAdapter.DOCK_STATIONS);
-
             if (resultCode == RESULT_OK){
                 mSearchFAB.hide();
                 final Place place = PlaceAutocomplete.getPlace(this, data);
@@ -968,6 +966,12 @@ public class NearbyActivity extends AppCompatActivity
                     final String clickedStationId = uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM);
                     setupBTabSelection(clickedStationId, false);
                 }
+            } else {
+
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.please_answer_first, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                        .show();
+
+                mStationListViewPager.setCurrentItem(StationListPagerAdapter.DOCK_STATIONS, true);
             }
         }
         //Map click
@@ -1029,6 +1033,7 @@ public class NearbyActivity extends AppCompatActivity
                             if (!_silent)
                                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                         } else {
+                            getListPagerAdapter().hideStationRecap(StationListPagerAdapter.DOCK_STATIONS);
                             mStationMapFragment.setPinOnStation(false, getListPagerAdapter().highlightClosestStationWithAvailability(false));
                             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, true);
                             if(!_silent)
@@ -1057,6 +1062,7 @@ public class NearbyActivity extends AppCompatActivity
         }
 
         if (_selectedStationId != null) {
+            getListPagerAdapter().hideStationRecap(StationListPagerAdapter.DOCK_STATIONS);
             mStationMapFragment.setPinOnStation(false, _selectedStationId);
             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, true);
         }
@@ -1319,6 +1325,13 @@ public class NearbyActivity extends AppCompatActivity
                 } else
                     setupBTabSelection(clickedStation.getId(), false);
             }
+        }
+        else if(uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_INACTIVE_ITEM_CLICK_PATH)){
+
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.please_answer_first, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                    .show();
+
+            mStationListViewPager.setCurrentItem(StationListPagerAdapter.DOCK_STATIONS, true);
         }
         else if (uri.getPath().equalsIgnoreCase("/"+ StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH) ||
                 uri.getPath().equalsIgnoreCase("/"+ StationListFragment.STATION_LIST_STATION_RECAP_FAVORITE_FAB_CLICK_PATH)){

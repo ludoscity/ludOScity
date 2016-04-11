@@ -269,17 +269,20 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         public void onClick(View view) {
 
             switch (view.getId()){
+
                 case R.id.list_item_root:
 
-                    if (!mRespondToClick)
-                        return;
+                    if (!mRespondToClick){
+                        mListener.onStationListItemClick(StationListFragment.STATION_LIST_INACTIVE_ITEM_CLICK_PATH);
+                    } else {
 
-                    int newlySelectedPos = StationRecyclerViewAdapter.this.setSelection(mStationId, false);
+                        int newlySelectedPos = StationRecyclerViewAdapter.this.setSelection(mStationId, false);
 
-                    mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
-                    mFabAnimationRequested = newlySelectedPos != mSelectedPos;
-
+                        mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
+                        mFabAnimationRequested = newlySelectedPos != mSelectedPos;
+                    }
                     break;
+
                 case R.id.favorite_fab:
                     mListener.onStationListItemClick(StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH);
                     //ordering matters
