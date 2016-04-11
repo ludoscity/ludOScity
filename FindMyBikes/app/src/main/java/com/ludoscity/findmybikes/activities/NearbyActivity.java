@@ -944,8 +944,6 @@ public class NearbyActivity extends AppCompatActivity
                     !isLookingForBike()) {
 
                 if (isLookingForBike()) {
-                    if (mAppBarLayout != null)
-                        mAppBarLayout.setExpanded(false, true);
 
                     if (getListPagerAdapter().highlightStationForPage(uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM),
                             StationListPagerAdapter.BIKE_STATIONS)) {
@@ -962,6 +960,10 @@ public class NearbyActivity extends AppCompatActivity
                         }
                     }
                 } else {
+
+                    if (mAppBarLayout != null)
+                        mAppBarLayout.setExpanded(false, true);
+
                     //B Tab, looking for dock
                     final String clickedStationId = uri.getQueryParameter(StationMapFragment.MARKER_CLICK_TITLE_PARAM);
                     setupBTabSelection(clickedStationId, false);
@@ -1485,7 +1487,7 @@ public class NearbyActivity extends AppCompatActivity
                     mDirectionsLocToAFab.show();
                 }
 
-                mAppBarLayout.setExpanded(true, true);
+                mAppBarLayout.setExpanded(false, true);
                 getListPagerAdapter().smoothScrollHighlightedInViewForPage(position, true);
 
                 mSearchFAB.hide();
@@ -1516,7 +1518,7 @@ public class NearbyActivity extends AppCompatActivity
                 //TODO: Should I lock that for regular users ?
                 mStationMapFragment.setScrollGesturesEnabled(true);
 
-                mAppBarLayout.setExpanded(false, true);
+                mAppBarLayout.setExpanded(true, true);
 
                 if (mStationMapFragment.getMarkerBVisibleLatLng() == null) {
                     mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13.75f));
