@@ -99,20 +99,56 @@
         android:id="@+id/empty_list_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="28sp"
         android:gravity="center"
         android:background="@color/theme_window_background"
         android:layout_centerInParent="true"/>
 
-    <TextView
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/b_tab_closest_bike_text"
-        android:visibility="gone"
-        android:textSize="14sp"
-        android:layout_alignParentBottom="true"
-        android:text="Closest bike available at station : Laurier / de Lanaudière"
-        />
+        android:id="@+id/station_recap"
+        android:visibility="invisible"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/b_tab_pin_a"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/ic_pin_a_36dp_black"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/b_tab_pin_a"
+            android:layout_toEndOf="@id/b_tab_pin_a">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/station_recap_name"
+                android:layout_centerHorizontal="true"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="Laurier / de Lanaudière"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/station_recap_availability"
+                android:layout_below="@id/station_recap_name"
+                android:layout_centerHorizontal="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold"
+                android:text="XX bikes"
+                />
+        </RelativeLayout>
+    </RelativeLayout>
 
     <!-- PULL TO REFRESH -->
     <android.support.v4.widget.SwipeRefreshLayout

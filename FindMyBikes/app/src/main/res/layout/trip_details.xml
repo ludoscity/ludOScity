@@ -34,7 +34,7 @@
                 android:layout_marginEnd="-8dp"
                 android:elevation="1dp"
                 android:layout_alignParentBottom="true"
-                app:srcCompat="@drawable/ic_my_location_24dp_black"/>
+                app:srcCompat="@drawable/ic_my_location_24dp_black_blue"/>
 
             <!--TODO: Use rounded ImageButton instead of those convenient but costly fabs -->
             <android.support.design.widget.FloatingActionButton

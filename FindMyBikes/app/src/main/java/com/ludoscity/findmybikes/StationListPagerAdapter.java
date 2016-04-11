@@ -2,7 +2,6 @@ package com.ludoscity.findmybikes;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.text.Spanned;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.fragments.StationListFragment;
@@ -47,15 +46,15 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
 
     public void setupUI(int _pageID, ArrayList<StationItem> _stationsList, String _stringIfEmpty,
                         LatLng _sortReferenceLatLng, LatLng _distanceReferenceLatLng){
-        retrieveListFragment(_pageID).setupUI(_stationsList, _pageID == BIKE_STATIONS, _stringIfEmpty, "", _sortReferenceLatLng, _distanceReferenceLatLng);
+        retrieveListFragment(_pageID).setupUI(_stationsList, _pageID == BIKE_STATIONS, _stringIfEmpty, _sortReferenceLatLng, _distanceReferenceLatLng);
     }
 
-    public void hideEmptyString(int _pageId){
-        retrieveListFragment(_pageId).hideEmptyString();
+    public void hideStationRecap(int _pageId){
+        retrieveListFragment(_pageId).hideStationRecap();
     }
 
-    public void showEmptyString(int _pageId){
-        retrieveListFragment(_pageId).showEmptyString();
+    public void showStationRecap(int _pageId){
+        retrieveListFragment(_pageId).showStationRecap();
     }
 
     public void setRefreshEnableAll(boolean toSet) {
@@ -134,8 +133,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         return retrieveListFragment(BIKE_STATIONS).isHighlightedVisibleInRecyclerView();
     }
 
-    public void setClosestBikeString(Spanned _toSet) {
-        retrieveListFragment(DOCK_STATIONS).setClosestBikeString(_toSet);
+    public void setupBTabStationARecap(StationItem _stationA) {
+        retrieveListFragment(DOCK_STATIONS).setupStationRecap(_stationA);
     }
 
     public void setClickResponsivenessForPage(int _pageID, boolean _toSet) {
