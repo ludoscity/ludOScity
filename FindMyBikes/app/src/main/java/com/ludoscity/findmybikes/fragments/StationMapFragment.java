@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,9 +29,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.StationMapGfx;
+import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 public class StationMapFragment extends Fragment
         implements OnMapReadyCallback,
@@ -346,7 +349,7 @@ public class StationMapFragment extends Fragment
     public boolean isMapReady(){ return mGoogleMap != null; }
 
     public void addMarkerForStationItem(StationItem item, boolean lookingForBike) {
-        mMapMarkersGfxData.add(new StationMapGfx(item, lookingForBike));
+        mMapMarkersGfxData.add(new StationMapGfx(item, lookingForBike, getContext()));
     }
 
     public void redrawMarkers() {
@@ -440,8 +443,15 @@ public class StationMapFragment extends Fragment
 
     public void showAllStations() {
 
-        for (StationMapGfx markerData : mMapMarkersGfxData){
-            markerData.show(mGoogleMap.getCameraPosition().zoom);
+        try {
+            for (StationMapGfx markerData : mMapMarkersGfxData){
+                markerData.show(mGoogleMap.getCameraPosition().zoom);
+            }
+        } catch (ConcurrentModificationException e){
+            Log.d("StationMapFragment", "problem while showing station - aborting." +
+                    "setting up new download", e);
+
+            DBHelper.notifyBeginSavingStations(getContext());   //hackfix. So data will be redownloaded
         }
     }
 
@@ -458,7 +468,7 @@ public class StationMapFragment extends Fragment
 
         //TODO: seen java.util.ConcurrentModificationException
         for (StationMapGfx markerData : mMapMarkersGfxData){
-            markerData.updateMarker(lookingForBike);
+            markerData.updateMarker(lookingForBike, getContext());
         }
     }
 

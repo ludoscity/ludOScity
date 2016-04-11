@@ -6,4 +6,8 @@
         android:summaryOff="@string/pref_manual_refresh_mode_manual"
         android:summaryOn="@string/pref_manual_refresh_mode_all"
         android:defaultValue="false" />
+
+    <com.ludoscity.findmybikes.AvailabilitySettingsDialogPreference
+        android:title="@string/pref_availability_settings_dialog_title"
+        />
 </PreferenceScreen>

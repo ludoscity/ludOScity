@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.fragments.StationListFragment;
+import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.Utils;
 
 import java.util.ArrayList;
@@ -255,9 +256,9 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             if (!selected)
                 itemView.setBackgroundResource(android.R.color.transparent);
             else{
-                if (availabilityValue == 0)
+                if (availabilityValue <= DBHelper.getCriticalAvailabilityMax(mCtx))
                     itemView.setBackgroundResource(R.color.stationlist_item_background_red);
-                else if (availabilityValue < 3)
+                else if (availabilityValue <= DBHelper.getBadAvailabilityMax(mCtx))
                     itemView.setBackgroundResource(R.color.stationlist_item_background_yellow);
                 else
                     itemView.setBackgroundResource(R.color.stationlist_item_background_green);
@@ -373,13 +374,13 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         for (StationItem stationItem: mStationList){
             if (_lookingForBike) {
                 if (!stationItem.isLocked())
-                    if (stationItem.getFree_bikes() > 0) {
+                    if (stationItem.getFree_bikes() > DBHelper.getCriticalAvailabilityMax(mCtx)) {
                         toReturn = stationItem;
                         break;
                     }
             }
             else {  //A locked station accepts bike returns
-                if (stationItem.getEmpty_slots() > 0){
+                if (stationItem.getEmpty_slots() > DBHelper.getCriticalAvailabilityMax(mCtx)){
                     toReturn = stationItem;
                     break;
                 }

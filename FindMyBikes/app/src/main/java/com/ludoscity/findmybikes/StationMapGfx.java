@@ -1,5 +1,7 @@
 package com.ludoscity.findmybikes;
 
+import android.content.Context;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -8,6 +10,7 @@ import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.Utils;
 
 /**
@@ -35,7 +38,7 @@ public class StationMapGfx {
     private static float minOverlaySize = 1;
     private static float maxOverlaySize = 50;
 
-    public StationMapGfx(StationItem item, boolean lookingForBike){
+    public StationMapGfx(StationItem item, boolean lookingForBike, Context _ctx){
 
         mItem = item;
 
@@ -56,17 +59,17 @@ public class StationMapGfx {
             groundOverlayOptions.image(greyIcon);
         else{
             if (lookingForBike){
-                if (item.getFree_bikes() == 0)
+                if (item.getFree_bikes() <= DBHelper.getCriticalAvailabilityMax(_ctx))
                     groundOverlayOptions.image(redIcon);
-                else if (item.getFree_bikes() < 3)
+                else if (item.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
                     groundOverlayOptions.image(yellowIcon);
                 else
                     groundOverlayOptions.image(greenIcon);
             }
             else{
-                if (item.getEmpty_slots() == 0)
+                if (item.getEmpty_slots() <= DBHelper.getCriticalAvailabilityMax(_ctx))
                     groundOverlayOptions.image(redIcon);
-                else if (item.getEmpty_slots() < 3)
+                else if (item.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
                     groundOverlayOptions.image(yellowIcon);
                 else
                     groundOverlayOptions.image(greenIcon);
@@ -83,27 +86,27 @@ public class StationMapGfx {
 
     public LatLng getMarkerLatLng() { return marker.getPosition(); }
 
-    public void updateMarker(boolean isLookingForBikes) {
+    public void updateMarker(boolean isLookingForBikes, Context _ctx) {
         if (isLookingForBikes){
             if (!mItem.isLocked()) {
-                if (mItem.getFree_bikes() == 0)
+                if (mItem.getFree_bikes() <= DBHelper.getCriticalAvailabilityMax(_ctx))
                     groundOverlay.setImage(redIcon);
-                else if (mItem.getFree_bikes() < 3)
+                else if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
                     groundOverlay.setImage(yellowIcon);
                     // check if the overlay is not already green
-                else if (mItem.getEmpty_slots() < 3)
+                else if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
                     // overlay isn't green yet
                     groundOverlay.setImage(greenIcon);
             } else
                 groundOverlay.setImage(greyIcon);
         } else {
             if (!mItem.isLocked()) {
-                if (mItem.getEmpty_slots() == 0)
+                if (mItem.getEmpty_slots() <= DBHelper.getCriticalAvailabilityMax(_ctx))
                     groundOverlay.setImage(redIcon);
-                else if (mItem.getEmpty_slots() < 3)
+                else if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
                     groundOverlay.setImage(yellowIcon);
                     // check if the overlay is not already green
-                else if (mItem.getFree_bikes() < 3)
+                else if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
                     // overlay isn't green yet
                     groundOverlay.setImage(greenIcon);
             } else

@@ -65,6 +65,8 @@ public class DBHelper {
     private static final String PREF_SUFFIX_NETWORK_BOUNDS_NE_LATITUDE = "_network_bounds_ne_lat";
     private static final String PREF_SUFFIX_NETWORK_BOUNDS_NE_LONGITUDE = "_network_bounds_ne_lng";
 
+    private static final int PREF_CRITICAL_AVAILABILITY_MAX_DEFAULT = 1;
+    private static final int PREF_BAD_AVAILABILITY_MAX_DEFAULT = 4;
 
     private DBHelper() {}
 
@@ -108,10 +110,36 @@ public class DBHelper {
         }
     }
 
-    public static boolean getAutoUpdate(Context ctx){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+    public static boolean getAutoUpdate(Context _ctx){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(_ctx);
 
-        return sp.getBoolean(ctx.getString(R.string.pref_refresh_options_key), false);
+        return sp.getBoolean(_ctx.getString(R.string.pref_refresh_options_key), false);
+    }
+
+    public static int getCriticalAvailabilityMax(Context _ctx) {
+        SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+
+        return sp.getInt(_ctx.getString(R.string.pref_critical_availability_max_key), PREF_CRITICAL_AVAILABILITY_MAX_DEFAULT);
+    }
+
+    public static int getBadAvailabilityMax(Context _ctx) {
+
+        SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+
+        return sp.getInt(_ctx.getString(R.string.pref_bad_availability_max_key), PREF_BAD_AVAILABILITY_MAX_DEFAULT);
+
+    }
+
+    public static void saveCriticalAvailabilityMax(Context _ctx, int _toSave) {
+        _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE).edit()
+                .putInt(_ctx.getString(R.string.pref_critical_availability_max_key), _toSave)
+                .apply();
+    }
+
+    public static void saveBadAvailabilityMax(Context _ctx, int _toSave) {
+        _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE).edit()
+                .putInt(_ctx.getString(R.string.pref_bad_availability_max_key), _toSave)
+                .apply();
     }
 
     public static long getLastUpdateTimestamp(Context ctx){

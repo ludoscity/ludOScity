@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
+import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.DividerItemDecoration;
 import com.ludoscity.findmybikes.utils.ScrollingLinearLayoutManager;
 import com.ludoscity.findmybikes.utils.Utils;
@@ -201,7 +202,7 @@ public class StationListFragment extends Fragment
         mStationRecapName.setText(_station.getName());
         mStationRecapAvailability.setText(String.format(getResources().getString(R.string.station_recap_bikes), _station.getFree_bikes()));
 
-        if (_station.getFree_bikes() <= 3)
+        if (_station.getFree_bikes() <= DBHelper.getBadAvailabilityMax(getContext()))
             mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.station_recap_yellow));
         else
             mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.station_recap_green));

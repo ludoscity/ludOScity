@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pref_station_red"
+                android:src="@drawable/ic_station_64px_red"
+                android:layout_centerVertical="true"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pref_station_red_zero"
+                android:text="0 -- "
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:fontFamily="droid-sans-mono"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/pref_station_red"
+                android:layout_toEndOf="@id/pref_station_red"
+                />
+            <NumberPicker
+                android:layout_width="30dp"
+                android:layout_height="120dp"
+                android:id="@+id/pref_availability_critical_max_picker"
+                android:layout_toRightOf="@id/pref_station_red_zero"
+                android:layout_toEndOf="@id/pref_station_red_zero"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingStart="10dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:layout_toRightOf="@id/pref_availability_critical_max_picker"
+                android:layout_toEndOf="@id/pref_availability_critical_max_picker"
+                android:text="@string/pref_availability_critical_hint"
+                android:layout_centerVertical="true"
+                />
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pref_station_yellow"
+                android:src="@drawable/ic_station_64px_yellow"
+                android:layout_centerVertical="true"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pref_availability_bad_min_text"
+                android:text="x - "
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:fontFamily="droid-sans-mono"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/pref_station_yellow"
+                android:layout_toEndOf="@id/pref_station_yellow"
+                />
+            <NumberPicker
+                android:layout_width="30dp"
+                android:layout_height="120dp"
+                android:id="@+id/pref_availability_bad_max_picker"
+                android:layout_toRightOf="@id/pref_availability_bad_min_text"
+                android:layout_toEndOf="@id/pref_availability_bad_min_text"
+                />
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pref_station_green"
+                android:src="@drawable/ic_station_64px_green"
+                android:layout_centerVertical="true"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pref_availability_great_min_text"
+                android:text="y+"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:fontFamily="droid-sans-mono"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/pref_station_green"
+                android:layout_toEndOf="@id/pref_station_green"
+                />
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pref_station_grey"
+                android:src="@drawable/ic_station_64px_grey"
+                android:layout_centerVertical="true"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/pref_station_locked"
+                android:text="@string/locked"
+                android:fontFamily="droid-sans-mono"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/pref_station_grey"
+                android:layout_toEndOf="@id/pref_station_grey"
+                />
+
+            <!-- to align everything "nicely" -->
+            <FrameLayout
+                android:layout_width="30dp"
+                android:layout_height="100dp">
+
+            </FrameLayout>
+
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+</ScrollView>

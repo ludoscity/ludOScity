@@ -133,7 +133,8 @@ public class NearbyActivity extends AppCompatActivity
     private FrameLayout mTripDetailsSumSeparator;
     private View mTripDetailsBToSearchRow;
 
-    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static int SETTINGS_REQUEST_CODE = 2;
     private FloatingActionButton mDirectionsLocToAFab;
     private FloatingActionButton mSearchFAB;
     private MaterialSheetFab mFavoritesSheetFab;
@@ -457,6 +458,14 @@ public class NearbyActivity extends AppCompatActivity
 
                 getListPagerAdapter().showStationRecap(StationListPagerAdapter.DOCK_STATIONS);
             }
+        } else if (requestCode == SETTINGS_REQUEST_CODE){
+
+            getListPagerAdapter().highlightClosestStationWithAvailability(true);
+            getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, isAppBarExpanded());
+
+            mRefreshMarkers = true;
+            refreshMap();
+            mRefreshTabs = true;
         }
     }
 
@@ -542,7 +551,7 @@ public class NearbyActivity extends AppCompatActivity
 
             case R.id.settings_menu_item:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
+                startActivityForResult(settingsIntent, SETTINGS_REQUEST_CODE);
                 return true;
         }
         return super.onOptionsItemSelected(item);
