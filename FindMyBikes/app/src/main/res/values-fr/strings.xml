@@ -6,7 +6,7 @@
     <string name="title_section_nearby">À proximité</string>
     <string name="navigation_drawer_open">Ouvrir navigation drawer</string>
     <string name="navigation_drawer_close">Fermer navigation drawer</string>
-    <string name="no_data">Connection internet requise pour le téléchargement des données!</string>
+    <string name="no_data">Connexion internet requise pour le téléchargement des données!</string>
     <string name="favorite_added">Favori ajouté</string>
     <string name="bikes">Vélos</string>
     <string name="distance">Distance</string>
@@ -14,7 +14,7 @@
     <string name="min">min</string>
     <string name="moments">À l\'instant</string>
     <string name="nextUpdate">Prochaine màj</string>
-    <string name="b_tab_question">Où allons-nous aujourd\'hui ?</string>
+    <string name="b_tab_question">Où pédalons-nous aujourd\'hui ?</string>
     <string name="docks">Ancrages</string>
     <string name="favorite_removed">Favori supprimé</string>
     <string name="station">Station</string>
@@ -43,7 +43,7 @@
     <string name="b_tab_closest_bike">Vélo le plus proche disponible à la station A :&lt;br>&lt;b>%1$s&lt;/b></string>
     <string name="station_recap_bikes">Vélos : %1$d</string>
     <string name="pref_availability_settings_dialog_title">Paramètres disponibilité</string>
-    <string name="pref_availability_critical_hint">Traitées comme vide dans l\'onglet A ou plaine dans l\'onglet B</string>
+    <string name="pref_availability_critical_hint">Considérées vide dans l\'onglet A ou pleine dans l\'onglet B</string>
     <string name="such_short_trip">Pas besoin de moi pour un trajet si court ! ;)</string>
     <string name="please_answer_first">Veuillez d\'abord répondre à ma question !</string>
 </resources>
