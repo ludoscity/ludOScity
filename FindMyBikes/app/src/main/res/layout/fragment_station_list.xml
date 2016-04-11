@@ -105,6 +105,20 @@
         android:background="@color/theme_window_background"
         android:layout_centerInParent="true"/>
 
+    <!-- PULL TO REFRESH -->
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/station_list_swipe_refresh_layout"
+        android:layout_below="@+id/station_list_headers"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <!-- STATION LIST -->
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/station_list_recyclerview"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -124,6 +138,7 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/station_recap_strings"
             android:orientation="vertical"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@id/b_tab_pin_a"
@@ -148,21 +163,23 @@
                 android:text="XX bikes"
                 />
         </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/station_recap_favorite_fab"
+            android:clickable="true"
+            app:srcCompat="@drawable/ic_action_favorite_outline_24dp"
+            android:layout_toRightOf="@id/station_recap_strings"
+            android:layout_toEndOf="@id/station_recap_strings"
+            android:layout_centerVertical="true"
+
+            app:fabSize="mini"
+            app:backgroundTint="@color/theme_primary_dark"
+
+            style="@style/listitem_floating_action_button"
+            />
     </RelativeLayout>
-
-    <!-- PULL TO REFRESH -->
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/station_list_swipe_refresh_layout"
-        android:layout_below="@+id/station_list_headers"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
-        <!-- STATION LIST -->
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/station_list_recyclerview"/>
-    </android.support.v4.widget.SwipeRefreshLayout>
 
 
 

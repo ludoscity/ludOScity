@@ -435,6 +435,8 @@ public class NearbyActivity extends AppCompatActivity
             mPlaceAutocompleteLoadingProgressBar.setVisibility(View.GONE);
             mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.theme_primary_dark));
 
+            getListPagerAdapter().showStationRecap(StationListPagerAdapter.DOCK_STATIONS);
+
             if (resultCode == RESULT_OK){
                 mSearchFAB.hide();
                 final Place place = PlaceAutocomplete.getPlace(this, data);
@@ -486,16 +488,12 @@ public class NearbyActivity extends AppCompatActivity
 
     private void setupFavoriteListFeedback(boolean _noFavorite) {
         if (_noFavorite){
-            ((TextView)findViewById(R.id.empty_favorite_list_text)).setText(
+            ((TextView)findViewById(R.id.favorites_sheet_header)).setText(
                     Html.fromHtml(String.format(getResources().getString(R.string.no_favorite), DBHelper.getBikeNetworkName(this))));
-            findViewById(R.id.empty_favorite_list_text).setVisibility(View.VISIBLE);
-            findViewById(R.id.favorites_sheet_content).setVisibility(View.GONE);
         }
         else{
             ((TextView)findViewById(R.id.favorites_sheet_header)).setText(
                     Html.fromHtml(String.format(getResources().getString(R.string.favorites_sheet_header), DBHelper.getBikeNetworkName(this))));
-            findViewById(R.id.empty_favorite_list_text).setVisibility(View.GONE);
-            findViewById(R.id.favorites_sheet_content).setVisibility(View.VISIBLE);
         }
     }
 
@@ -557,44 +555,62 @@ public class NearbyActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void removeFavorite(final StationItem station) {
-        station.setFavorite(false, this);
+    //TODO: refactor add and remove favorite
+    private void removeFavorite(final StationItem _station, boolean _showUndo) {
+        _station.setFavorite(false, this);
         ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(this);
         setupFavoriteListFeedback(favoriteList.isEmpty());
         mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
-        if (mCoordinatorLayout != null)
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                    /*.setAction(R.string.undo, new View.OnClickListener() {
+        if (mCoordinatorLayout != null) {
+            if (!_showUndo) {
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
+                        Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                     .show();
+            }
+            else{
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
+                        Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                    .setAction(R.string.undo, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
 
-                            addFavorite(station);
-
+                            addFavorite(_station, false);
+                            getListPagerAdapter().setupBTabStationARecap(_station);
                         }
-                    })*/.show();
+                    }).show();
+            }
+        }
         else //TODO: Rework landscape layout
             Toast.makeText(this, getString(R.string.favorite_removed), Toast.LENGTH_SHORT).show();
     }
 
-    private void addFavorite(final StationItem station) {
-        station.setFavorite(true, this);
+    private void addFavorite(final StationItem _station, boolean _showUndo) {
+        _station.setFavorite(true, this);
         ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(this);
         setupFavoriteListFeedback(favoriteList.isEmpty());
         mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
-        //getListPagerAdapter().addStationForPage(StationListPagerAdapter.DOCK_STATIONS, station);
+        //getListPagerAdapter().addStationForPage(StationListPagerAdapter.DOCK_STATIONS, _station);
 
-        if (mCoordinatorLayout != null)
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                    /*.setAction(R.string.undo,new View.OnClickListener() {
+        if (mCoordinatorLayout != null) {
+            if (!_showUndo) {
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added,
+                        Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                     .show();
+            }
+            else {
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                    .setAction(R.string.undo,new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
 
-                            removeFavorite(station);
-
+                            removeFavorite(_station, false);
+                            getListPagerAdapter().setupBTabStationARecap(_station);
                         }
-                    })*/.show();
+                    }).show();
+            }
+        }
         else //TODO: Rework landscape layout
             Toast.makeText(this, getString(R.string.favorite_added),Toast.LENGTH_SHORT).show();
     }
@@ -1304,21 +1320,29 @@ public class NearbyActivity extends AppCompatActivity
                     setupBTabSelection(clickedStation.getId(), false);
             }
         }
-        else if (uri.getPath().equalsIgnoreCase("/"+ StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH)){
+        else if (uri.getPath().equalsIgnoreCase("/"+ StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH) ||
+                uri.getPath().equalsIgnoreCase("/"+ StationListFragment.STATION_LIST_STATION_RECAP_FAVORITE_FAB_CLICK_PATH)){
 
-            //Setup favorite icon should be done at view binding time, might be inefficient though
 
-            final StationItem curSelectedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
+            StationItem clickedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
 
-            //should not be null, fabs are showed only after selection
-            if (null != curSelectedStation) {
+            boolean showUndo = false;
 
-                boolean newState = !curSelectedStation.isFavorite(this);
+
+            if (uri.getPath().equalsIgnoreCase("/"+ StationListFragment.STATION_LIST_STATION_RECAP_FAVORITE_FAB_CLICK_PATH)){
+
+                clickedStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+                showUndo = true;
+            }
+
+            if (null != clickedStation) {
+
+                boolean newState = !clickedStation.isFavorite(this);
 
                 if (newState) {
-                    addFavorite(curSelectedStation);
+                    addFavorite(clickedStation, showUndo);
                 } else {
-                    removeFavorite(curSelectedStation);
+                    removeFavorite(clickedStation, showUndo);
                 }
             }
         }
@@ -1576,8 +1600,21 @@ public class NearbyActivity extends AppCompatActivity
 
     @Override
     public void onFavoriteListItemClick(String _stationID) {
-        mStationMapFragment.clearMarkerPickedPlace();
-        setupBTabSelection(_stationID, false);
+
+        StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+
+        if (stationA.getId().equalsIgnoreCase(_stationID)){
+
+            if (mCoordinatorLayout != null)
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.such_short_trip, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                              .show();
+            else //TODO: Rework landscape layout
+                Toast.makeText(this, getString(R.string.such_short_trip),Toast.LENGTH_SHORT).show();
+
+        } else {
+            mStationMapFragment.clearMarkerPickedPlace();
+            setupBTabSelection(_stationID, false);
+        }
     }
 
     @Override
