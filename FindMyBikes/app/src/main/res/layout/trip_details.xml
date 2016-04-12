@@ -44,7 +44,7 @@
                 android:layout_toEndOf="@id/trip_details_from_loc"
                 android:layout_toRightOf="@id/trip_details_from_loc"
                 android:clickable="true"
-                app:srcCompat="@drawable/ic_action_maps_directions_24dp"
+                app:srcCompat="@drawable/ic_action_maps_directions_and_walk_24dp"
 
                 app:fabSize="mini"
                 app:backgroundTint="@color/theme_primary_dark"
@@ -119,7 +119,7 @@
                 android:layout_toEndOf="@id/trip_details_from_pin_a"
                 android:layout_toRightOf="@id/trip_details_from_pin_a"
                 android:clickable="true"
-                app:srcCompat="@drawable/ic_action_maps_directions_24dp"
+                app:srcCompat="@drawable/ic_action_maps_directions_and_bike_24dp"
 
                 app:fabSize="mini"
                 app:backgroundTint="@color/theme_primary_dark"
@@ -194,7 +194,7 @@
                 android:layout_toEndOf="@id/trip_details_from_pin_b"
                 android:layout_toRightOf="@id/trip_details_from_pin_b"
                 android:clickable="true"
-                app:srcCompat="@drawable/ic_action_maps_directions_24dp"
+                app:srcCompat="@drawable/ic_action_maps_directions_and_walk_24dp"
 
                 app:fabSize="mini"
                 app:backgroundTint="@color/theme_primary_dark"
