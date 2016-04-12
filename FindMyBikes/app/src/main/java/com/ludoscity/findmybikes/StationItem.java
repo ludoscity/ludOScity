@@ -3,6 +3,8 @@ package com.ludoscity.findmybikes;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -130,11 +132,30 @@ public class StationItem implements Parcelable, ClusterItem {
     }
 
     public void setFavorite(Boolean b, Context ctx){
-        DBHelper.updateFavorite(b, id, name, ctx);
+        DBHelper.updateFavorite(b, id, name, true, ctx);
     }
 
     public boolean isLocked() {
         return locked;
+    }
+
+    // you MUST call this on a favorite station. No validation to not got to SharedPref too much
+    public Spanned getFavoriteName(Context _ctx, boolean _favoriteDisplayNameOnly){
+
+        Spanned toReturn = Html.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_only_italic),
+                name));
+
+        if (!DBHelper.getFavoriteItemForStationId(_ctx, id).isDisplayNameDefault()){
+            if(_favoriteDisplayNameOnly){
+                toReturn = Html.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_only_bold),
+                        DBHelper.getFavoriteItemForStationId(_ctx, id).getDisplayName()));
+            } else {
+                toReturn = Html.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_complete),
+                        DBHelper.getFavoriteItemForStationId(_ctx, id).getDisplayName(), name ));
+            }
+        }
+
+        return toReturn;
     }
 
     public String getTimestamp() {

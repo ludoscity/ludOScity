@@ -57,4 +57,7 @@
     <string name="undo"><b>UNDO</b></string>
     <string name="no_favorite">No favorite for &lt;b>%1$s&lt;/b></string>
     <string name="please_answer_first">Please answer my question first !</string>
+    <string name="favorite_display_name_only_bold" translatable="false">&lt;b>%1$s&lt;/b></string>
+    <string name="favorite_display_name_only_italic" translatable="false">&lt;i>%1$s&lt;/i></string>
+    <string name="favorite_display_name_complete" translatable="false"><![CDATA[<b>%1$s</b><br><i>%2$s</i>]]></string>
 </resources>

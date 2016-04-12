@@ -142,8 +142,6 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             mStationId = _station.getId();
 
-            mName.setText(_station.getName());
-
             if (mDistanceDisplayReferenceLatLng != null) {
 
                 String proximityString;
@@ -165,6 +163,12 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             } else {
                 mProximity.setVisibility(View.GONE);
             }
+
+            if (_station.isFavorite(mCtx))
+                mName.setText(_station.getFavoriteName(mCtx, false));
+            else
+                mName.setText(_station.getName());
+
 
             if (_selected){
 
@@ -284,6 +288,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                     break;
 
                 case R.id.favorite_fab:
+                    //must redo binding for favorite name display
+                    notifyDataSetChanged();
                     mListener.onStationListItemClick(StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH);
                     //ordering matters
                     if (getSelected().isFavorite(mCtx))

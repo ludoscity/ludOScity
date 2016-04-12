@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
@@ -103,6 +104,14 @@ public class DBHelper {
                 //change default value for auto update setting
                 editor.putBoolean(context.getString(R.string.pref_refresh_options_key), false);
                 editor.apply();
+            }
+
+            if (!cleared && sharedPrefVersion <= 15 && currentVersionCode >= 16){
+                //Changed formatting of favorites JSONArray
+                //Those version numbers are beta so I guess it's ok to remove all favorites
+                editor.clear();
+                editor.commit(); //I do want commit and not apply
+                cleared = true;
             }
 
             editor.putInt(SHARED_PREF_VERSION_CODE, currentVersionCode);
@@ -440,11 +449,33 @@ public class DBHelper {
             JSONArray favoritesJSONArray = new JSONArray(sp.getString(
                     buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, _ctx), "[]" ));
 
-            for (int i=0; i<favoritesJSONArray.length(); i+=2){
-                toReturn.add(new FavoriteItem(favoritesJSONArray.getString(i), favoritesJSONArray.getString(i+1)));
+            for (int i=0; i<favoritesJSONArray.length(); i+=3){
+                toReturn.add(new FavoriteItem(favoritesJSONArray.getString(i), favoritesJSONArray.getString(i+1),favoritesJSONArray.getBoolean(i+2) ));
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.d("DBHelper", "Error while loading favorites from prefs", e);
+        }
+
+        return toReturn;
+    }
+
+    public static FavoriteItem getFavoriteItemForStationId(Context _ctx, String _stationID){
+        FavoriteItem toReturn = null;
+
+        SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+
+        try {
+            JSONArray favoritesJSONArray = new JSONArray(sp.getString(
+                    buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, _ctx), "[]" ));
+
+            for (int i=0; i<favoritesJSONArray.length(); i+=3){
+                if (favoritesJSONArray.getString(i).equalsIgnoreCase(_stationID)) {
+                    toReturn = new FavoriteItem(favoritesJSONArray.getString(i), favoritesJSONArray.getString(i + 1), favoritesJSONArray.getBoolean(i + 2));
+                    break;
+                }
+            }
+        } catch (JSONException e) {
+            Log.d("DBHelper", "Error while loading favorites from prefs", e);
         }
 
         return toReturn;
@@ -460,7 +491,7 @@ public class DBHelper {
             JSONArray favoritesJSONArray = new JSONArray(sp.getString(
                     buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, ctx), "[]" ));
 
-            for (int i=0; i<favoritesJSONArray.length(); ++i){
+            for (int i=0; i<favoritesJSONArray.length(); i += 3){
                 if (favoritesJSONArray.getString(i).equalsIgnoreCase(id)){
                     toReturn = true;
                     break;
@@ -473,7 +504,7 @@ public class DBHelper {
         return toReturn;
     }
 
-    public static void updateFavorite(final Boolean isFavorite, String id, String displayName, Context ctx) {
+    public static void updateFavorite(final Boolean isFavorite, String id, String displayName, boolean isDisplayNameDefault, Context ctx) {
 
         SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
@@ -486,7 +517,7 @@ public class DBHelper {
 
             int existingIndex = -1;
 
-            for (int i=0; i<oldFavoriteJSONArray.length(); i+=2){
+            for (int i=0; i<oldFavoriteJSONArray.length(); i+=3){
                 if (oldFavoriteJSONArray.getString(i).equalsIgnoreCase(id)){
                     existingIndex = i;
                     break;
@@ -497,21 +528,23 @@ public class DBHelper {
                 if (existingIndex == -1) {
                     oldFavoriteJSONArray.put(id);
                     oldFavoriteJSONArray.put(displayName);
+                    oldFavoriteJSONArray.put(isDisplayNameDefault);
                 }
                 else{
 
                     oldFavoriteJSONArray.put(existingIndex + 1, displayName);
+                    oldFavoriteJSONArray.put(existingIndex + 2, isDisplayNameDefault);
                 }
 
                 newFavoriteJSONArray = oldFavoriteJSONArray;
             }
-            else{
+            else{ //Removing favorite
                 //Requires API 19
                 //oldFavoriteJSONArray.remove(existingIndex);
                 newFavoriteJSONArray = new JSONArray();
                 for (int i=0; i<oldFavoriteJSONArray.length(); ++i){
-                    if (i != existingIndex && i != existingIndex+1)
-                        newFavoriteJSONArray.put(oldFavoriteJSONArray.getString(i));
+                    if (i != existingIndex && i != existingIndex+1 && i != existingIndex+2)
+                        newFavoriteJSONArray.put(oldFavoriteJSONArray.getString(i));    //get and put methods coerce boolean to String and vice versa
                 }
             }
 

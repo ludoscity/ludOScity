@@ -1,6 +1,7 @@
 package com.ludoscity.findmybikes;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -84,6 +85,12 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         }
 
         public void bindFavorite(FavoriteItem _favorite){
+
+            if (_favorite.isDisplayNameDefault())
+                mName.setTypeface(null, Typeface.ITALIC);
+            else
+                mName.setTypeface(null, Typeface.BOLD);
+
             mName.setText(_favorite.getDisplayName());
             mStationId = _favorite.getStationId();
         }

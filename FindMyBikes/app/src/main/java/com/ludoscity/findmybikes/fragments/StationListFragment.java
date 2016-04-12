@@ -224,12 +224,16 @@ public class StationListFragment extends Fragment
 
         mStationToRecap = _station;
 
-        if (_station.isFavorite(getContext()))
+        if (_station.isFavorite(getContext())) {
             mStationRecapFavoriteFab.setImageResource(R.drawable.ic_action_favorite_24dp);
-        else
+            mStationRecapName.setText(_station.getFavoriteName(getContext(), true));
+        }
+        else {
             mStationRecapFavoriteFab.setImageResource(R.drawable.ic_action_favorite_outline_24dp);
+            mStationRecapName.setText(_station.getName());
+        }
 
-        mStationRecapName.setText(_station.getName());
+
         mStationRecapAvailability.setText(String.format(getResources().getString(R.string.station_recap_bikes), _station.getFree_bikes()));
 
         if (_station.getFree_bikes() <= DBHelper.getBadAvailabilityMax(getContext()))
@@ -381,6 +385,10 @@ public class StationListFragment extends Fragment
 
     public void setResponsivenessToClick(boolean _toSet) {
         getStationRecyclerViewAdapter().setClickResponsiveness(_toSet);
+    }
+
+    public void notifyDatasetChangedToRecyclerView() {
+        getStationRecyclerViewAdapter().notifyDataSetChanged();
     }
 
     public interface OnStationListFragmentInteractionListener {

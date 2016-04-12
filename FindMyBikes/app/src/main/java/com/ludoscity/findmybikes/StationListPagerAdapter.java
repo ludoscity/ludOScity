@@ -87,6 +87,11 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         }
     }
 
+    public void notifyRecyclerViewDatasetChangedForAllPages(){
+        retrieveListFragment(BIKE_STATIONS).notifyDatasetChangedToRecyclerView();
+        retrieveListFragment(DOCK_STATIONS).notifyDatasetChangedToRecyclerView();
+    }
+
     public String highlightClosestStationWithAvailability(boolean _lookingForBike){
         String toReturn = null;
 

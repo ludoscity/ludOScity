@@ -560,6 +560,10 @@ public class NearbyActivity extends AppCompatActivity
         setupFavoriteListFeedback(favoriteList.isEmpty());
         mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
+        //To setup correct name
+        StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+        getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
+
         if (mCoordinatorLayout != null) {
             if (!_showUndo) {
                 Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
@@ -588,6 +592,10 @@ public class NearbyActivity extends AppCompatActivity
         ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(this);
         setupFavoriteListFeedback(favoriteList.isEmpty());
         mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
+
+        //To setup correct name
+        StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+        getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
 
         //getListPagerAdapter().addStationForPage(StationListPagerAdapter.DOCK_STATIONS, _station);
 
@@ -1634,8 +1642,11 @@ public class NearbyActivity extends AppCompatActivity
 
     @Override
     public void onFavoristeListItemEditDone(String _stationId, String _newName) {
-        DBHelper.updateFavorite(true, _stationId, _newName, this);
+        DBHelper.updateFavorite(true, _stationId, _newName, false, this);
         mFavoriteRecyclerViewAdapter.setupFavoriteList(DBHelper.getFavoriteItems(this));
+        StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+        getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
+        getListPagerAdapter().notifyRecyclerViewDatasetChangedForAllPages();
     }
 
     public class RedrawMarkersTask extends AsyncTask<Boolean, Void, Void> {
