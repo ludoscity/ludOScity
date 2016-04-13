@@ -24,10 +24,9 @@
     <string name="download_failed">Échec du téléchargement :/ ! Màj auto suspendue</string>
     <string name="google_maps_not_installed">Google Maps non installé !</string>
     <string name="searching_bike_network">Recherche sur citybik.es du système le plus proche…</string>
-    <string name="bike_network_found_message">Système de vélos réglé sur &lt;b>%1$s, %2$s&lt;/b> en rapport à votre position.&lt;br /&gt;Il sera automatiquement mis à jour si vous voyagez.</string>
+    <string name="bike_network_found_message">J\'ai réglé votre système de vélos sur &lt;b>%1$s&lt;/b>.&lt;br /&gt;Je le mettrai à jour si vous voyagez.</string>
     <string name="searching_wait_location">En attente de localisation…</string>
-    <string name="welcome">Bienvenue</string>
-    <string name="bike_network_change_message">Système de vélo changé pour &lt;b>%1$s, %2$s&lt;/b> en rapport à votre position.&lt;br /&gt;Vos favoris ont été préservés.</string>
+    <string name="bike_network_change_message"><![CDATA[J\'ai changé votre système de vélo pour <b>%1$s</b>.<br />J\'ai aussi sauvegardé vos favoris pour <i>%2$s</i>.]]></string>
     <string name="locked">Verrouillée</string>
     <string name="pull_to_refresh">Tirer pour rafraîchir</string>
     <string name="status_string">%1$s de citybik.es - %2$s</string>
@@ -49,4 +48,7 @@
     <string name="resume">REPRENDRE</string>
     <string name="auto_bike_select_finding">Je localise vos vélos. Donnez moi un instant.</string>
     <string name="auto_bike_select_found">J\'ai localisé votre vélo ! :)</string>
+    <string name="ok">OK</string>
+    <string name="hello_city"><![CDATA[%1$sBonjour <b>%2$s</b> !]]></string>
+    <string name="hello_travel">Il semble que vous avez voyagé.\u0020</string>
 </resources>

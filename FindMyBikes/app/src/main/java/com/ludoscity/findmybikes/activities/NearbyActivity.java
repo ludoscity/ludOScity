@@ -4,6 +4,7 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -166,7 +168,7 @@ public class NearbyActivity extends AppCompatActivity
 
         if (Utils.Connectivity.isConnected(getApplicationContext()) && !DBHelper.isBikeNetworkIdAvailable(this)) {
 
-            mFindNetworkTask = new FindNetworkTask();
+            mFindNetworkTask = new FindNetworkTask(DBHelper.getBikeNetworkName(this));
             mFindNetworkTask.execute();
         }
         else if(mStationsNetwork.isEmpty()){
@@ -829,7 +831,7 @@ public class NearbyActivity extends AppCompatActivity
                             }
                         }
                         else{
-                            mFindNetworkTask = new FindNetworkTask();
+                            mFindNetworkTask = new FindNetworkTask(DBHelper.getBikeNetworkName(NearbyActivity.this));
                             mFindNetworkTask.execute();
                         }
                     } else {
@@ -866,7 +868,7 @@ public class NearbyActivity extends AppCompatActivity
 
                             if (mStationMapFragment.getMarkerBVisibleLatLng() == null) {
                                 mStationListViewPager.setCurrentItem(StationListPagerAdapter.DOCK_STATIONS, true);
-                                //TODO : work on proper regular user mode
+
                                 mFavoritesSheetFab.showFab();
 
                                 final Handler handler = new Handler();
@@ -901,7 +903,7 @@ public class NearbyActivity extends AppCompatActivity
                             if (mStationMapFragment.getMarkerBVisibleLatLng() == null){
                                 mClosestBikeAutoSelected = false;
                             }
-                            else if (isLookingForBike() && mAutoSelectBikeFab.getVisibility() != View.VISIBLE) {
+                            else if (isLookingForBike() && !mClosestBikeAutoSelected) {
                                 mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
                                 mAutoSelectBikeFab.show();
                                 animateCameraToShowUserAndStation(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS));
@@ -1706,6 +1708,10 @@ public class NearbyActivity extends AppCompatActivity
 
     public class FindNetworkTask extends AsyncTask<Void, Void, Map<String,String>> {
 
+        String mOldBikeNetworkName = "";
+
+        public FindNetworkTask(String _currentNetworkName){ mOldBikeNetworkName = _currentNetworkName; }
+
         private void checkAndAskLocationPermission(){
             // Here, thisActivity is the current activity
             if (ContextCompat.checkSelfPermission(NearbyActivity.this,
@@ -1848,6 +1854,7 @@ public class NearbyActivity extends AppCompatActivity
             super.onPostExecute(backgroundResults);
 
             mClosestBikeAutoSelected = false;
+            int i=0;
 
             //noinspection ConstantConditions
             getSupportActionBar().setSubtitle(DBHelper.getBikeNetworkName(NearbyActivity.this));
@@ -1856,14 +1863,20 @@ public class NearbyActivity extends AppCompatActivity
             AlertDialog alertDialog = new AlertDialog.Builder(NearbyActivity.this).create();
             //alertDialog.setTitle(getString(R.string.network_found_title));
             if (!backgroundResults.keySet().contains("old_network_name")) {
-                alertDialog.setTitle(R.string.welcome);
+                alertDialog.setTitle(Html.fromHtml(String.format(getResources().getString(R.string.hello_city), "", backgroundResults.get("new_network_city") )));
                 alertDialog.setMessage(Html.fromHtml(String.format(getString(R.string.bike_network_found_message),
-                        DBHelper.getBikeNetworkName(NearbyActivity.this), backgroundResults.get("new_network_city"))));
+                        DBHelper.getBikeNetworkName(NearbyActivity.this) )));
+                Message toPass = null; //To resolve ambiguous call
+                //noinspection ConstantConditions
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.ok), toPass);
             }
             else{
-                //alertDialog.setTitle(R.string.bike_network_change_title);
+                alertDialog.setTitle(Html.fromHtml(String.format(getResources().getString(R.string.hello_city), getResources().getString(R.string.hello_travel), backgroundResults.get("new_network_city"))));
                 alertDialog.setMessage(Html.fromHtml(String.format(getString(R.string.bike_network_change_message),
-                        DBHelper.getBikeNetworkName(NearbyActivity.this), backgroundResults.get("new_network_city"))));
+                        DBHelper.getBikeNetworkName(NearbyActivity.this), mOldBikeNetworkName)));
+                Message toPass = null; //To resolve ambiguous call
+                //noinspection ConstantConditions
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.ok), toPass);
                 mStationMapFragment.doInitialCameraSetup(CameraUpdateFactory.newLatLngZoom(mCurrentUserLatLng, 15), true);
             }
 
@@ -1929,7 +1942,7 @@ public class NearbyActivity extends AppCompatActivity
 
                 getListPagerAdapter().removeStationHighlightForPage(mTabLayout.getSelectedTabPosition());
 
-                mFindNetworkTask = new FindNetworkTask();
+                mFindNetworkTask = new FindNetworkTask(DBHelper.getBikeNetworkName(NearbyActivity.this));
                 mFindNetworkTask.execute();
             }
         }

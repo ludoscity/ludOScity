@@ -27,10 +27,12 @@
     <string name="download_failed">Download failed :/ Auto update paused</string>
     <string name="google_maps_not_installed">Google Maps not installed !</string>
     <string name="searching_bike_network">Searching closest bike system on citybik.es…</string>
-    <string name="bike_network_found_message">Bike share network set to &lt;b>%1$s, %2$s&lt;/b> based on location.&lt;br /&gt;It will update automatically if you travel.</string>
+    <string name="bike_network_found_message">I\'ve set your bike system to &lt;b>%1$s&lt;/b>.&lt;br /&gt;I\'ll update it if you travel.</string>
     <string name="searching_wait_location">Waiting on location…</string>
-    <string name="welcome">Welcome</string>
-    <string name="bike_network_change_message">Bike share network changed to &lt;b>%1$s, %2$s&lt;/b> based on location.&lt;br /&gt;Your favorites been preserved.</string>
+    <string name="hello_city">%1$sHello &lt;b>%2$s&lt;/b> !</string>
+    <string name="hello_travel">It seems you travelled.\u0020</string>
+    <!-- TODO: add 'OK but delete favorites for [OLD NETWORK]' -->
+    <string name="bike_network_change_message"><![CDATA[I\'ve changed your bike network to <b>%1$s</b>.<br />I also saved your favorites for <i>%2$s</i>.]]></string>
     <string name="locked">Locked</string>
     <string name="pull_to_refresh">Pull to refresh</string>
     <string name="status_string">%1$s ago from citybik.es - %2$s</string>
@@ -63,4 +65,5 @@
     <string name="resume">RESUME</string>
     <string name="auto_bike_select_finding">I\'m finding your bikes. Hang tight...</string>
     <string name="auto_bike_select_found">I found your bike ! :)</string>
+    <string name="ok">OK</string>
 </resources>
