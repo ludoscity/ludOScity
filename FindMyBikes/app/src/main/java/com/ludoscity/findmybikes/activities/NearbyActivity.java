@@ -161,6 +161,8 @@ public class NearbyActivity extends AppCompatActivity
 
     private boolean mClosestBikeAutoSelected = false;
 
+    private boolean mOnboardingInProgress = false;
+
     @Override
     public void onStart() {
 
@@ -571,9 +573,18 @@ public class NearbyActivity extends AppCompatActivity
         getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
 
         if (!_showUndo) {
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
-                    Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                 .show();
+
+            if (!mOnboardingInProgress) {
+
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
+                        Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                        .show();
+            } else {
+
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_onboarding_complete,
+                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(this, R.color.theme_accent))
+                        .show();
+            }
         }
         else{
             Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
@@ -608,7 +619,7 @@ public class NearbyActivity extends AppCompatActivity
         }
         else {
             Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                .setAction(R.string.undo,new View.OnClickListener() {
+                .setAction(R.string.undo, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
@@ -656,6 +667,16 @@ public class NearbyActivity extends AppCompatActivity
         mClearFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if (mOnboardingInProgress) {
+                    Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_complete,
+                            Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
+                            .show();
+
+                    mOnboardingInProgress = false;
+                }
+
+
                 mStationMapFragment.setMapPaddingLeft(0);
                 mStationMapFragment.setMapPaddingRight(0);
                 hideTripDetailsWidget();
@@ -892,6 +913,26 @@ public class NearbyActivity extends AppCompatActivity
                         Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_bike_select_found,
                                 Snackbar.LENGTH_LONG, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
                                 .show();
+
+                        if (mOnboardingInProgress){
+                            //Adding onboarding Favorite
+                            StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+
+                            for(StationItem station : mStationsNetwork) {
+                                if (!station.getId().equalsIgnoreCase(stationA.getId())) {
+
+                                    station.setFavorite(true, NearbyActivity.this);
+                                    ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(NearbyActivity.this);
+                                    setupFavoriteListFeedback(favoriteList.isEmpty());
+                                    mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
+
+                                    Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_start,
+                                            Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
+                                            .show();
+                                    break;
+                                }
+                            }
+                        }
 
                         mClosestBikeAutoSelected = true;
                     }
@@ -1625,15 +1666,24 @@ public class NearbyActivity extends AppCompatActivity
     @Override
     public void onFavoriteListItemClick(String _stationID) {
 
-        StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+        if (!mOnboardingInProgress) {
+            StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
 
-        if (stationA.getId().equalsIgnoreCase(_stationID)){
+            if (stationA.getId().equalsIgnoreCase(_stationID)) {
 
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.such_short_trip, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                          .show();
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.such_short_trip, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                        .show();
 
+            } else {
+                mStationMapFragment.clearMarkerPickedPlace();
+                setupBTabSelection(_stationID, false);
+            }
+        }
+        else{
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_onboarding_start,
+                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
+                    .show();
 
-        } else {
             mStationMapFragment.clearMarkerPickedPlace();
             setupBTabSelection(_stationID, false);
         }
@@ -1854,7 +1904,6 @@ public class NearbyActivity extends AppCompatActivity
             super.onPostExecute(backgroundResults);
 
             mClosestBikeAutoSelected = false;
-            int i=0;
 
             //noinspection ConstantConditions
             getSupportActionBar().setSubtitle(DBHelper.getBikeNetworkName(NearbyActivity.this));
@@ -1869,6 +1918,8 @@ public class NearbyActivity extends AppCompatActivity
                 Message toPass = null; //To resolve ambiguous call
                 //noinspection ConstantConditions
                 alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.ok), toPass);
+
+                mOnboardingInProgress = true;
             }
             else{
                 alertDialog.setTitle(Html.fromHtml(String.format(getResources().getString(R.string.hello_city), getResources().getString(R.string.hello_travel), backgroundResults.get("new_network_city"))));

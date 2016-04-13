@@ -14,7 +14,7 @@
     <string name="min">min</string>
     <string name="moments">À l\'instant</string>
     <string name="nextUpdate">Prochaine màj</string>
-    <string name="b_tab_question">Où pédalons-nous aujourd\'hui ?</string>
+    <string name="b_tab_question">Où allons-nous aujourd\'hui ?</string>
     <string name="docks">Ancrages</string>
     <string name="favorite_removed">Favori supprimé</string>
     <string name="station">Station</string>
@@ -46,9 +46,13 @@
     <string name="such_short_trip">Pas besoin de moi pour un trajet si court ! ;)</string>
     <string name="please_answer_first">Veuillez d\'abord répondre à ma question !</string>
     <string name="resume">REPRENDRE</string>
-    <string name="auto_bike_select_finding">Je localise vos vélos. Donnez moi un instant.</string>
+    <string name="auto_bike_select_finding">Je localise vos vélos. Donnez moi un instant…</string>
     <string name="auto_bike_select_found">J\'ai localisé votre vélo ! :)</string>
     <string name="ok">OK</string>
     <string name="hello_city"><![CDATA[%1$sBonjour <b>%2$s</b> !]]></string>
     <string name="hello_travel">Il semble que vous avez voyagé.\u0020</string>
+    <string name="favorite_onboarding_complete">C\'est ainsi que fonctionnent les favoris. Maintenant, annulez avec le \'X\' en bas à droite.</string>
+    <string name="onboarding_start">Laissez moi vous montrer. Pour commencer, cliquez sur votre premier favori.</string>
+    <string name="onboarding_complete">Et voilà ! Sélectionnez toujours \'B\' avec un favori, la recherche ou directement sur la carte.</string>
+    <string name="favorite_onboarding_start"><![CDATA[Vous voyez le récapitulatif du trajet en bas ? Maintenant supprimez le favori avec l\'icône <3.]]></string>
 </resources>
