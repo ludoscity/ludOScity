@@ -321,6 +321,12 @@ public class NearbyActivity extends AppCompatActivity
 
         setupFavoriteSheet();
 
+        if (!mClosestBikeAutoSelected){
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_bike_select_finding,
+                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(this, R.color.theme_accent))
+                    .show();
+        }
+
         //noinspection ConstantConditions
         findViewById(R.id.trip_details_directions_loc_to_a).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -880,6 +886,10 @@ public class NearbyActivity extends AppCompatActivity
                                 animateCameraToShowUserAndStation(closestBikeStation);
                             }
                         }
+
+                        Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_bike_select_found,
+                                Snackbar.LENGTH_LONG, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
+                                .show();
 
                         mClosestBikeAutoSelected = true;
                     }
