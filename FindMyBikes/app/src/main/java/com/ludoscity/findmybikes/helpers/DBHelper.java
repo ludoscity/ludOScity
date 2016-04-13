@@ -69,6 +69,8 @@ public class DBHelper {
     private static final int PREF_CRITICAL_AVAILABILITY_MAX_DEFAULT = 1;
     private static final int PREF_BAD_AVAILABILITY_MAX_DEFAULT = 4;
 
+    private static boolean mAutoUpdatePaused = false;
+
     private DBHelper() {}
 
     public static void init(Context context) throws IOException, CouchbaseLiteException, PackageManager.NameNotFoundException {
@@ -122,8 +124,12 @@ public class DBHelper {
     public static boolean getAutoUpdate(Context _ctx){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(_ctx);
 
-        return sp.getBoolean(_ctx.getString(R.string.pref_refresh_options_key), false);
+        return !mAutoUpdatePaused && sp.getBoolean(_ctx.getString(R.string.pref_refresh_options_key), false);
     }
+
+    public static void pauseAutoUpdate() { mAutoUpdatePaused = true; }
+
+    public static void resumeAutoUpdate() { mAutoUpdatePaused = false; }
 
     public static int getCriticalAvailabilityMax(Context _ctx) {
         SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);

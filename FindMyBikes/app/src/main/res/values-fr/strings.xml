@@ -21,7 +21,7 @@
     <string name="downloading">Téléchargement des données…</string>
     <string name="no_connectivity">Non connecté</string>
     <string name="refreshing">Rafraîchissement de la carte…</string>
-    <string name="download_failed">Échec du téléchargement !</string>
+    <string name="download_failed">Échec du téléchargement :/ ! Màj auto suspendue</string>
     <string name="google_maps_not_installed">Google Maps non installé !</string>
     <string name="searching_bike_network">Recherche sur citybik.es du système le plus proche…</string>
     <string name="bike_network_found_message">Système de vélos réglé sur &lt;b>%1$s, %2$s&lt;/b> en rapport à votre position.&lt;br /&gt;Il sera automatiquement mis à jour si vous voyagez.</string>
@@ -46,4 +46,7 @@
     <string name="pref_availability_critical_hint">Considérées vide dans l\'onglet A ou pleine dans l\'onglet B</string>
     <string name="such_short_trip">Pas besoin de moi pour un trajet si court ! ;)</string>
     <string name="please_answer_first">Veuillez d\'abord répondre à ma question !</string>
+    <string name="resume">REPRENDRE</string>
+    <string name="auto_bike_select_finding">Je localise vos vélos. Donnez moi un instant.</string>
+    <string name="auto_bike_select_found">J\'ai localisé votre vélo ! :)</string>
 </resources>

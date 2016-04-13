@@ -29,7 +29,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,7 +41,6 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.common.ConnectionResult;
@@ -564,27 +562,23 @@ public class NearbyActivity extends AppCompatActivity
         StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
         getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
 
-        if (mCoordinatorLayout != null) {
-            if (!_showUndo) {
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
-                        Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                     .show();
-            }
-            else{
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
-                        Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                    .setAction(R.string.undo, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            addFavorite(_station, false);
-                            getListPagerAdapter().setupBTabStationARecap(_station);
-                        }
-                    }).show();
-            }
+        if (!_showUndo) {
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
+                    Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                 .show();
         }
-        else //TODO: Rework landscape layout
-            Toast.makeText(this, getString(R.string.favorite_removed), Toast.LENGTH_SHORT).show();
+        else{
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
+                    Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                .setAction(R.string.undo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        addFavorite(_station, false);
+                        getListPagerAdapter().setupBTabStationARecap(_station);
+                    }
+                }).show();
+        }
     }
 
     private void addFavorite(final StationItem _station, boolean _showUndo) {
@@ -599,26 +593,22 @@ public class NearbyActivity extends AppCompatActivity
 
         //getListPagerAdapter().addStationForPage(StationListPagerAdapter.DOCK_STATIONS, _station);
 
-        if (mCoordinatorLayout != null) {
-            if (!_showUndo) {
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added,
-                        Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                     .show();
-            }
-            else {
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                    .setAction(R.string.undo,new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            removeFavorite(_station, false);
-                            getListPagerAdapter().setupBTabStationARecap(_station);
-                        }
-                    }).show();
-            }
+        if (!_showUndo) {
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added,
+                    Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                 .show();
         }
-        else //TODO: Rework landscape layout
-            Toast.makeText(this, getString(R.string.favorite_added),Toast.LENGTH_SHORT).show();
+        else {
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                .setAction(R.string.undo,new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        removeFavorite(_station, false);
+                        getListPagerAdapter().setupBTabStationARecap(_station);
+                    }
+                }).show();
+        }
     }
 
     private void setupFavoriteFab() {
@@ -899,8 +889,6 @@ public class NearbyActivity extends AppCompatActivity
 
                         if (!isStationAClosestBike()){
                             if (mStationMapFragment.getMarkerBVisibleLatLng() == null){
-                                //TODO: this piece of code fights with the user if no station B is selected
-                                //Solution : implement occasional / regular modes and have the setting impact this
                                 mClosestBikeAutoSelected = false;
                             }
                             else if (isLookingForBike() && mAutoSelectBikeFab.getVisibility() != View.VISIBLE) {
@@ -1316,11 +1304,6 @@ public class NearbyActivity extends AppCompatActivity
                 //if null, means the station was clicked twice, hence unchecked
                 final StationItem clickedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
 
-                //TODO: Rework landscape layout
-                //hackfix
-                //if (mAppBarLayout != null)
-                //    mAppBarLayout.setExpanded(true , true);
-
                 if (isLookingForBike()) {
 
                     if (mStationMapFragment.getMarkerBVisibleLatLng() != null) {
@@ -1410,8 +1393,9 @@ public class NearbyActivity extends AppCompatActivity
         if (getPackageManager().queryIntentActivities(intent, 0).size() > 0) {
             startActivity(intent); // launch the map activity
         } else {
-            //TODO: replace by Snackbar
-            Toast.makeText(this, getString(R.string.google_maps_not_installed), Toast.LENGTH_LONG).show();
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.google_maps_not_installed,
+                    Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                    .show();
         }
     }
 
@@ -1467,6 +1451,11 @@ public class NearbyActivity extends AppCompatActivity
     @Override
     public void onPageSelected(final int position) {
 
+        StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+
+        if (stationA != null)
+            getListPagerAdapter().setupBTabStationARecap(stationA);
+
         //Happens on screen orientation change
         if (mStationMapFragment == null ||
                 (mStationMapFragment.getMarkerBVisibleLatLng() != null && getListPagerAdapter().getHighlightedStationForPage(position) == null)){
@@ -1512,7 +1501,7 @@ public class NearbyActivity extends AppCompatActivity
                 if (highlightedStation != null ) {
 
                     mStationMapFragment.setPinOnStation(true, highlightedStation.getId());
-                    getListPagerAdapter().setupBTabStationARecap(highlightedStation);
+
 
                     animateCameraToShowUserAndStation(highlightedStation);
 
@@ -1628,11 +1617,9 @@ public class NearbyActivity extends AppCompatActivity
 
         if (stationA.getId().equalsIgnoreCase(_stationID)){
 
-            if (mCoordinatorLayout != null)
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.such_short_trip, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                              .show();
-            else //TODO: Rework landscape layout
-                Toast.makeText(this, getString(R.string.such_short_trip),Toast.LENGTH_SHORT).show();
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.such_short_trip, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                          .show();
+
 
         } else {
             mStationMapFragment.clearMarkerPickedPlace();
@@ -1816,12 +1803,17 @@ public class NearbyActivity extends AppCompatActivity
                 }
 
             } catch (IOException e) {
-                Toast toast;
 
-                toast = Toast.makeText(getApplicationContext(),getString(R.string.download_failed),Toast.LENGTH_LONG);
+                DBHelper.pauseAutoUpdate();
 
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.download_failed,
+                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                        .setAction(R.string.resume, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                DBHelper.resumeAutoUpdate();
+                            }
+                        }).show();
 
                 cancel(false); //No need to try to interrupt the thread
             }
@@ -1930,8 +1922,6 @@ public class NearbyActivity extends AppCompatActivity
                 mFindNetworkTask = new FindNetworkTask();
                 mFindNetworkTask.execute();
             }
-
-            //Toast.makeText(context, "DatabaseUpdate Successful!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -2014,6 +2004,8 @@ public class NearbyActivity extends AppCompatActivity
             super.onPreExecute();
             mStatusTextView.setText(getString(R.string.downloading));
 
+            DBHelper.resumeAutoUpdate();
+
             //Cannot do that, for some obscure reason, task gets automatically
             //cancelled when the permission dialog is visible
             //checkAndAskLocationPermission();
@@ -2028,12 +2020,16 @@ public class NearbyActivity extends AppCompatActivity
             //Set interface back
             getListPagerAdapter().setRefreshingAll(false);
 
-            Toast toast;
+            DBHelper.pauseAutoUpdate();
 
-            toast = Toast.makeText(getApplicationContext(),getString(R.string.download_failed),Toast.LENGTH_LONG);
-
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.download_failed,
+                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                    .setAction(R.string.resume, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            DBHelper.resumeAutoUpdate();
+                        }
+                    }).show();
 
             //must be done last
             mDownloadWebTask = null;

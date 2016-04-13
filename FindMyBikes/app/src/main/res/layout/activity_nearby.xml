@@ -20,7 +20,7 @@
                 android:id="@+id/toolbar_main"
                 layout="@layout/toolbar" />
 
-            <!-- STATUS BAR -->
+            <!-- UPDATE BAR -->
             <LinearLayout
                 android:id="@+id/app_status_bar"
                 android:layout_width="match_parent"
