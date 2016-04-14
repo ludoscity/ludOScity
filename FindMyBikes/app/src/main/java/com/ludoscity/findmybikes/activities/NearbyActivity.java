@@ -162,6 +162,8 @@ public class NearbyActivity extends AppCompatActivity
     private boolean mClosestBikeAutoSelected = false;
 
     private boolean mOnboardingInProgress = false;
+    Snackbar mOnboardingSnackbar; //indefinite snackbar have buggy behavior on older platform if we let the framework dismiss them
+    Snackbar mFindBikesSnackbar;
 
     @Override
     public void onStart() {
@@ -297,7 +299,7 @@ public class NearbyActivity extends AppCompatActivity
 
         mAppBarLayout = (AppBarLayout) findViewById(R.id.action_toolbar_layout);
 
-        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.appbar_coordinator);
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.snackbar_coordinator);
 
         mTripDetailsWidget = findViewById(R.id.trip_details);
         mTripDetailsProximityA = (TextView) findViewById(R.id.trip_details_proximity_a);
@@ -326,9 +328,9 @@ public class NearbyActivity extends AppCompatActivity
         setupFavoriteSheet();
 
         if (!mClosestBikeAutoSelected){
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_bike_select_finding,
-                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(this, R.color.theme_accent))
-                    .show();
+            mFindBikesSnackbar = Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_bike_select_finding,
+                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(this, R.color.theme_primary_dark));
+            mFindBikesSnackbar.show();
         }
 
         //noinspection ConstantConditions
@@ -581,9 +583,19 @@ public class NearbyActivity extends AppCompatActivity
                         .show();
             } else {
 
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_onboarding_complete,
-                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(this, R.color.theme_accent))
-                        .show();
+                mOnboardingSnackbar.dismiss();
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        mOnboardingSnackbar = Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_onboarding_complete,
+                                Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
+
+                        mOnboardingSnackbar.show();
+                    }
+                }, 500);
             }
         }
         else{
@@ -669,13 +681,21 @@ public class NearbyActivity extends AppCompatActivity
             public void onClick(View view) {
 
                 if (mOnboardingInProgress) {
-                    Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_complete,
-                            Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
-                            .show();
+
+                    mOnboardingSnackbar.dismiss();
+
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_complete,
+                                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
+                                    .show();
+                        }
+                    }, 500);
 
                     mOnboardingInProgress = false;
                 }
-
 
                 mStationMapFragment.setMapPaddingLeft(0);
                 mStationMapFragment.setMapPaddingRight(0);
@@ -875,7 +895,7 @@ public class NearbyActivity extends AppCompatActivity
 
                         getListPagerAdapter().highlightClosestStationWithAvailability(true);
                         getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, isAppBarExpanded());
-                        StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+                        final StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
                         mStationMapFragment.setPinOnStation(true, closestBikeStation.getId());
                         getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
 
@@ -910,9 +930,29 @@ public class NearbyActivity extends AppCompatActivity
                             }
                         }
 
-                        Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_bike_select_found,
-                                Snackbar.LENGTH_LONG, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
-                                .show();
+                        //Bug on older API levels. Dismissing by hand fixes it.
+                        mFindBikesSnackbar.dismiss();
+
+                        Handler handler = new Handler();
+
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                if(!closestBikeStation.isLocked() && closestBikeStation.getFree_bikes() > DBHelper.getCriticalAvailabilityMax(NearbyActivity.this)) {
+
+                                    mFindBikesSnackbar = Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_bike_select_found,
+                                            Snackbar.LENGTH_LONG, ContextCompat.getColor(NearbyActivity.this, R.color.snackbar_green));
+                                    mFindBikesSnackbar.show();
+                                }
+                                else{
+
+                                    mFindBikesSnackbar = Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_bike_select_error,
+                                            Snackbar.LENGTH_LONG, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
+                                    mFindBikesSnackbar.show();
+                                }
+                            }
+                        }, 500);
 
                         if (mOnboardingInProgress){
                             //Adding onboarding Favorite
@@ -926,9 +966,18 @@ public class NearbyActivity extends AppCompatActivity
                                     setupFavoriteListFeedback(favoriteList.isEmpty());
                                     mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
-                                    Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_start,
-                                            Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
-                                            .show();
+                                    mFindBikesSnackbar.dismiss();
+
+                                    Handler snackbarHandler = new Handler();
+                                    snackbarHandler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mOnboardingSnackbar = Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_start,
+                                                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
+                                            mOnboardingSnackbar.show();
+                                        }
+                                    }, 500);
+
                                     break;
                                 }
                             }
@@ -1263,7 +1312,7 @@ public class NearbyActivity extends AppCompatActivity
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-            Animator hideAnimator = buildTripDetailsWidgetAnimators(false, getResources().getInteger(R.integer.camera_animation_duration)/2, .23f);
+            Animator hideAnimator = buildTripDetailsWidgetAnimators(false, getResources().getInteger(R.integer.camera_animation_duration) / 2, .23f);
 
             hideAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -1573,7 +1622,7 @@ public class NearbyActivity extends AppCompatActivity
                 if (mStationMapFragment.getMarkerBVisibleLatLng() == null) {
                     mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13.75f));
 
-                    if (mFavoriteSheetVisible)
+                    if (mFavoriteSheetVisible && !mFavoritesSheetFab.isSheetVisible())
                         mFavoritesSheetFab.showSheet();
                     else if (mPlaceAutocompleteLoadingProgressBar.getVisibility() != View.GONE){
                         mFavoritesSheetFab.hideSheetThenFab();
@@ -1680,9 +1729,19 @@ public class NearbyActivity extends AppCompatActivity
             }
         }
         else{
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_onboarding_start,
-                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
-                    .show();
+            mOnboardingSnackbar.dismiss();
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    mOnboardingSnackbar = Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_onboarding_start,
+                            Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
+
+                    mOnboardingSnackbar.show();
+                }
+            }, 500);
 
             mStationMapFragment.clearMarkerPickedPlace();
             setupBTabSelection(_stationID, false);

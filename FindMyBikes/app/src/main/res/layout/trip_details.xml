@@ -11,28 +11,25 @@
 
         android:layout_width="@dimen/trip_details_widget_width"
         android:layout_height="wrap_content"
-        android:paddingTop="2dp"
-        android:paddingBottom="3dp"
-        android:paddingStart="3dp"
-        android:paddingEnd="3dp"
-        android:paddingRight="3dp"
-        android:paddingLeft="3dp"
+        android:paddingTop="@dimen/trip_details_widget_paddingTop"
+        android:paddingBottom="@dimen/trip_details_widget_paddingBottom"
+        android:paddingStart="@dimen/trip_details_widget_paddingStart"
+        android:paddingEnd="@dimen/trip_details_widget_paddingEnd"
+        android:paddingRight="@dimen/trip_details_widget_paddingEnd"
+        android:paddingLeft="@dimen/trip_details_widget_paddingStart"
         android:background="@color/theme_window_background">
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
             android:id="@+id/trip_details_loc_to_a"
-            android:paddingTop="1dp"
-            android:paddingBottom="3dp">
+
+            style="@style/trip_details_row">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_from_loc"
-                android:layout_marginRight="-8dp"
-                android:layout_marginEnd="-8dp"
-                android:elevation="1dp"
+                style="@style/trip_details_row_imageview_start"
                 android:layout_alignParentBottom="true"
                 app:srcCompat="@drawable/ic_my_location_24dp_black_blue"/>
 
@@ -56,9 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_to_pin_a"
-                android:layout_marginLeft="-9dp"
-                android:layout_marginStart="-9dp"
-                android:elevation="1dp"
+                style="@style/trip_details_row_imageview_end"
                 android:layout_toEndOf="@id/trip_details_directions_loc_to_a"
                 android:layout_toRightOf="@id/trip_details_directions_loc_to_a"
                 android:layout_alignBottom="@id/trip_details_directions_loc_to_a"
@@ -95,19 +90,15 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
             android:id="@+id/trip_details_a_to_b"
             android:layout_below="@id/trip_details_loc_to_a"
-            android:paddingTop="1dp"
-            android:paddingBottom="3dp">
+            style="@style/trip_details_row">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_from_pin_a"
-                android:layout_marginRight="-8dp"
-                android:layout_marginEnd="-8dp"
-                android:elevation="1dp"
+                style="@style/trip_details_row_imageview_start"
                 android:layout_alignParentBottom="true"
                 app:srcCompat="@drawable/ic_pin_a_24dp_black"/>
 
@@ -130,9 +121,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:elevation="1dp"
-                android:layout_marginLeft="-9dp"
-                android:layout_marginStart="-9dp"
+                style="@style/trip_details_row_imageview_end"
                 android:id="@+id/trip_details_to_pin_b"
                 android:layout_toEndOf="@id/trip_details_directions_a_to_b"
                 android:layout_toRightOf="@id/trip_details_directions_a_to_b"
@@ -170,11 +159,9 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
             android:id="@+id/trip_details_b_to_search"
             android:layout_below="@id/trip_details_a_to_b"
-            android:paddingTop="1dp"
-            android:paddingBottom="3dp">
+            style="@style/trip_details_row">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -205,9 +192,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="-9dp"
-                android:layout_marginStart="-9dp"
-                android:elevation="3dp"
+                style="@style/trip_details_row_imageview_end"
                 android:id="@+id/trip_details_to_search"
                 android:layout_toEndOf="@id/trip_details_directions_b_to_search"
                 android:layout_toRightOf="@id/trip_details_directions_b_to_search"

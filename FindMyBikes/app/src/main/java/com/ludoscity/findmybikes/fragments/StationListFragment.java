@@ -236,7 +236,14 @@ public class StationListFragment extends Fragment
 
         mStationRecapAvailability.setText(String.format(getResources().getString(R.string.station_recap_bikes), _station.getFree_bikes()));
 
-        if (_station.getFree_bikes() <= DBHelper.getBadAvailabilityMax(getContext()))
+        mStationRecapAvailability.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.theme_window_background));
+
+        if (_station.getFree_bikes() <= DBHelper.getCriticalAvailabilityMax(getContext())){
+
+            mStationRecapAvailability.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.theme_accent));
+            mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.theme_primary_dark));
+        }
+        else if (_station.getFree_bikes() <= DBHelper.getBadAvailabilityMax(getContext()))
             mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.station_recap_yellow));
         else
             mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.station_recap_green));

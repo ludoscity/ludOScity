@@ -37,7 +37,7 @@
     <!--suppress AndroidDomInspection -->
     <android.support.design.widget.CoordinatorLayout
         android:layout_height="wrap_content"
-        android:id="@+id/appbar_coordinator"
+        android:id="@+id/snackbar_coordinator"
         app:layout_widthPercent="@dimen/main_layout_list_section"
         android:layout_below="@+id/action_toolbar_layout"
         >
@@ -63,9 +63,6 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
-
-
-
     <!-- MAP -->
     <!--suppress AndroidDomInspection -->
     <android.support.design.widget.CoordinatorLayout
@@ -74,8 +71,8 @@
         android:layout_height="match_parent"
         app:layout_widthPercent="@dimen/main_layout_map_section"
         android:layout_below="@+id/action_toolbar_layout"
-        android:layout_toRightOf="@id/appbar_coordinator"
-        android:layout_toEndOf="@id/appbar_coordinator">
+        android:layout_toRightOf="@id/snackbar_coordinator"
+        android:layout_toEndOf="@id/snackbar_coordinator">
         <fragment
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:name="com.ludoscity.findmybikes.fragments.StationMapFragment"

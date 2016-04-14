@@ -48,6 +48,13 @@
     </android.support.design.widget.CoordinatorLayout>
 
     <!--suppress AndroidDomInspection -->
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/snackbar_coordinator"
+        app:layout_marginTopPercent="31%"/>
+
+    <!--suppress AndroidDomInspection -->
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"

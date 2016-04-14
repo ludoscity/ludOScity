@@ -1,4 +1,5 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.percent.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -119,13 +120,13 @@
             android:id="@+id/station_list_recyclerview"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <RelativeLayout
+    <android.support.percent.PercentRelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/station_recap"
         android:visibility="invisible"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="30dp"
+        app:layout_marginTopPercent="3%"
         android:layout_centerHorizontal="true">
 
         <ImageView
@@ -179,10 +180,10 @@
 
             style="@style/listitem_floating_action_button"
             />
-    </RelativeLayout>
+    </android.support.percent.PercentRelativeLayout>
 
 
 
-</RelativeLayout>
+</android.support.percent.PercentRelativeLayout>
 
 

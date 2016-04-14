@@ -66,8 +66,9 @@
     <string name="auto_bike_select_finding">I\'m finding your bikes. Hang tight…</string>
     <string name="auto_bike_select_found">I found your bike ! :)</string>
     <string name="ok">OK</string>
-    <string name="favorite_onboarding_complete"><![CDATA[That\'s how favorites work. Now clear with \'X\' button at the bottom right.]]></string>
-    <string name="onboarding_complete"><![CDATA[Done ! Always set \'B\' by picking a favorite, use the search or directly on the map. (swipe to dismiss)]]></string>
+    <string name="favorite_onboarding_complete"><![CDATA[That\'s how favorites work. Now clear B with \'X\' button at the bottom right.]]></string>
+    <string name="onboarding_complete"><![CDATA[Done ! Always set B by picking a favorite, use the search or directly on the map. (swipe to dismiss)]]></string>
     <string name="onboarding_start">Let me show you. Set \'B\' by clicking on your first favorite.</string>
     <string name="favorite_onboarding_start">See the trip recap on the bottom? Now remove favorite by clicking on the &lt;3 icon.</string>
+    <string name="auto_bike_select_error">Couldn\'t find a bike :s ! Selected closest station.</string>
 </resources>

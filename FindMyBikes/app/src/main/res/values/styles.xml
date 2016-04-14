@@ -94,6 +94,22 @@
         <item name="borderWidth">0dp</item>
     </style>
 
+    <style name="trip_details_row">
+        <item name="android:layout_height">@dimen/trip_details_widget_row_height</item>
+        <item name="android:paddingTop">@dimen/trip_details_widget_row_PaddingTop</item>
+        <item name="android:paddingBottom">@dimen/trip_details_widget_row_PaddingBottom</item>
+    </style>
+
+    <style name="trip_details_row_imageview_start">
+        <item name="android:layout_marginRight">@dimen/trip_details_widget_row_imageview_start_marginRight</item>
+
+    </style>
+
+    <style name="trip_details_row_imageview_end">
+        <item name="android:layout_marginLeft">@dimen/trip_details_widget_row_imageview_end_marginLeft</item>
+
+    </style>
+
     <!-- on API < 21, this is used so that unselected single line items have same
     height as selected ones with fabs and their margins/paddings -->
     <style name="layout_compat_textview_minheight">

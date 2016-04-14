@@ -115,7 +115,8 @@ public class StationMapGfx {
     }
 
     public void hide() {
-        groundOverlay.setVisible(false);
+        if (groundOverlay != null)
+            groundOverlay.setVisible(false);
     }
 
     public void show(float _zoom) {
