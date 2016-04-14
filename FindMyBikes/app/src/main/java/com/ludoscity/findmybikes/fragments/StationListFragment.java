@@ -240,8 +240,8 @@ public class StationListFragment extends Fragment
 
         if (_station.getFree_bikes() <= DBHelper.getCriticalAvailabilityMax(getContext())){
 
-            mStationRecapAvailability.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.theme_accent));
-            mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.theme_primary_dark));
+            mStationRecapAvailability.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.station_recap_error));
+            mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.theme_textcolor_primary));
         }
         else if (_station.getFree_bikes() <= DBHelper.getBadAvailabilityMax(getContext()))
             mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.station_recap_yellow));

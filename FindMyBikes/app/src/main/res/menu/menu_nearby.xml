@@ -9,4 +9,9 @@
         app:showAsAction="ifRoom"
         android:title="@string/title_section_settings"
         android:icon="@drawable/ic_action_settings_24dp"/>
+
+    <item
+        android:id="@+id/legal_notices_menu_item"
+        app:showAsAction="never"
+        android:title="@string/title_legal"/>
 </menu>

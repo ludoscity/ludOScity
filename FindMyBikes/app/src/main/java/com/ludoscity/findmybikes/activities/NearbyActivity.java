@@ -86,6 +86,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.psdev.licensesdialog.LicensesDialog;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -559,6 +560,12 @@ public class NearbyActivity extends AppCompatActivity
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivityForResult(settingsIntent, SETTINGS_REQUEST_CODE);
                 return true;
+            case R.id.legal_notices_menu_item:
+                new LicensesDialog.Builder(this)
+                        .setNotices(R.raw.notices)
+                        .build()
+                        .show();
+
         }
         return super.onOptionsItemSelected(item);
     }

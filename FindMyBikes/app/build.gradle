@@ -16,8 +16,8 @@ android {
         applicationId "com.ludoscity.findmybikes"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 19
-        versionName "v2.0-beta RC2"
+        versionCode 20
+        versionName "v2.0"
 
         generatedDensities = []
     }
@@ -68,4 +68,6 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
 
     compile 'com.gordonwong:material-sheet-fab:1.2.1'
+
+    compile 'de.psdev.licensesdialog:licensesdialog:1.8.0'
 }
