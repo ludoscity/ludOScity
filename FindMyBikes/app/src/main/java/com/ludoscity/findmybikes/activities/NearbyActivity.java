@@ -773,6 +773,7 @@ public class NearbyActivity extends AppCompatActivity
             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, false);
         }
         else
+        //Crash if B is selected and user changed cities (not a typical use case)
             setupBTabSelection(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS).getId(), isLookingForBike());
 
         mRefreshTabs = false;
@@ -1824,6 +1825,7 @@ public class NearbyActivity extends AppCompatActivity
 
     public class FindNetworkTask extends AsyncTask<Void, Void, Map<String,String>> {
 
+        private static final String NEW_YORK_HUDSON_BIKESHARE_ID = "hudsonbikeshare-hoboken" ;
         String mOldBikeNetworkName = "";
 
         public FindNetworkTask(String _currentNetworkName){ mOldBikeNetworkName = _currentNetworkName; }
@@ -1918,6 +1920,10 @@ public class NearbyActivity extends AppCompatActivity
                 });
 
                 NetworkDesc closestNetwork = answerList.get(0);
+
+                if (closestNetwork.id.equalsIgnoreCase(NEW_YORK_HUDSON_BIKESHARE_ID)){
+                    closestNetwork = answerList.get(1);
+                }
 
                 //It seems we don't have a better candidate than the one we're presently using
                 if (closestNetwork.id.equalsIgnoreCase(DBHelper.getBikeNetworkId(NearbyActivity.this))){

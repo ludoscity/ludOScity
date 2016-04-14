@@ -51,10 +51,10 @@
     <string name="ok">OK</string>
     <string name="hello_city"><![CDATA[%1$sBonjour <b>%2$s</b> !]]></string>
     <string name="hello_travel">Il semble que vous avez voyagé.\u0020</string>
-    <string name="favorite_onboarding_complete">C\'est ainsi que fonctionnent les favoris. Maintenant, annulez B avec le \'X\' en bas à droite.</string>
-    <string name="onboarding_start">Laissez moi vous montrer. Pour commencer, cliquez sur votre premier favori.</string>
-    <string name="onboarding_complete">Et voilà ! Sélectionnez toujours B avec un favori, la recherche ou directement sur la carte.</string>
-    <string name="favorite_onboarding_start"><![CDATA[Vous voyez le récapitulatif du trajet en bas ? Maintenant supprimez le favori avec l\'icône <3.]]></string>
+    <string name="favorite_onboarding_complete">Voilà pour les favoris. Maintenant, annulez B avec le \'X\' en bas à droite.</string>
+    <string name="onboarding_start">Je vous montre. Pour commencer, cliquez sur votre premier favori.</string>
+    <string name="onboarding_complete">C\'est tout ! Sélectionnez B avec un favori, la recherche ou directement sur la carte.</string>
+    <string name="favorite_onboarding_start"><![CDATA[Récapitulatif du trajet en bas. Maintenant supprimez le favori avec l\'icône <3.]]></string>
     <string name="auto_bike_select_error">Je n\'ai pu localiser aucun vélo :s ! J\'ai sélectionné la station la plus proche.</string>
     <string name="title_legal">Mentions légales</string>
 </resources>
