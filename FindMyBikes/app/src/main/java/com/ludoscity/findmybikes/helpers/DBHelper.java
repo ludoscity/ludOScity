@@ -117,7 +117,7 @@ public class DBHelper {
                 cleared = true;
             }
 
-            if (!cleared && sharedPrefVersion <= 24 && currentVersionCode >= 25 ){
+            if (!cleared && sharedPrefVersion <= 24 && currentVersionCode >= 26 ){
                 //reworked appbar title and subtitle
                 editor.remove(PREF_CURRENT_BIKE_NETWORK_ID);
                 editor.remove(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_NAME, context));
