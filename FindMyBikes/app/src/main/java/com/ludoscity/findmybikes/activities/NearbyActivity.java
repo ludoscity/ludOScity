@@ -275,6 +275,7 @@ public class NearbyActivity extends AppCompatActivity
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
 
         //noinspection ConstantConditions
+        //get bikenetworkdesc from here and build string, possibly serializing on savedinstanceState
         getSupportActionBar().setTitle(getString(R.string.app_name));
         getSupportActionBar().setSubtitle(DBHelper.getBikeNetworkName(this));
 
@@ -376,6 +377,10 @@ public class NearbyActivity extends AppCompatActivity
     private void setupAutoselectBikeFab() {
         mAutoSelectBikeFab = (FloatingActionButton) findViewById(R.id.autoselect_closest_bike);
 
+        //Flipping this bool gives way to bike auto selection and found Snackbar animation
+        //TODO : BonPlatDePates. Spaghetti monster must be contained.
+        //In need an FSM of some kind. States being A selected Y/N B selected Y/N ....
+        //TODO: Think about it more
         mAutoSelectBikeFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1071,8 +1076,18 @@ public class NearbyActivity extends AppCompatActivity
                         getListPagerAdapter().setupBTabStationARecap(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS));
 
                         if (mStationMapFragment.getMarkerBVisibleLatLng() != null) {
-                            getListPagerAdapter().notifyStationAUpdate(mStationMapFragment.getMarkerALatLng());
+                            LatLng newALatLng = mStationMapFragment.getMarkerALatLng();
+                            getListPagerAdapter().notifyStationAUpdate(newALatLng);
                             hideSetupShowTripDetailsWidget();
+
+                            if ( (getListPagerAdapter().getClosestBikeLatLng().latitude != newALatLng.latitude) &&
+                                    (getListPagerAdapter().getClosestBikeLatLng().longitude != newALatLng.longitude) ){
+
+                                mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
+                                mAutoSelectBikeFab.show();
+                                animateCameraToShowUserAndStation(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS));
+
+                            }
                         }
                     }
                 } else {
@@ -1427,7 +1442,20 @@ public class NearbyActivity extends AppCompatActivity
                 if (isLookingForBike()) {
 
                     if (mStationMapFragment.getMarkerBVisibleLatLng() != null) {
-                        getListPagerAdapter().notifyStationAUpdate(mStationMapFragment.getMarkerALatLng());
+
+                        LatLng newALatLng = mStationMapFragment.getMarkerALatLng();
+                        getListPagerAdapter().notifyStationAUpdate(newALatLng);
+
+                        if ( (getListPagerAdapter().getClosestBikeLatLng().latitude != newALatLng.latitude) &&
+                                (getListPagerAdapter().getClosestBikeLatLng().longitude != newALatLng.longitude) ){
+
+                            mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
+                            mAutoSelectBikeFab.show();
+                            animateCameraToShowUserAndStation(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS));
+
+                        }
+
+
                         hideSetupShowTripDetailsWidget();
                     }
 
