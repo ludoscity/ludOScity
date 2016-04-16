@@ -939,7 +939,14 @@ public class NearbyActivity extends AppCompatActivity
                         }
 
                         //Bug on older API levels. Dismissing by hand fixes it.
-                        mFindBikesSnackbar.dismiss();
+                        // First biggest bug happened here. Putting defensive code
+                        //TODO: investigate how state is maintained, Snackbar is destroyed by framework on screen orientation change
+                        //TODO: Refactor this spgathetti is **TOP** priosity
+                        //and probably long background state.
+                        if (mFindBikesSnackbar != null){
+
+                            mFindBikesSnackbar.dismiss();
+                        }
 
                         Handler handler = new Handler();
 
@@ -974,7 +981,10 @@ public class NearbyActivity extends AppCompatActivity
                                     setupFavoriteListFeedback(favoriteList.isEmpty());
                                     mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
-                                    mFindBikesSnackbar.dismiss();
+                                    if (mFindBikesSnackbar != null){
+
+                                        mFindBikesSnackbar.dismiss();
+                                    }
 
                                     Handler snackbarHandler = new Handler();
                                     snackbarHandler.postDelayed(new Runnable() {
