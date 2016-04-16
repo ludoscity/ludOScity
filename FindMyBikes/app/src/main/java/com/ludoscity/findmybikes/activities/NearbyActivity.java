@@ -274,10 +274,22 @@ public class NearbyActivity extends AppCompatActivity
         setContentView(R.layout.activity_nearby);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
 
+        String hashtagable_bikeNetworkName = DBHelper.getBikeNetworkName(this);
+        hashtagable_bikeNetworkName = hashtagable_bikeNetworkName.replaceAll("\\s","");
+        hashtagable_bikeNetworkName = hashtagable_bikeNetworkName.toLowerCase();
         //noinspection ConstantConditions
-        //get bikenetworkdesc from here and build string, possibly serializing on savedinstanceState
-        getSupportActionBar().setTitle(getString(R.string.app_name));
-        getSupportActionBar().setSubtitle(DBHelper.getBikeNetworkName(this));
+        getSupportActionBar().setTitle(Html.fromHtml(String.format(getResources().getString(R.string.appbar_title_formatting),
+                getResources().getString(R.string.appbar_title_prefix),
+                hashtagable_bikeNetworkName,
+                getResources().getString(R.string.appbar_title_postfix))));
+        //doesn't scale well, but just a little touch for my fellow Montréalers
+        String city_hasgtag = "";
+        String bikeNetworkCity = DBHelper.getBikeNetworkCity(this);
+        if (bikeNetworkCity.contains(", QC")){
+            city_hasgtag = " #mtlvi";
+        }
+        String hastagedEnhanced_bikeNetworkCity = bikeNetworkCity + city_hasgtag;
+        getSupportActionBar().setSubtitle(Html.fromHtml(String.format(getResources().getString(R.string.appbar_subtitle_formatted), hastagedEnhanced_bikeNetworkCity)));
 
         // Update Bar
         mStatusTextView = (TextView) findViewById(R.id.status_textView);

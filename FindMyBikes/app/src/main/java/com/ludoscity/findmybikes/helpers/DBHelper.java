@@ -61,6 +61,7 @@ public class DBHelper {
     private static final String PREF_SUFFIX_WEBTASK_LAST_TIMESTAMP_MS = "_last_refresh_timestamp";
     private static final String PREF_SUFFIX_NETWORK_NAME = "_network_name";
     private static final String PREF_SUFFIX_NETWORK_HREF = "_network_href";
+    private static final String PREF_SUFFIX_NETWORK_CITY = "_network_city";
     private static final String PREF_SUFFIX_NETWORK_BOUNDS_SW_LATITUDE = "_network_bounds_sw_lat";
     private static final String PREF_SUFFIX_NETWORK_BOUNDS_SW_LONGITUDE = "_network_bounds_sw_lng";
     private static final String PREF_SUFFIX_NETWORK_BOUNDS_NE_LATITUDE = "_network_bounds_ne_lat";
@@ -114,6 +115,15 @@ public class DBHelper {
                 editor.clear();
                 editor.commit(); //I do want commit and not apply
                 cleared = true;
+            }
+
+            if (!cleared && sharedPrefVersion <= 23 && currentVersionCode >= 24 ){
+                //reworked appbar title and subtitle
+                editor.remove(PREF_CURRENT_BIKE_NETWORK_ID);
+                editor.remove(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_NAME, context));
+                editor.remove(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_HREF, context));
+                editor.remove(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_CITY, context));
+                editor.apply();
             }
 
             editor.putInt(SHARED_PREF_VERSION_CODE, currentVersionCode);
@@ -187,6 +197,12 @@ public class DBHelper {
                 .getString(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_HREF, ctx), "/v2/networks/bixi-montreal");
     }
 
+    public static String getBikeNetworkCity(Context _ctx) {
+
+        return _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE)
+                .getString(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_CITY, _ctx), "");
+    }
+
     public static void saveBikeNetworkDesc(NetworkDesc networkDesc, Context ctx){
 
         SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
@@ -199,6 +215,7 @@ public class DBHelper {
 
         editor.putString(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_NAME, ctx), networkDesc.name);
         editor.putString(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_HREF, ctx), networkDesc.href);
+        editor.putString(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_CITY, ctx), networkDesc.location.city);
 
         editor.apply();
     }

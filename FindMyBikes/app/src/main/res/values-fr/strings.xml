@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Vélocalise</string>
+    <string name="app_name">#vélocalise</string>
     <string name="favorites_sheet_header">Favoris - &lt;b>%1$s&lt;/b></string>
     <string name="title_section_settings">Paramètres</string>
     <string name="title_section_nearby">À proximité</string>
@@ -57,4 +57,7 @@
     <string name="favorite_onboarding_start"><![CDATA[Récapitulatif du trajet en bas. Maintenant supprimez le favori avec l\'icône <3.]]></string>
     <string name="auto_bike_select_error">Je n\'ai pu localiser aucun vélo :s ! J\'ai sélectionné la station la plus proche.</string>
     <string name="title_legal">Mentions légales</string>
+    <string name="appbar_title_postfix"></string>
+    <string name="appbar_title_prefix">#vélocalise</string>
+    <string name="appbar_subtitle_formatted"><![CDATA[<i>à %1$s</b>]]></string>
 </resources>

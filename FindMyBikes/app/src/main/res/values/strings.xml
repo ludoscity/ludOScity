@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name">FindMyBikes</string>
+    <string name="app_name">#findmybikes</string>
+    <string name="appbar_title_formatting" translatable="false">%1$s&lt;u>%2$s&lt;/u>%3$s</string>
+    <string name="appbar_title_prefix">#findmy</string>
+    <string name="appbar_title_postfix">bikes</string>
+    <string name="appbar_subtitle_formatted">&lt;i>in %1$s&lt;/b></string>
     <string name="favorites_sheet_header">Favorites - &lt;b>%1$s&lt;/b></string>
     <string name="title_section_nearby">Nearby</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
