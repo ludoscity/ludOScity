@@ -1015,7 +1015,8 @@ public class NearbyActivity extends AppCompatActivity
                             for(StationItem station : mStationsNetwork) {
                                 if (!station.getId().equalsIgnoreCase(stationA.getId())) {
 
-                                    station.setFavorite(true, NearbyActivity.this);
+                                    //station.setFavorite(true, NearbyActivity.this); //We want to manipulate everything, hence go directly to DBHelper
+                                    DBHelper.updateFavorite(true, station.getId(), getResources().getString(R.string.onboarding_favorite_name), false, NearbyActivity.this);
                                     ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(NearbyActivity.this);
                                     setupFavoriteListFeedback(favoriteList.isEmpty());
                                     mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
@@ -2274,6 +2275,7 @@ public class NearbyActivity extends AppCompatActivity
             //switch progressbar view visibility
 
             getListPagerAdapter().setRefreshingAll(false);
+            mClosestBikeAutoSelected = false;
 
             //Removed this Toast as progressBar AND updated textView with time in minutes already convey the idea
             //Maybe have a toast if it was NOT a success
