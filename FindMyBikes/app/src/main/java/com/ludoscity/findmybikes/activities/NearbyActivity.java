@@ -28,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -499,6 +500,25 @@ public class NearbyActivity extends AppCompatActivity
 
     private void setupFavoriteSheet() {
 
+        //ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+        //        ItemTouchHelper.LEFT) {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback( 0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+                FavoriteRecyclerViewAdapter.FavoriteListItemViewHolder favViewHolder = (FavoriteRecyclerViewAdapter.FavoriteListItemViewHolder)viewHolder;
+
+                removeFavorite(getStation(favViewHolder.getStationId()), true);
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+
         RecyclerView favoriteRecyclerView = (RecyclerView) findViewById(R.id.favorites_sheet_recyclerview);
 
         favoriteRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
@@ -510,6 +530,8 @@ public class NearbyActivity extends AppCompatActivity
         setupFavoriteListFeedback(favoriteList.isEmpty());
         mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
         favoriteRecyclerView.setAdapter(mFavoriteRecyclerViewAdapter);
+
+        itemTouchHelper.attachToRecyclerView(favoriteRecyclerView);
     }
 
     private void setupFavoriteListFeedback(boolean _noFavorite) {
@@ -1431,6 +1453,20 @@ public class NearbyActivity extends AppCompatActivity
         }
 
         return toReturn;
+    }
+
+    private StationItem getStation(String _stationId){
+        StationItem toReturn = null;
+
+        for(StationItem station : mStationsNetwork){
+            if (station.getId().equalsIgnoreCase(_stationId)){
+                toReturn = station;
+                break;
+            }
+        }
+
+        return toReturn;
+
     }
 
     private void cancelDownloadWebTask() {

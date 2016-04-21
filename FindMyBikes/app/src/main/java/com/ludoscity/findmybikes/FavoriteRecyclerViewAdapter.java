@@ -72,6 +72,8 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         boolean mEditing = false;
         String mNameBuffer;
 
+        public String getStationId(){ return mStationId; }
+
         public FavoriteListItemViewHolder(View itemView) {
             super(itemView);
 
