@@ -284,12 +284,12 @@ public class NearbyActivity extends AppCompatActivity
                 hashtagable_bikeNetworkName,
                 getResources().getString(R.string.appbar_title_postfix))));
         //doesn't scale well, but just a little touch for my fellow Montréalers
-        String city_hasgtag = "";
+        String city_hashtag = "";
         String bikeNetworkCity = DBHelper.getBikeNetworkCity(this);
         if (bikeNetworkCity.contains(", QC")){
-            city_hasgtag = " #mtlvi";
+            city_hashtag = " @mtlvi";
         }
-        String hastagedEnhanced_bikeNetworkCity = bikeNetworkCity + city_hasgtag;
+        String hastagedEnhanced_bikeNetworkCity = bikeNetworkCity + city_hashtag;
         getSupportActionBar().setSubtitle(Html.fromHtml(String.format(getResources().getString(R.string.appbar_subtitle_formatted), hastagedEnhanced_bikeNetworkCity)));
 
         // Update Bar
