@@ -90,6 +90,8 @@ import java.util.Map;
 import de.psdev.licensesdialog.LicensesDialog;
 import retrofit2.Call;
 import retrofit2.Response;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
 
 /**
  * Created by F8Full on 2015-07-26.
@@ -1483,6 +1485,8 @@ public class NearbyActivity extends AppCompatActivity
 
         if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
         {
+            new UpdateTwitterStatus().execute("soon smart");
+
             if(isLookingForBike() && mStationMapFragment.getMarkerBVisibleLatLng() != null ||
                     !isLookingForBike()) {
                 //if null, means the station was clicked twice, hence unchecked
@@ -2155,6 +2159,25 @@ public class NearbyActivity extends AppCompatActivity
                 mFindNetworkTask = new FindNetworkTask(DBHelper.getBikeNetworkName(NearbyActivity.this));
                 mFindNetworkTask.execute();
             }
+        }
+    }
+
+    public class UpdateTwitterStatus extends AsyncTask<String, Void, Void>{
+
+        @Override
+        protected Void doInBackground(String... params) {
+            Twitter api = ((RootApplication) getApplication()).getTwitterApi();
+            try {
+                twitter4j.Status truc = api.updateStatus(params[0]);
+                int i=0;
+                ++i;
+
+            } catch (TwitterException e) {
+                //Exception raised on duplicate, contains "403"
+                Log.d("TAG", "oops", e);
+            }
+
+            return null;
         }
     }
 
