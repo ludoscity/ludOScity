@@ -18,14 +18,14 @@ Anyone else, including you, could come up with some idea to use it.
 Data is tweeted **when the station closest to you doesn't provide service**. When that happen, #ludOS publishes
 a status update through [@findmybikesdata]. This tweet mentions what was the closest station **that could provide you service**.
 
-    #findmybixibikes bike is not closest! Bikes:X #BAD at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID ~XXmin walk stationnamestationnamestation #deduplicateZ
-sample *#findmybixibikes bike is not closest! Bikes:7 #BAD at f132843c3c740cce6760167985bc4d17 ~2min walk Brébeuf / Laurier #deduplicate0*
+    #findmybixibikes bike is not closest! Bikes:X BAD at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID ~XXmin walk stationnamestationnamestation #deduplicateZ
+sample *#findmybixibikes bike is not closest! Bikes:7 BAD at f132843c3c740cce6760167985bc4d17 ~2min walk Brébeuf / Laurier #deduplicate0*
 
 If some stations were discarded in the selection process (because they'd be closer but could not provide service either)
 Tweet replies are generated, providing more details on discarded stations
 
-    #findmybixibikes discarded closer! Bikes:Y #CRI at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID stationnamestationnamestationnamestationnamestationnam
-sample *#findmyvlovbikes discarded closer! Bikes:0 #CRI at 962c34a494d29737aa7c534f85566949 10102 - DOUA / G. BERGER*
+    #findmybixibikes discarded closer! Bikes:Y CRI at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID stationnamestationnamestationnamestationnamestationnam
+sample *#findmyvlovbikes discarded closer! Bikes:0 CRI at 962c34a494d29737aa7c534f85566949 10102 - DOUA / G. BERGER*
 
 All status updates (root or replies) are geotagged with the location of the described station.
 
