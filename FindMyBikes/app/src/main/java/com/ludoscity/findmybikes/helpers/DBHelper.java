@@ -191,6 +191,17 @@ public class DBHelper {
                 .getString(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_NAME, ctx), "");
     }
 
+    public static String getHashtaggableNetworkName(Context _ctx){
+
+        String hashtagable_bikeNetworkName = getBikeNetworkName(_ctx);
+        hashtagable_bikeNetworkName = hashtagable_bikeNetworkName.replaceAll("\\s","");
+        hashtagable_bikeNetworkName = hashtagable_bikeNetworkName.replaceAll("[^A-Za-z0-9 ]", "");
+        hashtagable_bikeNetworkName = hashtagable_bikeNetworkName.toLowerCase();
+
+        return hashtagable_bikeNetworkName;
+
+    }
+
     public static String getBikeNetworkHRef(Context ctx){
 
         return ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE)
@@ -338,6 +349,40 @@ public class DBHelper {
         //doc.putProperties(new Gson().<Map<String, Object>>fromJson(new Gson().toJson(toSave), new TypeToken<HashMap<String, Object>>() {
         //}.getType()));
         //mGotTracks = true; // mGotTracks = !getAllTracks().isEmpty(); in init()
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //!!! DANGER ZONE !!!
+    //This method cannot be completely trusted as of yet, because db update algorithm is too violent
+    //TODO: Rework saving algorithm.
+    //current method of dropping / recreating everything leads to some big troubles
+    //NO CLIENT FOR NOW
+    public static StationItem getStation(final String _stationId){
+
+        StationItem toReturn = null;
+
+        Document stationDoc = getStationFromId(_stationId);
+
+        if (stationDoc != null && stationDoc.getProperties() != null){
+            toReturn = createStationItem(stationDoc);
+        }
+
+        return toReturn;
+    }
+
+
+    private static Document getStationFromId(String _stationId) {
+
+        Document toReturn = null;
+        // retrieve the document from the database
+        //from : http://developer.couchbase.com/documentation/mobile/current/develop/training/build-first-android-app/do-crud/index.html
+        try {
+            toReturn = mManager.getDatabase(mSTATIONS_DB_NAME).getDocument(_stationId);
+        } catch (CouchbaseLiteException e) {
+            Log.d("DBHelper", "Couldn't retrieve a station document from id", e);
+        }
+
+        return toReturn;
     }
 
     public static List<QueryRow> getAllTracks() throws CouchbaseLiteException {

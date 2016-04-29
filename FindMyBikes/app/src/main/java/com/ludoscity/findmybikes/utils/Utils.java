@@ -21,8 +21,11 @@ import android.view.View;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by F8Full on 2015-04-30.
@@ -30,6 +33,81 @@ import java.math.BigDecimal;
  * Class with static utilities
  */
 public class Utils {
+
+    public static String extractClosestAvailableStationIdFromProcessedString(String _processedString){
+
+        //int debug0 = _processedString.indexOf(StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX);
+        //int debug1 = StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length();
+        //int debug2 = _processedString.length();
+
+
+        //Either a station id followed by AVAILABILITY_AOK_
+        //or
+        //a station id followed by AVAILABILITY_BAD_
+        //or
+        //a station id followed by AVAILABILITY_LCK_
+
+        //extract only first id
+
+        return extractOrderedStationIdsFromProcessedString(_processedString).get(0).substring(0, 32);
+
+
+
+
+
+
+        //everything went AOK
+        /*if (_processedString.indexOf(StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX) != -1 &&
+                _processedString.indexOf(StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX) + StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length() ==
+                        _processedString.length()){
+
+            return _processedString.substring(0, _processedString.length() - StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length() );
+
+        }
+        else {
+            int debug3 = _processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE);
+
+            //some availability troubles, let's just trim the end
+            return _processedString.substring(0, _processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE));
+        }*/
+    }
+
+    //citybik.es Ids, ordered by distance
+    //get(0) is the id of the selected station with AOK availability
+    public static List<String> extractOrderedStationIdsFromProcessedString(String _processedString){
+
+        //int startSequenceIdx = _processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE);
+
+        int subStringStarIdxDebug = _processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE)
+                + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length();
+
+        String subStringDebug = _processedString.substring(_processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE)
+                + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length());
+
+
+        String debugSplit = _processedString.substring(_processedString.indexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE)
+                        + StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length());
+
+        //String[] debugSplitResult = debugSplit.split(String.format("(?<=\\G.{%d})", StationRecyclerViewAdapter.CRITICAL_AVAILABILITY_POSTFIX.length() + 32));
+
+        List<String> toReturn = new ArrayList<>();
+        toReturn.add(_processedString.substring(0,32 + StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length() ));
+
+        toReturn.addAll(splitEqually(debugSplit, StationRecyclerViewAdapter.CRITICAL_AVAILABILITY_POSTFIX.length() + 32));
+
+        return toReturn;
+    }
+
+    private static List<String> splitEqually(String text, int size) {
+        // Give the list the right capacity to start with. You could use an array
+        // instead if you wanted.
+        List<String> ret = new ArrayList<String>((text.length() + size - 1) / size);
+
+        for (int start = 0; start < text.length(); start += size) {
+            ret.add(text.substring(start, Math.min(text.length(), start + size)));
+        }
+        return ret;
+    }
 
     //workaround from https://code.google.com/p/gmaps-api-issues/issues/detail?id=9011
     public static BitmapDescriptor getBitmapDescriptor(Context ctx, int id) {
@@ -79,7 +157,7 @@ public class Utils {
     public static float getPercentResource(Context _ctx, int _resId, boolean _rounded){
         TypedValue valueContainer = new TypedValue();
         _ctx.getResources().getValue(_resId, valueContainer, true);
-        float toReturn = valueContainer.getFraction(1, 1);http://stackoverflow.com/questions/11734470/how-does-one-use-resources-getfraction
+        float toReturn = valueContainer.getFraction(1, 1);//http://stackoverflow.com/questions/11734470/how-does-one-use-resources-getfraction
 
         if (_rounded)
             toReturn = Utils.round(toReturn,2);
