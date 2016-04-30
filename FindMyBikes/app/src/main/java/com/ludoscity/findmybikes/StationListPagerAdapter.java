@@ -92,17 +92,27 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         retrieveListFragment(DOCK_STATIONS).notifyDatasetChangedToRecyclerView();
     }
 
-    public String highlightClosestStationWithAvailability(boolean _lookingForBike){
+    public String retrieveClosestRawIdAndAvailability(boolean _lookingForBike){
         String toReturn = null;
 
         if (isViewPagerReady()){
             if (_lookingForBike)
-                toReturn = retrieveListFragment(BIKE_STATIONS).highlightClosestStationWithAvailability(true);
+                toReturn = retrieveListFragment(BIKE_STATIONS).retrieveClosestRawIdAndAvailability(true);
             else
-                toReturn = retrieveListFragment(DOCK_STATIONS).highlightClosestStationWithAvailability(false);
+                toReturn = retrieveListFragment(DOCK_STATIONS).retrieveClosestRawIdAndAvailability(false);
         }
 
         return toReturn;
+    }
+
+    public void highlightStationforId(boolean _lookingForBike, String _stationId){
+
+        if (isViewPagerReady()){
+            if (_lookingForBike)
+                retrieveListFragment(BIKE_STATIONS).highlightStation(_stationId);
+            else
+                retrieveListFragment(DOCK_STATIONS).highlightStation(_stationId);
+        }
     }
 
     public boolean isRecyclerViewReadyForItemSelection(int pageID){

@@ -22,6 +22,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -68,6 +69,7 @@ import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.RootApplication;
 import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.StationListPagerAdapter;
+import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
 import com.ludoscity.findmybikes.citybik_es.Citybik_esAPI;
 import com.ludoscity.findmybikes.citybik_es.model.ListNetworksAnswerRoot;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
@@ -85,11 +87,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.psdev.licensesdialog.LicensesDialog;
 import retrofit2.Call;
 import retrofit2.Response;
+import twitter4j.GeoLocation;
+import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
@@ -117,6 +122,7 @@ public class NearbyActivity extends AppCompatActivity
     private DownloadWebTask mDownloadWebTask = null;
     private RedrawMarkersTask mRedrawMarkersTask = null;
     private FindNetworkTask mFindNetworkTask = null;
+    private UpdateTwitterStatusTask mUpdateTwitterTask = null;
 
     private ArrayList<StationItem> mStationsNetwork = new ArrayList<>();
 
@@ -277,13 +283,11 @@ public class NearbyActivity extends AppCompatActivity
         setContentView(R.layout.activity_nearby);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
 
-        String hashtagable_bikeNetworkName = DBHelper.getBikeNetworkName(this);
-        hashtagable_bikeNetworkName = hashtagable_bikeNetworkName.replaceAll("\\s","");
-        hashtagable_bikeNetworkName = hashtagable_bikeNetworkName.toLowerCase();
+
         //noinspection ConstantConditions
         getSupportActionBar().setTitle(Html.fromHtml(String.format(getResources().getString(R.string.appbar_title_formatting),
                 getResources().getString(R.string.appbar_title_prefix),
-                hashtagable_bikeNetworkName,
+                DBHelper.getHashtaggableNetworkName(this),
                 getResources().getString(R.string.appbar_title_postfix))));
         //doesn't scale well, but just a little touch for my fellow Montréalers
         String city_hashtag = "";
@@ -491,7 +495,7 @@ public class NearbyActivity extends AppCompatActivity
             }
         } else if (requestCode == SETTINGS_REQUEST_CODE){
 
-            getListPagerAdapter().highlightClosestStationWithAvailability(true);
+            getListPagerAdapter().highlightStationforId(true, Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(true)));
             getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, isAppBarExpanded());
 
             mRefreshMarkers = true;
@@ -942,7 +946,10 @@ public class NearbyActivity extends AppCompatActivity
                             !mClosestBikeAutoSelected &&
                             getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.BIKE_STATIONS)){
 
-                        getListPagerAdapter().highlightClosestStationWithAvailability(true);
+                        //Requesting raw string with availability
+                        String rawClosest = getListPagerAdapter().retrieveClosestRawIdAndAvailability(true);
+                        getListPagerAdapter().highlightStationforId(true, Utils.extractClosestAvailableStationIdFromProcessedString(rawClosest));
+
                         getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, isAppBarExpanded());
                         final StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
                         mStationMapFragment.setPinOnStation(true, closestBikeStation.getId());
@@ -1044,6 +1051,16 @@ public class NearbyActivity extends AppCompatActivity
                         }
 
                         mClosestBikeAutoSelected = true;
+                        //launch twitter task if not already running, pass it the raw String
+                        if ( Utils.Connectivity.isConnected(getApplicationContext()) && //data network available
+                                mUpdateTwitterTask == null &&   //not already tweeting
+                                rawClosest.length() > 32 + StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length() && //there was trouble
+                                difference < NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.outdated_data_warning_time_min) * 60 * 1000){ //data is fresh enough
+
+                            mUpdateTwitterTask = new UpdateTwitterStatusTask(mStationsNetwork);
+                            mUpdateTwitterTask.execute(rawClosest);
+
+                        }
                     }
 
                     //Checking if station is closest bike
@@ -1204,7 +1221,7 @@ public class NearbyActivity extends AppCompatActivity
                                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                         } else {
                             getListPagerAdapter().hideStationRecap(StationListPagerAdapter.DOCK_STATIONS);
-                            mStationMapFragment.setPinOnStation(false, getListPagerAdapter().highlightClosestStationWithAvailability(false));
+                            mStationMapFragment.setPinOnStation(false, Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(false)));
                             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, true);
                             if(!_silent)
                                 animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
@@ -1485,8 +1502,6 @@ public class NearbyActivity extends AppCompatActivity
 
         if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
         {
-            new UpdateTwitterStatus().execute("soon smart");
-
             if(isLookingForBike() && mStationMapFragment.getMarkerBVisibleLatLng() != null ||
                     !isLookingForBike()) {
                 //if null, means the station was clicked twice, hence unchecked
@@ -1803,12 +1818,10 @@ public class NearbyActivity extends AppCompatActivity
 
     private boolean isStationAClosestBike(){
 
-        LatLng ALatLng = mStationMapFragment.getMarkerALatLng();
-        LatLng closestBikeLatLng = getListPagerAdapter().getClosestBikeLatLng();
+        String stationAId = mStationMapFragment.getMarkerAStationId();
+        String closestBikeId = Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(true));
 
-        return closestBikeLatLng != null &&
-                ALatLng.latitude == closestBikeLatLng.latitude &&
-                ALatLng.longitude == closestBikeLatLng.longitude;
+        return stationAId.equalsIgnoreCase(closestBikeId);
     }
 
     @Override
@@ -2162,22 +2175,196 @@ public class NearbyActivity extends AppCompatActivity
         }
     }
 
-    public class UpdateTwitterStatus extends AsyncTask<String, Void, Void>{
+    public class UpdateTwitterStatusTask extends AsyncTask<String, Void, Void>{
+
+        private static final int NEW_STATUS_STATION_NAME_MAX_LENGTH = 29;
+        private static final int REPLY_STATION_NAME_MAX_LENGTH = 54;
+
+        private Map<String, StationItem> mTrustedEfficientMap;
+
+        public UpdateTwitterStatusTask(List<StationItem> _stationsNetwork){
+
+            mTrustedEfficientMap = new HashMap<>();
+
+            //first, build an efficient map of stations from stationnetwork
+            //because I don't trust the DBHelper.getStationForId just yet
+            //TODO: reowrk database code to use versioning
+            for (StationItem station : mStationsNetwork){
+                mTrustedEfficientMap.put(station.getId(), station);
+            }
+        }
 
         @Override
         protected Void doInBackground(String... params) {
-            Twitter api = ((RootApplication) getApplication()).getTwitterApi();
-            try {
-                twitter4j.Status truc = api.updateStatus(params[0]);
-                int i=0;
-                ++i;
 
-            } catch (TwitterException e) {
-                //Exception raised on duplicate, contains "403"
-                Log.d("TAG", "oops", e);
+            Twitter api = ((RootApplication) getApplication()).getTwitterApi();
+
+
+            //Extract all stations from raw string
+            //if only one station, call updateStatus with intended one and selected one + deduplication
+            //if multiple stations, post selected one first and then all other in replies
+            //////////////////////////////////////////////////////////////////////////////////////
+            //FORMAT -- ROOT STATUS
+            /*#findmybixibikes bike is not closest! Bikes:X #BAD at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID ~XXmin walk stationnamestationnamestation #deduplicateZ
+              #findmybixibikes bike is not closest! Bikes:XX #AOK at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID ~XXmin walk stationnamestationnamestatio #deduplicateZ
+
+              -- REPLIES
+              #findmybixibikes discarded closer! Bikes:Y #CRI at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID stationnamestationnamestationnamestationnamestationnam
+              #findmybixibikes discarded closer! Bikes:Y #LCK at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID stationnamestationnamestationnamestationnamestationnam
+
+              */
+            String systemHashtag = getResources().getString(R.string.appbar_title_prefix) +
+                    DBHelper.getHashtaggableNetworkName(NearbyActivity.this) + //must be hastagable
+                    getResources().getString(R.string.appbar_title_postfix);
+            int selectedNbBikes = -1;
+            String selectedBadorAok = "BAD";    //hashtagged
+            String selectedStationId = "";
+            String selectedProximityString = "XXmin";
+            String selectedStationName = "Laurier / De Lanaudière";
+            int newStatusStationNameMaxLength = NEW_STATUS_STATION_NAME_MAX_LENGTH;
+            String deduplicate = "deduplicate";    //hashtagged
+
+            //Pair of station id and availability code (always 'CRI' as of now)
+            List<Pair<String,String>> discardedStations = new ArrayList<>();
+
+            StationItem selectedStation = null;
+            List<String> extracted = Utils.extractOrderedStationIdsFromProcessedString(params[0]);
+
+
+            for (String e : extracted)
+            {
+                //e could be either : f132843c3c740cce6760167985bc4d17AVAILABILITY_BAD_ (selected station)
+                //or AVAILABILITY_CRI_92d97d6adec177649b366c36f3e8e2ff for subsequent discarded stations
+
+                if (e.indexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE) != 0){
+                    //f132843c3c740cce6760167985bc4d17AVAILABILITY_BAD_ or
+                    //f132843c3c740cce6760167985bc4d17AVAILABILITY_AOK_
+
+                    selectedStationId = e.substring(0,32);
+                    selectedBadorAok = e.substring(32 + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() ,
+                            32 + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() + 3); //'BAD' oe 'AOK'
+
+                    selectedStation = mTrustedEfficientMap.get(selectedStationId);
+
+                    selectedNbBikes = selectedStation.getFree_bikes();
+
+                    selectedProximityString = selectedStation.getProximityStringFromLatLng(mCurrentUserLatLng,
+                            false, getResources().getInteger(R.integer.average_walking_speed_kmh), NearbyActivity.this);
+
+
+                    int maxStationNameIdx = 138 - (deduplicate.length()+" ".length()
+                            + " walk ".length()
+                            + selectedProximityString.length()
+                            + " ".length()
+                            + 32
+                            + " at ".length()
+                            + selectedBadorAok.length()
+                            + " #".length()
+                            + Integer.toString(selectedNbBikes).length()
+                            + " bike is not closest! Bikes:".length()
+                            + systemHashtag.length());
+
+                    selectedStationName = selectedStation.getName().substring(0, Math.min(selectedStation.getName().length(), maxStationNameIdx));
+                }
+                else { //AVAILABILITY_CRI_92d97d6adec177649b366c36f3e8e2ff
+
+                    Pair<String, String> discarded = new Pair<>(e.substring(e.length()-32), e.substring(
+                            StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length(),
+                            StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() + 3
+                    ));
+
+                    discardedStations.add(discarded);
+
+
+
+                }
+
+            }
+
+            int deduplicateCounter = 0;
+
+            deduplicate = deduplicate + deduplicateCounter;
+
+            String newStatusString = String.format(getResources().getString(R.string.twitter_not_closest_bike_data_format),
+                    systemHashtag, selectedNbBikes, selectedBadorAok, selectedStationId, selectedProximityString, selectedStationName, deduplicate);
+
+            StatusUpdate newStatus = new StatusUpdate(newStatusString);
+            //noinspection ConstantConditions
+            newStatus.displayCoordinates(true).location(new GeoLocation(selectedStation.getPosition().latitude, selectedStation.getPosition().longitude));
+
+            boolean deduplicationDone = false;
+
+
+            while (!deduplicationDone){
+
+                //post status before adding replies
+                try {
+                    //can be interrupted here (duplicate)
+                    twitter4j.Status answerStatus = api.updateStatus(newStatus);
+
+                    long replyToId = answerStatus.getId();
+
+                    List<StatusUpdate> replies = new ArrayList<>();
+
+                    for (Pair<String, String> discarded : discardedStations ){
+                        StationItem discardedStationItem = mTrustedEfficientMap.get(discarded.first);
+
+                        String replyStatusString = String.format(getResources().getString(R.string.twitter_closer_discarded_reply_data_format),
+                                systemHashtag, discardedStationItem.getFree_bikes(), discarded.second, discarded.first,
+                                discardedStationItem.getName().substring(0, Math.min(discardedStationItem.getName().length(), REPLY_STATION_NAME_MAX_LENGTH)));
+
+                        StatusUpdate replyStatus = new StatusUpdate(replyStatusString);
+
+                        replyStatus.inReplyToStatusId(replyToId)
+                                .displayCoordinates(true)
+                                .location(new GeoLocation(discardedStationItem.getPosition().latitude, discardedStationItem.getPosition().longitude));
+
+                        //that can also raise exception
+                        api.updateStatus(replyStatus);
+
+                    }
+
+                    deduplicationDone = true;
+
+
+                } catch (TwitterException e) {
+                    String errorMessage = e.getErrorMessage();
+                    if (errorMessage.contains("Status is a duplicate.")){
+                        ++deduplicateCounter;
+
+                        deduplicate = "deduplicate" + deduplicateCounter;
+
+                        newStatusString = String.format(getResources().getString(R.string.twitter_not_closest_bike_data_format),
+                                systemHashtag, selectedNbBikes, selectedBadorAok, selectedStationId, selectedProximityString, selectedStationName, deduplicate);
+
+                        newStatus = new StatusUpdate(newStatusString);
+                        //noinspection ConstantConditions
+                        newStatus.displayCoordinates(true).location(new GeoLocation(selectedStation.getPosition().latitude, selectedStation.getPosition().longitude));
+
+                        Log.d("TwitterUpdate", "TwitterUpdate duplication -- deduplicating now", e);
+
+                    }
+                    String message = e.getMessage();
+
+                }
+
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            mUpdateTwitterTask = null;
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+            mUpdateTwitterTask = null;
         }
     }
 

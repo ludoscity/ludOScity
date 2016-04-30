@@ -31,6 +31,12 @@ import static android.support.v7.widget.RecyclerView.NO_POSITION;
  */
 public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecyclerViewAdapter.StationListItemViewHolder> {
 
+    public static final String AVAILABILITY_POSTFIX_START_SEQUENCE = "AVAILABILITY_";
+    public static final String AOK_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "AOK_";
+    public static final String BAD_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "BAD_";
+    public static final String CRITICAL_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "CRI_";
+    public static final String LOCKED_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "LCK_";
+
     private ArrayList<StationItem> mStationList = new ArrayList<>();
     private LatLng mDistanceSortReferenceLatLng;
     private LatLng mDistanceDisplayReferenceLatLng;
@@ -376,39 +382,85 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             notifyItemChanged(selectedBefore);
     }
 
-    private StationItem getClosestStationItemWithAvailability(boolean _lookingForBike){
+    private String getClosestStationIdWithAvailability(boolean _lookingForBike){
 
-        StationItem toReturn = null;
+        StringBuilder availabilityDataPostfixBuilder = new StringBuilder("");
 
-        for (StationItem stationItem: mStationList){
+        for (StationItem stationItem: mStationList){ //mStationList is SORTED BY DISTANCE
             if (_lookingForBike) {
-                if (!stationItem.isLocked())
+                if (!stationItem.isLocked()) {
+
                     if (stationItem.getFree_bikes() > DBHelper.getCriticalAvailabilityMax(mCtx)) {
-                        toReturn = stationItem;
+
+                        if (stationItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(mCtx)){
+
+                            availabilityDataPostfixBuilder.insert(0, stationItem.getId() + BAD_AVAILABILITY_POSTFIX);
+                        }
+                        else{
+                            availabilityDataPostfixBuilder.insert(0, stationItem.getId() + AOK_AVAILABILITY_POSTFIX);
+                        }
+
                         break;
                     }
+                    else{
+                        availabilityDataPostfixBuilder.append(CRITICAL_AVAILABILITY_POSTFIX)
+                                .append(stationItem.getId());
+                    }
+                }
+                else {
+                    availabilityDataPostfixBuilder.append(LOCKED_AVAILABILITY_POSTFIX)
+                            .append(stationItem.getId());
+                }
             }
             else {  //A locked station accepts bike returns
+
                 if (stationItem.getEmpty_slots() > DBHelper.getCriticalAvailabilityMax(mCtx)){
-                    toReturn = stationItem;
+
+                    if (stationItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(mCtx)){
+
+                        availabilityDataPostfixBuilder.insert(0, stationItem.getId() + BAD_AVAILABILITY_POSTFIX);
+                    }
+                    else{
+
+                        availabilityDataPostfixBuilder.insert(0, stationItem.getId() + AOK_AVAILABILITY_POSTFIX);
+                    }
+
                     break;
+                }
+                else{
+                    availabilityDataPostfixBuilder.append(CRITICAL_AVAILABILITY_POSTFIX)
+                            .append(stationItem.getId());
                 }
             }
         }
 
         //failsafe
-        if (toReturn == null && !mStationList.isEmpty())
-            toReturn = mStationList.get(0);
+        if (availabilityDataPostfixBuilder.toString().isEmpty() && !mStationList.isEmpty())
+            availabilityDataPostfixBuilder.append(mStationList.get(0).getId()).append(LOCKED_AVAILABILITY_POSTFIX);
 
-        return toReturn;
+        return availabilityDataPostfixBuilder.toString();
     }
 
-    public String getClosestStationWithAvailability(boolean _lookingForBike){
-        return getClosestStationItemWithAvailability(_lookingForBike).getId();
+    public String retrieveClosestRawIdAndAvailability(boolean _lookingForBike){
+
+            return getClosestStationIdWithAvailability(_lookingForBike);
     }
 
     public LatLng getClosestAvailabilityLatLng(boolean _lookingForBike){
-        StationItem closest = getClosestStationItemWithAvailability(_lookingForBike);
+        //DBHelper can't be trusted !!
+        //StationItem closest = DBHelper.getStation(Utils.extractClosestAvailableStationIdFromProcessedString(getClosestStationIdWithAvailability(_lookingForBike)));
+
+        StationItem closest = null;
+
+        String closestId = Utils.extractClosestAvailableStationIdFromProcessedString(getClosestStationIdWithAvailability(_lookingForBike));
+
+        for (StationItem station : mStationList){
+            if (station.getId().equalsIgnoreCase(closestId)){
+                closest = station;
+                break;
+            }
+        }
+
         if (closest != null)
             return closest.getPosition();
 
