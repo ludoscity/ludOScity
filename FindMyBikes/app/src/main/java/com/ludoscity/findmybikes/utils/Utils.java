@@ -48,8 +48,9 @@ public class Utils {
         //a station id followed by AVAILABILITY_LCK_
 
         //extract only first id
+        String firstId = extractOrderedStationIdsFromProcessedString(_processedString).get(0);
 
-        return extractOrderedStationIdsFromProcessedString(_processedString).get(0).substring(0, 32);
+        return firstId.length()>=32 ? firstId.substring(0, 32) : "";
 
 
 
@@ -75,6 +76,13 @@ public class Utils {
     //citybik.es Ids, ordered by distance
     //get(0) is the id of the selected station with AOK availability
     public static List<String> extractOrderedStationIdsFromProcessedString(String _processedString){
+
+        if (_processedString.isEmpty()){
+            List<String> toReturn = new ArrayList<>();
+            toReturn.add(_processedString);
+
+            return toReturn;
+        }
 
         //int startSequenceIdx = _processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE);
 
