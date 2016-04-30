@@ -17,7 +17,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 28
-        versionName "v2.1-beta0"
+        versionName "v2.1-alpha0"
 
         generatedDensities = []
     }
