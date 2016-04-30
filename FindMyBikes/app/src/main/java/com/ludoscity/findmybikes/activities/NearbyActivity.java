@@ -2343,6 +2343,8 @@ public class NearbyActivity extends AppCompatActivity
 
                         Log.d("TwitterUpdate", "TwitterUpdate duplication -- deduplicating now", e);
 
+                    } else {
+                        deduplicationDone = true;
                     }
                     String message = e.getMessage();
 
