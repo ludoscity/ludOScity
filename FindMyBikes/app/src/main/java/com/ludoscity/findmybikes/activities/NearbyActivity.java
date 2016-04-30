@@ -2205,12 +2205,12 @@ public class NearbyActivity extends AppCompatActivity
             //if multiple stations, post selected one first and then all other in replies
             //////////////////////////////////////////////////////////////////////////////////////
             //FORMAT -- ROOT STATUS
-            /*#findmybixibikes bike is not closest! Bikes:X #BAD at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID ~XXmin walk stationnamestationnamestation #deduplicateZ
-              #findmybixibikes bike is not closest! Bikes:XX #AOK at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID ~XXmin walk stationnamestationnamestatio #deduplicateZ
+            /*#findmybixibikes bike is not closest! Bikes:X BAD at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID ~XXmin walk stationnamestationnamestation deduplicateZ
+              #findmybixibikes bike is not closest! Bikes:XX AOK at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID ~XXmin walk stationnamestationnamestatio deduplicateZ
 
               -- REPLIES
-              #findmybixibikes discarded closer! Bikes:Y #CRI at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID stationnamestationnamestationnamestationnamestationnam
-              #findmybixibikes discarded closer! Bikes:Y #LCK at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID stationnamestationnamestationnamestationnamestationnam
+              #findmybixibikes discarded closer! Bikes:Y CRI at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID stationnamestationnamestationnamestationnamestationnam
+              #findmybixibikes discarded closer! Bikes:Y LCK at IDIDIDIDIDIDIDIDIDIDIDIDIDIDIDID stationnamestationnamestationnamestationnamestationnam
 
               */
             String systemHashtag = getResources().getString(R.string.appbar_title_prefix) +
