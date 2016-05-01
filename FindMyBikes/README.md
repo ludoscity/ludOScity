@@ -35,5 +35,5 @@ To retrieve corresponding station data, see the great API and fantastic project 
 [privacy policy]:https://github.com/f8full/ludOScity/blob/master/FindMyBikes/Privacy%20policy
 [@findmybikesdata]:https://twitter.com/findmybikesdata
 [GET IT ON GOOGLE PLAY]:https://play.google.com/store/apps/details?id=com.ludoscity.findmybikes
-[ludOScity initiative]:http://ludoscity.com
+[#ludOScity initiative]:http://ludoscity.com
 
