@@ -1,4 +1,4 @@
-# # findmybikes -- part of the [ludOScity initiative]
+# # findmybikes -- part of the [#ludOScity initiative]
 
 ####[GET IT ON GOOGLE PLAY]
 
