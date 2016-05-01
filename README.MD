@@ -1,18 +1,18 @@
-# # [#ludOScity initiative]
+# [#ludOScity initiative]
 
-****
-
-#ludic Operating System for cities
+### #ludic Operating System for cities
 
 Powered by
-#ludOS
-#ludic Operating System
+#### #ludOS
+#### #ludic Operating System
 
 ****
 
-#hi
-#ready to [#findmybikes]
+"># hi"
+">#ready to [#findmybikes]"
 
+****
+****
 The initiative is very early stages right now, so more is hopefuly to come here in the times to come.
 
 F.
