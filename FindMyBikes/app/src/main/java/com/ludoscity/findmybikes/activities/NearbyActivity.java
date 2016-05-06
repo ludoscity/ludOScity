@@ -611,9 +611,15 @@ public class NearbyActivity extends AppCompatActivity
                         .build()
                         .show();
                 return true;
+
             case R.id.privacy_policy_menu_item:
                 Intent implicit = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/f8full/ludOScity/blob/master/FindMyBikes/Privacy_policy.md"));
                 startActivity(implicit);
+                return true;
+
+            case R.id.source_code_menu_item:
+                Intent implicit2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/f8full/ludOScity/tree/master/FindMyBikes"));
+                startActivity(implicit2);
                 return true;
 
         }

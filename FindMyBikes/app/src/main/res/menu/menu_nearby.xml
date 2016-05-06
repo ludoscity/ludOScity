@@ -20,4 +20,9 @@
         app:showAsAction="never"
         android:title="@string/title_privacy_policy"/>
 
+    <item
+        android:id="@+id/source_code_menu_item"
+        app:showAsAction="never"
+        android:title="@string/title_source_code"/>
+
 </menu>
