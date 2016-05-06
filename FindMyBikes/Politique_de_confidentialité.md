@@ -1,5 +1,5 @@
 ### Cette section s'applique à toutes les versions d'Android
-# #vélocalise (#findmybikes) ne collecte ni ne traite aucune donnée personelle.
+# #vélocalise (#findmybikes) ne collecte ni ne traite aucune donnée personnelle.
 
 **Note sur l'identifiabilité d'une donnée : En soi, le nom d'une station (le nom par défaut d'un nouveau favori) ne révèle rien sur vous.
 Par contre, si vous renommez l'un de vos favoris, disons 'Maison',
