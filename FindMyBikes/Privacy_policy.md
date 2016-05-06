@@ -35,7 +35,7 @@ This non personal and non identifiable is limited to :
 
 - The **id and truncated name** (as provided by citybik.es API) of the closest station that **COULD** provide you service
 - The **walking time** from your current location (**never** shared by #findmybikes) to the closest station that **COULD** provide you service
-  If relevant, #findmybikes also additionaly outputs :
+<br>If relevant, #findmybikes also additionaly outputs :
 - A **collection of station id** (as provided by citybik.es API) for each station that were closer than the selected one but **COULD NOT** provide you service either
 
 ### This public open data is published immediatly on the Twitter platform
@@ -47,7 +47,7 @@ This non personal and non identifiable is limited to :
 
 # #findmybikes uses the Google provided Android Backup Service.
 By using #findmybikes, you grant explicit permission to #findmybikes developer for the limited purpose
-of backing up this non personal and freeform information to the Android Backup Service for favorites restoration purposes.
+of backing up non personal and freeform information to the Android Backup Service for favorites restoration purposes.
 
 
 ### This section applies only to Android version 6 and up
