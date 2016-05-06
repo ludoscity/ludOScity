@@ -54,7 +54,7 @@ de sauvegarder des données non personelles et de forme libre vers le Android Ba
 
 ### Cette section ne s'applique qu'aux versions d'Android 6 et plus
 
-Google a intégré le Android Backup Service directement dans la plateforme Android (ou Google Ply Services).
+Google a intégré le Android Backup Service directement dans la plateforme Android (ou Google Play Services).
 # La politique de confidentialité de #vélocalise (#findmybikes) ne s'applique pas à la sauvegarde des données non personelles et de forme libre qu'elle collecte et utilise aux fins de restoration des favoris.
 La politique de confidentialité en regard de ces données est celle que vous avez acceptée de Google et que vous pouvez trouver ici
 https://www.google.com/policies/privacy/
