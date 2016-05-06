@@ -28,17 +28,17 @@ The collection and use happens only if the following conditions are met
 - \#findmybikes in running in the foreground
 - \#findmybikes located a bike
 - \#findmybikes determined that the closest station from your current location **CAN NOT** provide you service
-- an internet connection is available
 - \#findmybikes last refresh is dated from less than 15 minutes
+- an internet connection is available
 
 This non personal and non identifiable is limited to :
 
 - The **id and truncated name** (as provided by citybik.es API) of the closest station that **COULD** provide you service
 - The **walking time** from your current location (**never** shared by #findmybikes) to the closest station that **COULD** provide you service
-<br>If relevant, #findmybikes also additionaly outputs :
+<br>If relevant, #findmybikes also additionally collects :
 - A **collection of station id** (as provided by citybik.es API) for each station that were closer than the selected one but **COULD NOT** provide you service either
 
-### This public open data is published immediatly on the Twitter platform
+### This public open data is published immediately on the Twitter platform
 # https://twitter.com/findmybikesdata
 
 
