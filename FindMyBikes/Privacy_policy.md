@@ -21,7 +21,7 @@ https://www.google.com/transparencyreport/
 
 ### Public data output
 
-# #findmybikes collects and use non personal and non identifiable information for public open data collection
+# #findmybikes collects and use non personal and non identifiable information for public open data publication
 By using #findmybikes v2.1 (code version :28) or later, you acknowledge that this feature is on by default and that there is no opt-out.
 The collection and use happens only if the following conditions are met
 
@@ -33,12 +33,12 @@ The collection and use happens only if the following conditions are met
 
 This non personal and non identifiable is limited to :
 
-- The **truncated name and id** (as provided by citybik.es API) of the closest station that **COULD** provide you service
+- The **id and truncated name** (as provided by citybik.es API) of the closest station that **COULD** provide you service
 - The **walking time** from your current location (**never** shared by #findmybikes) to the closest station that **COULD** provide you service
-If relevant, #findmybikes also additionaly outputs :
+  If relevant, #findmybikes also additionaly outputs :
 - A **collection of station id** (as provided by citybik.es API) for each station that were closer than the selected one but **COULD NOT** provide you service either
 
-### This public open data is published immediatly on the Twitter platform at the following
+### This public open data is published immediatly on the Twitter platform
 # https://twitter.com/findmybikesdata
 
 
