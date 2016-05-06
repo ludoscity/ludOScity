@@ -40,12 +40,12 @@ Ces données non personelles et non identifiables sont limitées à :
 <br>Si pertinent, #vélocalise (#findmybikes) collecte également :
 - Une **collection d'identifiants de station** (tels que fourni par l'API citybik.es) pour chacune des stations plus proche que celle sélectionnée mais qui **N'ÉTAIENT PAS EN MESURE** de vous fournir le service non plus
 
-### Ces données ouvertes publques sont immédiatement publiées sur la plateforme Twitter
+### Ces données ouvertes publiques sont immédiatement publiées sur la plateforme Twitter
 # https://twitter.com/findmybikesdata
 
 
 
-### Cette section ne s'applique qu'aux versions d'Android avant la 6
+### Cette section ne s'applique qu'aux versions d'Android avant 6
 
 # #vélocalise (#findmybikes) s'appuie sur le service Google Android Backup Service.
 En utilisant #vélocalise (#findmybikes), vous donnez l'autorisation explicite au développeur de #vélocalise (#findmybikes) aux fins limitées
