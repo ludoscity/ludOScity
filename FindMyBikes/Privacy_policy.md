@@ -21,7 +21,7 @@ https://www.google.com/transparencyreport/
 
 ### Public data output
 
-# #findmybikes collects and use non personal and non identifiable information for public open data publication
+# #findmybikes collects and use non personal and non identifiable information for public open data publication.
 By using #findmybikes v2.1 (code version :28) or later, you acknowledge that this feature is on by default and that there is no opt-out.
 The collection and use happens only if the following conditions are met
 
