@@ -261,13 +261,9 @@ public class StationListFragment extends Fragment
         getStationRecyclerViewAdapter().setDistanceDisplayReferenceLatLng(_toSet, _notify);
     }
 
-    public String highlightClosestStationWithAvailability(boolean _lookingForBike){
+    public String retrieveClosestRawIdAndAvailability(boolean _lookingForBike){
 
-        String closestWithAvailability = getStationRecyclerViewAdapter().getClosestStationWithAvailability(_lookingForBike);
-
-        highlightStation(closestWithAvailability);
-
-        return closestWithAvailability;
+        return getStationRecyclerViewAdapter().retrieveClosestRawIdAndAvailability(_lookingForBike);
 
     }
 

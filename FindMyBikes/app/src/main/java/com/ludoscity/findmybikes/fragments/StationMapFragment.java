@@ -146,6 +146,7 @@ public class StationMapFragment extends Fragment
         outState.putBoolean("pin_B_visibility", mMarkerStationB != null && mMarkerStationB.isVisible());
         outState.putParcelable("pin_A_latlng", mMarkerStationA != null ? mMarkerStationA.getPosition() : MONTREAL_LATLNG);
         outState.putParcelable("pin_B_latlng", mMarkerStationB != null ? mMarkerStationB.getPosition() : MONTREAL_LATLNG);
+        outState.putString("pin_a_station_id", mMarkerStationA != null ? mMarkerStationA.getTitle() : "");
 
         outState.putBoolean("pin_picked_place_visibility", mMarkerPickedPlace != null && mMarkerPickedPlace.isVisible());
         outState.putParcelable("pin_picked_place_latlng", mMarkerPickedPlace != null ? mMarkerPickedPlace.getPosition() : MONTREAL_LATLNG);
@@ -282,6 +283,18 @@ public class StationMapFragment extends Fragment
         mInitialCameraSetupDone = true;
     }
 
+    public String getMarkerAStationId(){
+
+        String toReturn = "";
+
+        if (mMarkerStationA != null)
+            toReturn = mMarkerStationA.getTitle();
+        else if(mBufferedBundle != null)
+            toReturn = mBufferedBundle.getString("pin_a_station_id");
+
+        return toReturn;
+    }
+
     public LatLng getMarkerALatLng(){
         LatLng toReturn = null;
 
@@ -355,6 +368,7 @@ public class StationMapFragment extends Fragment
     public void redrawMarkers() {
 
         boolean pinAVisible;
+        String pinAStationId;
         boolean pinBVisible;
         boolean pinPickedPlaceVisible;
         LatLng pinALatLng;
@@ -375,6 +389,8 @@ public class StationMapFragment extends Fragment
 
             pickedPlaceName = mBufferedBundle.getString("picked_place_name");
 
+            pinAStationId = mBufferedBundle.getString("pin_a_station_id");
+
             mBufferedBundle = null;
         } else {
 
@@ -386,6 +402,8 @@ public class StationMapFragment extends Fragment
             pinPickedPlaceLatLng = mMarkerPickedPlace != null ? mMarkerPickedPlace.getPosition() : MONTREAL_LATLNG;
 
             pickedPlaceName = mMarkerPickedPlace != null ? mMarkerPickedPlace.getTitle() : "";
+
+            pinAStationId = mMarkerStationA != null ? mMarkerStationA.getTitle() : "";
         }
 
         mGoogleMap.clear();
@@ -398,7 +416,8 @@ public class StationMapFragment extends Fragment
 
         mMarkerStationA = mGoogleMap.addMarker(new MarkerOptions().position(pinALatLng)
                 .icon(iconA)
-                .visible(pinAVisible));
+                .visible(pinAVisible)
+                .title(pinAStationId));
         mMarkerStationB = mGoogleMap.addMarker(new MarkerOptions().position(pinBLatLng)
                 .icon(iconB)
                 .visible(pinBVisible));
@@ -482,6 +501,7 @@ public class StationMapFragment extends Fragment
                 if (_lookingForBike){
                     mMarkerStationA.setPosition(markerData.getMarkerLatLng());
                     mMarkerStationA.setVisible(true);
+                    mMarkerStationA.setTitle(markerData.getMarkerTitle());
                 } else {
                     mMarkerStationB.setPosition(markerData.getMarkerLatLng());
                     mMarkerStationB.setVisible(true);

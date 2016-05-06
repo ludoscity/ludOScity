@@ -12,6 +12,9 @@ import java.io.IOException;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
 
 /**
  * Created by F8Full on 2015-09-28.
@@ -25,6 +28,7 @@ public class RootApplication extends Application {
     static final String ENDPOINT = "http://api.citybik.es";
 
     Citybik_esAPI mCitybik_esAPI;
+    Twitter mTwitterAPI;
 
     @Override
     public void onCreate() {
@@ -39,6 +43,7 @@ public class RootApplication extends Application {
         }
 
         mCitybik_esAPI = buildCitybik_esAPI();
+        mTwitterAPI = buildTwitterAPI();
     }
 
     private Citybik_esAPI buildCitybik_esAPI() {
@@ -51,7 +56,23 @@ public class RootApplication extends Application {
         return retrofit.create(Citybik_esAPI.class);
     }
 
+    //They are packaged indeed, but at least they don't show up on github ^^
+    private  Twitter buildTwitterAPI(){
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+        cb.setDebugEnabled(true)
+                .setOAuthConsumerKey(getResources().getString(R.string.twitter_consumer_key))
+                .setOAuthConsumerSecret(getResources().getString(R.string.twitter_consumer_secret))
+                .setOAuthAccessToken(getResources().getString(R.string.twitter_access_token))
+                .setOAuthAccessTokenSecret(getResources().getString(R.string.twitter_access_token_secret));
+        TwitterFactory tf = new TwitterFactory(cb.build());
+        return tf.getInstance();
+    }
+
     public Citybik_esAPI getCitybik_esApi() {
         return mCitybik_esAPI;
+    }
+
+    public Twitter getTwitterApi(){
+        return mTwitterAPI;
     }
 }

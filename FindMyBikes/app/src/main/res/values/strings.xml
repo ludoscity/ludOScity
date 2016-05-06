@@ -8,19 +8,19 @@
     <string name="title_section_nearby">Nearby</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="no_data">Connection needed for data download!</string>
+    <string name="no_data">#connection needed for data download!</string>
     <string name="title_section_settings">Settings</string>
     <string name="fromCitibik_es">from citybik.es</string>
     <string name="moments">Moments</string>
     <string name="min">min</string>
-    <string name="favorite_removed">Favorite removed</string>
-    <string name="favorite_added">Favorite added</string>
-    <string name="such_short_trip">You don\'t need me for such a short trip ! ;)</string>
+    <string name="favorite_removed">#favorite removed</string>
+    <string name="favorite_added">#favorite added</string>
+    <string name="such_short_trip">#you don\'t need me for such a short trip ! ;)</string>
     <string name="distance">Distance</string>
     <string name="station">Station</string>
     <string name="bikes">Bikes</string>
     <string name="docks">Docks</string>
-    <string name="b_tab_question">Where are we going today ?</string>
+    <string name="b_tab_question">#where are we going today ?</string>
     <string name="b_tab_closest_bike">Closest bike available at station A :&lt;br>&lt;b>%1$s&lt;/b></string>
     <string name="station_recap_bikes">Bikes : %1$d</string>
     <string name="downloading">Downloading data…</string>
@@ -28,13 +28,13 @@
     <string name="no_connectivity">No connectivity</string>
     <string name="placeholder_lorem_ipsum" translatable="false">lorem ipsum</string>
     <string name="refreshing">Refreshing map…</string>
-    <string name="download_failed">Download failed :/ Auto update paused</string>
+    <string name="download_failed">#download failed :/ Auto update paused</string>
     <string name="google_maps_not_installed">Google Maps not installed !</string>
     <string name="searching_bike_network">Searching closest bike system on citybik.es…</string>
-    <string name="bike_network_found_message">I\'ve set your bike system to &lt;b>%1$s&lt;/b>.&lt;br /&gt;I\'ll update it if you travel.</string>
+    <string name="bike_network_found_message"><![CDATA[#bike system been set to <b>%1$s</b>.<br />I\'ll update it if you travel.]]></string>
     <string name="searching_wait_location">Waiting on location…</string>
-    <string name="hello_city">%1$sHello &lt;b>%2$s&lt;/b> !</string>
-    <string name="hello_travel">It seems you travelled.\u0020</string>
+    <string name="hello_city"><![CDATA[%1$s#hello <b>%2$s</b> !]]></string>
+    <string name="hello_travel">#it seems you travelled.\u0020</string>
     <!-- TODO: add 'OK but delete favorites for [OLD NETWORK]' -->
     <string name="bike_network_change_message"><![CDATA[I\'ve changed your bike network to <b>%1$s</b>.<br />I also saved your favorites for <i>%2$s</i>.]]></string>
     <string name="locked">Locked</string>
@@ -62,19 +62,23 @@
     <string name="hour_symbol">h</string>
     <string name="undo"><b>UNDO</b></string>
     <string name="no_favorite">No favorite for &lt;b>%1$s&lt;/b></string>
-    <string name="please_answer_first">Please answer my question first !</string>
+    <string name="please_answer_first">#please answer my question first !</string>
     <string name="favorite_display_name_only_bold" translatable="false">&lt;b>%1$s&lt;/b></string>
     <string name="favorite_display_name_only_italic" translatable="false">&lt;i>%1$s&lt;/i></string>
     <string name="favorite_display_name_complete" translatable="false"><![CDATA[<b>%1$s</b><br><i>%2$s</i>]]></string>
     <string name="resume">RESUME</string>
-    <string name="auto_bike_select_finding">I\'m finding your bikes. Hang tight…</string>
-    <string name="auto_bike_select_found">I found your bike ! :)</string>
+    <string name="auto_bike_select_finding">#finding your bikes. Hang tight…</string>
+    <string name="auto_bike_select_found">#found your bike ! :)</string>
     <string name="ok">OK</string>
-    <string name="favorite_onboarding_complete"><![CDATA[That\'s how favorites work. Now clear B with \'X\' button at the bottom right.]]></string>
-    <string name="onboarding_complete"><![CDATA[Done ! Always set B by picking a favorite, use the search or directly on the map. (swipe to dismiss)]]></string>
-    <string name="onboarding_start">Let me show you. Set \'B\' by clicking on your first favorite.</string>
-    <string name="favorite_onboarding_start">See the trip recap on the bottom? Now remove favorite by clicking on the &lt;3 icon.</string>
-    <string name="auto_bike_select_error">Couldn\'t find any bike :s ! Selected closest station.</string>
+    <string name="favorite_onboarding_complete"><![CDATA[#favorites work that way. Now clear B with \'X\' button at the bottom right.]]></string>
+    <string name="onboarding_complete"><![CDATA[#done ! Always set B by picking a favorite, use the search or directly on the map. (swipe to dismiss)]]></string>
+    <string name="onboarding_start">#show you let me. Set \'B\' by clicking on your first favorite.</string>
+    <string name="favorite_onboarding_start"><![CDATA[#trip recap on the bottom you see? Now remove favorite by clicking on the <3 icon.]]></string>
+    <string name="auto_bike_select_error">#couldn\'t find any bike :s ! #selected closest station.</string>
     <string name="title_legal">Legal notices</string>
-    <string name="onboarding_favorite_name">#Hi ! I\'m your first favorite. Instructions say tap me !</string>
+    <string name="onboarding_favorite_name">#hi ! I\'m your first favorite. Instructions say tap me !</string>
+    <string name="twitter_not_closest_bike_data_format" translatable="false">%1$s bike is not closest! Bikes:%2$d %3$s at %4$s %5$s walk %6$s %7$s</string>
+    <string name="twitter_closer_discarded_reply_data_format" translatable="false">%1$s discarded closer! Bikes:%2$d %3$s at %4$s %5$s</string>
+    <string name="title_privacy_policy">Privacy policy</string>
+    <string name="title_source_code">Source code</string>
 </resources>
