@@ -8,7 +8,7 @@ As stated in the [privacy policy], no personal data is neither collected nor use
 However, some non personal and non identifiable data is collected and published publicly on Twitter.
 You can see the data output on the dedicated bot timeline
 #### https://twitter.com/findmybikesdata
-This published data is the essence of the ludOScity initiative : make cities smarter through clever interactions
+This published data is the essence of the #ludOScity initiative : make cities smarter through clever interactions
 with their inhabitants. This data could be used by your bike service provider to improve the service.
 Anyone else, including you, could come up with some idea to use it.
 
