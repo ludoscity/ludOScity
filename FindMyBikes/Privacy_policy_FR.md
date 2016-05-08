@@ -2,11 +2,10 @@
 # #vélocalise (#findmybikes) ne collecte ni ne traite aucune donnée personnelle.
 
 **Note sur l'identifiabilité d'une donnée : En soi, le nom d'une station (le nom par défaut d'un nouveau favori) ne révèle rien sur vous.
-Par contre, si vous renommez l'un de vos favoris, disons 'Maison',
-alors la donnée devient identifiable car elle porte un sens qui vous est spécifique**
+Par contre, si vous renommez l'un de vos favoris, disons 'Maison', alors la donnée devient identifiable car elle porte un sens qui révèle une donnée personnelle.**
 
 
-# #vélocalise (#findmybikes) collecte et utilise des données non personnelles et des données de forme libre pouvant être identifiables aux fins de restauration des favoris.
+# #vélocalise (#findmybikes) collecte et utilise des données non personnelles et des données de forme libre pouvant être identifiables seulement aux fins de restauration des favoris.
 Ces données non personnelles et de forme libre sont limitées à :
 
 - Le **nom et l'identifiant** (tels que fournis par l'API citybik.es) de chaque système de vélos que vous avez utilisé via #vélocalise (#findmybikes). NON IDENTIFIABLE
@@ -28,12 +27,12 @@ La collecte et l'utilisation intervient lorsque les conditions suivantes sont re
 - \#vélocalise (#findmybikes) a localisé un vélo
 - \#vélocalise (#findmybikes) a déterminé que la station la plus proche de votre position actuelle **N'EST PAS** en mesure de vous fournir le service
 - \#vélocalise (#findmybikes) a des données dont la fraîcheur n'excède pas 15 minutes
-- une cconnexion internet est disponible
+- une connexion internet est disponible
 
 Ces données non personnelles et non identifiables sont limitées à :
 
 - L'**identifiant et le nom tronqué** (tels que fournis par l'API citybik.es) de la station la plus proche qui **SOIT EN MESURE** de vous fournir le service
-- Le **temps de marche** depuis votre position actuelle (**jamais** partagée par #vélocalise (#findmybikes)) jusqu'à la station la plus proche qui **SOIT EN MESURE** de vous fournir le service
+- Le **temps de marche** depuis votre position actuelle (qui elle n'est **jamais** partagée par #vélocalise (#findmybikes)) jusqu'à la station la plus proche qui **SOIT EN MESURE** de vous fournir le service
 <br>Si pertinent, #vélocalise (#findmybikes) collecte également :
 - Une **collection d'identifiants de station** (tels que fournis par l'API citybik.es) pour les stations plus proches que celle sélectionnée mais qui **N'ÉTAIENT PAS EN MESURE** de vous fournir le service non plus
 

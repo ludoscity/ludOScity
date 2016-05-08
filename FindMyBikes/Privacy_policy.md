@@ -5,10 +5,10 @@ Version française disponible : https://github.com/f8full/ludOScity/blob/master/
 
 **A note on identifiable information : By itself, a station name (the default name for a new favorite) doesn't say anything about you.
 But if you rename one of your favorite, let's say 'Home',
-then the information becomes identifiable as it carries meaning specific to you**
+then the information becomes identifiable as it carries meaning that reveals a personal information.**
 
 
-# #findmybikes does collect and use some non personal information and freeform information that can be identifiable for favorites restoration.
+# #findmybikes does collect and use some non personal information and freeform information that can be identifiable for favorites restoration only.
 This non personal and freeform information is limited to :
 
 - The **name and id** (as provided by citybik.es API) of each bike networks you've used #findmybikes with. NON IDENTIFIABLE
@@ -36,7 +36,7 @@ The collection and use happens only if the following conditions are met
 This non personal and non identifiable information is limited to :
 
 - The **id and truncated name** (as provided by citybik.es API) of the closest station that **COULD** provide you service
-- The **walking time** from your current location (**never** shared by #findmybikes) to the closest station that **COULD** provide you service
+- The **walking time** from your current location (which is **never** shared by #findmybikes) to the closest station that **COULD** provide you service
 <br>If relevant, #findmybikes also additionally collects :
 - A **collection of station id** (as provided by citybik.es API) for each station that were closer than the selected one but **COULD NOT** provide you service either
 
