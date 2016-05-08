@@ -33,7 +33,7 @@ The collection and use happens only if the following conditions are met
 - \#findmybikes last refresh is dated from less than 15 minutes
 - an internet connection is available
 
-This non personal and non identifiable is limited to :
+This non personal and non identifiable information is limited to :
 
 - The **id and truncated name** (as provided by citybik.es API) of the closest station that **COULD** provide you service
 - The **walking time** from your current location (**never** shared by #findmybikes) to the closest station that **COULD** provide you service
