@@ -1,4 +1,4 @@
-Version française disponible : https://github.com/f8full/ludOScity/blob/master/FindMyBikes/Politique_de_confidentialité.md
+Version française disponible : https://github.com/f8full/ludOScity/blob/master/FindMyBikes/Privacy_policy_FR.md
 
 ### This section applies to all versions of Android
 # #findmybikes does not collect nor use any personal information.
