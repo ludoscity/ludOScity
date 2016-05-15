@@ -10,7 +10,7 @@ cache:
 
 before_install: 
     - chmod +x gradlew
-	- cd FindMyBikes
+    - cd FindMyBikes
 
 install: ./gradlew clean build
 
