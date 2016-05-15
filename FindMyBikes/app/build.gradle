@@ -28,7 +28,7 @@ android {
     
     signingConfigs {
         debug {
-            storeFile file("distribution/debug.keystore")
+            storeFile file("build/travis/debug.keystore")
         }
 
      }
