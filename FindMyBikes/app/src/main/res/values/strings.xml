@@ -75,10 +75,10 @@
     <string name="onboarding_start">#show you let me. Set \'B\' by clicking on your first favorite.</string>
     <string name="favorite_onboarding_start"><![CDATA[#trip recap on the bottom you see? Now remove favorite by clicking on the <3 icon.]]></string>
     <string name="auto_bike_select_error">#couldn\'t find any bike :s ! #selected closest station.</string>
-    <string name="title_legal">Legal notices</string>
+    <string name="title_legal">#legal</string>
     <string name="onboarding_favorite_name">#hi ! I\'m your first favorite. Instructions say tap me !</string>
     <string name="twitter_not_closest_bike_data_format" translatable="false">%1$s bike is not closest! Bikes:%2$d %3$s at %4$s %5$s walk %6$s %7$s</string>
     <string name="twitter_closer_discarded_reply_data_format" translatable="false">%1$s discarded closer! Bikes:%2$d %3$s at %4$s %5$s</string>
-    <string name="title_privacy_policy">Privacy policy</string>
-    <string name="title_source_code">Source code</string>
+    <string name="title_privacy_policy">#privacy</string>
+    <string name="title_source_code">#source</string>
 </resources>
