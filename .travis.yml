@@ -9,7 +9,9 @@ before_cache:
     - $HOME/.gradle/wrapper/
 
 before_install: cd FindMyBikes
+
 install: ./gradlew clean build
+
 script: ./gradlew check
  
 android:
