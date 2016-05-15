@@ -2,6 +2,8 @@
 
 ####[GET IT ON GOOGLE PLAY]
 
+[![Build Status](https://travis-ci.org/f8full/ludOScity.svg?branch=master)](https://travis-ci.org/f8full/ludOScity)
+
 ****
 ##### note
 As stated in the [privacy policy], no personal data is neither collected nor used by #findmybikes.
