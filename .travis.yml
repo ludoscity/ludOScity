@@ -8,6 +8,7 @@ cache:
 
 script:
   - cd FindMyBikes
+  - gradle build connectedCheck
  
 android:
   components:
