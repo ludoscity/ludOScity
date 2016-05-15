@@ -42,6 +42,22 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    lintOptions {
+
+        // set to true to turn off analysis progress reporting by lint
+        quiet false
+        // if true, stop the gradle build if errors are found
+        abortOnError false
+        // if true, only report errors
+        ignoreWarnings false
+
+        // set to true to have all release builds run lint on issues with severity=fatal
+
+        // and abort the build (controlled by abortOnError above) if fatal issues are found
+
+        checkReleaseBuilds true
+    }
 }
 
 repositories {
