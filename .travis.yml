@@ -8,7 +8,9 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-before_install: cd FindMyBikes
+before_install: 
+    - chmod +x gradlew
+	- cd FindMyBikes
 
 install: ./gradlew clean build
 
