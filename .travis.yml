@@ -8,13 +8,9 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-before_install: 
+script: 
     - cd FindMyBikes
-    - chmod +x gradlew
-
-install: ./gradlew clean build
-
-script: ./gradlew check
+    - gradle build connectedCheck
  
 android:
   components:
