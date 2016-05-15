@@ -5,6 +5,10 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+script:
+  - cd FindMyBikes
+ 
 android:
   components:
     # Uncomment the lines below if you want to
