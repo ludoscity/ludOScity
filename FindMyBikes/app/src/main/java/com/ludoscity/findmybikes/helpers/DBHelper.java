@@ -16,13 +16,10 @@ import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.ludoscity.findmybikes.FavoriteItem;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
-import com.udem.ift2906.bixitracksexplorer.backend.bixiTracksExplorerAPI.model.Track;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,7 +27,6 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +41,6 @@ public class DBHelper {
 
     private static Manager mManager = null;
     private static final String mTRACKS_DB_NAME = "tracksdb";
-    private static boolean mGotTracks;
 
     private static final String mSTATIONS_DB_NAME = "stationsdb";
 
@@ -76,7 +71,6 @@ public class DBHelper {
 
     public static void init(Context context) throws IOException, CouchbaseLiteException, PackageManager.NameNotFoundException {
         mManager = new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS);
-        mGotTracks = !getAllTracks().isEmpty();
 
         //Check for SharedPreferences versioning
         int sharedPrefVersion = context.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE).getInt(SHARED_PREF_VERSION_CODE, 0);
@@ -292,9 +286,9 @@ public class DBHelper {
         mManager.getDatabase(mTRACKS_DB_NAME).delete();
     }*/
 
-    public static boolean gotTracks() throws CouchbaseLiteException {
+    /*public static boolean gotTracks() throws CouchbaseLiteException {
         return mGotTracks;
-    }
+    }*/
 
     public static void notifyBeginSavingStations(Context _ctx){
 
@@ -319,12 +313,12 @@ public class DBHelper {
 
     }
 
-    public static void saveTrack(Track toSave) throws CouchbaseLiteException, JSONException {
+    /*public static void saveTrack(Track toSave) throws CouchbaseLiteException, JSONException {
         Document doc = mManager.getDatabase(mTRACKS_DB_NAME).getDocument(toSave.getKeyTimeUTC());
         doc.putProperties(new Gson().<Map<String, Object>>fromJson(toSave.toString(), new TypeToken<HashMap<String, Object>>() {
         }.getType()));
         mGotTracks = true; // mGotTracks = !getAllTracks().isEmpty(); in init()
-    }
+    }*/
 
     public static void saveStation(final StationItem toSave) throws CouchbaseLiteException, JSONException {
         Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getDocument(toSave.getId());
