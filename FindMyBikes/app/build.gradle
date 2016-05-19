@@ -19,7 +19,7 @@ android {
         versionCode 31
         versionName "v2.1.1-beta0"
 
-        generatedDensities = []
+        vectorDrawables.generatedDensities = []
 
         multiDexEnabled = true;
     }
