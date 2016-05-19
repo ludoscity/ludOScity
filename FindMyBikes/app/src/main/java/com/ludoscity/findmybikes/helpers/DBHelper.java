@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -321,24 +322,29 @@ public class DBHelper {
     }*/
 
     public static void saveStation(final StationItem toSave) throws CouchbaseLiteException, JSONException {
-        Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getDocument(toSave.getId());
 
-        doc.update(new Document.DocumentUpdater() {
-            @Override
-            public boolean update(UnsavedRevision newRevision) {
-                Map<String, Object> properties = newRevision.getUserProperties();
-                properties.put("id", toSave.getId());
-                properties.put("name", toSave.getName());
-                properties.put("locked", toSave.isLocked());
-                properties.put("empty_slots", toSave.getEmpty_slots());
-                properties.put("free_bikes", toSave.getFree_bikes());
-                properties.put("latitude", toSave.getPosition().latitude);
-                properties.put("longitude", toSave.getPosition().longitude);
-                properties.put("timestamp", toSave.getTimestamp());
-                newRevision.setUserProperties(properties);
-                return true;
-            }
-        });
+        try {
+            Document doc = mManager.getDatabase(mSTATIONS_DB_NAME).getDocument(toSave.getId());
+
+            doc.update(new Document.DocumentUpdater() {
+                @Override
+                public boolean update(UnsavedRevision newRevision) {
+                    Map<String, Object> properties = newRevision.getUserProperties();
+                    properties.put("id", toSave.getId());
+                    properties.put("name", toSave.getName());
+                    properties.put("locked", toSave.isLocked());
+                    properties.put("empty_slots", toSave.getEmpty_slots());
+                    properties.put("free_bikes", toSave.getFree_bikes());
+                    properties.put("latitude", toSave.getPosition().latitude);
+                    properties.put("longitude", toSave.getPosition().longitude);
+                    properties.put("timestamp", toSave.getTimestamp());
+                    newRevision.setUserProperties(properties);
+                    return true;
+                }
+            });
+        } catch (SQLiteException e){
+            Log.d("DBHelper", "Couldn't save station", e);
+        }
 
         //doc.putProperties(new Gson().<Map<String, Object>>fromJson(new Gson().toJson(toSave), new TypeToken<HashMap<String, Object>>() {
         //}.getType()));
@@ -372,7 +378,7 @@ public class DBHelper {
         //from : http://developer.couchbase.com/documentation/mobile/current/develop/training/build-first-android-app/do-crud/index.html
         try {
             toReturn = mManager.getDatabase(mSTATIONS_DB_NAME).getDocument(_stationId);
-        } catch (CouchbaseLiteException e) {
+        } catch (CouchbaseLiteException | SQLiteException e) {
             Log.d("DBHelper", "Couldn't retrieve a station document from id", e);
         }
 
@@ -388,13 +394,29 @@ public class DBHelper {
 
     private static List<QueryRow> getAllStations() throws CouchbaseLiteException{
         Map<String, Object> allDocs;
-        allDocs = mManager.getDatabase(mSTATIONS_DB_NAME).getAllDocs(new QueryOptions());
 
-        return (List<QueryRow>) allDocs.get("rows");
+        List<QueryRow> toReturn = new ArrayList<>();
+
+        try {
+            allDocs = mManager.getDatabase(mSTATIONS_DB_NAME).getAllDocs(new QueryOptions());
+            toReturn = (List<QueryRow>) allDocs.get("rows");
+        }
+        catch (SQLiteException e){
+
+        }
+
+        return toReturn;
     }
 
     public static void deleteAllStations() throws CouchbaseLiteException{
-        mManager.getDatabase(mSTATIONS_DB_NAME).delete();
+        try
+        {
+            mManager.getDatabase(mSTATIONS_DB_NAME).delete();
+        }
+        catch (SQLiteException e){
+            Log.d("DDB", "exception raised, doing nothing", e);
+        }
+
     }
 
     //Not used because only potential client (so far) BudgetTrackDetails duplicates this data
