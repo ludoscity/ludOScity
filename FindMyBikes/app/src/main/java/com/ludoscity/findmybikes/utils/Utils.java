@@ -19,6 +19,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.View;
 
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
@@ -126,6 +127,7 @@ public class Utils {
         Bitmap bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bm);
         vectorDrawable.draw(canvas);
+        MapsInitializer.initialize(ctx);
         return BitmapDescriptorFactory.fromBitmap(bm);
     }
 
