@@ -1231,8 +1231,11 @@ public class NearbyActivity extends AppCompatActivity
                             if (!_silent)
                                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                         } else {
+                            String stationId = Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(false));
+
                             getListPagerAdapter().hideStationRecap(StationListPagerAdapter.DOCK_STATIONS);
-                            mStationMapFragment.setPinOnStation(false, Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(false)));
+                            mStationMapFragment.setPinOnStation(false, stationId);
+                            getListPagerAdapter().highlightStationForPage(stationId, StationListPagerAdapter.DOCK_STATIONS);
                             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, true);
                             if(!_silent)
                                 animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
