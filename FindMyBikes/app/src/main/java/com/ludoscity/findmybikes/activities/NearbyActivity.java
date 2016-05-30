@@ -1231,8 +1231,11 @@ public class NearbyActivity extends AppCompatActivity
                             if (!_silent)
                                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                         } else {
+                            String stationId = Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(false));
+
                             getListPagerAdapter().hideStationRecap(StationListPagerAdapter.DOCK_STATIONS);
-                            mStationMapFragment.setPinOnStation(false, Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(false)));
+                            mStationMapFragment.setPinOnStation(false, stationId);
+                            getListPagerAdapter().highlightStationForPage(stationId, StationListPagerAdapter.DOCK_STATIONS);
                             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, true);
                             if(!_silent)
                                 animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
@@ -2059,7 +2062,7 @@ public class NearbyActivity extends AppCompatActivity
 
                 DBHelper.pauseAutoUpdate();
 
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.download_failed,
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_download_failed,
                         Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
                         .setAction(R.string.resume, new View.OnClickListener() {
                             @Override
@@ -2478,14 +2481,27 @@ public class NearbyActivity extends AppCompatActivity
 
             DBHelper.pauseAutoUpdate();
 
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.download_failed,
-                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
-                    .setAction(R.string.resume, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            DBHelper.resumeAutoUpdate();
-                        }
-                    }).show();
+            if (DBHelper.getAutoUpdate(NearbyActivity.this)) {
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_download_failed,
+                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                        .setAction(R.string.resume, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                DBHelper.resumeAutoUpdate();
+                            }
+                        }).show();
+            }
+            else {
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.manual_download_failed,
+                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                        .setAction(R.string.retry, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDownloadWebTask = new DownloadWebTask();
+                                mDownloadWebTask.execute();
+                            }
+                        }).show();
+            }
 
             //must be done last
             mDownloadWebTask = null;
