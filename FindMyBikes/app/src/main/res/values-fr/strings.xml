@@ -21,7 +21,7 @@
     <string name="downloading">Téléchargement des données…</string>
     <string name="no_connectivity">Non connecté</string>
     <string name="refreshing">Rafraîchissement de la carte…</string>
-    <string name="download_failed">#échec du téléchargement :/ ! Màj auto suspendue</string>
+    <string name="auto_download_failed">#échec du téléchargement :/ Màj auto suspendue</string>
     <string name="google_maps_not_installed">Google Maps non installé !</string>
     <string name="searching_bike_network">Recherche sur citybik.es du système le plus proche…</string>
     <string name="bike_network_found_message"><![CDATA[#système de vélos réglé sur <b>%1$s</b>.<br />Je le mettrai à jour si vous voyagez.]]></string>
@@ -63,4 +63,6 @@
     <string name="onboarding_favorite_name">#salut ! Je suis votre premier favori. D\'abord, cliquez moi !</string>
     <string name="title_privacy_policy">#confidentialité</string>
     <string name="title_source_code">#source</string>
+    <string name="manual_download_failed">#échec du téléchargement :/</string>
+    <string name="retry">RÉESSAYER</string>
 </resources>

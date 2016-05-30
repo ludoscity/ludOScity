@@ -2062,7 +2062,7 @@ public class NearbyActivity extends AppCompatActivity
 
                 DBHelper.pauseAutoUpdate();
 
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.download_failed,
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_download_failed,
                         Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
                         .setAction(R.string.resume, new View.OnClickListener() {
                             @Override
@@ -2481,14 +2481,27 @@ public class NearbyActivity extends AppCompatActivity
 
             DBHelper.pauseAutoUpdate();
 
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.download_failed,
-                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
-                    .setAction(R.string.resume, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            DBHelper.resumeAutoUpdate();
-                        }
-                    }).show();
+            if (DBHelper.getAutoUpdate(NearbyActivity.this)) {
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_download_failed,
+                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                        .setAction(R.string.resume, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                DBHelper.resumeAutoUpdate();
+                            }
+                        }).show();
+            }
+            else {
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.manual_download_failed,
+                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                        .setAction(R.string.retry, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDownloadWebTask = new DownloadWebTask();
+                                mDownloadWebTask.execute();
+                            }
+                        }).show();
+            }
 
             //must be done last
             mDownloadWebTask = null;
