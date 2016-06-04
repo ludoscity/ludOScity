@@ -7,8 +7,19 @@
     android:layout_height="wrap_content">
 
     <!--suppress AndroidDomInspection -->
+    <ImageView
+        android:id="@+id/handle"
+        app:layout_widthPercent="@dimen/favorite_handle_width"
+        android:layout_height="?listPreferredItemHeight"
+        android:layout_gravity="center_vertical|left|start"
+        android:scaleType="center"
+        app:srcCompat="@drawable/ic_reorder_primary_dark_24dp" />
+
+    <!--suppress AndroidDomInspection -->
     <TextView
         app:layout_widthPercent="@dimen/favorite_name_width"
+        android:layout_toRightOf="@+id/handle"
+        android:layout_toEndOf="@+id/handle"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/favorite_item_min_height"
         android:textSize="16sp"

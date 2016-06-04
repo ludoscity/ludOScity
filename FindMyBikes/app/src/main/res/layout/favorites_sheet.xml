@@ -27,7 +27,7 @@
             android:text="@string/favorites_sheet_header"
             android:singleLine="true"
             android:textColor="@color/primary_text_default_material_dark"
-            android:background="@color/theme_primary_dark"
+            android:background="@color/theme_primary"
             android:id="@+id/favorites_sheet_header" />
 
         <!--suppress AndroidDomInspection -->
