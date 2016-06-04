@@ -11,19 +11,43 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by F8Full on 2016-03-31.
  * Adapter for the RecyclerView displaying favorites station in a sheet
  * Also allows edition
+ * 2016-06-03 partially from - https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf#.4okwgvgtx
  */
-public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRecyclerViewAdapter.FavoriteListItemViewHolder> {
+public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRecyclerViewAdapter.FavoriteListItemViewHolder>
+                                        implements ItemTouchHelperAdapter {
 
 
     private final OnFavoriteListItemClickListener mListener;
     private final Context mCtx;
 
     private ArrayList<FavoriteItem> mFavoriteList = new ArrayList<>();
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(mFavoriteList, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(mFavoriteList, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+
+    }
 
     public interface OnFavoriteListItemClickListener {
         void onFavoriteListItemClick(String _stationId);

@@ -597,7 +597,7 @@ public class DBHelper {
         try {
             JSONArray oldFavoriteJSONArray = new JSONArray(sp.getString(
                     buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, ctx), "[]" ));
-            JSONArray newFavoriteJSONArray;
+            JSONArray newFavoriteJSONArray = new JSONArray();
 
             int existingIndex = -1;
 
@@ -610,17 +610,23 @@ public class DBHelper {
 
             if (isFavorite){
                 if (existingIndex == -1) {
-                    oldFavoriteJSONArray.put(id);
-                    oldFavoriteJSONArray.put(displayName);
-                    oldFavoriteJSONArray.put(isDisplayNameDefault);
+
+                    newFavoriteJSONArray.put(id);
+                    newFavoriteJSONArray.put(displayName);
+                    newFavoriteJSONArray.put(isDisplayNameDefault);
+
+                    for (int i=0; i<oldFavoriteJSONArray.length(); ++i){
+                        newFavoriteJSONArray.put(i+3, oldFavoriteJSONArray.get(i));
+                    }
                 }
                 else{
 
                     oldFavoriteJSONArray.put(existingIndex + 1, displayName);
                     oldFavoriteJSONArray.put(existingIndex + 2, isDisplayNameDefault);
-                }
 
-                newFavoriteJSONArray = oldFavoriteJSONArray;
+                    //TEMP. I need to handle the update case
+                    newFavoriteJSONArray = oldFavoriteJSONArray;
+                }
             }
             else{ //Removing favorite
                 //Requires API 19

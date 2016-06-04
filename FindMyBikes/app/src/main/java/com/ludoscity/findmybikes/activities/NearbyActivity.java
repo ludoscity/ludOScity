@@ -65,6 +65,7 @@ import com.gordonwong.materialsheetfab.MaterialSheetFabEventListener;
 import com.ludoscity.findmybikes.Fab;
 import com.ludoscity.findmybikes.FavoriteItem;
 import com.ludoscity.findmybikes.FavoriteRecyclerViewAdapter;
+import com.ludoscity.findmybikes.ItemTouchHelperAdapter;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.RootApplication;
 import com.ludoscity.findmybikes.StationItem;
@@ -508,10 +509,13 @@ public class NearbyActivity extends AppCompatActivity
 
         //ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
         //        ItemTouchHelper.LEFT) {
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback( 0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback( ItemTouchHelper.UP | ItemTouchHelper.DOWN
+                , ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
+                ((ItemTouchHelperAdapter)recyclerView.getAdapter()).onItemMove(viewHolder.getAdapterPosition(),
+                                                                                target.getAdapterPosition());
+                return true;
             }
 
             @Override
@@ -625,6 +629,8 @@ public class NearbyActivity extends AppCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
+
+    //private void swapFavoritesSave
 
     //TODO: refactor add and remove favorite
     private void removeFavorite(final StationItem _station, boolean _showUndo) {
