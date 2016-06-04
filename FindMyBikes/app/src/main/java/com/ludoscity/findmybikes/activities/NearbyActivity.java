@@ -60,8 +60,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.gordonwong.materialsheetfab.MaterialSheetFabEventListener;
+import com.ludoscity.findmybikes.EditableMaterialSheetFab;
 import com.ludoscity.findmybikes.Fab;
 import com.ludoscity.findmybikes.FavoriteItem;
 import com.ludoscity.findmybikes.FavoriteRecyclerViewAdapter;
@@ -148,7 +148,7 @@ public class NearbyActivity extends AppCompatActivity
     private static int SETTINGS_REQUEST_CODE = 2;
     private FloatingActionButton mDirectionsLocToAFab;
     private FloatingActionButton mSearchFAB;
-    private MaterialSheetFab mFavoritesSheetFab;
+    private EditableMaterialSheetFab mFavoritesSheetFab;
     private boolean mFavoriteSheetVisible = false;
     private FloatingActionButton mClearFAB;
     private Fab mFavoritePickerFAB;
@@ -546,11 +546,11 @@ public class NearbyActivity extends AppCompatActivity
 
     private void setupFavoriteListFeedback(boolean _noFavorite) {
         if (_noFavorite){
-            ((TextView)findViewById(R.id.favorites_sheet_header)).setText(
+            ((TextView)findViewById(R.id.favorites_sheet_header_textview)).setText(
                     Html.fromHtml(String.format(getResources().getString(R.string.no_favorite), DBHelper.getBikeNetworkName(this))));
         }
         else{
-            ((TextView)findViewById(R.id.favorites_sheet_header)).setText(
+            ((TextView)findViewById(R.id.favorites_sheet_header_textview)).setText(
                     Html.fromHtml(String.format(getResources().getString(R.string.favorites_sheet_header), DBHelper.getBikeNetworkName(this))));
         }
     }
@@ -722,7 +722,7 @@ public class NearbyActivity extends AppCompatActivity
 
         //Caused by: java.lang.NullPointerException (sheetView)
         // Create material sheet FAB
-        mFavoritesSheetFab = new MaterialSheetFab<>(mFavoritePickerFAB, sheetView, overlay, sheetColor, fabColor);
+        mFavoritesSheetFab = new EditableMaterialSheetFab(mFavoritePickerFAB, sheetView, overlay, sheetColor, fabColor);
 
         mFavoritesSheetFab.setEventListener(new MaterialSheetFabEventListener() {
             @Override
@@ -1881,7 +1881,19 @@ public class NearbyActivity extends AppCompatActivity
     }
 
     @Override
+    public void onFavoristeListItemEditBegin() {
+        mFavoritesSheetFab.hideEditFab();
+
+    }
+
+    @Override
+    public void onFavoristeListItemEditAbort() {
+        mFavoritesSheetFab.showEditFab();
+    }
+
+    @Override
     public void onFavoristeListItemEditDone(String _stationId, String _newName) {
+        mFavoritesSheetFab.showEditFab();
         DBHelper.updateFavorite(true, _stationId, _newName, false, this);
         mFavoriteRecyclerViewAdapter.setupFavoriteList(DBHelper.getFavoriteItems(this));
         StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);

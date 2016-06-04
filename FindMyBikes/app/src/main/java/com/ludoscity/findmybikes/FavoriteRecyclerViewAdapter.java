@@ -52,6 +52,10 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
     public interface OnFavoriteListItemClickListener {
         void onFavoriteListItemClick(String _stationId);
         void onFavoristeListItemEditDone(String _stationId, String _newName );
+
+        void onFavoristeListItemEditBegin();
+
+        void onFavoristeListItemEditAbort();
     }
 
     public FavoriteRecyclerViewAdapter(OnFavoriteListItemClickListener _listener, Context _ctx){
@@ -135,6 +139,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
                 case R.id.favorite_name_edit_fab:
                     mEditing = true;
                     setupEditMode(true);
+                    mListener.onFavoristeListItemEditBegin();
                     break;
 
                 case R.id.favorite_name_done_fab:
@@ -204,6 +209,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
 
                     mEditing = false;
                     setupEditMode(false);
+                    mListener.onFavoristeListItemEditAbort();
                 }
             }
         }
