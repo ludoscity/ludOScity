@@ -11,10 +11,10 @@
         android:id="@+id/handle"
         app:layout_widthPercent="@dimen/favorite_handle_width"
         android:layout_height="?listPreferredItemHeight"
-        android:layout_gravity="center_vertical|left|start"
+        android:layout_gravity="center_vertical|start"
         android:scaleType="center"
         android:visibility="gone"
-        app:srcCompat="@drawable/ic_affordance_handle_primary_dark_24dp" />
+        app:srcCompat="@drawable/ic_reorder_affordance_handle_primary_dark_24dp" />
 
     <!--suppress AndroidDomInspection -->
     <TextView
