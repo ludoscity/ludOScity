@@ -695,14 +695,14 @@ public class NearbyActivity extends AppCompatActivity
                     @Override
                     public void onClick(View v) {
 
-                        addFavorite(_station, _station.getName(), false);
+                        addFavorite(_station, _station.getName(), false, false);
                         getListPagerAdapter().setupBTabStationARecap(_station);
                     }
                 }).show();
         }
     }
 
-    private void addFavorite(final StationItem _station, String _displayName, boolean _showUndo) {
+    private void addFavorite(final StationItem _station, String _displayName, boolean _silent, boolean _showUndo) {
         _station.setFavorite(true, _displayName, this);
         ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteAll(this);
         setupFavoriteListFeedback(favoriteList.isEmpty());
@@ -714,21 +714,22 @@ public class NearbyActivity extends AppCompatActivity
 
         //getListPagerAdapter().addStationForPage(StationListPagerAdapter.DOCK_STATIONS, _station);
 
-        if (!_showUndo) {
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added,
-                    Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                 .show();
-        }
-        else {
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                .setAction(R.string.undo, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+        if (!_silent) {
+            if (!_showUndo) {
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added,
+                        Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                        .show();
+            } else {
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_added, Snackbar.LENGTH_LONG, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                        .setAction(R.string.undo, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                        removeFavorite(_station, false);
-                        getListPagerAdapter().setupBTabStationARecap(_station);
-                    }
-                }).show();
+                                removeFavorite(_station, false);
+                                getListPagerAdapter().setupBTabStationARecap(_station);
+                            }
+                        }).show();
+            }
         }
     }
 
@@ -1603,7 +1604,7 @@ public class NearbyActivity extends AppCompatActivity
                 boolean newState = !clickedStation.isFavorite(this);
 
                 if (newState) {
-                    addFavorite(clickedStation, clickedStation.getName(), showUndo);
+                    addFavorite(clickedStation, clickedStation.getName(), false, showUndo);
                 } else {
                     removeFavorite(clickedStation, showUndo);
                 }
@@ -1944,7 +1945,7 @@ public class NearbyActivity extends AppCompatActivity
             //String favDisplayName = fav.getDisplayName();
             //String StationName = station.getName();
 
-            addFavorite(station, fav.getDisplayName(), false);
+            addFavorite(station, fav.getDisplayName(), true, false);
         }
 
     }
