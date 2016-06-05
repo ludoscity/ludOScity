@@ -525,6 +525,13 @@ public class NearbyActivity extends AppCompatActivity
 
                 removeFavorite(getStation(favViewHolder.getStationId()), true);
             }
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+
+                return mFavoriteRecyclerViewAdapter.getSheetEditing();
+
+            }
         };
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
@@ -544,14 +551,21 @@ public class NearbyActivity extends AppCompatActivity
         itemTouchHelper.attachToRecyclerView(favoriteRecyclerView);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void setupFavoriteListFeedback(boolean _noFavorite) {
         if (_noFavorite){
             ((TextView)findViewById(R.id.favorites_sheet_header_textview)).setText(
                     Html.fromHtml(String.format(getResources().getString(R.string.no_favorite), DBHelper.getBikeNetworkName(this))));
+            findViewById(R.id.favorite_sheet_edit_fab).setVisibility(View.INVISIBLE);
+            findViewById(R.id.favorite_sheet_edit_done_fab).setVisibility(View.INVISIBLE);
+            mFavoriteRecyclerViewAdapter.setSheetEditing(false);
         }
         else{
             ((TextView)findViewById(R.id.favorites_sheet_header_textview)).setText(
                     Html.fromHtml(String.format(getResources().getString(R.string.favorites_sheet_header), DBHelper.getBikeNetworkName(this))));
+
+            ((FloatingActionButton)findViewById(R.id.favorite_sheet_edit_fab)).show();
+
         }
     }
 
@@ -1889,6 +1903,11 @@ public class NearbyActivity extends AppCompatActivity
     @Override
     public void onFavoristeListItemEditAbort() {
         mFavoritesSheetFab.showEditFab();
+    }
+
+    @Override
+    public void onFavoriteListItemDelete(String _stationId) {
+        removeFavorite(getStation(_stationId), true);
     }
 
     @Override

@@ -47,6 +47,22 @@
             style="@style/listitem_floating_action_button"
             />
 
+        <android.support.design.widget.FloatingActionButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/favorite_sheet_edit_done_fab"
+            android:clickable="true"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_action_done_24dp"
+
+            app:fabSize="mini"
+            app:layout_anchorGravity="start|center_vertical"
+            app:backgroundTint="@color/theme_accent"
+
+
+            style="@style/listitem_floating_action_button"
+            />
+
             <!-- Header -->
             <!--suppress AndroidDomInspection -->
             <TextView

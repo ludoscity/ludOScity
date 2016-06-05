@@ -8,7 +8,7 @@
 
     <!--suppress AndroidDomInspection -->
     <ImageView
-        android:id="@+id/handle"
+        android:id="@+id/reorder_affordance_handle"
         app:layout_widthPercent="@dimen/favorite_handle_width"
         android:layout_height="?listPreferredItemHeight"
         android:layout_gravity="center_vertical|start"
@@ -19,9 +19,9 @@
     <!--suppress AndroidDomInspection -->
     <TextView
         app:layout_widthPercent="@dimen/favorite_name_width_no_sheet_editing"
-        android:layout_toRightOf="@+id/handle"
-        android:layout_toEndOf="@+id/handle"
-        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/reorder_affordance_handle"
+        android:layout_toEndOf="@+id/reorder_affordance_handle"
+        android:layout_height="?listPreferredItemHeight"
         android:minHeight="@dimen/favorite_item_min_height"
         android:textSize="16sp"
         android:fontFamily="sans-serif-condensed"
@@ -50,6 +50,25 @@
         app:backgroundTint="@color/theme_primary_dark"
         android:layout_toEndOf="@+id/favorite_name"
         android:layout_toRightOf="@+id/favorite_name"
+
+        style="@style/listitem_floating_action_button"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/favorite_delete_fab"
+        android:layout_centerInParent="true"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_action_delete_24dp"
+
+        app:fabSize="mini"
+        app:layout_anchorGravity="start|center_vertical"
+        app:backgroundTint="@color/theme_accent_negative"
+        android:layout_toEndOf="@+id/favorite_name"
+        android:layout_toRightOf="@+id/favorite_name"
+
+        android:visibility="invisible"
 
         style="@style/listitem_floating_action_button"
         />
