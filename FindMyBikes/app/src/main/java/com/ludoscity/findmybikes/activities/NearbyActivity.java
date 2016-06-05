@@ -107,6 +107,7 @@ public class NearbyActivity extends AppCompatActivity
         implements StationMapFragment.OnStationMapFragmentInteractionListener,
         StationListFragment.OnStationListFragmentInteractionListener,
         FavoriteRecyclerViewAdapter.OnFavoriteListItemClickListener,
+        EditableMaterialSheetFab.OnFavoriteSheetClickListener,
         SwipeRefreshLayout.OnRefreshListener,
         ViewPager.OnPageChangeListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -532,6 +533,12 @@ public class NearbyActivity extends AppCompatActivity
                 return mFavoriteRecyclerViewAdapter.getSheetEditing();
 
             }
+
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+
+                return !mFavoriteRecyclerViewAdapter.getSheetEditing();
+            }
         };
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
@@ -543,7 +550,7 @@ public class NearbyActivity extends AppCompatActivity
 
         mFavoriteRecyclerViewAdapter = new FavoriteRecyclerViewAdapter(this, this);
 
-        ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(this);
+        ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteAll(this);
         setupFavoriteListFeedback(favoriteList.isEmpty());
         mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
         favoriteRecyclerView.setAdapter(mFavoriteRecyclerViewAdapter);
@@ -648,8 +655,8 @@ public class NearbyActivity extends AppCompatActivity
 
     //TODO: refactor add and remove favorite
     private void removeFavorite(final StationItem _station, boolean _showUndo) {
-        _station.setFavorite(false, this);
-        ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(this);
+        _station.setFavorite(false, "", this);
+        ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteAll(this);
         setupFavoriteListFeedback(favoriteList.isEmpty());
         mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
@@ -688,16 +695,16 @@ public class NearbyActivity extends AppCompatActivity
                     @Override
                     public void onClick(View v) {
 
-                        addFavorite(_station, false);
+                        addFavorite(_station, _station.getName(), false);
                         getListPagerAdapter().setupBTabStationARecap(_station);
                     }
                 }).show();
         }
     }
 
-    private void addFavorite(final StationItem _station, boolean _showUndo) {
-        _station.setFavorite(true, this);
-        ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(this);
+    private void addFavorite(final StationItem _station, String _displayName, boolean _showUndo) {
+        _station.setFavorite(true, _displayName, this);
+        ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteAll(this);
         setupFavoriteListFeedback(favoriteList.isEmpty());
         mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
@@ -736,7 +743,7 @@ public class NearbyActivity extends AppCompatActivity
 
         //Caused by: java.lang.NullPointerException (sheetView)
         // Create material sheet FAB
-        mFavoritesSheetFab = new EditableMaterialSheetFab(mFavoritePickerFAB, sheetView, overlay, sheetColor, fabColor);
+        mFavoritesSheetFab = new EditableMaterialSheetFab(mFavoritePickerFAB, sheetView, overlay, sheetColor, fabColor, this);
 
         mFavoritesSheetFab.setEventListener(new MaterialSheetFabEventListener() {
             @Override
@@ -1057,7 +1064,7 @@ public class NearbyActivity extends AppCompatActivity
 
                                     //station.setFavorite(true, NearbyActivity.this); //We want to manipulate everything, hence go directly to DBHelper
                                     DBHelper.updateFavorite(true, station.getId(), getResources().getString(R.string.onboarding_favorite_name), false, NearbyActivity.this);
-                                    ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteItems(NearbyActivity.this);
+                                    ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteAll(NearbyActivity.this);
                                     setupFavoriteListFeedback(favoriteList.isEmpty());
                                     mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
@@ -1596,7 +1603,7 @@ public class NearbyActivity extends AppCompatActivity
                 boolean newState = !clickedStation.isFavorite(this);
 
                 if (newState) {
-                    addFavorite(clickedStation, showUndo);
+                    addFavorite(clickedStation, clickedStation.getName(), showUndo);
                 } else {
                     removeFavorite(clickedStation, showUndo);
                 }
@@ -1914,10 +1921,32 @@ public class NearbyActivity extends AppCompatActivity
     public void onFavoristeListItemEditDone(String _stationId, String _newName) {
         mFavoritesSheetFab.showEditFab();
         DBHelper.updateFavorite(true, _stationId, _newName, false, this);
-        mFavoriteRecyclerViewAdapter.setupFavoriteList(DBHelper.getFavoriteItems(this));
+        mFavoriteRecyclerViewAdapter.setupFavoriteList(DBHelper.getFavoriteAll(this));
         StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
         getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
         getListPagerAdapter().notifyRecyclerViewDatasetChangedForAllPages();
+    }
+
+    @Override
+    public void onFavoriteSheetEditDoneClick() {
+
+        DBHelper.dropFavoriteAll(this);
+
+        ArrayList<FavoriteItem> newlyOrderedFavList = new ArrayList<>();
+        newlyOrderedFavList.addAll(mFavoriteRecyclerViewAdapter.getCurrentFavoriteList());
+
+        Collections.reverse(newlyOrderedFavList);   //pfff, it's ok those list will be small
+
+        for (FavoriteItem fav : newlyOrderedFavList){
+
+            StationItem station = getStation(fav.getStationId());
+
+            //String favDisplayName = fav.getDisplayName();
+            //String StationName = station.getName();
+
+            addFavorite(station, fav.getDisplayName(), false);
+        }
+
     }
 
     public class RedrawMarkersTask extends AsyncTask<Boolean, Void, Void> {

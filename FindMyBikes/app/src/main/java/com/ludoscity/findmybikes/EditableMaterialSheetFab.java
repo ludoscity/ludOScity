@@ -13,6 +13,12 @@ import com.gordonwong.materialsheetfab.MaterialSheetFab;
 public class EditableMaterialSheetFab extends MaterialSheetFab
                         implements View.OnClickListener{
 
+    public interface OnFavoriteSheetClickListener {
+        void onFavoriteSheetEditDoneClick();
+    }
+
+    private OnFavoriteSheetClickListener mListener;
+
     private FloatingActionButton mEditFAB;
     private FloatingActionButton mEditDoneFAB;
     private RecyclerView mFavRecyclerview;
@@ -25,7 +31,7 @@ public class EditableMaterialSheetFab extends MaterialSheetFab
      * @param sheetColor The background color of the material sheet.
      * @param fabColor   The background color of the FAB.
      */
-    public EditableMaterialSheetFab( View view, View sheet, View overlay, int sheetColor, int fabColor) {
+    public EditableMaterialSheetFab( View view, View sheet, View overlay, int sheetColor, int fabColor, OnFavoriteSheetClickListener _listener) {
         super(view, sheet, overlay, sheetColor, fabColor);
         mEditFAB = (FloatingActionButton)sheet.findViewById(R.id.favorite_sheet_edit_fab);
         mEditFAB.setOnClickListener(this);
@@ -34,6 +40,8 @@ public class EditableMaterialSheetFab extends MaterialSheetFab
         mEditDoneFAB.setOnClickListener(this);
 
         mFavRecyclerview = (RecyclerView) sheet.findViewById(R.id.favorites_sheet_recyclerview);
+
+        mListener = _listener;
     }
 
 
@@ -58,6 +66,8 @@ public class EditableMaterialSheetFab extends MaterialSheetFab
             case R.id.favorite_sheet_edit_done_fab:
                 mEditDoneFAB.hide();
                 mEditFAB.show();
+
+                mListener.onFavoriteSheetEditDoneClick();
                 break;
         }
     }

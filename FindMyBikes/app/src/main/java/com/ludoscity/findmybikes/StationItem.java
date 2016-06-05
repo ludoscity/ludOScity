@@ -131,8 +131,11 @@ public class StationItem implements Parcelable, ClusterItem {
         return DBHelper.isFavorite(id, ctx);
     }
 
-    public void setFavorite(Boolean b, Context ctx){
-        DBHelper.updateFavorite(b, id, name, true, ctx);
+    public void setFavorite(Boolean isFavorite, String displayName, Context ctx){
+        if (displayName.equalsIgnoreCase(name))
+            DBHelper.updateFavorite(isFavorite, id, name, true, ctx);
+        else
+            DBHelper.updateFavorite(isFavorite, id, displayName, false, ctx);
     }
 
     public boolean isLocked() {

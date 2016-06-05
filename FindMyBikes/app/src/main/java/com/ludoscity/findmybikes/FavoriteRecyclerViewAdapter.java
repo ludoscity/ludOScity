@@ -57,6 +57,8 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
 
     }
 
+    public ArrayList<FavoriteItem> getCurrentFavoriteList(){ return mFavoriteList; }
+
     public void setSheetEditing(boolean sheetEditing) {
         mSheetEditing = sheetEditing;
     }
