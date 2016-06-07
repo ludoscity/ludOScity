@@ -945,10 +945,20 @@ public class NearbyActivity extends AppCompatActivity
 
                         if (DBHelper.isBikeNetworkIdAvailable(getApplicationContext())) {
 
-                            if (difference >= NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.outdated_data_warning_time_min) * 60 * 1000)
-                                mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this,R.color.theme_accent));
-                            else
+                            if (difference >= NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.outdated_data_warning_time_min) * 60 * 1000) {
+                                mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
+
+                                if (getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.BIKE_STATIONS, true))
+                                    mClosestBikeAutoSelected = false; //yep, this is lazy
+
+                                getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.DOCK_STATIONS, true);
+                            }
+                            else {
                                 mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
+
+                                getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.BIKE_STATIONS, false);
+                                getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.DOCK_STATIONS, false);
+                            }
 
                             if (!DBHelper.getAutoUpdate(getApplicationContext())) {
                                 futureStringBuilder.append(getString(R.string.pull_to_refresh));

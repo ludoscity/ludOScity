@@ -1,6 +1,7 @@
 package com.ludoscity.findmybikes.fragments;
 
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -236,6 +237,15 @@ public class StationListFragment extends Fragment
 
         mStationRecapAvailability.setText(String.format(getResources().getString(R.string.station_recap_bikes), _station.getFree_bikes()));
 
+        if (getStationRecyclerViewAdapter().isAvailabilityOutdated()){
+            mStationRecapAvailability.getPaint().setStrikeThruText(true);
+            mStationRecapAvailability.getPaint().setTypeface(Typeface.DEFAULT);
+        }
+        else{
+            mStationRecapAvailability.getPaint().setTypeface(Typeface.DEFAULT_BOLD);
+            mStationRecapAvailability.getPaint().setStrikeThruText(false);
+        }
+
         mStationRecapAvailability.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.theme_window_background));
 
         if (_station.getFree_bikes() <= DBHelper.getCriticalAvailabilityMax(getContext())){
@@ -392,6 +402,10 @@ public class StationListFragment extends Fragment
 
     public void notifyDatasetChangedToRecyclerView() {
         getStationRecyclerViewAdapter().notifyDataSetChanged();
+    }
+
+    public boolean setOutdatedData(boolean _availabilityOutdated) {
+        return getStationRecyclerViewAdapter().setAvailabilityOutdated(_availabilityOutdated);
     }
 
     public interface OnStationListFragmentInteractionListener {
