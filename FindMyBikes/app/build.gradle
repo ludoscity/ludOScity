@@ -16,8 +16,8 @@ android {
         applicationId "com.ludoscity.findmybikes"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 36
-        versionName "v2.1.1-beta3"
+        versionCode 38
+        versionName "v2.2-rc0"
 
         generatedDensities = []
     }
