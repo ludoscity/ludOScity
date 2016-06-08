@@ -156,8 +156,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         retrieveListFragment(_pageID).setResponsivenessToClick(_toSet);
     }
 
-    public boolean setOutdatedDataForPage(int _pageID, boolean _isDataOutdated){
-        return retrieveListFragment(_pageID).setOutdatedData(_isDataOutdated);
+    public void setOutdatedDataForPage(int _pageID, boolean _isDataOutdated, StationItem _toRecap){
+        retrieveListFragment(_pageID).setOutdatedData(_isDataOutdated, _toRecap);
     }
 
 }

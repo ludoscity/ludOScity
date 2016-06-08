@@ -945,19 +945,20 @@ public class NearbyActivity extends AppCompatActivity
 
                         if (DBHelper.isBikeNetworkIdAvailable(getApplicationContext())) {
 
+                            String rawClosest = getListPagerAdapter().retrieveClosestRawIdAndAvailability(true);
+                            StationItem closestStation = getStation(Utils.extractClosestAvailableStationIdFromProcessedString(rawClosest));
+
                             if (difference >= NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.outdated_data_warning_time_min) * 60 * 1000) {
                                 mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
 
-                                if (getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.BIKE_STATIONS, true))
-                                    mClosestBikeAutoSelected = false; //yep, this is lazy
-
-                                getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.DOCK_STATIONS, true);
+                                getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.BIKE_STATIONS, true, closestStation);
+                                getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.DOCK_STATIONS, true, closestStation);
                             }
                             else {
                                 mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
 
-                                getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.BIKE_STATIONS, false);
-                                getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.DOCK_STATIONS, false);
+                                getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.BIKE_STATIONS, false, closestStation);
+                                getListPagerAdapter().setOutdatedDataForPage(StationListPagerAdapter.DOCK_STATIONS, false, closestStation);
                             }
 
                             if (!DBHelper.getAutoUpdate(getApplicationContext())) {

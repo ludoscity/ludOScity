@@ -404,8 +404,11 @@ public class StationListFragment extends Fragment
         getStationRecyclerViewAdapter().notifyDataSetChanged();
     }
 
-    public boolean setOutdatedData(boolean _availabilityOutdated) {
-        return getStationRecyclerViewAdapter().setAvailabilityOutdated(_availabilityOutdated);
+    public void setOutdatedData(boolean _availabilityOutdated, StationItem _toRecap) {
+        if (getStationRecyclerViewAdapter().setAvailabilityOutdated(_availabilityOutdated)){
+
+            setupStationRecap(_toRecap);
+        }
     }
 
     public interface OnStationListFragmentInteractionListener {
