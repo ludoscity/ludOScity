@@ -21,6 +21,9 @@
 
     <item name="camera_animation_duration" type="integer">850</item>
 
+    <item name="station_item_critical_availability_alpha" type="fraction">25%</item>
+    <item name="station_item_name_bad_availability_alpha" type="fraction">50%</item>
+    <item name="station_item_availability_bad_availability_alpha" type="fraction">65%</item>
 
     <!-- Must be copied to string resources for settings display, I could make it work in SettingsFragment-->
     <!-- TODO: figure this shit out -->

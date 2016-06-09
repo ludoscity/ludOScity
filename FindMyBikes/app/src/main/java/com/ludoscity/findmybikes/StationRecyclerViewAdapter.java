@@ -268,12 +268,12 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             if (mIsLookingForBike) {
                 mAvailability.setText(String.valueOf(_station.getFree_bikes()));
-                setBackgroundColor(_selected, _station.getFree_bikes());
+                setColorAndTransparencyFeedback(_selected, _station.getFree_bikes());
 
             }
             else {
                 mAvailability.setText(String.valueOf(_station.getEmpty_slots()));
-                setBackgroundColor(_selected, _station.getEmpty_slots());
+                setColorAndTransparencyFeedback(_selected, _station.getEmpty_slots());
             }
 
             if (mOutdatedAvailability) {
@@ -289,17 +289,38 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             }
         }
 
-        private void setBackgroundColor(boolean selected, int availabilityValue){
-            if (!selected)
-                itemView.setBackgroundResource(android.R.color.transparent);
-            else{
-                if (availabilityValue <= DBHelper.getCriticalAvailabilityMax(mCtx))
-                    itemView.setBackgroundResource(R.color.stationlist_item_background_red);
-                else if (availabilityValue <= DBHelper.getBadAvailabilityMax(mCtx))
-                    itemView.setBackgroundResource(R.color.stationlist_item_background_yellow);
-                else
-                    itemView.setBackgroundResource(R.color.stationlist_item_background_green);
-            }
+        private void setColorAndTransparencyFeedback(boolean selected, int availabilityValue){
+
+                if (availabilityValue <= DBHelper.getCriticalAvailabilityMax(mCtx)) {
+                    if (selected)
+                        itemView.setBackgroundResource(R.color.stationlist_item_selected_background_red);
+                    else {
+                        itemView.setBackgroundResource(R.color.stationlist_item_background_red);
+                        float alpha = mCtx.getResources().getFraction(R.fraction.station_item_critical_availability_alpha, 1, 1);
+                        mProximity.setAlpha(alpha);
+                        mName.setAlpha(alpha);
+                        mAvailability.setAlpha(alpha);
+                    }
+                }
+                else if (availabilityValue <= DBHelper.getBadAvailabilityMax(mCtx)) {
+                    if (selected)
+                        itemView.setBackgroundResource(R.color.stationlist_item_selected_background_yellow);
+                    else {
+                        itemView.setBackgroundResource(R.color.stationlist_item_background_yellow);
+                        mName.setAlpha(mCtx.getResources().getFraction(R.fraction.station_item_name_bad_availability_alpha, 1, 1));
+                        mAvailability.setAlpha(mCtx.getResources().getFraction(R.fraction.station_item_availability_bad_availability_alpha, 1, 1));
+                    }
+                }
+                else{
+                    if (selected)
+                        itemView.setBackgroundResource(R.color.stationlist_item_selected_background_green);
+                    else
+                        itemView.setBackgroundResource(android.R.color.transparent);
+
+                    mName.setAlpha(1.f);
+                    mAvailability.setAlpha(1.f);
+                    mProximity.setAlpha(1.f);
+                }
         }
 
         @Override
