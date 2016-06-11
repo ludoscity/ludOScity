@@ -1627,7 +1627,11 @@ public class NearbyActivity extends AppCompatActivity
                 boolean newState = !clickedStation.isFavorite(this);
 
                 if (newState) {
-                    addFavorite(clickedStation, clickedStation.getName(), false, showUndo);
+                    if (mStationMapFragment.getMarkerPickedPlaceVisibleName().isEmpty())
+                        addFavorite(clickedStation, clickedStation.getName(), false, showUndo);
+                    else {   //there's a third destination
+                        addFavorite(clickedStation, mStationMapFragment.getMarkerPickedPlaceVisibleName(), false, showUndo);
+                    }
                 } else {
                     removeFavorite(clickedStation, showUndo);
                 }

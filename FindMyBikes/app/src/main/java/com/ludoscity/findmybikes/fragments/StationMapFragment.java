@@ -348,6 +348,18 @@ public class StationMapFragment extends Fragment
         return toReturn;
     }
 
+    public String getMarkerPickedPlaceVisibleName() {
+        String toReturn = null;
+        if ( mMarkerPickedPlace != null  ) {
+            if (mMarkerPickedPlace.isVisible())
+                toReturn = mMarkerPickedPlace.getTitle();
+        }
+        else if (mBufferedBundle != null && mBufferedBundle.getBoolean("pin_picked_place_visibility") )
+            toReturn = mBufferedBundle.getParcelable("pin_picked_place_name");
+
+        return toReturn;
+    }
+
     public LatLngBounds getCameraLatLngBounds() {
         return mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
     }
