@@ -349,7 +349,7 @@ public class StationMapFragment extends Fragment
     }
 
     public String getMarkerPickedPlaceVisibleName() {
-        String toReturn = null;
+        String toReturn = "";
         if ( mMarkerPickedPlace != null  ) {
             if (mMarkerPickedPlace.isVisible())
                 toReturn = mMarkerPickedPlace.getTitle();
