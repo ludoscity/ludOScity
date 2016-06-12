@@ -324,7 +324,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             }
             else {
                 if (selected)
-                    itemView.setBackgroundResource(R.color.theme_primary);
+                    itemView.setBackgroundResource(R.color.theme_accent);
                 else
                     itemView.setBackgroundResource(android.R.color.transparent);
 
