@@ -19,7 +19,7 @@ android {
         versionCode 43
         versionName "v2.2-rc5"
 
-        generatedDensities = []
+        vectorDrawables.generatedDensities = []
     }
     // Flag that tells aapt to keep the attribute ids
     aaptOptions {
