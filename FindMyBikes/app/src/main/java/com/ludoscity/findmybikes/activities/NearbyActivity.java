@@ -1296,8 +1296,18 @@ public class NearbyActivity extends AppCompatActivity
                         }
 
                         getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
-                    } else
+                    } else {
+
+                        //hackfix. On some devices timing issues led to infinite loop with isRecyclerViewReadyForItemSelection always returning false
+                        //so, retry stting up the UI before going to sleep
+                        LatLng sortRef = _targetDestination != null ? _targetDestination.getLatLng() : getLatLngForStation(_selectedStationId);
+                        //Replace recyclerview content
+                        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
+                                sortRef, mStationMapFragment.getMarkerALatLng());
+                        //end hackfix
+
                         handler.postDelayed(this, 10);
+                    }
                 }
             }, 10);
         }
