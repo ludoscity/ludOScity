@@ -291,6 +291,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         private void setColorAndTransparencyFeedback(boolean selected, int availabilityValue){
 
+            if (!isAvailabilityOutdated()) {
+
                 if (availabilityValue <= DBHelper.getCriticalAvailabilityMax(mCtx)) {
                     if (selected)
                         itemView.setBackgroundResource(R.color.stationlist_item_selected_background_red);
@@ -301,8 +303,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                         mName.setAlpha(alpha);
                         mAvailability.setAlpha(alpha);
                     }
-                }
-                else if (availabilityValue <= DBHelper.getBadAvailabilityMax(mCtx)) {
+                } else if (availabilityValue <= DBHelper.getBadAvailabilityMax(mCtx)) {
                     if (selected)
                         itemView.setBackgroundResource(R.color.stationlist_item_selected_background_yellow);
                     else {
@@ -310,8 +311,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                         mName.setAlpha(mCtx.getResources().getFraction(R.fraction.station_item_name_bad_availability_alpha, 1, 1));
                         mAvailability.setAlpha(mCtx.getResources().getFraction(R.fraction.station_item_availability_bad_availability_alpha, 1, 1));
                     }
-                }
-                else{
+                } else {
                     if (selected)
                         itemView.setBackgroundResource(R.color.stationlist_item_selected_background_green);
                     else
@@ -321,6 +321,15 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                     mAvailability.setAlpha(1.f);
                     mProximity.setAlpha(1.f);
                 }
+            }
+            else {
+                if (selected)
+                    itemView.setBackgroundResource(R.color.theme_primary);
+                else
+                    itemView.setBackgroundResource(android.R.color.transparent);
+
+                mAvailability.setAlpha(mCtx.getResources().getFraction(R.fraction.station_item_critical_availability_alpha, 1, 1));
+            }
         }
 
         @Override
