@@ -294,8 +294,12 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             if (!isAvailabilityOutdated()) {
 
                 if (availabilityValue <= DBHelper.getCriticalAvailabilityMax(mCtx)) {
-                    if (selected)
+                    if (selected) {
                         itemView.setBackgroundResource(R.color.stationlist_item_selected_background_red);
+                        mProximity.setAlpha(1.f);
+                        mName.setAlpha(1.f);
+                        mAvailability.setAlpha(1.f);
+                    }
                     else {
                         itemView.setBackgroundResource(R.color.stationlist_item_background_red);
                         float alpha = mCtx.getResources().getFraction(R.fraction.station_item_critical_availability_alpha, 1, 1);
@@ -304,8 +308,12 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                         mAvailability.setAlpha(alpha);
                     }
                 } else if (availabilityValue <= DBHelper.getBadAvailabilityMax(mCtx)) {
-                    if (selected)
+                    if (selected) {
                         itemView.setBackgroundResource(R.color.stationlist_item_selected_background_yellow);
+                        mProximity.setAlpha(1.f);
+                        mName.setAlpha(1.f);
+                        mAvailability.setAlpha(1.f);
+                    }
                     else {
                         itemView.setBackgroundResource(R.color.stationlist_item_background_yellow);
                         mName.setAlpha(mCtx.getResources().getFraction(R.fraction.station_item_name_bad_availability_alpha, 1, 1));
