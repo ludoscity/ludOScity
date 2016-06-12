@@ -310,6 +310,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                         itemView.setBackgroundResource(R.color.stationlist_item_background_yellow);
                         mName.setAlpha(mCtx.getResources().getFraction(R.fraction.station_item_name_bad_availability_alpha, 1, 1));
                         mAvailability.setAlpha(mCtx.getResources().getFraction(R.fraction.station_item_availability_bad_availability_alpha, 1, 1));
+                        mProximity.setAlpha(1.f);
                     }
                 } else {
                     if (selected)
@@ -329,6 +330,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                     itemView.setBackgroundResource(android.R.color.transparent);
 
                 mAvailability.setAlpha(mCtx.getResources().getFraction(R.fraction.station_item_critical_availability_alpha, 1, 1));
+                mProximity.setAlpha(1.f);
+                mName.setAlpha(1.f);
             }
         }
 
