@@ -1,6 +1,7 @@
 package com.ludoscity.findmybikes;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -51,6 +52,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
     private OnStationListItemClickListener mListener;
     private boolean mRespondToClick = true;
+    private boolean mOutdatedAvailability = false;
 
     public void saveStationList(Bundle outState) {
         outState.putParcelableArrayList("stationitem_arraylist", mStationList);
@@ -78,6 +80,19 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         notifyDataSetChanged();
     }
+
+    public boolean setAvailabilityOutdated(boolean _toSet) {
+
+        if (mOutdatedAvailability == _toSet)
+            return false;
+
+        mOutdatedAvailability = !mOutdatedAvailability;
+        notifyDataSetChanged();
+
+        return true;
+    }
+
+    public boolean isAvailabilityOutdated(){ return mOutdatedAvailability; }
 
     public void setClickResponsiveness(boolean _toSet) {
         mRespondToClick = _toSet;
@@ -259,6 +274,18 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             else {
                 mAvailability.setText(String.valueOf(_station.getEmpty_slots()));
                 setBackgroundColor(_selected, _station.getEmpty_slots());
+            }
+
+            if (mOutdatedAvailability) {
+                mAvailability.getPaint().setStrikeThruText(true);
+                mAvailability.getPaint().setTypeface(Typeface.DEFAULT);
+                //mAvailability.getPaint().setStrokeWidth(6.5f);
+            }
+            else {
+                mAvailability.getPaint().setTypeface(Typeface.DEFAULT_BOLD);
+                mAvailability.getPaint().setStrikeThruText(false);
+                //thks @romainguy ! ;)
+                //http://stackoverflow.com/questions/6796809/remove-a-paint-flag-in-android
             }
         }
 

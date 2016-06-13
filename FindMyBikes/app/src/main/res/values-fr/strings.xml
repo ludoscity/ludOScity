@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">#vélocalise</string>
     <string name="favorites_sheet_header">Favoris - &lt;b>%1$s&lt;/b></string>
-    <string name="title_section_settings">Paramètres</string>
+    <string name="menu_settings">#paramètres</string>
     <string name="title_section_nearby">À proximité</string>
     <string name="navigation_drawer_open">Ouvrir navigation drawer</string>
     <string name="navigation_drawer_close">Fermer navigation drawer</string>
@@ -60,9 +60,11 @@
     <string name="appbar_title_postfix"></string>
     <string name="appbar_title_prefix">#vélocalise</string>
     <string name="appbar_subtitle_formatted"><![CDATA[<i>à %1$s</b>]]></string>
-    <string name="onboarding_favorite_name">#salut ! Je suis votre premier favori. D\'abord, cliquez moi !</string>
-    <string name="title_privacy_policy">#confidentialité</string>
+    <string name="onboarding_favorite_name">#salut ! Je suis votre favori d\'apprentissage. D\'abord, cliquez moi !</string>
+    <string name="menu_privacy">#confidentialité</string>
     <string name="title_source_code">#source</string>
     <string name="manual_download_failed">#échec du téléchargement :/</string>
     <string name="retry">RÉESSAYER</string>
+    <string name="menu_tutorial">#tutoriel ~1min</string>
+    <string name="title_legal_notices">#notices</string>
 </resources>

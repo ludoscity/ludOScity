@@ -9,7 +9,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="no_data">#connection needed for data download!</string>
-    <string name="title_section_settings">Settings</string>
+    <string name="menu_settings">#settings</string>
     <string name="fromCitibik_es">from citybik.es</string>
     <string name="moments">Moments</string>
     <string name="min">min</string>
@@ -76,11 +76,13 @@
     <string name="favorite_onboarding_start"><![CDATA[#trip recap on the bottom you see? Now remove favorite by clicking on the <3 icon.]]></string>
     <string name="auto_bike_select_error">#couldn\'t find any bike :s ! #selected closest station.</string>
     <string name="title_legal">#legal</string>
-    <string name="onboarding_favorite_name">#hi ! I\'m your first favorite. Instructions say tap me !</string>
+    <string name="onboarding_favorite_name">#hi ! I\'m your training favorite. Instructions say tap me !</string>
     <string name="twitter_not_closest_bike_data_format" translatable="false">%1$s bike is not closest! Bikes:%2$d %3$s at %4$s %5$s walk %6$s %7$s</string>
     <string name="twitter_closer_discarded_reply_data_format" translatable="false">%1$s discarded closer! Bikes:%2$d %3$s at %4$s %5$s</string>
-    <string name="title_privacy_policy">#privacy</string>
+    <string name="menu_privacy">#privacy</string>
     <string name="title_source_code">#source</string>
     <string name="manual_download_failed">#download failed :/</string>
     <string name="retry">RETRY</string>
+    <string name="menu_tutorial">#tutorial ~1min</string>
+    <string name="title_legal_notices">#notices</string>
 </resources>

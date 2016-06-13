@@ -524,7 +524,7 @@ public class DBHelper {
 
     //TODO: Add validation of IDs to handle the case were a favorite station been removed
     //Replace edit fab with red delete one
-    public static ArrayList<FavoriteItem> getFavoriteItems(Context _ctx){
+    public static ArrayList<FavoriteItem> getFavoriteAll(Context _ctx){
         ArrayList<FavoriteItem> toReturn = new ArrayList<>();
 
         SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
@@ -588,6 +588,14 @@ public class DBHelper {
         return toReturn;
     }
 
+    public static void dropFavoriteAll(Context _ctx){
+
+        SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+
+        sp.edit().remove(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, _ctx)).commit(); //I DO want commit and not apply
+
+    }
+
     public static void updateFavorite(final Boolean isFavorite, String id, String displayName, boolean isDisplayNameDefault, Context ctx) {
 
         SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
@@ -597,7 +605,7 @@ public class DBHelper {
         try {
             JSONArray oldFavoriteJSONArray = new JSONArray(sp.getString(
                     buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, ctx), "[]" ));
-            JSONArray newFavoriteJSONArray;
+            JSONArray newFavoriteJSONArray = new JSONArray();
 
             int existingIndex = -1;
 
@@ -610,17 +618,23 @@ public class DBHelper {
 
             if (isFavorite){
                 if (existingIndex == -1) {
-                    oldFavoriteJSONArray.put(id);
-                    oldFavoriteJSONArray.put(displayName);
-                    oldFavoriteJSONArray.put(isDisplayNameDefault);
+
+                    newFavoriteJSONArray.put(id);
+                    newFavoriteJSONArray.put(displayName);
+                    newFavoriteJSONArray.put(isDisplayNameDefault);
+
+                    for (int i=0; i<oldFavoriteJSONArray.length(); ++i){
+                        newFavoriteJSONArray.put(i+3, oldFavoriteJSONArray.get(i));
+                    }
                 }
                 else{
 
                     oldFavoriteJSONArray.put(existingIndex + 1, displayName);
                     oldFavoriteJSONArray.put(existingIndex + 2, isDisplayNameDefault);
-                }
 
-                newFavoriteJSONArray = oldFavoriteJSONArray;
+                    //TEMP. I need to handle the update case
+                    newFavoriteJSONArray = oldFavoriteJSONArray;
+                }
             }
             else{ //Removing favorite
                 //Requires API 19
