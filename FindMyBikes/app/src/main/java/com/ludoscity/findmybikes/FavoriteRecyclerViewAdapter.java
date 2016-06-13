@@ -110,7 +110,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         return mFavoriteList.size();
     }
 
-    public class FavoriteListItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnFocusChangeListener {
+    public class FavoriteListItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
 
         TextView mName;
         String mStationId;
@@ -138,6 +138,11 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
             mEditFab.setOnClickListener(this);
             mDoneFab.setOnClickListener(this);
             mDeleteFab.setOnClickListener(this);
+
+            mName.setOnLongClickListener(this);
+            mOrderingAffordanceHandle.setOnLongClickListener(this);
+            mDeleteFab.setOnLongClickListener(this);
+
         }
 
         public void bindFavorite(FavoriteItem _favorite){
@@ -149,6 +154,8 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
 
             mName.setText(_favorite.getDisplayName());
             mStationId = _favorite.getStationId();
+
+            setTransparentBackground();
 
             //Beware FloatingActionButton bugs !!
             //so, to get nicely animated buttons I need
@@ -205,6 +212,35 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
                 }
             }, 1);
 
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+
+            if (mSheetEditing) {
+                switchItemViewBackgroundColor();
+                return false;
+            }
+
+            return true;
+        }
+
+        private void setTransparentBackground(){
+            itemView.setSelected(false);
+            itemView.setBackgroundResource(android.R.color.transparent);
+        }
+
+        private void switchItemViewBackgroundColor(){
+            if (itemView.isSelected()) {
+                itemView.setBackgroundResource(android.R.color.transparent);
+                itemView.setSelected(false);
+            }
+
+            else{
+
+                itemView.setSelected(true);
+                itemView.setBackgroundResource(R.color.theme_accent);
+            }
         }
 
         @Override

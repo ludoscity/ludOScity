@@ -18,21 +18,21 @@
     <string name="such_short_trip">#you don\'t need me for such a short trip ! ;)</string>
     <string name="distance">Distance</string>
     <string name="station">Station</string>
-    <string name="bikes">Bikes</string>
-    <string name="docks">Docks</string>
+    <string name="bikes">#bikes</string>
+    <string name="docks">#docks</string>
     <string name="b_tab_question">#where are we going today ?</string>
     <string name="b_tab_closest_bike">Closest bike available at station A :&lt;br>&lt;b>%1$s&lt;/b></string>
-    <string name="station_recap_bikes">Bikes : %1$d</string>
-    <string name="downloading">Downloading data…</string>
+    <string name="station_recap_bikes">#bikes: %1$d</string>
+    <string name="downloading">#downloading data…</string>
     <string name="nextUpdate">Next update</string>
-    <string name="no_connectivity">No connectivity</string>
+    <string name="no_connectivity">connected #not.</string>
     <string name="placeholder_lorem_ipsum" translatable="false">lorem ipsum</string>
-    <string name="refreshing">Refreshing map…</string>
+    <string name="refreshing">#refreshing map…</string>
     <string name="auto_download_failed">#download failed :/ Auto update paused</string>
     <string name="google_maps_not_installed">Google Maps not installed !</string>
-    <string name="searching_bike_network">Searching closest bike system on citybik.es…</string>
+    <string name="searching_bike_network">#searching closest bike system on citybik.es…</string>
     <string name="bike_network_found_message"><![CDATA[#bike system been set to <b>%1$s</b>.<br />I\'ll update it if you travel.]]></string>
-    <string name="searching_wait_location">Waiting on location…</string>
+    <string name="searching_wait_location">#waiting on location…</string>
     <string name="hello_city"><![CDATA[%1$s#hello <b>%2$s</b> !]]></string>
     <string name="hello_travel">#it seems you travelled.\u0020</string>
     <!-- TODO: add 'OK but delete favorites for [OLD NETWORK]' -->

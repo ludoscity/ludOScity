@@ -161,7 +161,7 @@
                 android:layout_centerHorizontal="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textStyle="bold"
-                android:text="XX bikes"
+                android:text="#bikes : XX"
                 />
         </RelativeLayout>
 

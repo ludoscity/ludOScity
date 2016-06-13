@@ -94,7 +94,7 @@ public class StationMapGfx {
                 else if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
                     groundOverlay.setImage(yellowIcon);
                     // check if the overlay is not already green
-                else if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
+                else //if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
                     // overlay isn't green yet
                     groundOverlay.setImage(greenIcon);
             } else
@@ -106,7 +106,7 @@ public class StationMapGfx {
                 else if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
                     groundOverlay.setImage(yellowIcon);
                     // check if the overlay is not already green
-                else if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
+                else //if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
                     // overlay isn't green yet
                     groundOverlay.setImage(greenIcon);
             } else
