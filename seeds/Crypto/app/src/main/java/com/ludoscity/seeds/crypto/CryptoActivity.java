@@ -15,12 +15,14 @@ import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPKeyPair;
 import org.spongycastle.openpgp.PGPKeyRingGenerator;
 import org.spongycastle.openpgp.PGPPublicKey;
+import org.spongycastle.openpgp.PGPSecretKey;
 import org.spongycastle.openpgp.PGPSignature;
 import org.spongycastle.openpgp.operator.PGPDigestCalculator;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPKeyPair;
 import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyEncryptorBuilder;
+//import org.spongycastle.openpgp.examples.RSAKeyPairGenerator
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -51,11 +53,13 @@ public class CryptoActivity extends AppCompatActivity {
     private Button mGenButton;
     private TextView mSecret;
 
+
+    private static final String TAG = "CRYPTO_TAG";
+
     private static void exportKeyPair(
-            OutputStream secretOut,
+            OutputStream    secretOut,
             OutputStream    publicOut,
-            KeyPair dsaKp,
-            KeyPair         elgKp,
+            KeyPair         pair,
             String          identity,
             char[]          passPhrase,
             boolean         armor)
@@ -66,15 +70,11 @@ public class CryptoActivity extends AppCompatActivity {
             secretOut = new ArmoredOutputStream(secretOut);
         }
 
-        PGPKeyPair dsaKeyPair = new JcaPGPKeyPair(PGPPublicKey.DSA, dsaKp, new Date());
-        PGPKeyPair        elgKeyPair = new JcaPGPKeyPair(PGPPublicKey.ELGAMAL_ENCRYPT, elgKp, new Date());
         PGPDigestCalculator sha1Calc = new JcaPGPDigestCalculatorProviderBuilder().build().get(HashAlgorithmTags.SHA1);
-        PGPKeyRingGenerator keyRingGen = new PGPKeyRingGenerator(PGPSignature.POSITIVE_CERTIFICATION, dsaKeyPair,
-                identity, sha1Calc, null, null, new JcaPGPContentSignerBuilder(dsaKeyPair.getPublicKey().getAlgorithm(), HashAlgorithmTags.SHA1), new JcePBESecretKeyEncryptorBuilder(PGPEncryptedData.AES_256, sha1Calc).setProvider("SC").build(passPhrase));
+        PGPKeyPair          keyPair = new JcaPGPKeyPair(PGPPublicKey.RSA_GENERAL, pair, new Date());
+        PGPSecretKey        secretKey = new PGPSecretKey(PGPSignature.DEFAULT_CERTIFICATION, keyPair, identity, sha1Calc, null, null, new JcaPGPContentSignerBuilder(keyPair.getPublicKey().getAlgorithm(), HashAlgorithmTags.SHA1), new JcePBESecretKeyEncryptorBuilder(PGPEncryptedData.CAST5, sha1Calc).setProvider("SC").build(passPhrase));
 
-        keyRingGen.addSubKey(elgKeyPair);
-
-        keyRingGen.generateSecretKeyRing().encode(secretOut);
+        secretKey.encode(secretOut);
 
         secretOut.close();
 
@@ -83,7 +83,9 @@ public class CryptoActivity extends AppCompatActivity {
             publicOut = new ArmoredOutputStream(publicOut);
         }
 
-        keyRingGen.generatePublicKeyRing().encode(publicOut);
+        PGPPublicKey    key = secretKey.getPublicKey();
+
+        key.encode(publicOut);
 
         publicOut.close();
     }
@@ -102,31 +104,16 @@ public class CryptoActivity extends AppCompatActivity {
 
                 Security.addProvider(new BouncyCastleProvider());
 
-                KeyPairGenerator dsaKpg;
+                // second test from https://github.com/open-keychain/bouncycastle/blob/openkeychain-master/pg/src/main/java/org/bouncycastle/openpgp/examples/RSAKeyPairGenerator.java
+                //adapted for spongycastle
+
+                KeyPairGenerator kpg;
                 try {
-                    dsaKpg = KeyPairGenerator.getInstance("DSA", "SC");
+                    kpg = KeyPairGenerator.getInstance("RSA", "SC");
 
-                    dsaKpg.initialize(512);
+                    kpg.initialize(512);
 
-                    //
-                    // this takes a while as the key generator has to generate some DSA params
-                    // before it generates the key.
-                    //
-                    KeyPair             dsaKp = dsaKpg.generateKeyPair();
-
-                    KeyPairGenerator    elgKpg = KeyPairGenerator.getInstance("ELGAMAL", "SC");
-                    BigInteger g = new BigInteger("153d5d6172adb43045b68ae8e1de1070b6137005686d29d3d73a7749199681ee5b212c9b96bfdcfa5b20cd5e3fd2044895d609cf9b410b7a0f12ca1cb9a428cc", 16);
-                    BigInteger          p = new BigInteger("9494fec095f3b85ee286542b3836fc81a5dd0a0349b4c239dd38744d488cf8e31db8bcb7d33b41abb9e5a33cca9144b1cef332c94bf0573bf047a3aca98cdf3b", 16);
-
-                    DHParameterSpec elParams = new DHParameterSpec(p, g);
-
-                    elgKpg.initialize(elParams);
-
-                    //
-                    // this is quicker because we are using pregenerated parameters.
-                    //
-                    KeyPair                    elgKp = elgKpg.generateKeyPair();
-
+                    KeyPair                    kp = kpg.generateKeyPair();
 
                     //BufferedReader br = new BufferedReader(new output);
 
@@ -134,10 +121,10 @@ public class CryptoActivity extends AppCompatActivity {
                     ByteArrayOutputStream secretKey = new ByteArrayOutputStream();
                     ByteArrayOutputStream publicKey = new ByteArrayOutputStream();
 
-                    //776 bytes
+                    //393 bytes
                     //exportKeyPair(secretKey, publicKey, dsaKp, elgKp, "identity", "Brilliant pass phrase".toCharArray(), false);
-                    //1164 bytes but "human readable"
-                    exportKeyPair(secretKey, publicKey, dsaKp, elgKp, "identity", "Brilliant pass phrase".toCharArray(), true);
+                    //644 bytes but "human readable"
+                    exportKeyPair(secretKey, publicKey, kp, "identity", "Brilliant pass phrase".toCharArray(), true);
 
 
                     mSecret.setText("size bytes : " + secretKey.size() + '\n' + secretKey.toString());
@@ -154,8 +141,8 @@ public class CryptoActivity extends AppCompatActivity {
                     os.close();*/
 
 
-                } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException | IOException | SignatureException | PGPException | InvalidKeyException e) {
-                    Log.d("CRYPTO_TAG", "oops", e);
+                } catch (NoSuchAlgorithmException | NoSuchProviderException | IOException | SignatureException | PGPException | InvalidKeyException e) {
+                    Log.d(TAG, "oops", e);
                 }
 
 
