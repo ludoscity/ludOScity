@@ -1,7 +1,9 @@
 package com.ludoscity.findmybikes;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -76,4 +78,9 @@ public class RootApplication extends Application {
         return mTwitterAPI;
     }
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
 }

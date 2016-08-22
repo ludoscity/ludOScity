@@ -11,6 +11,8 @@ import android.util.Log;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Manager;
+import com.couchbase.lite.Query;
+import com.couchbase.lite.QueryEnumerator;
 import com.couchbase.lite.QueryOptions;
 import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.UnsavedRevision;
@@ -28,6 +30,7 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -393,15 +396,17 @@ public class DBHelper {
     }
 
     private static List<QueryRow> getAllStations() throws CouchbaseLiteException{
-        Map<String, Object> allDocs;
 
         List<QueryRow> toReturn = new ArrayList<>();
 
-        try {
-            allDocs = mManager.getDatabase(mSTATIONS_DB_NAME).getAllDocs(new QueryOptions());
-            toReturn = (List<QueryRow>) allDocs.get("rows");
-        }
-        catch (SQLiteException e){
+        Query query = mManager.getDatabase(mSTATIONS_DB_NAME).createAllDocumentsQuery();
+
+        QueryEnumerator result = query.run();
+
+        for (Iterator<QueryRow> it = result; it.hasNext(); ) {
+            QueryRow row = it.next();
+
+            toReturn.add(row);
 
         }
 
