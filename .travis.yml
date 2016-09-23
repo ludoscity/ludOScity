@@ -1,6 +1,9 @@
 language: android
 jdk: oraclejdk8
 
+#following so that the build runs in the standard environment (more memory)
+sudo: required
+
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 
