@@ -15,11 +15,10 @@ import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.TypedValue;
 import android.view.View;
 
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
@@ -120,14 +119,13 @@ public class Utils {
 
     //workaround from https://code.google.com/p/gmaps-api-issues/issues/detail?id=9011
     public static BitmapDescriptor getBitmapDescriptor(Context ctx, int id) {
-        Drawable vectorDrawable = ContextCompat.getDrawable(ctx, id);
+        Drawable vectorDrawable = ResourcesCompat.getDrawable(ctx.getResources(), id, null);
         int h = vectorDrawable.getIntrinsicHeight();
         int w = vectorDrawable.getIntrinsicWidth();
         vectorDrawable.setBounds(0, 0, w, h);
         Bitmap bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bm);
         vectorDrawable.draw(canvas);
-        MapsInitializer.initialize(ctx);
         return BitmapDescriptorFactory.fromBitmap(bm);
     }
 
