@@ -471,13 +471,13 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                         break;
                     }
                     else{
-                        availabilityDataPostfixBuilder.append(CRITICAL_AVAILABILITY_POSTFIX)
-                                .append(stationItem.getId());
+                        availabilityDataPostfixBuilder.append(stationItem.getId())
+                                .append(CRITICAL_AVAILABILITY_POSTFIX);
                     }
                 }
                 else {
-                    availabilityDataPostfixBuilder.append(LOCKED_AVAILABILITY_POSTFIX)
-                            .append(stationItem.getId());
+                    availabilityDataPostfixBuilder.append(stationItem.getId())
+                            .append(LOCKED_AVAILABILITY_POSTFIX);
                 }
             }
             else {  //A locked station accepts bike returns
@@ -496,8 +496,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                     break;
                 }
                 else{
-                    availabilityDataPostfixBuilder.append(CRITICAL_AVAILABILITY_POSTFIX)
-                            .append(stationItem.getId());
+                    availabilityDataPostfixBuilder.append(stationItem.getId())
+                            .append(CRITICAL_AVAILABILITY_POSTFIX);
                 }
             }
         }

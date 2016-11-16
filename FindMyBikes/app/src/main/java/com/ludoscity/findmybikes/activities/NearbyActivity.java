@@ -1116,7 +1116,8 @@ public class NearbyActivity extends AppCompatActivity
                         //launch twitter task if not already running, pass it the raw String
                         if ( Utils.Connectivity.isConnected(getApplicationContext()) && //data network available
                                 mUpdateTwitterTask == null &&   //not already tweeting
-                                rawClosest.length() > 32 + StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length() && //there was trouble
+                                rawClosest.length() > 32 + StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length() && //validate format
+                                rawClosest.contains(StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX) && //validate content
                                 difference < NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.outdated_data_warning_time_min) * 60 * 1000){ //data is fresh enough
 
                             mUpdateTwitterTask = new UpdateTwitterStatusTask(mStationsNetwork);
