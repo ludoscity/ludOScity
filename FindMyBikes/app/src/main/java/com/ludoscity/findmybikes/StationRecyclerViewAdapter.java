@@ -32,11 +32,11 @@ import static android.support.v7.widget.RecyclerView.NO_POSITION;
  */
 public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecyclerViewAdapter.StationListItemViewHolder> {
 
-    public static final String AVAILABILITY_POSTFIX_START_SEQUENCE = "AVAILABILITY_";
-    public static final String AOK_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "AOK_";
-    public static final String BAD_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "BAD_";
-    public static final String CRITICAL_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "CRI_";
-    public static final String LOCKED_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "LCK_";
+    public static final String AVAILABILITY_POSTFIX_START_SEQUENCE = "_AVAILABILITY_";
+    public static final String AOK_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "AOK";
+    public static final String BAD_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "BAD";
+    public static final String CRITICAL_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "CRI";
+    public static final String LOCKED_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "LCK";
 
     private ArrayList<StationItem> mStationList = new ArrayList<>();
     private LatLng mDistanceSortReferenceLatLng;

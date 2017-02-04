@@ -1116,8 +1116,8 @@ public class NearbyActivity extends AppCompatActivity
                         //launch twitter task if not already running, pass it the raw String
                         if ( Utils.Connectivity.isConnected(getApplicationContext()) && //data network available
                                 mUpdateTwitterTask == null &&   //not already tweeting
-                                rawClosest.length() > 32 + StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length() && //validate format
-                                rawClosest.contains(StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX) && //validate content
+                                rawClosest.length() > 32 + StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length() && //validate format - 32 is station ID length
+                                (rawClosest.contains(StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX) || rawClosest.contains(StationRecyclerViewAdapter.BAD_AVAILABILITY_POSTFIX) ) && //validate content
                                 difference < NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.outdated_data_warning_time_min) * 60 * 1000){ //data is fresh enough
 
                             mUpdateTwitterTask = new UpdateTwitterStatusTask(mStationsNetwork);
@@ -2296,8 +2296,8 @@ public class NearbyActivity extends AppCompatActivity
 
     public class UpdateTwitterStatusTask extends AsyncTask<String, Void, Void>{
 
-        private static final int NEW_STATUS_STATION_NAME_MAX_LENGTH = 29;
         private static final int REPLY_STATION_NAME_MAX_LENGTH = 54;
+        private static final int STATION_ID_LENGTH = 32;
 
         private Map<String, StationItem> mTrustedEfficientMap;
 
@@ -2340,7 +2340,6 @@ public class NearbyActivity extends AppCompatActivity
             String selectedStationId = "";
             String selectedProximityString = "XXmin";
             String selectedStationName = "Laurier / De Lanaudière";
-            int newStatusStationNameMaxLength = NEW_STATUS_STATION_NAME_MAX_LENGTH;
             String deduplicate = "deduplicate";    //hashtagged
 
             //Pair of station id and availability code (always 'CRI' as of now)
@@ -2348,20 +2347,23 @@ public class NearbyActivity extends AppCompatActivity
 
             StationItem selectedStation = null;
             List<String> extracted = Utils.extractOrderedStationIdsFromProcessedString(params[0]);
+            //extracted will contain as firt element
+            //   359f354466083c962d243bc238c95245_AVAILABILITY_AOK
+            //OR 359f354466083c962d243bc238c95245_AVAILABILITY_BAD
+            //followed by 1 or more string in the form of
+            //   3c3bf5e74cb938e7d57641edaf909d24_AVAILABILITY_CRI
 
+            boolean firstString = true;
 
             for (String e : extracted)
             {
-                //e could be either : f132843c3c740cce6760167985bc4d17AVAILABILITY_BAD_ (selected station)
-                //or AVAILABILITY_CRI_92d97d6adec177649b366c36f3e8e2ff for subsequent discarded stations
+                if (firstString){
+                    //359f354466083c962d243bc238c95245_AVAILABILITY_BAD or
+                    //359f354466083c962d243bc238c95245_AVAILABILITY_AOK
 
-                if (e.indexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE) != 0){
-                    //f132843c3c740cce6760167985bc4d17AVAILABILITY_BAD_ or
-                    //f132843c3c740cce6760167985bc4d17AVAILABILITY_AOK_
-
-                    selectedStationId = e.substring(0,32);
-                    selectedBadorAok = e.substring(32 + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() ,
-                            32 + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() + 3); //'BAD' oe 'AOK'
+                    selectedStationId = e.substring(0,STATION_ID_LENGTH);
+                    selectedBadorAok = e.substring(STATION_ID_LENGTH + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() ,
+                            STATION_ID_LENGTH + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() + 3); //'BAD' or 'AOK'
 
                     selectedStation = mTrustedEfficientMap.get(selectedStationId);
 
@@ -2370,12 +2372,13 @@ public class NearbyActivity extends AppCompatActivity
                     selectedProximityString = selectedStation.getProximityStringFromLatLng(mCurrentUserLatLng,
                             false, getResources().getInteger(R.integer.average_walking_speed_kmh), NearbyActivity.this);
 
-
+                    //station name will be truncated to fit everything in a single tweet
+                    //see R.string.twitter_not_closest_bike_data_format
                     int maxStationNameIdx = 138 - (deduplicate.length()+" ".length()
                             + " walk ".length()
                             + selectedProximityString.length()
                             + " ".length()
-                            + 32
+                            + STATION_ID_LENGTH
                             + " at ".length()
                             + selectedBadorAok.length()
                             + " #".length()
@@ -2384,18 +2387,17 @@ public class NearbyActivity extends AppCompatActivity
                             + systemHashtag.length());
 
                     selectedStationName = selectedStation.getName().substring(0, Math.min(selectedStation.getName().length(), maxStationNameIdx));
-                }
-                else { //AVAILABILITY_CRI_92d97d6adec177649b366c36f3e8e2ff
 
-                    Pair<String, String> discarded = new Pair<>(e.substring(e.length()-32), e.substring(
-                            StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length(),
-                            StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() + 3
+                    firstString = false;
+                }
+                else { //3c3bf5e74cb938e7d57641edaf909d24_AVAILABILITY_CRI
+
+                    Pair<String, String> discarded = new Pair<>(e.substring(0,STATION_ID_LENGTH), e.substring(
+                            STATION_ID_LENGTH + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length(),
+                            STATION_ID_LENGTH + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() + 3
                     ));
 
                     discardedStations.add(discarded);
-
-
-
                 }
 
             }
@@ -2422,8 +2424,6 @@ public class NearbyActivity extends AppCompatActivity
                     twitter4j.Status answerStatus = api.updateStatus(newStatus);
 
                     long replyToId = answerStatus.getId();
-
-                    List<StatusUpdate> replies = new ArrayList<>();
 
                     for (Pair<String, String> discarded : discardedStations ){
                         StationItem discardedStationItem = mTrustedEfficientMap.get(discarded.first);
@@ -2465,8 +2465,6 @@ public class NearbyActivity extends AppCompatActivity
                     } else {
                         deduplicationDone = true;
                     }
-                    String message = e.getMessage();
-
                 }
 
             }
