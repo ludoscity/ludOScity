@@ -41,11 +41,11 @@ public class Utils {
         //int debug2 = _processedString.length();
 
 
-        //Either a station id followed by AVAILABILITY_AOK_
+        //Either a station id followed by _AVAILABILITY_AOK
         //or
-        //a station id followed by AVAILABILITY_BAD_
+        //a station id followed by _AVAILABILITY_BAD
         //or
-        //a station id followed by AVAILABILITY_LCK_
+        //a station id followed by _AVAILABILITY_LCK
 
         //extract only first id
         String firstId = extractOrderedStationIdsFromProcessedString(_processedString).get(0);
@@ -74,7 +74,7 @@ public class Utils {
     }
 
     //citybik.es Ids, ordered by distance
-    //get(0) is the id of the selected station with AOK availability
+    //get(0) is the id of the selected station with BAD or AOK availability
     public static List<String> extractOrderedStationIdsFromProcessedString(String _processedString){
 
         if (_processedString.isEmpty()){
@@ -86,13 +86,14 @@ public class Utils {
 
         //int startSequenceIdx = _processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE);
 
-        int subStringStarIdxDebug = _processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE)
-                + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length();
+        /*int subStringStarIdxDebug = _processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE)
+                + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length();*/
 
-        String subStringDebug = _processedString.substring(_processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE)
-                + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length());
+        /*String subStringDebug = _processedString.substring(_processedString.lastIndexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE)
+                + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length());*/
 
 
+        //TODO: something is fishy here, couldn't figure out how to get the same result without intermediary debug labelled variable
         String debugSplit = _processedString.substring(_processedString.indexOf(StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE)
                         + StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX.length());
 
@@ -194,6 +195,7 @@ public class Utils {
 
             View snackbarView = toReturn.getView();
 
+            //didn't use to work but maybe newer SnackBar versions will support it ?
             /*//change snackbar action text color
             toReturn.setActionTextColor(_actionTextColor);
 
