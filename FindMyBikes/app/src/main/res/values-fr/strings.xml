@@ -44,7 +44,7 @@
     <string name="pref_availability_settings_dialog_title">Paramètres disponibilité</string>
     <string name="pref_availability_critical_hint">Considérées vide dans l\'onglet A ou pleine dans l\'onglet B</string>
     <string name="such_short_trip">#pas besoin de moi pour un trajet si court ! ;)</string>
-    <string name="please_answer_first">#veuillez d\'abord répondre à ma question !</string>
+    <string name="please_answer_first">#choisir favori, utiliser recherche, ou cliquer sur la carte</string>
     <string name="resume">REPRENDRE</string>
     <string name="auto_bike_select_finding">#localisation de vos vélos. Un instant…</string>
     <string name="auto_bike_select_found">#vélocalisé ! :)</string>
@@ -67,4 +67,5 @@
     <string name="retry">RÉESSAYER</string>
     <string name="menu_tutorial">#tutoriel ~1min</string>
     <string name="title_legal_notices">#notices</string>
+    <string name="gotit">COMPRIS!</string>
 </resources>

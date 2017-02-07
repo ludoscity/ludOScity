@@ -1613,7 +1613,13 @@ public class NearbyActivity extends AppCompatActivity
         }
         else if(uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_INACTIVE_ITEM_CLICK_PATH)){
 
-            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.please_answer_first, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.please_answer_first, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                    .setAction(R.string.gotit, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            //Snackbar dismisses itself on click
+                        }
+                    })
                     .show();
 
             mStationListViewPager.setCurrentItem(StationListPagerAdapter.DOCK_STATIONS, true);
