@@ -6,7 +6,9 @@
     android:layout_height="wrap_content"
     android:id="@+id/trip_details"
     android:visibility="invisible"
-    >
+
+    android:clickable="true"
+    > <!-- clickable so that map markers underneath don't get clicked-->
     <RelativeLayout
 
         android:layout_width="@dimen/trip_details_widget_width"
@@ -167,9 +169,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/trip_details_from_pin_b"
-                android:layout_marginRight="-8dp"
-                android:layout_marginEnd="-8dp"
-                android:elevation="1dp"
+                style="@style/trip_details_row_imageview_start"
                 android:layout_alignParentBottom="true"
                 app:srcCompat="@drawable/ic_pin_b_24dp_black"/>
 
@@ -232,16 +232,38 @@
             android:layout_height="3dp"
             android:id="@+id/trip_details_sum_separator"
             android:layout_below="@id/trip_details_b_to_search"
-            android:background="@color/background_material_dark"/>
+            style="@style/trip_details_sum_separator"
+
+            android:background="@color/background_dark"/>
+
+        <!--TODO: Use rounded ImageButton instead of those convenient but costly fabs -->
+        <android.support.design.widget.FloatingActionButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/trip_details_share"
+
+            android:layout_below="@id/trip_details_sum_separator"
+            android:layout_alignLeft="@id/trip_details_sum_separator"
+            android:layout_alignStart="@id/trip_details_sum_separator"
+
+
+            android:clickable="true"
+            app:srcCompat="@drawable/ic_action_share_24dp"
+
+            app:fabSize="mini"
+            app:backgroundTint="@color/theme_primary_dark"
+
+            style="@style/listitem_floating_action_button"
+            />
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/trip_details_sum_separator"
             android:layout_alignEnd="@id/trip_details_sum_separator"
             android:layout_alignRight="@id/trip_details_sum_separator"
-            android:id="@+id/trip_details_total"
-            android:paddingTop="4.5dp">
+            android:layout_alignBottom="@id/trip_details_share"
+
+            android:id="@+id/trip_details_total">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -259,8 +281,6 @@
                 android:layout_toEndOf="@id/trip_details_proximity_total"
                 android:layout_toRightOf="@id/trip_details_proximity_total"
                 android:fontFamily="droid-sans-mono"
-                android:layout_marginStart="4dp"
-                android:layout_marginLeft="4dp"
                 android:textStyle="bold"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:text="="

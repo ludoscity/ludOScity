@@ -15,7 +15,7 @@
     <dimen name="trip_details_widget_paddingBottom">3dp</dimen>
     <dimen name="trip_details_widget_paddingStart">3dp</dimen>
     <dimen name="trip_details_widget_paddingEnd">@dimen/trip_details_widget_paddingStart</dimen>
-    <dimen name="trip_details_widget_row_height">40dp</dimen>
+    <dimen name="trip_details_widget_row_height">44dp</dimen>
     <dimen name="trip_details_widget_row_PaddingTop">1dp</dimen>
     <dimen name="trip_details_widget_row_PaddingBottom">3dp</dimen>
     <dimen name="trip_details_widget_row_imageview_start_marginEnd">-8dp</dimen>
@@ -24,5 +24,6 @@
     <dimen name="trip_details_widget_row_imageview_end_marginStart">-9dp</dimen>
     <dimen name="trip_details_widget_row_imageview_end_marginLeft">@dimen/trip_details_widget_row_imageview_end_marginStart</dimen>
     <dimen name="trip_details_widget_row_imageview_end_elevation">1dp</dimen>
+    <dimen name="trip_details_widget_sum_separator_marginBottom">3dp</dimen>
 
 </resources>
