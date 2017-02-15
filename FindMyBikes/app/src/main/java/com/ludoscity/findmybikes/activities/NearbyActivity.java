@@ -26,6 +26,7 @@ import android.support.v4.util.Pair;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -266,6 +267,10 @@ public class NearbyActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //So that Utils::getBitmapDescriptor works on API < 21
+        //when doing Drawable vectorDrawable = ResourcesCompat.getDrawable(ctx.getResources(), id, null);
+        //see https://medium.com/@chrisbanes/appcompat-v23-2-age-of-the-vectors-91cbafa87c88#.i8luinewc
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         super.onCreate(savedInstanceState);
 
         boolean autoCompleteLoadingProgressBarVisible = false;
