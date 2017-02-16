@@ -79,6 +79,7 @@
     <string name="onboarding_favorite_name">#hi ! I\'m your training favorite. Instructions say tap me !</string>
     <string name="twitter_not_closest_bike_data_format" translatable="false">%1$s bike is not closest! Bikes:%2$d %3$s at %4$s %5$s walk %6$s %7$s</string>
     <string name="twitter_closer_discarded_reply_data_format" translatable="false">%1$s discarded closer! Bikes:%2$d %3$s at %4$s %5$s</string>
+    <string name="trip_details_share_message_content">I will be at the %1$s station %2$s in %3$s ! Shared via #findmybikes</string>
     <string name="menu_privacy">#privacy</string>
     <string name="title_source_code">#source</string>
     <string name="manual_download_failed">#download failed :/</string>
@@ -86,4 +87,5 @@
     <string name="menu_tutorial">#tutorial ~1min</string>
     <string name="title_legal_notices">#notices</string>
     <string name="gotit">GOT IT!</string>
+    <string name="trip_details_share_title">Share trip duration with…</string>
 </resources>

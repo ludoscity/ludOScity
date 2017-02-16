@@ -40,6 +40,7 @@
     <string name="undo"><b>ANNULER</b></string>
     <string name="no_favorite">Aucun favori pour &lt;b>%1$s&lt;/b></string>
     <string name="b_tab_closest_bike">Vélo le plus proche disponible à la station A :&lt;br>&lt;b>%1$s&lt;/b></string>
+    <string name="trip_details_share_message_content">Je serai à la station %1$s %2$s dans %3$s ! Partagé via #findmybikes</string>
     <string name="station_recap_bikes">#vélos: %1$d</string>
     <string name="pref_availability_settings_dialog_title">Paramètres disponibilité</string>
     <string name="pref_availability_critical_hint">Considérées vide dans l\'onglet A ou pleine dans l\'onglet B</string>
@@ -57,7 +58,7 @@
     <string name="favorite_onboarding_start"><![CDATA[#récapitulatif du trajet en bas. Maintenant supprimez le favori avec l\'icône <3.]]></string>
     <string name="auto_bike_select_error">#je n\'ai pu localiser aucun vélo :s ! #sélectionné station la plus proche.</string>
     <string name="title_legal">#légal</string>
-    <string name="appbar_title_postfix"></string>
+    <string name="appbar_title_postfix" />
     <string name="appbar_title_prefix">#vélocalise</string>
     <string name="appbar_subtitle_formatted"><![CDATA[<i>à %1$s</b>]]></string>
     <string name="onboarding_favorite_name">#salut ! Je suis votre favori d\'apprentissage. D\'abord, cliquez moi !</string>
@@ -68,4 +69,5 @@
     <string name="menu_tutorial">#tutoriel ~1min</string>
     <string name="title_legal_notices">#notices</string>
     <string name="gotit">COMPRIS!</string>
+    <string name="trip_details_share_title">Partager durée du trajet avec…</string>
 </resources>

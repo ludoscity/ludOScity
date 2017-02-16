@@ -382,6 +382,23 @@ public class NearbyActivity extends AppCompatActivity
                 launchGoogleMapsForDirections(mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(), true);
             }
         });
+        findViewById(R.id.trip_details_share).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //Je serai à la station Bixi Hutchison/beaubien dans ~15min ! Partagé via #findmybikes
+                //I will be at the Bixi station Hutchison/beaubien in ~15min ! Shared via #findmybikes
+                String message = String.format(getResources().getString(R.string.trip_details_share_message_content),
+                        DBHelper.getBikeNetworkName(getApplicationContext()), getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS).getName(),
+                        mTripDetailsProximityTotal.getText().toString());
+
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, message);
+                sendIntent.setType("text/plain");
+                startActivity(Intent.createChooser(sendIntent, getString(R.string.trip_details_share_title)));
+            }
+        });
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
