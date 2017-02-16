@@ -15,6 +15,7 @@ import java.util.ArrayList;
  */
 public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
 
+    @SuppressWarnings("FieldCanBeLocal")
     private static int NUM_ITEMS = 2;
 
     public static int BIKE_STATIONS = 0;

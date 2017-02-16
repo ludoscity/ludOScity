@@ -31,7 +31,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -146,8 +145,8 @@ public class NearbyActivity extends AppCompatActivity
     private FrameLayout mTripDetailsSumSeparator;
     private View mTripDetailsBToSearchRow;
 
-    private static int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
-    private static int SETTINGS_REQUEST_CODE = 2;
+    private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final int SETTINGS_REQUEST_CODE = 2;
     private FloatingActionButton mDirectionsLocToAFab;
     private FloatingActionButton mSearchFAB;
     private EditableMaterialSheetFab mFavoritesSheetFab;
@@ -175,8 +174,8 @@ public class NearbyActivity extends AppCompatActivity
     private boolean mClosestBikeAutoSelected = false;
 
     private boolean mOnboardingInProgress = false;
-    Snackbar mOnboardingSnackbar; //indefinite snackbar have buggy behavior on older platform if we let the framework dismiss them
-    Snackbar mFindBikesSnackbar;
+    private Snackbar mOnboardingSnackbar; //indefinite snackbar have buggy behavior on older platform if we let the framework dismiss them
+    private Snackbar mFindBikesSnackbar;
 
     @Override
     public void onStart() {
@@ -292,7 +291,7 @@ public class NearbyActivity extends AppCompatActivity
 
 
         //noinspection ConstantConditions
-        getSupportActionBar().setTitle(Html.fromHtml(String.format(getResources().getString(R.string.appbar_title_formatting),
+        getSupportActionBar().setTitle(Utils.fromHtml(String.format(getResources().getString(R.string.appbar_title_formatting),
                 getResources().getString(R.string.appbar_title_prefix),
                 DBHelper.getHashtaggableNetworkName(this),
                 getResources().getString(R.string.appbar_title_postfix))));
@@ -303,7 +302,7 @@ public class NearbyActivity extends AppCompatActivity
             city_hashtag = " @mtlvi";
         }
         String hastagedEnhanced_bikeNetworkCity = bikeNetworkCity + city_hashtag;
-        getSupportActionBar().setSubtitle(Html.fromHtml(String.format(getResources().getString(R.string.appbar_subtitle_formatted), hastagedEnhanced_bikeNetworkCity)));
+        getSupportActionBar().setSubtitle(Utils.fromHtml(String.format(getResources().getString(R.string.appbar_subtitle_formatted), hastagedEnhanced_bikeNetworkCity)));
 
         // Update Bar
         mStatusTextView = (TextView) findViewById(R.id.status_textView);
@@ -322,6 +321,7 @@ public class NearbyActivity extends AppCompatActivity
         {
             //noinspection ConstantConditions
             mTabLayout.getTabAt(i).setCustomView(R.layout.tab_custom_view);
+            //noinspection ConstantConditions
             mTabLayout.getTabAt(i).setIcon(ContextCompat.getDrawable(this,TABS_ICON_RES_ID[i]));
         }
 
@@ -584,14 +584,14 @@ public class NearbyActivity extends AppCompatActivity
     private void setupFavoriteListFeedback(boolean _noFavorite) {
         if (_noFavorite){
             ((TextView)findViewById(R.id.favorites_sheet_header_textview)).setText(
-                    Html.fromHtml(String.format(getResources().getString(R.string.no_favorite), DBHelper.getBikeNetworkName(this))));
+                    Utils.fromHtml(String.format(getResources().getString(R.string.no_favorite), DBHelper.getBikeNetworkName(this))));
             findViewById(R.id.favorite_sheet_edit_fab).setVisibility(View.INVISIBLE);
             findViewById(R.id.favorite_sheet_edit_done_fab).setVisibility(View.INVISIBLE);
             mFavoriteRecyclerViewAdapter.setSheetEditing(false);
         }
         else{
             ((TextView)findViewById(R.id.favorites_sheet_header_textview)).setText(
-                    Html.fromHtml(String.format(getResources().getString(R.string.favorites_sheet_header), DBHelper.getBikeNetworkName(this))));
+                    Utils.fromHtml(String.format(getResources().getString(R.string.favorites_sheet_header), DBHelper.getBikeNetworkName(this))));
 
             ((FloatingActionButton)findViewById(R.id.favorite_sheet_edit_fab)).show();
 
@@ -2016,7 +2016,7 @@ public class NearbyActivity extends AppCompatActivity
 
     }
 
-    public class RedrawMarkersTask extends AsyncTask<Boolean, Void, Void> {
+    private class RedrawMarkersTask extends AsyncTask<Boolean, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -2079,7 +2079,7 @@ public class NearbyActivity extends AppCompatActivity
         private static final String NEW_YORK_HUDSON_BIKESHARE_ID = "hudsonbikeshare-hoboken" ;
         String mOldBikeNetworkName = "";
 
-        public FindNetworkTask(String _currentNetworkName){ mOldBikeNetworkName = _currentNetworkName; }
+        FindNetworkTask(String _currentNetworkName){ mOldBikeNetworkName = _currentNetworkName; }
 
         private void checkAndAskLocationPermission(){
             // Here, thisActivity is the current activity
@@ -2235,8 +2235,8 @@ public class NearbyActivity extends AppCompatActivity
             AlertDialog alertDialog = new AlertDialog.Builder(NearbyActivity.this).create();
             //alertDialog.setTitle(getString(R.string.network_found_title));
             if (!backgroundResults.keySet().contains("old_network_name")) {
-                alertDialog.setTitle(Html.fromHtml(String.format(getResources().getString(R.string.hello_city), "", backgroundResults.get("new_network_city") )));
-                alertDialog.setMessage(Html.fromHtml(String.format(getString(R.string.bike_network_found_message),
+                alertDialog.setTitle(Utils.fromHtml(String.format(getResources().getString(R.string.hello_city), "", backgroundResults.get("new_network_city") )));
+                alertDialog.setMessage(Utils.fromHtml(String.format(getString(R.string.bike_network_found_message),
                         DBHelper.getBikeNetworkName(NearbyActivity.this) )));
                 Message toPass = null; //To resolve ambiguous call
                 //noinspection ConstantConditions
@@ -2245,8 +2245,8 @@ public class NearbyActivity extends AppCompatActivity
                 mOnboardingInProgress = true;
             }
             else{
-                alertDialog.setTitle(Html.fromHtml(String.format(getResources().getString(R.string.hello_city), getResources().getString(R.string.hello_travel), backgroundResults.get("new_network_city"))));
-                alertDialog.setMessage(Html.fromHtml(String.format(getString(R.string.bike_network_change_message),
+                alertDialog.setTitle(Utils.fromHtml(String.format(getResources().getString(R.string.hello_city), getResources().getString(R.string.hello_travel), backgroundResults.get("new_network_city"))));
+                alertDialog.setMessage(Utils.fromHtml(String.format(getString(R.string.bike_network_change_message),
                         DBHelper.getBikeNetworkName(NearbyActivity.this), mOldBikeNetworkName)));
                 Message toPass = null; //To resolve ambiguous call
                 //noinspection ConstantConditions
@@ -2266,7 +2266,7 @@ public class NearbyActivity extends AppCompatActivity
     }
 
     //TODO: NOT use an asynchtask for this long running database operation
-    public class SaveNetworkToDatabaseTask extends AsyncTask<Void, Void, Void> {
+    private class SaveNetworkToDatabaseTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -2327,9 +2327,9 @@ public class NearbyActivity extends AppCompatActivity
         private static final int REPLY_STATION_NAME_MAX_LENGTH = 54;
         private static final int STATION_ID_LENGTH = 32;
 
-        private Map<String, StationItem> mTrustedEfficientMap;
+        private final Map<String, StationItem> mTrustedEfficientMap;
 
-        public UpdateTwitterStatusTask(List<StationItem> _stationsNetwork){
+        UpdateTwitterStatusTask(List<StationItem> _stationsNetwork){
 
             mTrustedEfficientMap = new HashMap<>();
 

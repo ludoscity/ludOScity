@@ -16,6 +16,8 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -173,6 +175,17 @@ public class Utils {
         return toReturn;
     }
 
+    @SuppressWarnings("deprecation")
+    public static Spanned fromHtml(String html){
+        Spanned result;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(html,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(html);
+        }
+        return result;
+    }
+
     //Snackbar related utils
     public static class Snackbar{
 
@@ -247,6 +260,7 @@ public class Utils {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
+
 
             mConnected = extras.getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY);
 

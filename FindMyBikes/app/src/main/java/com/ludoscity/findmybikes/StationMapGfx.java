@@ -33,8 +33,11 @@ public class StationMapGfx {
     private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_station_64px_yellow);
 
     //For linear mappig of zoom level to oberlay size. Empirically determined.
+    @SuppressWarnings("FieldCanBeLocal")
     private static float maxZoomOut = 13.75f;
+    @SuppressWarnings("FieldCanBeLocal")
     private static float maxZoomIn = 21;
+    @SuppressWarnings("FieldCanBeLocal")
     private static float minOverlaySize = 1;
     private static float maxOverlaySize = 50;
 

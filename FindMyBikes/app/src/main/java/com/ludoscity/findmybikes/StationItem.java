@@ -12,6 +12,7 @@ import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.ClusterItem;
 import com.ludoscity.findmybikes.citybik_es.model.Station;
 import com.ludoscity.findmybikes.helpers.DBHelper;
+import com.ludoscity.findmybikes.utils.Utils;
 
 import java.io.UnsupportedEncodingException;
 
@@ -145,15 +146,15 @@ public class StationItem implements Parcelable, ClusterItem {
     // you MUST call this on a favorite station. No validation to not got to SharedPref too much
     public Spanned getFavoriteName(Context _ctx, boolean _favoriteDisplayNameOnly){
 
-        Spanned toReturn = Html.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_only_italic),
+        Spanned toReturn = Utils.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_only_italic),
                 name));
 
         if (!DBHelper.getFavoriteItemForStationId(_ctx, id).isDisplayNameDefault()){
             if(_favoriteDisplayNameOnly){
-                toReturn = Html.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_only_bold),
+                toReturn = Utils.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_only_bold),
                         DBHelper.getFavoriteItemForStationId(_ctx, id).getDisplayName()));
             } else {
-                toReturn = Html.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_complete),
+                toReturn = Utils.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_complete),
                         DBHelper.getFavoriteItemForStationId(_ctx, id).getDisplayName(), name ));
             }
         }

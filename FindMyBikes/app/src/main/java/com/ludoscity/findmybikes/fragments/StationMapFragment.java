@@ -38,7 +38,7 @@ import java.util.ConcurrentModificationException;
 public class StationMapFragment extends Fragment
         implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
-        GoogleMap.OnCameraChangeListener,
+        /*GoogleMap.OnCameraChangeListener,*/
         GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMapClickListener {
 
@@ -85,11 +85,9 @@ public class StationMapFragment extends Fragment
     private static int CURRENT_MAP_PADDING_RIGHT = 0;
 
     private boolean mInitialCameraSetupDone;
-    private boolean mEnforceMaxZoom = false;
+
     private GoogleMap mGoogleMap = null;
     private CustomCancellableCallback mAnimCallback = null;
-
-    private float mMaxZoom = 16f;
 
     private ArrayList<StationMapGfx> mMapMarkersGfxData = new ArrayList<>();
 
@@ -171,13 +169,11 @@ public class StationMapFragment extends Fragment
         mListener = null;
     }
 
-    @Override
+    /*@Override
     public void onCameraChange(CameraPosition cameraPosition) {
         //Log.d("CameraZoomLevel", Float.toString(cameraPosition.zoom));
-        if (mEnforceMaxZoom && cameraPosition.zoom > mMaxZoom) {
-            mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(mMaxZoom));
-        }
-    }
+
+    }*/
 
     @Override
     public void onInfoWindowClick(Marker marker) {
@@ -203,7 +199,7 @@ public class StationMapFragment extends Fragment
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.5086699, -73.5539925), 13));
         mGoogleMap.setOnMarkerClickListener(this);
         mGoogleMap.setOnInfoWindowClickListener(this);
-        mGoogleMap.setOnCameraChangeListener(this);
+        //mGoogleMap.setOnCameraChangeListener(this);
         mGoogleMap.setOnMapClickListener(this);
         //héhéhé, feel the power of design !!
         mGoogleMap.getUiSettings().setZoomGesturesEnabled(false);
@@ -532,7 +528,7 @@ public class StationMapFragment extends Fragment
         mMarkerPickedPlace.showInfoWindow();
 
         if (_attributions != null) {
-            mAttributionsText.setText(Html.fromHtml(_attributions.toString()));
+            mAttributionsText.setText(Utils.fromHtml(_attributions.toString()));
             mAttributionsText.setVisibility(View.VISIBLE);
         }
     }
