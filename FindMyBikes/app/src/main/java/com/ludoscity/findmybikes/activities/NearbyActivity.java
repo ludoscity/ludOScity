@@ -6,6 +6,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
@@ -51,9 +52,16 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -147,6 +155,7 @@ public class NearbyActivity extends AppCompatActivity
 
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private static final int SETTINGS_REQUEST_CODE = 2;
+    private static final int REQUEST_CHECK_SETTINGS_GPS = 3;
     private FloatingActionButton mDirectionsLocToAFab;
     private FloatingActionButton mSearchFAB;
     private EditableMaterialSheetFab mFavoritesSheetFab;
@@ -414,6 +423,36 @@ public class NearbyActivity extends AppCompatActivity
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,
+                        builder.build());
+
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+                final Status status = locationSettingsResult.getStatus();
+
+                if(status.getStatusCode() == LocationSettingsStatusCodes.RESOLUTION_REQUIRED) {
+                    // Location settings are not satisfied, but this can be fixed
+                    // by showing the user a dialog.
+                    try {
+                        // Show the dialog by calling startResolutionForResult(),
+                        // and check the result in onActivityResult().
+                        status.startResolutionForResult(
+                                NearbyActivity.this,
+                                REQUEST_CHECK_SETTINGS_GPS);
+                    } catch (IntentSender.SendIntentException e) {
+                        // Ignore the error.
+                    }
+                }
+
+            }
+        });
+
+
         mCircularRevealInterpolator = AnimationUtils.loadInterpolator(this, R.interpolator.msf_interpolator);
     }
 
@@ -525,7 +564,12 @@ public class NearbyActivity extends AppCompatActivity
             mRefreshMarkers = true;
             refreshMap();
             mRefreshTabs = true;
-        }
+        } /*else if(requestCode == REQUEST_CHECK_SETTINGS_GPS){
+            //getting here when GPS been activated through system settings dialog
+            if (resultCode == RESULT_OK){
+
+            }
+        }*/
     }
 
     private void setupFavoriteSheet() {
