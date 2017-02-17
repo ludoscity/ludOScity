@@ -16,8 +16,8 @@ android {
         applicationId "com.ludoscity.findmybikes"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 52
-        versionName "v2.2.3-alpha1"
+        versionCode 53
+        versionName "v2.2.3"
 
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
