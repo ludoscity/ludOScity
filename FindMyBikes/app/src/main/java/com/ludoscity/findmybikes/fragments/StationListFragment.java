@@ -11,12 +11,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
@@ -153,8 +155,8 @@ public class StationListFragment extends Fragment
         outState.putInt("station_recap_availability_color", mStationRecapAvailability.getCurrentTextColor());
         outState.putBoolean("station_recap_visible", mStationRecap.getVisibility() == View.VISIBLE);
 
-        getStationRecyclerViewAdapter().saveStationList(outState);
         getStationRecyclerViewAdapter().saveLookingForBike(outState);
+        getStationRecyclerViewAdapter().saveIsAvailabilityOutdated(outState);
     }
 
     @Override
@@ -163,18 +165,25 @@ public class StationListFragment extends Fragment
 
         if (savedInstanceState != null) {
 
-            int selectedPos = savedInstanceState.getInt("selected_pos");
-
-            if (selectedPos != NO_POSITION)
-                getStationRecyclerViewAdapter().setSelectedPos(selectedPos, false);
-
             LatLng sortReferenceLatLng = savedInstanceState.getParcelable("sort_reference_LatLng");
             LatLng distanceReferenceLatLng = savedInstanceState.getParcelable("distance_reference_latlng");
-            ArrayList<StationItem> stationList = savedInstanceState.getParcelableArrayList("stationitem_arraylist");
+            ArrayList<StationItem> stationList = null;
+            try {
+                stationList = DBHelper.getStationsNetwork();
+            } catch (CouchbaseLiteException e) {
+                Log.d("StationListFragment", "Couldn't retrieve Station Network from db when restoring view state.",e );
+            }
+
+            getStationRecyclerViewAdapter().setAvailabilityOutdated(savedInstanceState.getBoolean("availability_outdated"));
 
             setupUI(stationList, savedInstanceState.getBoolean("looking_for_bike"),
                     savedInstanceState.getString("string_if_empty"),
                     sortReferenceLatLng, distanceReferenceLatLng);
+
+            int selectedPos = savedInstanceState.getInt("selected_pos");
+
+            if (selectedPos != NO_POSITION)
+                getStationRecyclerViewAdapter().setSelectedPos(selectedPos, false);
 
             if (!savedInstanceState.getBoolean("station_recap_visible")) {
                 mStationRecap.setVisibility(View.GONE);

@@ -286,7 +286,6 @@ public class NearbyActivity extends AppCompatActivity
         if (savedInstanceState != null) {
 
             mSavedInstanceCameraPosition = savedInstanceState.getParcelable("saved_camera_pos");
-            mStationsNetwork = savedInstanceState.getParcelableArrayList("network_data");
             mRequestingLocationUpdates = savedInstanceState.getBoolean("requesting_location_updates");
             mCurrentUserLatLng = savedInstanceState.getParcelable("user_location_latlng");
             mClosestBikeAutoSelected = savedInstanceState.getBoolean("closest_bike_auto_selected");
@@ -647,7 +646,6 @@ public class NearbyActivity extends AppCompatActivity
         super.onSaveInstanceState(outState);
 
         outState.putParcelable("saved_camera_pos", mStationMapFragment.getCameraPosition());
-        outState.putParcelableArrayList("network_data", mStationsNetwork);
         outState.putBoolean("requesting_location_updates", mRequestingLocationUpdates);
         outState.putParcelable("user_location_latlng", mCurrentUserLatLng);
         outState.putBoolean("closest_bike_auto_selected", mClosestBikeAutoSelected);

@@ -54,12 +54,12 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     private boolean mRespondToClick = true;
     private boolean mOutdatedAvailability = false;
 
-    public void saveStationList(Bundle outState) {
-        outState.putParcelableArrayList("stationitem_arraylist", mStationList);
-    }
-
     public void saveLookingForBike(Bundle outState) {
         outState.putBoolean("looking_for_bike", mIsLookingForBike);
+    }
+
+    public void saveIsAvailabilityOutdated(Bundle outState){
+        outState.putBoolean("availability_outdated", mOutdatedAvailability);
     }
 
     public boolean removeItem(StationItem toRemove) {
