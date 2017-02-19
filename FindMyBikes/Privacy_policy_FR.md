@@ -15,7 +15,7 @@ POTENTIELLEMENT IDENTIFIABLE (pas avec le nom par défaut des favoris).
 
 Le seul traitement de ces données est la restauration de vos favoris après une réinitialisation d'usine ou la mise à jour vers un nouveau téléphone (restauration des favoris). Cette politique vous fait savoir que Google maintient ces données hors de portée du développeur de #vélocalise (#findmybikes). Google répond fréquemment aux requêtes judiciaires normalement constituées.
 Vous pouvez consulter le rapport de transparence de Google à
-https://www.google.com/transparencyreport/
+[www.google.com/transparencyreport/]
 
 ### Collecte de données publiques
 
@@ -37,7 +37,7 @@ Ces données non personnelles et non identifiables sont limitées à :
 - Une **collection d'identifiants de station** (tels que fournis par l'API citybik.es) pour les stations plus proches que celle sélectionnée mais qui **N'ÉTAIENT PAS EN MESURE** de vous fournir le service non plus
 
 ### Ces données ouvertes publiques sont immédiatement publiées sur la plateforme Twitter
-# https://twitter.com/findmybikesdata
+# [@findmybikesdata]
 
 
 
@@ -52,5 +52,8 @@ En utilisant #vélocalise (#findmybikes), vous donnez l'autorisation explicite a
 Google a intégré le Android Backup Service directement dans la plateforme Android (ou Google Play Services).
 # La politique de confidentialité de #vélocalise (#findmybikes) ne s'applique pas à la sauvegarde des données non personnelles et de forme libre qu'elle collecte et utilise aux fins de restauration des favoris.
 La politique de confidentialité en regard de ces données est celle que vous avez acceptée de Google et que vous pouvez trouver ici
-https://www.google.com/policies/privacy/
+[www.google.com/policies/privacy/]
 
+[@findmybikesdata]:https://twitter.com/findmybikesdata
+[www.google.com/transparencyreport/]:https://www.google.com/transparencyreport/
+[www.google.com/policies/privacy/]:https://www.google.com/policies/privacy/

@@ -19,7 +19,7 @@ list for each bike networks you've used the #findmybikes with. POTENTIALLY IDENT
 
 The only use of this data is to restore your favorites after a factory reset or upgrade to a new phone (favorites restoration). This policy makes you aware that Google maintains this data outside of reach
 of #findmybikes developer. Google routinely respond to well formed legal requests. You can consult Google's transparency report at
-https://www.google.com/transparencyreport/
+[www.google.com/transparencyreport/]
 
 ### Public data collection
 
@@ -41,7 +41,7 @@ This non personal and non identifiable information is limited to :
 - A **collection of station id** (as provided by citybik.es API) for each station that were closer than the selected one but **COULD NOT** provide you service either
 
 ### This public open data is published immediately on the Twitter platform
-# https://twitter.com/findmybikesdata
+# [@findmybikesdata]
 
 
 
@@ -57,5 +57,9 @@ of backing up non personal and freeform information to the Android Backup Servic
 Google integrated the Android Backup Service directly into the Android platform (or Play Services platform).
 # #findmybikes privacy policy doesn't apply in relation to the backing up of the non personal and freeform information it collects and use for favorites restoration purposes.
 The privacy policy regarding such data is the one you accepted from Google and that you can find here
-https://www.google.com/policies/privacy/
+[www.google.com/policies/privacy/]
+
+[@findmybikesdata]:https://twitter.com/findmybikesdata
+[www.google.com/transparencyreport/]:https://www.google.com/transparencyreport/
+[www.google.com/policies/privacy/]:https://www.google.com/policies/privacy/
 
