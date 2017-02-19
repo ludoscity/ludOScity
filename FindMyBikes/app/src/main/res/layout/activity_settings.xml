@@ -1,14 +1,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="false"
-    tools:context=".BaseActivity">
+    android:clipChildren="false">
 
     <include
         android:id="@+id/toolbar_main"
         layout="@layout/toolbar" />
 
+    <!-- A fragment because corresponding SettingsFragment java class extends PreferenceFragment-->
     <fragment
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
