@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ludoscity.findmybikes" >
+    package="com.ludoscity.findmybikes">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -13,30 +13,32 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name="com.ludoscity.findmybikes.RootApplication"
+        android:name=".RootApplication"
+        android:allowBackup="true"
+        android:backupAgent=".helpers.PrefsBackupAgent"
+        android:fullBackupOnly="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:allowBackup="true"
-        android:fullBackupOnly="true"
-        android:backupAgent="com.ludoscity.findmybikes.helpers.PrefsBackupAgent"
         android:theme="@style/FindMyBikesTheme">
-
         <activity
             android:name=".activities.NearbyActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.SettingsActivity"
-            android:parentActivityName="com.ludoscity.findmybikes.activities.NearbyActivity"/>
-
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:parentActivityName=".activities.NearbyActivity" />
+        <activity
+            android:name=".activities.WebViewActivity"
+            android:parentActivityName=".activities.NearbyActivity" />
         <receiver
-            android:name="com.ludoscity.findmybikes.utils.Utils$Connectivity"
-            android:enabled="false" >
+            android:name=".utils.Utils$Connectivity"
+            android:enabled="false">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
@@ -51,6 +53,7 @@
         <meta-data
             android:name="com.google.android.backup.api_key"
             android:value="@string/google_data_backup_key" />
+
 
     </application>
 </manifest>
