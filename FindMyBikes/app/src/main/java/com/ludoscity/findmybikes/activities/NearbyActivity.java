@@ -714,8 +714,10 @@ public class NearbyActivity extends AppCompatActivity
                 return true;
 
             case R.id.privacy_policy_menu_item:
-                Intent implicit = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/f8full/ludOScity/blob/master/FindMyBikes/Privacy_policy.md"));
-                startActivity(implicit);
+                Intent intent = new Intent(this, WebViewActivity.class);
+                intent.putExtra(WebViewActivity.EXTRA_URL, "file:///android_res/raw/privacy_policy.html");
+                intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, getString(R.string.menu_privacy));
+                startActivity(intent);
                 return true;
 
             case R.id.source_code_menu_item:
