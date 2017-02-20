@@ -1220,17 +1220,24 @@ public class NearbyActivity extends AppCompatActivity
     }
 
     private void setStatusBarClickListener() {
-        mStatusBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Utils.Connectivity.isConnected(getApplicationContext())) {
-                    Intent implicit = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.citybik.es"));
-                    startActivity(implicit);
-                }
-            }
-        });
-    }
+        //Because the citybik.es landing page is javascript heavy
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
 
+            mStatusBar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Utils.Connectivity.isConnected(getApplicationContext())) {
+                        // use the android system webview
+                        Intent intent = new Intent(NearbyActivity.this, WebViewActivity.class);
+                        intent.putExtra(WebViewActivity.EXTRA_URL, "http://www.citybik.es");
+                        intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, getString(R.string.cities));
+                        intent.putExtra(WebViewActivity.EXTRA_JAVASCRIPT_ENABLED, true);
+                        startActivity(intent);
+                    }
+                }
+            });
+        }
+    }
 
     @Override
     public void onStationMapFragmentInteraction(final Uri uri) {

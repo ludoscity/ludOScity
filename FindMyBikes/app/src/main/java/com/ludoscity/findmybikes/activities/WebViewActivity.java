@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.ludoscity.findmybikes.R;
 
@@ -14,6 +15,7 @@ public class WebViewActivity extends AppCompatActivity {
 
     public final static String EXTRA_URL = "webviewactivity.URL";
     public final static String EXTRA_ACTIONBAR_SUBTITLE = "webviewactivity.SUBTITLE";
+    public final static String EXTRA_JAVASCRIPT_ENABLED = "webviewactivity.JAVASCRIPT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,13 @@ public class WebViewActivity extends AppCompatActivity {
         String url = intent.getStringExtra(EXTRA_URL);
 
         WebView webview = (WebView) findViewById(R.id.webview);
+
+        if (intent.getBooleanExtra(EXTRA_JAVASCRIPT_ENABLED, false)) {
+            webview.getSettings().setJavaScriptEnabled(true);
+            webview.setWebViewClient(new WebViewClient());
+        }
+
+        webview.getSettings().setDefaultTextEncodingName("utf-8");
 
         webview.loadUrl(url);
     }
