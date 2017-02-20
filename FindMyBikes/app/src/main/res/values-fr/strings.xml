@@ -52,16 +52,11 @@
     <string name="ok">OK</string>
     <string name="hello_city"><![CDATA[%1$s#bonjour <b>%2$s</b> !]]></string>
     <string name="hello_travel">#il semble que vous avez voyagé.\u0020</string>
-    <string name="favorite_onboarding_complete">#voilà pour les favoris. Maintenant, annulez B avec le \'X\' en bas à droite.</string>
-    <string name="onboarding_start">#je vous montre. Pour commencer, cliquez sur votre premier favori.</string>
-    <string name="onboarding_complete">#fini ! Sélectionnez B avec un favori, la recherche ou directement sur la carte.</string>
-    <string name="favorite_onboarding_start"><![CDATA[#récapitulatif du trajet en bas. Maintenant supprimez le favori avec l\'icône <3.]]></string>
     <string name="auto_bike_select_error">#je n\'ai pu localiser aucun vélo :s ! #sélectionné station la plus proche.</string>
     <string name="title_legal">#légal</string>
     <string name="appbar_title_postfix" />
     <string name="appbar_title_prefix">#vélocalise</string>
     <string name="appbar_subtitle_formatted"><![CDATA[<i>à %1$s</b>]]></string>
-    <string name="onboarding_favorite_name">#salut ! Je suis votre favori d\'apprentissage. D\'abord, cliquez moi !</string>
     <string name="menu_privacy">#confidentialité</string>
     <string name="title_source_code">#source</string>
     <string name="manual_download_failed">#échec du téléchargement :/</string>

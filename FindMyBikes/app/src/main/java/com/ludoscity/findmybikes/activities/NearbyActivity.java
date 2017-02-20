@@ -182,8 +182,6 @@ public class NearbyActivity extends AppCompatActivity
 
     private boolean mClosestBikeAutoSelected = false;
 
-    private boolean mOnboardingInProgress = false;
-    private Snackbar mOnboardingSnackbar; //indefinite snackbar have buggy behavior on older platform if we let the framework dismiss them
     private Snackbar mFindBikesSnackbar;
 
     @Override
@@ -702,7 +700,6 @@ public class NearbyActivity extends AppCompatActivity
                 if (!mFavoriteSheetVisible)
                     mFavoritesSheetFab.showSheet();
 
-                mOnboardingInProgress = true;
                 mClosestBikeAutoSelected = false;
                 return true;
 
@@ -744,27 +741,9 @@ public class NearbyActivity extends AppCompatActivity
 
         if (!_showUndo) {
 
-            if (!mOnboardingInProgress) {
-
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
-                        Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                        .show();
-            } else {
-
-                mOnboardingSnackbar.dismiss();
-
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        mOnboardingSnackbar = Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_onboarding_complete,
-                                Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
-
-                        mOnboardingSnackbar.show();
-                    }
-                }, 500);
-            }
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
+                    Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                    .show();
         }
         else{
             Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_removed,
@@ -848,23 +827,6 @@ public class NearbyActivity extends AppCompatActivity
         mClearFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if (mOnboardingInProgress) {
-
-                    mOnboardingSnackbar.dismiss();
-
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_complete,
-                                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent))
-                                    .show();
-                        }
-                    }, 500);
-
-                    mOnboardingInProgress = false;
-                }
 
                 mStationMapFragment.setMapPaddingLeft(0);
                 mStationMapFragment.setMapPaddingRight(0);
@@ -1144,39 +1106,6 @@ public class NearbyActivity extends AppCompatActivity
                                 }
                             }
                         }, 500);
-
-                        if (mOnboardingInProgress){
-                            //Adding onboarding Favorite
-                            StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
-
-                            for(StationItem station : mStationsNetwork) {
-                                if (!station.getId().equalsIgnoreCase(stationA.getId())) {
-
-                                    //station.setFavorite(true, NearbyActivity.this); //We want to manipulate everything, hence go directly to DBHelper
-                                    DBHelper.updateFavorite(true, station.getId(), getResources().getString(R.string.onboarding_favorite_name), false, NearbyActivity.this);
-                                    ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteAll(NearbyActivity.this);
-                                    setupFavoriteListFeedback(favoriteList.isEmpty());
-                                    mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
-
-                                    if (mFindBikesSnackbar != null){
-
-                                        mFindBikesSnackbar.dismiss();
-                                    }
-
-                                    Handler snackbarHandler = new Handler();
-                                    snackbarHandler.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            mOnboardingSnackbar = Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_start,
-                                                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
-                                            mOnboardingSnackbar.show();
-                                        }
-                                    }, 500);
-
-                                    break;
-                                }
-                            }
-                        }
 
                         mClosestBikeAutoSelected = true;
                         //launch twitter task if not already running, pass it the raw String
@@ -1986,34 +1915,14 @@ public class NearbyActivity extends AppCompatActivity
     @Override
     public void onFavoriteListItemClick(String _stationID) {
 
-        if (!mOnboardingInProgress) {
-            StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+        StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
 
-            if (stationA.getId().equalsIgnoreCase(_stationID)) {
+        if (stationA.getId().equalsIgnoreCase(_stationID)) {
 
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.such_short_trip, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
-                        .show();
+            Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.such_short_trip, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                    .show();
 
-            } else {
-                mStationMapFragment.clearMarkerPickedPlace();
-                setupBTabSelection(_stationID, false);
-            }
-        }
-        else{
-            mOnboardingSnackbar.dismiss();
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-
-                    mOnboardingSnackbar = Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.favorite_onboarding_start,
-                            Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
-
-                    mOnboardingSnackbar.show();
-                }
-            }, 500);
-
+        } else {
             mStationMapFragment.clearMarkerPickedPlace();
             setupBTabSelection(_stationID, false);
         }
@@ -2293,7 +2202,6 @@ public class NearbyActivity extends AppCompatActivity
                 //noinspection ConstantConditions
                 alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.ok), toPass);
 
-                mOnboardingInProgress = true;
             }
             else{
                 alertDialog.setTitle(Utils.fromHtml(String.format(getResources().getString(R.string.hello_city), getResources().getString(R.string.hello_travel), backgroundResults.get("new_network_city"))));
