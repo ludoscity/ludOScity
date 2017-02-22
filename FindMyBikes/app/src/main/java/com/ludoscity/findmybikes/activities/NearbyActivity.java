@@ -935,7 +935,6 @@ public class NearbyActivity extends AppCompatActivity
             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, false);
         }
         else
-        //Crash if B is selected and user changed cities (not a typical use case)
             setupBTabSelection(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS).getId(), isLookingForBike());
 
         mRefreshTabs = false;
@@ -2164,6 +2163,10 @@ public class NearbyActivity extends AppCompatActivity
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
+            if(mStationMapFragment != null && mStationMapFragment.getMarkerBVisibleLatLng() != null) {
+                clearBTab();
+            }
 
             checkAndAskLocationPermission();
 
