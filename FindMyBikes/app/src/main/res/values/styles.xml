@@ -120,5 +120,10 @@
         <item name="android:minHeight">56dp</item>
     </style>
 
+    <style name="OnboardingShowcaseTheme" parent="ShowcaseView">
+        <item name="sv_backgroundColor">@color/onboarding_showcaseview_background</item>
+        <item name="sv_showcaseColor">@color/onboarding_showcaseview</item>
+        <item name="sv_buttonText">@string/ok</item>
+    </style>
 
 </resources>

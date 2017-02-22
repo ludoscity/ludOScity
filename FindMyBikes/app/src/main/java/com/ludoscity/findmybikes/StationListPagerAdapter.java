@@ -3,6 +3,7 @@ package com.ludoscity.findmybikes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.fragments.StationListFragment;
 import com.ludoscity.findmybikes.utils.SmartFragmentPagerAdapter;
@@ -161,4 +162,7 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         retrieveListFragment(_pageID).setOutdatedData(_isDataOutdated, _toRecap);
     }
 
+    public ViewTarget getDockingStationFavoriteFabViewTarget(){
+        return retrieveListFragment(DOCK_STATIONS).getHighlightedFavoriteFabViewTarget();
+    }
 }

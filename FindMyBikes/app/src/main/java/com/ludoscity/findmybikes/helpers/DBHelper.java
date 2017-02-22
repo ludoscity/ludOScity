@@ -587,10 +587,35 @@ public class DBHelper {
                 }
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.d("DBHelper", "JSON error checking favorite status", e);
         }
 
         return toReturn;
+    }
+
+    //counts valid favorites, an invalid favorite corresponds to the provided StationItem
+    //returns true if this count >= provided parameter
+    public static boolean hasAtLeastNValidFavorites(StationItem _closestBikeStation, int _n, Context _ctx) {
+
+        int validCount = 0;
+
+        SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+
+        try {
+            JSONArray favoritesJSONArray = new JSONArray(sp.getString(
+                    buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, _ctx), "[]" ));
+
+            for (int i=0; i<favoritesJSONArray.length(); i += 3){
+                if (favoritesJSONArray.getString(i).equalsIgnoreCase(_closestBikeStation.getId()) == false){
+                    ++validCount;
+                }
+            }
+        } catch (JSONException e) {
+            Log.d("DBHelper", "JSON error counting valid favorites", e);
+        }
+
+
+        return validCount >= _n;
     }
 
     public static void dropFavoriteAll(Context _ctx){

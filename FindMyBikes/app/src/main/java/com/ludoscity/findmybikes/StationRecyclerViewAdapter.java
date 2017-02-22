@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.fragments.StationListFragment;
 import com.ludoscity.findmybikes.helpers.DBHelper;
@@ -373,6 +374,22 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                     break;
             }
         }
+
+        public ViewTarget getFavoriteFabTarget(){
+            return new ViewTarget(mFavoriteFab);
+        }
+    }
+
+    public ViewTarget getSelectedItemFavoriteFabViewTarget(final RecyclerView _recyclerView){
+
+        ViewTarget toReturn = null;
+
+        if (mSelectedPos != NO_POSITION)
+        {
+            toReturn = ((StationRecyclerViewAdapter.StationListItemViewHolder)_recyclerView.findViewHolderForAdapterPosition(mSelectedPos)).getFavoriteFabTarget();
+        }
+
+        return toReturn;
     }
 
     public void requestFabAnimation(){ mFabAnimationRequested = true; }

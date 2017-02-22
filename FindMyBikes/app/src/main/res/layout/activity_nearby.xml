@@ -118,8 +118,10 @@
                 android:layout_gravity="bottom|end"
                 android:orientation="vertical">
 
+                <!-- TODO : rework this setup for search FAB (ShowcaseView doesn't center correctly -->
                 <FrameLayout
                     android:layout_width="wrap_content"
+                    android:id="@+id/search_framelayout"
                     android:layout_height="wrap_content">
 
                     <android.support.design.widget.FloatingActionButton

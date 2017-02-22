@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.couchbase.lite.CouchbaseLiteException;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
@@ -298,6 +299,11 @@ public class StationListFragment extends Fragment
         return mStationRecyclerView != null && getStationRecyclerViewAdapter().getSortReferenceLatLng() != null &&
                 ((ScrollingLinearLayoutManager)mStationRecyclerView.getLayoutManager()).findFirstVisibleItemPosition() !=
                         NO_POSITION;
+    }
+
+    public ViewTarget getHighlightedFavoriteFabViewTarget(){
+
+        return getStationRecyclerViewAdapter().getSelectedItemFavoriteFabViewTarget(mStationRecyclerView);
     }
 
     public boolean highlightStation(String _stationId) {
