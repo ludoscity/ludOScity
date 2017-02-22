@@ -44,7 +44,7 @@ public class StationItem implements Parcelable, ClusterItem {
         this.timestamp = timestamp;
     }
 
-    public StationItem(Station _station, Context ctx) {
+    public StationItem(Station _station, Context _ctx) {
 
         this.id = _station.id;
 
@@ -84,7 +84,23 @@ public class StationItem implements Parcelable, ClusterItem {
             this.empty_slots = 0;
             this.free_bikes = 31;
         } else {*/
-        this.empty_slots = _station.empty_slots;
+
+        //Some systems have empty_slots to null (like nextbike SZ-bike in Dresden, Germany)
+        //in that case, dock availability is derived from bike availability
+        //bike availability CRI ==> dock availability is AOK
+        //bike availability BAD ==> dock availability is BAD
+        //bike availability AOK ==> dock availibility is CRI
+        if(_station.empty_slots != null)
+            this.empty_slots = _station.empty_slots;
+        else{
+            if (_station.free_bikes <= DBHelper.getCriticalAvailabilityMax(_ctx))
+                this.empty_slots = DBHelper.getBadAvailabilityMax(_ctx) + 1;    //This is AOK
+            else if (_station.free_bikes <= DBHelper.getBadAvailabilityMax(_ctx))
+                this.empty_slots = DBHelper.getBadAvailabilityMax(_ctx);
+            else
+                this.empty_slots = DBHelper.getCriticalAvailabilityMax(_ctx);
+        }
+
         this.free_bikes = _station.free_bikes;
         //}
         this.latitude = _station.latitude;
@@ -93,7 +109,7 @@ public class StationItem implements Parcelable, ClusterItem {
         this.timestamp = _station.timestamp;
     }
 
-    public StationItem(Parcel in){
+    private StationItem(Parcel in){
         id = in.readString();
         name = in.readString();
         locked = in.readByte() != 0;
@@ -120,7 +136,7 @@ public class StationItem implements Parcelable, ClusterItem {
 
     public int getFree_bikes() { return free_bikes; }
 
-    public double getMeterFromLatLng(LatLng userLocation) {
+    double getMeterFromLatLng(LatLng userLocation) {
         return SphericalUtil.computeDistanceBetween(userLocation, new LatLng(latitude,longitude));}
 
     //public double getBearingFromLatLng(LatLng userLocation){

@@ -60,6 +60,7 @@
     <!--<string name="pref_biking_proximity_duration">Time. (As the crow flies, at %1$dkm/h)</string>-->
     <string name="pref_biking_proximity_duration">Duration. (As the crow flies, at 10km/h)</string>
     <string name="hour_symbol">h</string>
+    <string name="ok" translatable="false">@android:string/ok</string>
     <string name="undo"><b>UNDO</b></string>
     <string name="no_favorite">No favorite for &lt;b>%1$s&lt;/b></string>
     <string name="please_answer_first">#pick favorite, use search, or tap map</string>
@@ -69,7 +70,6 @@
     <string name="resume">RESUME</string>
     <string name="auto_bike_select_finding">#finding your bikes. Hang tight…</string>
     <string name="auto_bike_select_found">#found your bike ! :)</string>
-    <string name="ok">OK</string>
     <string name="auto_bike_select_error">#couldn\'t find any bike :s ! #selected closest station.</string>
     <string name="title_legal">#legal</string>
     <string name="twitter_not_closest_bike_data_format" translatable="false">%1$s bike is not closest! Bikes:%2$d %3$s at %4$s %5$s walk %6$s %7$s</string>
