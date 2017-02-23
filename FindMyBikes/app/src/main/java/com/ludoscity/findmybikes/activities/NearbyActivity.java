@@ -1302,17 +1302,89 @@ public class NearbyActivity extends AppCompatActivity
         }
     }
 
+    private abstract class FinalDestinationBase{
+
+        public abstract LatLng getLocation();
+        public abstract String getStationID();
+        public abstract String getName();
+        public abstract CharSequence getAttributions();
+
+    }
+
+    private class FinalDestinationPlace extends FinalDestinationBase{
+
+        private Place mPlace;
+
+        public FinalDestinationPlace(Place _place){mPlace = _place;}
+
+        @Override
+        public LatLng getLocation() {
+            return mPlace.getLatLng();
+        }
+
+        @Override
+        public String getStationID() {
+            return null;
+        }
+
+        @Override
+        public String getName() {
+            return mPlace.getName().toString();
+        }
+
+        @Override
+        public CharSequence getAttributions() {
+            return mPlace.getAttributions();
+        }
+    }
+
+    private class FinalDestinationStation extends FinalDestinationBase{
+        private String mStationID;
+        private String mName;   //doesn't matter when final destination is a station
+        //as station name is always selected and on top of the list
+
+        public FinalDestinationStation(String _stationID){mStationID = _stationID;}
+
+        @Override
+        public LatLng getLocation() {
+            return getLatLngForStation(mStationID);
+        }
+
+        @Override
+        public String getStationID() {
+            return mStationID;
+        }
+
+        @Override
+        public String getName() {
+            return mName;
+        }
+
+        @Override
+        public CharSequence getAttributions() {
+            return null;
+        }
+    }
+
+    private class FinalDestinationStationFavorite extends FinalDestinationStation{
+
+
+        public FinalDestinationStationFavorite(String _stationID) {
+            super(_stationID);
+        }
+    }
+
     private void setupBTabSelectionClosestDock(final Place _from){
-        setupBTabSelection(null, _from, false);
+        setupBTabSelection(new FinalDestinationPlace(_from), false);
     }
 
     private void setupBTabSelection(final String _selectedStationId, boolean _silent){
-        setupBTabSelection(_selectedStationId, null, _silent);
+        setupBTabSelection(new FinalDestinationStation(_selectedStationId), _silent);
     }
 
-    //Both _selectedStationId and _targetDestination shouldn't be null at the same time
     // silent parameter is used when the UI shouldn't be impacted
-    private void setupBTabSelection(final String _selectedStationId, final Place _targetDestination, final boolean _silent) {
+    private void setupBTabSelection(final FinalDestinationBase _dest, final boolean _silent) {
+
         //Remove any previous selection
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
 
@@ -1328,10 +1400,10 @@ public class NearbyActivity extends AppCompatActivity
             hideSetupShowTripDetailsWidget();
         }
 
-
+        //!!! DANGER !!!
         if (!mStationMapFragment.isPickedPlaceMarkerVisible()) {
 
-            LatLng sortRef = _targetDestination != null ? _targetDestination.getLatLng() : getLatLngForStation(_selectedStationId);
+            LatLng sortRef = _dest.getLocation();
             //Replace recyclerview content
             getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
                     sortRef, mStationMapFragment.getMarkerALatLng());
@@ -1350,20 +1422,21 @@ public class NearbyActivity extends AppCompatActivity
 
                     if (getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.DOCK_STATIONS)) {
                         //highlight B station in list
-                        if (_selectedStationId != null) {
-                            getListPagerAdapter().highlightStationForPage(_selectedStationId, StationListPagerAdapter.DOCK_STATIONS);
+                        if (_dest.getStationID() != null) {
+                            getListPagerAdapter().highlightStationForPage(_dest.getStationID(), StationListPagerAdapter.DOCK_STATIONS);
                             if (!_silent)
                                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                         } else {
+                            //the following works because of sortref being passed to the list before posting the handler (I'm not so proud of that :|)
                             String stationId = Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(false));
 
                             getListPagerAdapter().hideStationRecap(StationListPagerAdapter.DOCK_STATIONS);
-                            mStationMapFragment.setPinOnStation(false, stationId);
+                            mStationMapFragment.setPinOnStation(false, stationId);//set B pin on closest station with available dock
                             getListPagerAdapter().highlightStationForPage(stationId, StationListPagerAdapter.DOCK_STATIONS);
                             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, true);
                             if(!_silent)
                                 animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
-                                        _targetDestination.getLatLng(),
+                                        _dest.getLocation(),
                                         mStationMapFragment.getMarkerBVisibleLatLng(),
                                         null);
                         }
@@ -1373,7 +1446,7 @@ public class NearbyActivity extends AppCompatActivity
 
                         //hackfix. On some devices timing issues led to infinite loop with isRecyclerViewReadyForItemSelection always returning false
                         //so, retry stting up the UI before going to sleep
-                        LatLng sortRef = _targetDestination != null ? _targetDestination.getLatLng() : getLatLngForStation(_selectedStationId);
+                        LatLng sortRef = _dest.getLocation();
                         //Replace recyclerview content
                         getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
                                 sortRef, mStationMapFragment.getMarkerALatLng());
@@ -1385,25 +1458,27 @@ public class NearbyActivity extends AppCompatActivity
             }, 10);
         }
         else {
-
+            //This code assumes that branching into this else means the destination is NOT a Place (it has stationID)
             if (!_silent)
                 animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
-                        getLatLngForStation(_selectedStationId),
+                        _dest.getLocation(),//getLatLngForStation(_selectedStationId),
                         mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(),
                         null);
 
-            getListPagerAdapter().highlightStationForPage(_selectedStationId, StationListPagerAdapter.DOCK_STATIONS);
+            getListPagerAdapter().highlightStationForPage(_dest.getStationID(), StationListPagerAdapter.DOCK_STATIONS);
             getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
         }
 
-        if (_selectedStationId != null) {
+        if (_dest.getStationID() != null) {
+            //Here the distinction between a station or a favorite will appear
             getListPagerAdapter().hideStationRecap(StationListPagerAdapter.DOCK_STATIONS);
-            mStationMapFragment.setPinOnStation(false, _selectedStationId);
+            mStationMapFragment.setPinOnStation(false, _dest.getStationID());
             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, true);
         }
         else
-            mStationMapFragment.setPinForPickedPlace(_targetDestination.getName().toString(),
-                    _targetDestination.getLatLng(), _targetDestination.getAttributions());
+            mStationMapFragment.setPinForPickedPlace(_dest.getName(),
+                    _dest.getLocation(), _dest.getAttributions());
+
     }
 
     //Assumption here is that there is an A and a B station selected (or soon will be)
