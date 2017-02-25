@@ -177,7 +177,7 @@
             <android.support.design.widget.FloatingActionButton
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:id="@+id/trip_details_directions_b_to_search"
+                android:id="@+id/trip_details_directions_b_to_destination"
                 android:layout_toEndOf="@id/trip_details_from_pin_b"
                 android:layout_toRightOf="@id/trip_details_from_pin_b"
                 android:clickable="true"
@@ -194,10 +194,19 @@
                 android:layout_height="wrap_content"
                 style="@style/trip_details_row_imageview_end"
                 android:id="@+id/trip_details_to_search"
-                android:layout_toEndOf="@id/trip_details_directions_b_to_search"
-                android:layout_toRightOf="@id/trip_details_directions_b_to_search"
-                android:layout_alignBottom="@id/trip_details_directions_b_to_search"
+                android:layout_toEndOf="@id/trip_details_directions_b_to_destination"
+                android:layout_toRightOf="@id/trip_details_directions_b_to_destination"
+                android:layout_alignBottom="@id/trip_details_directions_b_to_destination"
                 app:srcCompat="@drawable/ic_pin_search_24dp_black"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/trip_details_row_imageview_end"
+                android:id="@+id/trip_details_to_favorite"
+                android:layout_toEndOf="@id/trip_details_directions_b_to_destination"
+                android:layout_toRightOf="@id/trip_details_directions_b_to_destination"
+                android:layout_alignBottom="@id/trip_details_directions_b_to_destination"
+                app:srcCompat="@drawable/ic_pin_favorite_24dp_black"/>
 
             <TextView
                 android:layout_width="wrap_content"

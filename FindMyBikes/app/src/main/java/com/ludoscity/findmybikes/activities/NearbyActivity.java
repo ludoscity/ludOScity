@@ -60,7 +60,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -151,7 +150,9 @@ public class NearbyActivity extends AppCompatActivity
     private TextView mTripDetailsProximitySearch;
     private TextView mTripDetailsProximityTotal;
     private FrameLayout mTripDetailsSumSeparator;
-    private View mTripDetailsBToSearchRow;
+    private View mTripDetailsBToDestinationRow;
+    private View mTripDetailsPinSearch;
+    private View mTripDetailsPinFavorite;
 
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private static final int SETTINGS_REQUEST_CODE = 2;
@@ -343,7 +344,9 @@ public class NearbyActivity extends AppCompatActivity
         mTripDetailsProximitySearch = (TextView) findViewById(R.id.trip_details_proximity_search);
         mTripDetailsProximityTotal = (TextView) findViewById(R.id.trip_details_proximity_total);
         mTripDetailsSumSeparator = (FrameLayout) findViewById(R.id.trip_details_sum_separator);
-        mTripDetailsBToSearchRow = findViewById(R.id.trip_details_b_to_search);
+        mTripDetailsBToDestinationRow = findViewById(R.id.trip_details_b_to_search);
+        mTripDetailsPinSearch = findViewById(R.id.trip_details_to_search);
+        mTripDetailsPinFavorite = findViewById(R.id.trip_details_to_favorite);
 
         mSearchFAB = (FloatingActionButton) findViewById(R.id.search_fab);
         mDirectionsLocToAFab = (FloatingActionButton) findViewById(R.id.directions_loc_to_a_fab);
@@ -384,10 +387,13 @@ public class NearbyActivity extends AppCompatActivity
             }
         });
         //noinspection ConstantConditions
-        findViewById(R.id.trip_details_directions_b_to_search).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.trip_details_directions_b_to_destination).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                launchGoogleMapsForDirections(mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(), true);
+                if (mStationMapFragment.isPickedPlaceMarkerVisible())
+                    launchGoogleMapsForDirections(mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(), true);
+                else //Either Place marker or Favorite marker is visible, but not both at once
+                    launchGoogleMapsForDirections(mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng(), true);
             }
         });
         findViewById(R.id.trip_details_share).setOnClickListener(new View.OnClickListener() {
@@ -1296,26 +1302,25 @@ public class NearbyActivity extends AppCompatActivity
                 mStationListViewPager.setCurrentItem(StationListPagerAdapter.DOCK_STATIONS, true);
             }
         }
-        //Map click
-        else if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MAP_CLICK_PATH)){
-
-        }
     }
 
-    private abstract class FinalDestinationBase{
+    /////////////////////////////////////////////////////////////////////////////
+    //internal classes definitions follow
+    public interface DestinationInterface{
 
-        public abstract LatLng getLocation();
-        public abstract String getStationID();
-        public abstract String getName();
-        public abstract CharSequence getAttributions();
-
+        LatLng getLocation();
+        String getStationID();
+        String getName();
+        CharSequence getAttributions();
+        boolean isPlace();    //ark !
+        boolean isSationFavorite(); //ark !
     }
 
-    private class FinalDestinationPlace extends FinalDestinationBase{
+    private class FinalDestinationPlace implements DestinationInterface{
 
         private Place mPlace;
 
-        public FinalDestinationPlace(Place _place){mPlace = _place;}
+        FinalDestinationPlace(Place _place){mPlace = _place;}
 
         @Override
         public LatLng getLocation() {
@@ -1336,14 +1341,24 @@ public class NearbyActivity extends AppCompatActivity
         public CharSequence getAttributions() {
             return mPlace.getAttributions();
         }
+
+        @Override
+        public boolean isPlace() {
+            return true;
+        }
+
+        @Override
+        public boolean isSationFavorite() {
+            return false;
+        }
     }
 
-    private class FinalDestinationStation extends FinalDestinationBase{
+    private class FinalDestinationStation implements DestinationInterface{
         private String mStationID;
-        private String mName;   //doesn't matter when final destination is a station
-        //as station name is always selected and on top of the list
+        private String mName;
 
-        public FinalDestinationStation(String _stationID){mStationID = _stationID;}
+        FinalDestinationStation(String _stationID, String _name){mStationID = _stationID; mName=_name;}
+        FinalDestinationStation(String _stationID){mStationID = _stationID; mName="STATION";}
 
         @Override
         public LatLng getLocation() {
@@ -1364,26 +1379,59 @@ public class NearbyActivity extends AppCompatActivity
         public CharSequence getAttributions() {
             return null;
         }
+
+        @Override
+        public boolean isPlace() {
+            return false;
+        }
+
+        @Override
+        public boolean isSationFavorite() {
+            return false;
+        }
     }
 
     private class FinalDestinationStationFavorite extends FinalDestinationStation{
 
+        FinalDestinationStationFavorite(String _stationID, String _name) {
+            super(_stationID, _name);
+        }
 
-        public FinalDestinationStationFavorite(String _stationID) {
-            super(_stationID);
+        @Override
+        public boolean isSationFavorite() {
+            return true;
         }
     }
+    ////////////////////////////////////////////////////////////////////////////////
+    //End of internal classes definitions - they are used in the following setupBTabSelection methods
+    //TODO: explore refactoring with the following considerations
+    //-stop relying on mapfragment markers visibility to branch code
+    //-retain pertinent data to know if a Place, a Favorite or a regular station is presently displayed
+    //(maybe retain an instance of the previously declared classes implementing DestinationInterface)
+    //or have a subsystem do it.
+    //Those objects should loose the identifying isPlace()/isStationFavorite() methods
 
+    //Final destination is a place from the search widget
     private void setupBTabSelectionClosestDock(final Place _from){
         setupBTabSelection(new FinalDestinationPlace(_from), false);
     }
 
+    //Final destination is a favorite station
+    private void setupBTabSelectionClosestDock(final String _fromStationID){
+        setupBTabSelection(new FinalDestinationStationFavorite(_fromStationID, DBHelper.getStation(_fromStationID).getName()), false);
+    }
+
+    //Final destination may be a station or not. Depends if this method is called directly
+    //or if things been specially setup through a call to setupBTabSelectionClosestDock
+    //TODO: refactor this by splitting code into those respective methods, duplicating it and then refactor
+    //common bits
     private void setupBTabSelection(final String _selectedStationId, boolean _silent){
         setupBTabSelection(new FinalDestinationStation(_selectedStationId), _silent);
     }
 
+    //There's now three entry points for this unique piece of code with a hard to follow flow
     // silent parameter is used when the UI shouldn't be impacted
-    private void setupBTabSelection(final FinalDestinationBase _dest, final boolean _silent) {
+    private void setupBTabSelection(final DestinationInterface _dest, final boolean _silent) {
 
         //Remove any previous selection
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
@@ -1401,10 +1449,10 @@ public class NearbyActivity extends AppCompatActivity
         }
 
         //!!! DANGER !!!
-        if (!mStationMapFragment.isPickedPlaceMarkerVisible()) {
-
+        if (!mStationMapFragment.isPickedPlaceMarkerVisible() && !mStationMapFragment.isPickedFavoriteMarkerVisible())
+        {
             LatLng sortRef = _dest.getLocation();
-            //Replace recyclerview content
+            //Replace recyclerview content. SORTS by distance to sortref
             getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
                     sortRef, mStationMapFragment.getMarkerALatLng());
 
@@ -1422,11 +1470,13 @@ public class NearbyActivity extends AppCompatActivity
 
                     if (getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.DOCK_STATIONS)) {
                         //highlight B station in list
-                        if (_dest.getStationID() != null) {
+                        if (!_dest.isSationFavorite() && !_dest.isPlace()) {
+                            //FinalDestinationStation (not from favorite codepath)
                             getListPagerAdapter().highlightStationForPage(_dest.getStationID(), StationListPagerAdapter.DOCK_STATIONS);
                             if (!_silent)
                                 mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                         } else {
+                            //FinalDestinationPlace or FinalDestinationStationFavorite
                             //the following works because of sortref being passed to the list before posting the handler (I'm not so proud of that :|)
                             String stationId = Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(false));
 
@@ -1434,15 +1484,41 @@ public class NearbyActivity extends AppCompatActivity
                             mStationMapFragment.setPinOnStation(false, stationId);//set B pin on closest station with available dock
                             getListPagerAdapter().highlightStationForPage(stationId, StationListPagerAdapter.DOCK_STATIONS);
                             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, true);
-                            if(!_silent)
-                                animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
-                                        _dest.getLocation(),
-                                        mStationMapFragment.getMarkerBVisibleLatLng(),
-                                        null);
+
+                            if (_dest.isPlace() || !stationId.equalsIgnoreCase(_dest.getStationID())) {
+                                //This is a three legged journey (either to a place or a favorite station that has no dock)
+
+                                if (_dest.isPlace())
+                                    mStationMapFragment.setPinForPickedPlace(_dest.getName(),
+                                            _dest.getLocation(),
+                                            _dest.getAttributions());
+                                else    //a favorite station without docks
+                                    mStationMapFragment.setPinForPickedFavorite(_dest.getName(),
+                                            _dest.getLocation(), true);
+
+
+                                if (!_silent)
+                                    animateCameraToShow((int) getResources().getDimension(R.dimen.camera_search_infowindow_padding),
+                                            _dest.getLocation(),
+                                            mStationMapFragment.getMarkerBVisibleLatLng(),
+                                            null);
+                            }
+                            else    //trip to a favorite station that has docks
+                            {
+                                //pin will be hidden by 'B' pin because of marker Z sorting but it must be "visible"
+                                //because the rest of the code relies on visibility checks on mapFragment
+                                //this is madness
+                                mStationMapFragment.setPinForPickedFavorite(_dest.getName(), _dest.getLocation(), false);
+
+                                if (!_silent) {
+
+                                    mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
+                                }
+                            }
                         }
 
                         getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
-                    } else {
+                    } else {    //This is a repost if RecyclerView is not ready for selection
 
                         //hackfix. On some devices timing issues led to infinite loop with isRecyclerViewReadyForItemSelection always returning false
                         //so, retry stting up the UI before going to sleep
@@ -1457,29 +1533,43 @@ public class NearbyActivity extends AppCompatActivity
                 }
             }, 10);
         }
-        else {
-            //This code assumes that branching into this else means the destination is NOT a Place (it has stationID)
-            if (!_silent)
-                animateCameraToShow((int)getResources().getDimension(R.dimen.camera_search_infowindow_padding),
-                        _dest.getLocation(),//getLatLngForStation(_selectedStationId),
-                        mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(),
-                        null);
+        else {  //Favorite or Place marker is visible (not both of same)
+
+            LatLng locationToShow;
+
+            if (mStationMapFragment.isPickedPlaceMarkerVisible())
+                locationToShow = mStationMapFragment.getMarkerPickedPlaceVisibleLatLng();
+            else
+                locationToShow = mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng();
+
+            if (!_silent) {
+                if (locationToShow.latitude != _dest.getLocation().latitude ||
+                        locationToShow.longitude != _dest.getLocation().longitude)
+                {
+                    animateCameraToShow((int) getResources().getDimension(R.dimen.camera_search_infowindow_padding),
+                            _dest.getLocation(),//getLatLngForStation(_selectedStationId),
+                            locationToShow,
+                            null);
+                }
+                else{
+                    mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(_dest.getLocation(), 15));
+                }
+            }
 
             getListPagerAdapter().highlightStationForPage(_dest.getStationID(), StationListPagerAdapter.DOCK_STATIONS);
             getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
         }
 
-        if (_dest.getStationID() != null) {
-            //Here the distinction between a station or a favorite will appear
+        if (!_dest.isSationFavorite() && !_dest.isPlace()) {
+            //FinalDestinationStation
             getListPagerAdapter().hideStationRecap(StationListPagerAdapter.DOCK_STATIONS);
             mStationMapFragment.setPinOnStation(false, _dest.getStationID());
             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, true);
         }
-        else
-            mStationMapFragment.setPinForPickedPlace(_dest.getName(),
-                    _dest.getLocation(), _dest.getAttributions());
-
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    //End of B tab setup
 
     //Assumption here is that there is an A and a B station selected (or soon will be)
     private void setupTripDetailsWidget() {
@@ -1522,11 +1612,18 @@ public class NearbyActivity extends AppCompatActivity
                     mTripDetailsProximityB.setText(formattedProximityString);
 
 
-                    if (mStationMapFragment.getMarkerPickedPlaceVisibleLatLng() == null) {
-                        mTripDetailsBToSearchRow.setVisibility(View.GONE);
+                    //TODO: this string of if...elseif...elseif...else needs refactoring.
+                    // Explore extract methods or create some kind of tripdetailswidget configurator
+                    if (mStationMapFragment.getMarkerPickedPlaceVisibleLatLng() == null &&
+                            mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng() == null) {
+                        //no marker is showed
+
+                        mTripDetailsBToDestinationRow.setVisibility(View.GONE);
                         ViewGroup.LayoutParams param = mTripDetailsSumSeparator.getLayoutParams();
                         ((RelativeLayout.LayoutParams) param).addRule(RelativeLayout.BELOW, R.id.trip_details_a_to_b);
-                    } else {
+                    }
+                    else if(mStationMapFragment.getMarkerPickedPlaceVisibleLatLng() != null){
+                        //Place marker is showed
 
                         rawProximityString = selectedStation.getProximityStringFromLatLng(mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(),
                                 false, getResources().getInteger(R.integer.average_walking_speed_kmh), NearbyActivity.this);
@@ -1539,9 +1636,39 @@ public class NearbyActivity extends AppCompatActivity
 
                         mTripDetailsProximitySearch.setText(formattedProximityString);
 
-                        mTripDetailsBToSearchRow.setVisibility(View.VISIBLE);
+                        mTripDetailsPinSearch.setVisibility(View.VISIBLE);
+                        mTripDetailsPinFavorite.setVisibility(View.INVISIBLE);
+                        mTripDetailsBToDestinationRow.setVisibility(View.VISIBLE);
                         ViewGroup.LayoutParams param = mTripDetailsSumSeparator.getLayoutParams();
                         ((RelativeLayout.LayoutParams) param).addRule(RelativeLayout.BELOW, R.id.trip_details_b_to_search);
+                    }
+                    else if (mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng().latitude != mStationMapFragment.getMarkerBVisibleLatLng().latitude ||
+                                mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng().longitude != mStationMapFragment.getMarkerBVisibleLatLng().longitude) {
+                        //Favorite marker is showed and not on B station
+
+                        rawProximityString = selectedStation.getProximityStringFromLatLng(mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng(),
+                                false, getResources().getInteger(R.integer.average_walking_speed_kmh), NearbyActivity.this);
+                        formattedProximityString = getTripDetailsWdigetFormattedString(rawProximityString);
+
+                        if (formattedProximityString.startsWith(">"))
+                            totalOver1h = true;
+                        else if (!formattedProximityString.startsWith("<"))
+                            BToSearchMinutes = Integer.valueOf(formattedProximityString.substring(1, 3));
+
+                        mTripDetailsProximitySearch.setText(formattedProximityString);
+
+                        mTripDetailsPinSearch.setVisibility(View.INVISIBLE);
+                        mTripDetailsPinFavorite.setVisibility(View.VISIBLE);
+                        mTripDetailsBToDestinationRow.setVisibility(View.VISIBLE);
+                        ViewGroup.LayoutParams param = mTripDetailsSumSeparator.getLayoutParams();
+                        ((RelativeLayout.LayoutParams) param).addRule(RelativeLayout.BELOW, R.id.trip_details_b_to_search);
+                    }
+                    else{
+                        //Favorite marker is showed and on B station
+
+                        mTripDetailsBToDestinationRow.setVisibility(View.GONE);
+                        ViewGroup.LayoutParams param = mTripDetailsSumSeparator.getLayoutParams();
+                        ((RelativeLayout.LayoutParams) param).addRule(RelativeLayout.BELOW, R.id.trip_details_a_to_b);
                     }
 
                     int total = 0;
@@ -1665,6 +1792,7 @@ public class NearbyActivity extends AppCompatActivity
 
         mStationMapFragment.clearMarkerB();
         mStationMapFragment.clearMarkerPickedPlace();
+        mStationMapFragment.clearMarkerPickedFavorite();
 
         //A TAB
         getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, false);
@@ -1754,8 +1882,22 @@ public class NearbyActivity extends AppCompatActivity
 
                     mStationMapFragment.setPinOnStation(true, clickedStation.getId());
                     getListPagerAdapter().setupBTabStationARecap(clickedStation);
-                } else
+                } else {
+
+                    if (mStationMapFragment.isPickedFavoriteMarkerVisible()) {
+
+                        if(clickedStation.getPosition().latitude != mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng().latitude ||
+                                clickedStation.getPosition().longitude != mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng().longitude)
+                        {
+                            mStationMapFragment.pickedFavoriteMarkerInfoWindowShow();
+                        }
+                        else {
+                            mStationMapFragment.pickedFavoriteMarkerInfoWindowHide();
+                        }
+                    }
+
                     setupBTabSelection(clickedStation.getId(), false);
+                }
             }
         }
         else if(uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_INACTIVE_ITEM_CLICK_PATH)){
@@ -1866,6 +2008,9 @@ public class NearbyActivity extends AppCompatActivity
         }
     }
 
+    //TODO: refactor this method such as
+    //-passing only one valid LatLng leads to a regular animateCamera
+    //-passing identical LatLng leads to a regular animateCamera, maybe with client code provided zoom level or a default one
     private void animateCameraToShow(int _cameraPaddingPx, LatLng _latLng0, LatLng _latLng1, LatLng _latLng2){
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
@@ -1996,7 +2141,24 @@ public class NearbyActivity extends AppCompatActivity
                     mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
                     mClearFAB.show();
 
-                    mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
+                    LatLng locationToShow = null;
+
+                    if (mStationMapFragment.isPickedPlaceMarkerVisible())
+                        locationToShow = mStationMapFragment.getMarkerPickedPlaceVisibleLatLng();
+                    else if(mStationMapFragment.isPickedFavoriteMarkerVisible() &&
+                            (mStationMapFragment.getMarkerBVisibleLatLng().latitude != mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng().latitude ||
+                            mStationMapFragment.getMarkerBVisibleLatLng().longitude != mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng().longitude)
+                            )
+                        locationToShow = mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng();
+
+                    if (locationToShow != null) {
+                        animateCameraToShow((int) getResources().getDimension(R.dimen.camera_search_infowindow_padding),
+                                mStationMapFragment.getMarkerBVisibleLatLng(),
+                                locationToShow,
+                                null);
+                    }
+                    else
+                        mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                 }
 
                 mStationMapFragment.lookingForBikes(false);
@@ -2069,8 +2231,7 @@ public class NearbyActivity extends AppCompatActivity
                         .show();
 
             } else {
-                mStationMapFragment.clearMarkerPickedPlace();
-                setupBTabSelection(_stationID, false);
+                setupBTabSelectionClosestDock(_stationID);
             }
         }
         else{
