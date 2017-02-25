@@ -50,6 +50,7 @@ public class StationMapGfx {
                 .position(item.getPosition())
                 .title(item.getId())
                 .alpha(0)
+                .zIndex(.5f)//so that invisible clicking marker is in front of Favorite pin
                 .anchor(0.5f,0.5f)
                 .infoWindowAnchor(0.5f,0.5f);
 

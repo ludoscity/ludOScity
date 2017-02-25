@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,8 +38,8 @@ public class StationMapFragment extends Fragment
         implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
         /*GoogleMap.OnCameraChangeListener,*/
-        GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnMapClickListener {
+        GoogleMap.OnInfoWindowClickListener/*,
+        GoogleMap.OnMapClickListener*/ {
 
     //Used to buffer markers update requests (avoids glitchy anim)
     private class CustomCancellableCallback implements GoogleMap.CancelableCallback {
@@ -94,11 +93,13 @@ public class StationMapFragment extends Fragment
     private OnStationMapFragmentInteractionListener mListener;
 
     private Marker mMarkerStationA;
+    private BitmapDescriptor mPinAIconBitmapDescriptor;
     private Marker mMarkerStationB;
-    private BitmapDescriptor mIconABitmapDescriptor;
-    private BitmapDescriptor mIconBBitmapDescriptor;
+    private BitmapDescriptor mPinBIconBitmapDescriptor;
     private Marker mMarkerPickedPlace;
-    private BitmapDescriptor mIconPickedPlaceBitmapDescriptor;
+    private BitmapDescriptor mPinSearchIconBitmapDescriptor;
+    private Marker mMarkerPickedFavorite;
+    private BitmapDescriptor mPinFavoriteIconBitmapDescriptor;
 
     private TextView mAttributionsText;
 
@@ -118,9 +119,10 @@ public class StationMapFragment extends Fragment
 
         mBufferedBundle = savedInstanceState;
 
-        mIconABitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a_36dp_black);
-        mIconBBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b_36dp_black);
-        mIconPickedPlaceBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_search_24dp_black);
+        mPinAIconBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_a_36dp_black);
+        mPinBIconBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b_36dp_black);
+        mPinSearchIconBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_search_24dp_black);
+        mPinFavoriteIconBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_favorite_24dp_black);
 
         mAttributionsText = (TextView) inflatedView.findViewById(R.id.attributions_text);
 
@@ -149,6 +151,10 @@ public class StationMapFragment extends Fragment
         outState.putBoolean("pin_picked_place_visibility", mMarkerPickedPlace != null && mMarkerPickedPlace.isVisible());
         outState.putParcelable("pin_picked_place_latlng", mMarkerPickedPlace != null ? mMarkerPickedPlace.getPosition() : MONTREAL_LATLNG);
         outState.putString("picked_place_name", mMarkerPickedPlace != null ? mMarkerPickedPlace.getTitle() : "");
+
+        outState.putBoolean("pin_picked_favorite_visibility", mMarkerPickedFavorite != null && mMarkerPickedFavorite.isVisible());
+        outState.putParcelable("pin_picked_favorite_latlng", mMarkerPickedFavorite != null ? mMarkerPickedFavorite.getPosition() : MONTREAL_LATLNG);
+        outState.putString("picked_favorite_name", mMarkerPickedFavorite != null ? mMarkerPickedFavorite.getTitle() : "");
         super.onSaveInstanceState(outState);
     }
 
@@ -200,9 +206,12 @@ public class StationMapFragment extends Fragment
         mGoogleMap.setOnMarkerClickListener(this);
         mGoogleMap.setOnInfoWindowClickListener(this);
         //mGoogleMap.setOnCameraChangeListener(this);
-        mGoogleMap.setOnMapClickListener(this);
+        //mGoogleMap.setOnMapClickListener(this);
         //héhéhé, feel the power of design !!
         mGoogleMap.getUiSettings().setZoomGesturesEnabled(false);
+        mGoogleMap.getUiSettings().setRotateGesturesEnabled(false);
+        mGoogleMap.getUiSettings().setIndoorLevelPickerEnabled(false);
+        mGoogleMap.getUiSettings().setTiltGesturesEnabled(false);
 
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(MAP_READY_PATH);
@@ -215,6 +224,9 @@ public class StationMapFragment extends Fragment
     @Override
     public boolean onMarkerClick(Marker marker) {
 
+        if (isPickedFavoriteMarkerVisible())
+            mMarkerPickedFavorite.showInfoWindow();
+
         if (isPickedPlaceMarkerVisible())
             mMarkerPickedPlace.showInfoWindow();
 
@@ -224,10 +236,19 @@ public class StationMapFragment extends Fragment
             (mMarkerStationB.isVisible() &&
                 mMarkerStationB.getPosition().latitude == marker.getPosition().latitude &&
                 mMarkerStationB.getPosition().longitude == marker.getPosition().longitude) ||
-            (mMarkerPickedPlace.isVisible() &&
+            (mMarkerPickedPlace.isVisible() && //except if picked destination is favorite
                 mMarkerPickedPlace.getPosition().latitude == marker.getPosition().latitude &&
                 mMarkerPickedPlace.getPosition().longitude == marker.getPosition().longitude) )
             return true;
+
+        if(mMarkerPickedFavorite.isVisible() &&
+                //TODO: the following seems a bit patterny, checking if B pin and Favorite one are not on the same station
+                //check connection with NearbyActivity::setupBTabSelection refactor ideas
+                mMarkerPickedFavorite.getPosition().latitude == marker.getPosition().latitude &&
+                mMarkerPickedFavorite.getPosition().longitude == marker.getPosition().longitude)
+        {
+            mMarkerPickedFavorite.hideInfoWindow();
+        }
 
         Uri.Builder builder = new Uri.Builder();
         builder.appendPath(MARKER_CLICK_PATH);
@@ -328,10 +349,30 @@ public class StationMapFragment extends Fragment
         mGoogleMap.getUiSettings().setScrollGesturesEnabled(_toSet);
     }
 
+    //TODO: refactor so that the map fragment is a simple dumb view
+    //Model and controller could be NearbyActivity
+    //in any case, try to remove checks for visibility as a basis fro branching in NearbyActivity
     public boolean isPickedPlaceMarkerVisible(){
         return mMarkerPickedPlace != null && mMarkerPickedPlace.isVisible();
     }
 
+    public void pickedFavoriteMarkerInfoWindowShow(){
+        mMarkerPickedFavorite.showInfoWindow();
+    }
+
+    public void pickedFavoriteMarkerInfoWindowHide(){
+        mMarkerPickedFavorite.hideInfoWindow();
+    }
+
+    //TODO: refactor so that the map fragment is a simple dumb view
+    //Model and controller could be NearbyActivity
+    //in any case, try to remove checks for visibility as a basis fro branching in NearbyActivity
+    //investigate if that should extend to grabbing LatLng and Name
+    public boolean isPickedFavoriteMarkerVisible(){
+        return mMarkerPickedFavorite != null && mMarkerPickedFavorite.isVisible();
+    }
+
+    //LatLng
     public LatLng getMarkerPickedPlaceVisibleLatLng() {
         LatLng toReturn = null;
         if ( mMarkerPickedPlace != null  ) {
@@ -343,7 +384,7 @@ public class StationMapFragment extends Fragment
 
         return toReturn;
     }
-
+    //Name
     public String getMarkerPickedPlaceVisibleName() {
         String toReturn = "";
         if ( mMarkerPickedPlace != null  ) {
@@ -352,6 +393,19 @@ public class StationMapFragment extends Fragment
         }
         else if (mBufferedBundle != null && mBufferedBundle.getBoolean("pin_picked_place_visibility") )
             toReturn = mBufferedBundle.getParcelable("pin_picked_place_name");
+
+        return toReturn;
+    }
+
+    //LatLng
+    public LatLng getMarkerPickedFavoriteVisibleLatLng() {
+        LatLng toReturn = null;
+        if ( mMarkerPickedFavorite != null  ) {
+            if (mMarkerPickedFavorite.isVisible())
+                toReturn = mMarkerPickedFavorite.getPosition();
+        }
+        else if (mBufferedBundle != null && mBufferedBundle.getBoolean("pin_picked_favorite_visibility") )
+            toReturn = mBufferedBundle.getParcelable("pin_picked_favorite_latlng");
 
         return toReturn;
     }
@@ -379,23 +433,29 @@ public class StationMapFragment extends Fragment
         String pinAStationId;
         boolean pinBVisible;
         boolean pinPickedPlaceVisible;
+        boolean pinPickedFavoriteVisible;
         LatLng pinALatLng;
         LatLng pinBLatLng;
         LatLng pinPickedPlaceLatLng;
+        LatLng pinPickedFavoriteLatLng;
 
         String pickedPlaceName;
+        String pickedFavoriteName;
 
         if (mBufferedBundle != null){
 
             pinAVisible = mBufferedBundle.getBoolean("pin_A_visibility");
             pinBVisible = mBufferedBundle.getBoolean("pin_B_visibility");
             pinPickedPlaceVisible = mBufferedBundle.getBoolean("pin_picked_place_visibility");
+            pinPickedFavoriteVisible = mBufferedBundle.getBoolean("pin_picked_favorite_visibility");
 
             pinALatLng = mBufferedBundle.getParcelable("pin_A_latlng");
             pinBLatLng = mBufferedBundle.getParcelable("pin_B_latlng");
             pinPickedPlaceLatLng = mBufferedBundle.getParcelable("pin_picked_place_latlng");
+            pinPickedFavoriteLatLng = mBufferedBundle.getParcelable("pin_picked_favorite_latlng");
 
             pickedPlaceName = mBufferedBundle.getString("picked_place_name");
+            pickedFavoriteName = mBufferedBundle.getString("picked_favorite_name");
 
             pinAStationId = mBufferedBundle.getString("pin_a_station_id");
 
@@ -405,36 +465,46 @@ public class StationMapFragment extends Fragment
             pinAVisible = mMarkerStationA != null && mMarkerStationA.isVisible();
             pinBVisible = mMarkerStationB != null && mMarkerStationB.isVisible();
             pinPickedPlaceVisible = mMarkerPickedPlace != null && mMarkerPickedPlace.isVisible();
+            pinPickedFavoriteVisible = mMarkerPickedFavorite != null && mMarkerPickedFavorite.isVisible();
+
             pinALatLng = mMarkerStationA != null ? mMarkerStationA.getPosition() : MONTREAL_LATLNG;
             pinBLatLng = mMarkerStationB != null ? mMarkerStationB.getPosition() : MONTREAL_LATLNG;
             pinPickedPlaceLatLng = mMarkerPickedPlace != null ? mMarkerPickedPlace.getPosition() : MONTREAL_LATLNG;
+            pinPickedFavoriteLatLng = mMarkerPickedFavorite != null ? mMarkerPickedFavorite.getPosition() : MONTREAL_LATLNG;
 
             pickedPlaceName = mMarkerPickedPlace != null ? mMarkerPickedPlace.getTitle() : "";
+            pickedFavoriteName = mMarkerPickedFavorite != null ? mMarkerPickedFavorite.getTitle() : "";
 
             pinAStationId = mMarkerStationA != null ? mMarkerStationA.getTitle() : "";
         }
 
         mGoogleMap.clear();
 
-        //There is a bug in the map library with vector drawable, I use a workaround I found in the bug report
-        //https://code.google.com/p/gmaps-api-issues/issues/detail?id=9011
-        BitmapDescriptor iconA = mIconABitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_a_36dp_black);
-        BitmapDescriptor iconB = mIconBBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b_36dp_black);
-        BitmapDescriptor iconPickedPlace = mIconPickedPlaceBitmapDescriptor;//BitmapDescriptorFactory.fromResource(R.drawable.ic_pin_b_36dp_black);
-
         mMarkerStationA = mGoogleMap.addMarker(new MarkerOptions().position(pinALatLng)
-                .icon(iconA)
+                .icon(mPinAIconBitmapDescriptor)
                 .visible(pinAVisible)
-                .title(pinAStationId));
+                .title(pinAStationId)
+                .zIndex(1.f));
         mMarkerStationB = mGoogleMap.addMarker(new MarkerOptions().position(pinBLatLng)
-                .icon(iconB)
-                .visible(pinBVisible));
+                .icon(mPinBIconBitmapDescriptor)
+                .visible(pinBVisible)
+                .zIndex(1.f));//so that it hides Favorite one (default Z is 0)
         mMarkerPickedPlace = mGoogleMap.addMarker(new MarkerOptions().position(pinPickedPlaceLatLng)
-                .icon(iconPickedPlace)
+                .icon(mPinSearchIconBitmapDescriptor)
                 .visible(pinPickedPlaceVisible)
                 .title(pickedPlaceName));
+        mMarkerPickedFavorite = mGoogleMap.addMarker(new MarkerOptions().position(pinPickedFavoriteLatLng)
+                .icon(mPinFavoriteIconBitmapDescriptor)
+                .visible(pinPickedFavoriteVisible)
+                .title(pickedFavoriteName));
 
-        mMarkerPickedPlace.showInfoWindow();
+        if (pinPickedPlaceVisible)
+            mMarkerPickedPlace.showInfoWindow();
+
+        if ( pinPickedFavoriteVisible &&
+                (mMarkerPickedFavorite.getPosition().latitude != pinBLatLng.latitude ||
+                mMarkerPickedFavorite.getPosition().longitude != pinBLatLng.longitude) )
+            mMarkerPickedFavorite.showInfoWindow();
 
         for (StationMapGfx markerData : mMapMarkersGfxData){
             markerData.addMarkerToMap(mGoogleMap);
@@ -533,6 +603,17 @@ public class StationMapFragment extends Fragment
         }
     }
 
+    public void setPinForPickedFavorite(String _favoriteName, LatLng _favoritePosition, boolean _showInfoWindow){
+
+        mMarkerPickedFavorite.setTitle(_favoriteName);
+        mMarkerPickedFavorite.setPosition(_favoritePosition);
+        mMarkerPickedFavorite.setVisible(true);
+
+
+        if (_showInfoWindow)
+            mMarkerPickedFavorite.showInfoWindow();
+    }
+
     public  void clearMarkerPickedPlace(){
         if(mMarkerPickedPlace != null)
             mMarkerPickedPlace.setVisible(false);
@@ -541,18 +622,9 @@ public class StationMapFragment extends Fragment
         mAttributionsText.setText("");
     }
 
-    @Override
-    public void onMapClick(LatLng latLng) {
-
-        if (mMarkerPickedPlace != null && mMarkerPickedPlace.isVisible())
-            mMarkerPickedPlace.showInfoWindow();
-
-        Uri.Builder builder = new Uri.Builder();
-        builder.appendPath(MAP_CLICK_PATH);
-
-        if (mListener != null){
-            mListener.onStationMapFragmentInteraction(builder.build());
-        }
+    public  void clearMarkerPickedFavorite(){
+        if(mMarkerPickedFavorite != null)
+            mMarkerPickedFavorite.setVisible(false);
     }
 
     /**
