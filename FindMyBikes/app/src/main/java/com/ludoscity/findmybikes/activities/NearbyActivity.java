@@ -2363,9 +2363,8 @@ public class NearbyActivity extends AppCompatActivity
             Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.such_short_trip, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
                     .show();
 
-            } else {
-                setupBTabSelectionClosestDock(_stationID);
-            }
+        } else {
+            setupBTabSelectionClosestDock(_stationID);
         }
     }
 
