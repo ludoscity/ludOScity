@@ -2232,8 +2232,6 @@ public class NearbyActivity extends AppCompatActivity
                 }
             } else { //B TAB
 
-                checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT);
-
                 mAutoSelectBikeFab.hide();
                 mStationMapFragment.setMapPaddingRight(0);
 
@@ -2244,7 +2242,9 @@ public class NearbyActivity extends AppCompatActivity
 
                 if (mStationMapFragment.getMarkerBVisibleLatLng() == null) {
 
-                    checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE);
+                    //check if showcasing should happen, if not check if hint should happen
+                    if(!checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE))
+                        checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT);
 
                     mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13.75f));
 
