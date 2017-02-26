@@ -65,6 +65,12 @@
     <string name="gotit">COMPRIS!</string>
     <string name="trip_details_share_title">Partager durée du trajet avec…</string>
     <string name="cities">#villes</string>
-    <string name="go_to_favorite">#cliquer nom favori pour définir destination</string>
+    <string name="go_to_favorite">#cliquer un nom de favori pour définir destination</string>
     <string name="search_any">#Tapez n\'importe quel nom de lieu ou adresse</string>
+    <string name="onboarding_showcase_add_favorite_text">\nPresque terminé ! Pour ajouter un favori, cliquer sur ce bouton coeur…</string>
+    <string name="onboarding_showcase_add_favorite_title">#truc 2/2</string>
+    <string name="onboarding_showcase_search_text">\nPédalons de A vers B. Comme vous n\'avez aucun favori, trouvons un nom de lieu ou une adresse où vous voulez aller en appuyant sur le bouton de recherche…</string>
+    <string name="onboarding_showcase_search_title">#vers où ?</string>
+    <string name="onboarding_showcase_total_time_text">\nHop ! Voyez l\'estimation de votre temps de trajet basée sur la disponibilité des ancrages %1$s aux alentours de %2$s</string>
+    <string name="onboarding_showcase_total_time_title">#truc 1/2</string>
 </resources>

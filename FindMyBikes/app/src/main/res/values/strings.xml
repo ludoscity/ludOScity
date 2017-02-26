@@ -84,6 +84,12 @@
     <string name="gotit">GOT IT!</string>
     <string name="trip_details_share_title">Share trip duration with…</string>
     <string name="cities">#cities</string>
-    <string name="go_to_favorite">#tap favorite name to set as destination</string>
+    <string name="go_to_favorite">#tap a favorite name to set as destination</string>
     <string name="search_any">#type any place name or address</string>
+    <string name="onboarding_showcase_search_title">#where to ?</string>
+    <string name="onboarding_showcase_search_text">\nLet\'s bike from A to B.\nYou have no favorite so start looking for any place name or address you\'d like to go by tapping the search button…</string>
+    <string name="onboarding_showcase_total_time_title">#tip 1/2</string>
+    <string name="onboarding_showcase_total_time_text">"\nBam ! View your trip time estimate based on %1$s docks availability around %2$s</string>
+    <string name="onboarding_showcase_add_favorite_title">#tip 2/2</string>
+    <string name="onboarding_showcase_add_favorite_text">\nAlmost done ! Add a favorite by tapping this heart shaped button…</string>
 </resources>

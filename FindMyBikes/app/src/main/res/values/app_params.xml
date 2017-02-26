@@ -20,7 +20,9 @@
     <item name="outdated_data_warning_time_min" type="integer">15</item>
     <!-- 0 favorite corresponds to onboarding_full-->
     <item name="onboarding_light_min_valid_favorites_count" type="integer">1</item>
-    <item name="onboarding_none_min_valid_favorites_count" type="integer">2</item>
+    <item name="onboarding_ultra_light_min_valid_favorites_count" type="integer">2</item>
+    <item name="onboarding_none_min_valid_favorites_count" type="integer">3</item>
+
 
     <item name="camera_animation_duration" type="integer">850</item>
 
