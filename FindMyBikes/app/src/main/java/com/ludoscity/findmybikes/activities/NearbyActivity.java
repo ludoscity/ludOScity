@@ -284,6 +284,7 @@ public class NearbyActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         boolean autoCompleteLoadingProgressBarVisible = false;
+        String showcaseTripTotalPlaceName = null;
 
         if (savedInstanceState != null) {
 
@@ -294,6 +295,7 @@ public class NearbyActivity extends AppCompatActivity
             mFavoriteSheetVisible = savedInstanceState.getBoolean("favorite_sheet_visible");
             autoCompleteLoadingProgressBarVisible = savedInstanceState.getBoolean("place_autocomplete_loading");
             mRefreshTabs = savedInstanceState.getBoolean("refresh_tabs");
+            showcaseTripTotalPlaceName = savedInstanceState.getString("onboarding_showcase_trip_total_place_name", null);
         }
 
         setContentView(R.layout.activity_nearby);
@@ -352,6 +354,13 @@ public class NearbyActivity extends AppCompatActivity
         mPlaceAutocompleteLoadingProgressBar = (ProgressBar) findViewById(R.id.place_autocomplete_loading);
         if (autoCompleteLoadingProgressBarVisible)
             mPlaceAutocompleteLoadingProgressBar.setVisibility(View.VISIBLE);
+
+        if (showcaseTripTotalPlaceName != null){
+            setupShowcaseTripTotal();
+            mOnboardingShowcaseView.setContentText(String.format(getString(R.string.onboarding_showcase_total_time_text),
+                    DBHelper.getBikeNetworkName(this), showcaseTripTotalPlaceName));
+            mOnboardingShowcaseView.setTag(showcaseTripTotalPlaceName);
+        }
 
         setupDirectionsLocToAFab();
         setupSearchFab();
@@ -554,6 +563,8 @@ public class NearbyActivity extends AppCompatActivity
                 {
                     mOnboardingShowcaseView.setContentText(String.format(getString(R.string.onboarding_showcase_total_time_text),
                             DBHelper.getBikeNetworkName(this), place.getName()));
+
+                    mOnboardingShowcaseView.setTag(place.getName());
                 }
 
                 final Handler handler = new Handler();
@@ -680,6 +691,10 @@ public class NearbyActivity extends AppCompatActivity
         outState.putBoolean("favorite_sheet_visible", mFavoriteSheetVisible);
         outState.putBoolean("place_autocomplete_loading", mPlaceAutocompleteLoadingProgressBar.getVisibility() == View.VISIBLE);
         outState.putBoolean("refresh_tabs", mRefreshTabs);
+
+        if (mOnboardingShowcaseView != null && mOnboardingShowcaseView.getTag() != null){
+            outState.putString("onboarding_showcase_trip_total_place_name", (String)mOnboardingShowcaseView.getTag());
+        }
     }
 
     @Override
