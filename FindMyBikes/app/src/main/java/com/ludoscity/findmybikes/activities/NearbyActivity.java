@@ -286,6 +286,7 @@ public class NearbyActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         boolean autoCompleteLoadingProgressBarVisible = false;
+        String showcaseTripTotalPlaceName = null;
 
         if (savedInstanceState != null) {
 
@@ -296,6 +297,7 @@ public class NearbyActivity extends AppCompatActivity
             mFavoriteSheetVisible = savedInstanceState.getBoolean("favorite_sheet_visible");
             autoCompleteLoadingProgressBarVisible = savedInstanceState.getBoolean("place_autocomplete_loading");
             mRefreshTabs = savedInstanceState.getBoolean("refresh_tabs");
+            showcaseTripTotalPlaceName = savedInstanceState.getString("onboarding_showcase_trip_total_place_name", null);
         }
 
         setContentView(R.layout.activity_nearby);
@@ -356,6 +358,13 @@ public class NearbyActivity extends AppCompatActivity
         mPlaceAutocompleteLoadingProgressBar = (ProgressBar) findViewById(R.id.place_autocomplete_loading);
         if (autoCompleteLoadingProgressBarVisible)
             mPlaceAutocompleteLoadingProgressBar.setVisibility(View.VISIBLE);
+
+        if (showcaseTripTotalPlaceName != null){
+            setupShowcaseTripTotal();
+            mOnboardingShowcaseView.setContentText(String.format(getString(R.string.onboarding_showcase_total_time_text),
+                    DBHelper.getBikeNetworkName(this), showcaseTripTotalPlaceName));
+            mOnboardingShowcaseView.setTag(showcaseTripTotalPlaceName);
+        }
 
         setupDirectionsLocToAFab();
         setupSearchFab();
@@ -552,11 +561,18 @@ public class NearbyActivity extends AppCompatActivity
 
             if (resultCode == RESULT_OK){
 
-                //User selected a search result, onboarding showcases total trip time and favorite action button
-                checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_TRIP_TOTAL_SHOWCASE);
-
                 mSearchFAB.hide();
                 final Place place = PlaceAutocomplete.getPlace(this, data);
+
+                //User selected a search result, onboarding showcases total trip time and favorite action button
+                if(checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_TRIP_TOTAL_SHOWCASE))
+                //Because destination name is available here and can't be passed down checkOnboarding
+                {
+                    mOnboardingShowcaseView.setContentText(String.format(getString(R.string.onboarding_showcase_total_time_text),
+                            DBHelper.getBikeNetworkName(this), place.getName()));
+
+                    mOnboardingShowcaseView.setTag(place.getName());
+                }
 
                 final Handler handler = new Handler();
 
@@ -682,6 +698,10 @@ public class NearbyActivity extends AppCompatActivity
         outState.putBoolean("favorite_sheet_visible", mFavoriteSheetVisible);
         outState.putBoolean("place_autocomplete_loading", mPlaceAutocompleteLoadingProgressBar.getVisibility() == View.VISIBLE);
         outState.putBoolean("refresh_tabs", mRefreshTabs);
+
+        if (mOnboardingShowcaseView != null && mOnboardingShowcaseView.getTag() != null){
+            outState.putString("onboarding_showcase_trip_total_place_name", (String)mOnboardingShowcaseView.getTag());
+        }
     }
 
     @Override
@@ -847,7 +867,8 @@ public class NearbyActivity extends AppCompatActivity
             public void onSheetHidden() {
                 if (!isLookingForBike() && mStationMapFragment.getMarkerBVisibleLatLng() == null) {
                     //B tab with no selection
-                    mSearchFAB.show();
+                    if (Utils.Connectivity.isConnected(NearbyActivity.this))
+                        mSearchFAB.show();
 
                     if (!checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE) &&
                             !checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT))
@@ -864,10 +885,7 @@ public class NearbyActivity extends AppCompatActivity
 
             @Override
             public void onSheetShown() {
-                if (mOnboardingSnackBar != null)
-                    setupHintTapFavName();
-                //now based on previous main hint being displayed
-                //checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_TAP_FAV_NAME_HINT);
+                checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_ULTRA_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_TAP_FAV_NAME_HINT);
             }
         });
     }
@@ -890,13 +908,15 @@ public class NearbyActivity extends AppCompatActivity
         hideTripDetailsWidget();
         clearBTab();
 
-        checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT);
+        if (!checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE)) {
+            checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT);
+        }
     }
 
     private enum eONBOARDING_STEP { ONBOARDING_STEP_SEARCH_SHOWCASE, ONBOARDING_STEP_TRIP_TOTAL_SHOWCASE,
         ONBOARDING_STEP_MAIN_CHOICE_HINT, ONBOARDING_STEP_TAP_FAV_NAME_HINT, ONBOARDING_STEP_SEARCH_HINT }
 
-    private enum eONBOARDING_LEVEL{ONBOARDING_LEVEL_FULL, ONBOARDING_LEVEL_LIGHT}
+    private enum eONBOARDING_LEVEL{ONBOARDING_LEVEL_FULL, ONBOARDING_LEVEL_LIGHT, ONBOARDING_LEVEL_ULTRA_LIGHT}
 
     //returns true if conditions satisfied (onboarding is showed)
     private boolean checkOnboarding(eONBOARDING_LEVEL _level, eONBOARDING_STEP _step){
@@ -907,21 +927,20 @@ public class NearbyActivity extends AppCompatActivity
 
         if (_level == eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL)
             minValidFavorites = getApplicationContext().getResources().getInteger(R.integer.onboarding_light_min_valid_favorites_count);
-        else //_level == eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT
+        else if(_level == eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT)
+            minValidFavorites = getApplicationContext().getResources().getInteger(R.integer.onboarding_ultra_light_min_valid_favorites_count);
+        else if (_level == eONBOARDING_LEVEL.ONBOARDING_LEVEL_ULTRA_LIGHT)
             minValidFavorites = getApplicationContext().getResources().getInteger(R.integer.onboarding_none_min_valid_favorites_count);
 
         //count valid favorites
         //+ network
         //== onboarding
-        //TODO: validate flows when there's no connectivity
-        if (!DBHelper.hasAtLeastNValidFavorites(
+        if ( !DBHelper.hasAtLeastNValidFavorites(
                 getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS),
                 minValidFavorites,
-                NearbyActivity.this)
-                &&
-                Utils.Connectivity.isConnected(getApplicationContext())){
+                NearbyActivity.this) ){
 
-            if (_step == eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE && mOnboardingShowcaseView == null)
+            if (_step == eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE)
                 setupShowcaseSearch();
             else if(_step == eONBOARDING_STEP.ONBOARDING_STEP_TRIP_TOTAL_SHOWCASE)
                 setupShowcaseTripTotal();
@@ -942,6 +961,10 @@ public class NearbyActivity extends AppCompatActivity
     public void onBackPressed() {
         if (mFavoritesSheetFab.isSheetVisible()) {
             mFavoritesSheetFab.hideSheet();
+            if (mOnboardingSnackBar != null) {
+                mOnboardingSnackBar.dismiss();
+                mOnboardingSnackBar = null;
+            }
         } else if(mOnboardingShowcaseView != null){
             //do nothing if onboarding is in progress
         } else if(isLookingForBike()){
@@ -1089,8 +1112,13 @@ public class NearbyActivity extends AppCompatActivity
 
                         getListPagerAdapter().setRefreshEnableAll(true);
                         if (!mSearchFAB.isEnabled()) {
+                            mSearchFAB.show();
                             mSearchFAB.setEnabled(true);
-                            mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.theme_primary_dark));
+
+                            if (mOnboardingSnackBar != null && mOnboardingSnackBar.getView().getTag() != null)
+                                if (!checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE))
+                                    checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT);
+
                             mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
                         }
 
@@ -1146,7 +1174,12 @@ public class NearbyActivity extends AppCompatActivity
 
                         getListPagerAdapter().setRefreshEnableAll(false);
                         mSearchFAB.setEnabled(false);
-                        mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(NearbyActivity.this, R.color.light_gray));
+                        mSearchFAB.hide();
+
+                        if(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS) != null &&
+                                mOnboardingSnackBar != null && mOnboardingSnackBar.getView().getTag() != null && !((String)mOnboardingSnackBar.getView().getTag()).equalsIgnoreCase("NO_CONNECTIVITY"))
+                            checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT);
+
                         mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this,R.color.theme_accent));
                     }
 
@@ -1181,8 +1214,9 @@ public class NearbyActivity extends AppCompatActivity
 
                                 mFavoritesSheetFab.showFab();
 
-                                //if full onboarding not happening...
-                                if (!checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE))
+                                //if onboarding not happening...
+                                if (!checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE) &&
+                                        !checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT))
                                 {
                                     //...open favorites sheet
                                     final Handler handler = new Handler();
@@ -1280,21 +1314,39 @@ public class NearbyActivity extends AppCompatActivity
 
     private void setupShowcaseSearch() {
 
-        mOnboardingShowcaseView =
-                new ShowcaseView.Builder(NearbyActivity.this)
-                        .setTarget(new ViewTarget(R.id.search_framelayout, NearbyActivity.this))
-                        .setStyle(R.style.OnboardingShowcaseTheme)
-                        .withMaterialShowcase()
-                        .build();
+        if (Utils.Connectivity.isConnected(getApplicationContext())) {
 
-        mOnboardingShowcaseView.hideButton();
+            if (mOnboardingShowcaseView == null) {
+                mOnboardingShowcaseView =
+                        new ShowcaseView.Builder(NearbyActivity.this)
+                                .setTarget(new ViewTarget(R.id.search_framelayout, NearbyActivity.this))
+                                .setStyle(R.style.OnboardingShowcaseTheme)
+                                .setContentTitle(R.string.onboarding_showcase_search_title)
+                                .setContentText(R.string.onboarding_showcase_search_text)
+
+                                .withMaterialShowcase()
+                                .build();
+
+                mOnboardingShowcaseView.hideButton();
+            } else {
+                mOnboardingShowcaseView.setContentTitle(getString(R.string.onboarding_showcase_search_title));
+                mOnboardingShowcaseView.setContentText(getString(R.string.onboarding_showcase_search_text));
+            }
+        }
+        else{
+            setupHintMainChoice();
+        }
     }
 
     private void setupShowcaseTripTotal() {
+        if (mOnboardingShowcaseView != null)
+            mOnboardingShowcaseView.hide();
+
         mOnboardingShowcaseView =
                 new ShowcaseView.Builder(NearbyActivity.this)
                         .setTarget(new ViewTarget(R.id.trip_details_total, NearbyActivity.this))
                         .setStyle(R.style.OnboardingShowcaseTheme)
+                        .setContentTitle(R.string.onboarding_showcase_total_time_title)
                         .withMaterialShowcase()
                         .setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -1304,36 +1356,64 @@ public class NearbyActivity extends AppCompatActivity
                             }
                         })
                         .build();
-        RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        lps.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
-        lps.setMargins(margin, margin, margin, margin);
 
-        mOnboardingShowcaseView.setButtonPosition(lps);
+        //TODO: position button depending on screen orientation
+        //RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        /*lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        lps.addRule(RelativeLayout.RIGHT_OF, R.id.trip_details_total);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            lps.addRule(RelativeLayout.END_OF, R.id.trip_details_total);
+        }*/
+
+        //lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        //lps.addRule(RelativeLayout.CENTER_IN_PARENT);
+        //int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
+        //lps.setMargins(margin, margin, margin, margin);
+
+        //mOnboardingShowcaseView.setButtonPosition(lps);
 
     }
 
     private void setupHintMainChoice(){
 
-        mOnboardingSnackBar =  Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.please_answer_first, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(this, R.color.theme_primary_dark))
+        int messageResourceId = R.string.onboarding_hint_main_choice;
+
+        if (!Utils.Connectivity.isConnected(getApplicationContext()))
+            messageResourceId = R.string.onboarding_hint_main_choice_no_connectivity;
+
+        mOnboardingSnackBar =  Utils.Snackbar.makeStyled(mCoordinatorLayout, messageResourceId, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(this, R.color.theme_primary_dark))
                 /*.setAction(R.string.gotit, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         //Snackbar dismisses itself on click
                     }
                 })*/;
+        if (!Utils.Connectivity.isConnected(getApplicationContext()))
+            mOnboardingSnackBar.getView().setTag("NO_CONNECTIVITY");
+        else
+            mOnboardingSnackBar.getView().setTag("CONNECTIVITY");
+
+        mOnboardingSnackBar.setCallback(new Snackbar.Callback() {
+            @Override
+            public void onDismissed(Snackbar snackbar, int event) {
+                if (event == DISMISS_EVENT_SWIPE)
+                    mOnboardingSnackBar = null;
+            }
+        });
+
 
         mOnboardingSnackBar.show();
     }
 
     private void setupHintTapFavName(){
-        mOnboardingSnackBar =  Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.go_to_favorite, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
+        mOnboardingSnackBar =  Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_hint_tap_favorite_name, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
+        mOnboardingSnackBar.getView().setTag(null);
         mOnboardingSnackBar.show();
     }
 
     private void setupHintSearch(){
-        mOnboardingSnackBar =  Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.search_any, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
+        mOnboardingSnackBar =  Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_hint_search, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
+        mOnboardingSnackBar.getView().setTag(null);
         mOnboardingSnackBar.show();
     }
 
@@ -1341,6 +1421,8 @@ public class NearbyActivity extends AppCompatActivity
         mOnboardingShowcaseView.hideButton();
 
         mOnboardingShowcaseView.setShowcase(getListPagerAdapter().getDockingStationFavoriteFabViewTarget(), true);
+        mOnboardingShowcaseView.setContentTitle(getString(R.string.onboarding_showcase_add_favorite_title));
+        mOnboardingShowcaseView.setContentText(getString(R.string.onboarding_showcase_add_favorite_text));
     }
 
     private void setStatusBarClickListener() {
@@ -1372,8 +1454,8 @@ public class NearbyActivity extends AppCompatActivity
         {
             refreshMap();
         }
-        //Marker click
-        else if ( uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH)){
+        //Marker click - ignored if onboarding is in progress
+        else if ( uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH) && mOnboardingShowcaseView == null){
 
             if(isLookingForBike() && mStationMapFragment.getMarkerBVisibleLatLng() != null ||
                     !isLookingForBike()) {
@@ -1415,7 +1497,7 @@ public class NearbyActivity extends AppCompatActivity
                 }
             } else {
 
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.please_answer_first, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.onboarding_hint_main_choice, Snackbar.LENGTH_SHORT, ContextCompat.getColor(this, R.color.theme_primary_dark))
                         .show();
 
                 mStationListViewPager.setCurrentItem(StationListPagerAdapter.DOCK_STATIONS, true);
@@ -1925,7 +2007,8 @@ public class NearbyActivity extends AppCompatActivity
         if (!isLookingForBike()) {
             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13));
             mFavoritesSheetFab.showFab();
-            mSearchFAB.show();
+            if (Utils.Connectivity.isConnected(NearbyActivity.this))
+                mSearchFAB.show();
             mClearFAB.hide();
         }
         else{
@@ -2258,7 +2341,8 @@ public class NearbyActivity extends AppCompatActivity
                     else {
                         mDirectionsLocToAFab.hide();
                         mFavoritesSheetFab.showFab();
-                        mSearchFAB.show();
+                        if (Utils.Connectivity.isConnected(NearbyActivity.this))
+                            mSearchFAB.show();
                     }
 
                     mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
@@ -2658,7 +2742,9 @@ public class NearbyActivity extends AppCompatActivity
 
             alertDialog.show();
 
-            mStationMapFragment.clearMarkerB();
+            if(!checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE)){
+                checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT);
+            }
 
             mDownloadWebTask = new DownloadWebTask();
             mDownloadWebTask.execute();

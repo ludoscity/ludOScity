@@ -124,6 +124,17 @@
         <item name="sv_backgroundColor">@color/onboarding_showcaseview_background</item>
         <item name="sv_showcaseColor">@color/onboarding_showcaseview</item>
         <item name="sv_buttonText">@string/ok</item>
+        <item name="sv_titleTextAppearance">@style/CustomTitle</item>
+        <item name="sv_detailTextAppearance">@style/CustomText</item>
+    </style>
+
+    <style name="CustomTitle" parent="TextAppearance.ShowcaseView.Title">
+        <item name="android:textSize">40sp</item>
+        <item name="android:textColor">@color/onboarding_showcaseview_title_color</item>
+    </style>
+    <style name="CustomText" parent="TextAppearance.ShowcaseView.Detail.Light">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">@color/onboarding_showcaseview_text_color</item>
     </style>
 
 </resources>

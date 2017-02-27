@@ -19,7 +19,7 @@
     <string name="favorite_removed">#favori supprimé</string>
     <string name="station">Station</string>
     <string name="downloading">#téléchargement des données…</string>
-    <string name="no_connectivity">#not connecté</string>
+    <string name="no_connectivity">#non connecté</string>
     <string name="refreshing">#rafraîchissement de la carte…</string>
     <string name="auto_download_failed">#échec du téléchargement :/ Màj auto suspendue</string>
     <string name="google_maps_not_installed">Google Maps non installé !</string>
@@ -45,7 +45,6 @@
     <string name="pref_availability_settings_dialog_title">Paramètres disponibilité</string>
     <string name="pref_availability_critical_hint">Considérées vide dans l\'onglet A ou pleine dans l\'onglet B</string>
     <string name="such_short_trip">#pas besoin de moi pour un trajet si court ! ;)</string>
-    <string name="please_answer_first">#ouvrir favoris, utiliser recherche, ou cliquer une station</string>
     <string name="resume">REPRENDRE</string>
     <string name="auto_bike_select_finding">#localisation de vos vélos. Un instant…</string>
     <string name="auto_bike_select_found">#vélocalisé ! :)</string>
@@ -65,6 +64,14 @@
     <string name="gotit">COMPRIS!</string>
     <string name="trip_details_share_title">Partager durée du trajet avec…</string>
     <string name="cities">#villes</string>
-    <string name="go_to_favorite">#cliquer nom favori pour définir destination</string>
-    <string name="search_any">#Tapez n\'importe quel nom de lieu ou adresse</string>
+    <string name="onboarding_showcase_add_favorite_text">\nPresque terminé ! Pour ajouter un favori, cliquez sur ce bouton coeur.</string>
+    <string name="onboarding_showcase_add_favorite_title">#truc 2/2</string>
+    <string name="onboarding_showcase_search_text">Pédalons de A vers B.\n\nVous n\'avez aucun favori ! Pour commencer, cliquez sur le bouton de recherche et entrez un nom de lieu ou une adresse…</string>
+    <string name="onboarding_showcase_search_title">#vers où ?</string>
+    <string name="onboarding_showcase_total_time_text">\nHop ! Voyez l\'estimation de votre temps de trajet basée sur la disponibilité des ancrages %1$s aux alentours de %2$s…</string>
+    <string name="onboarding_showcase_total_time_title">#truc 1/2</string>
+    <string name="onboarding_hint_main_choice">#ouvrir favoris, utiliser recherche, ou cliquer une station</string>
+    <string name="onboarding_hint_main_choice_no_connectivity">#ouvrir favoris ou cliquer une station</string>
+    <string name="onboarding_hint_tap_favorite_name">#cliquer un nom de favori pour définir destination</string>
+    <string name="onboarding_hint_search">#Tapez n\'importe quel nom de lieu ou adresse</string>
 </resources>
