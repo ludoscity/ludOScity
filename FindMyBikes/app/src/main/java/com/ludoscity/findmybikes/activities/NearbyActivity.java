@@ -1261,6 +1261,25 @@ public class NearbyActivity extends AppCompatActivity
                             }
                         }, 500);
 
+                        //special case for test versions in firebase lab
+                        //full onboarding prevents meaningfull coverage (robo test don't input anything in search autocomplete widget)
+                        if (getApplicationContext().getResources().getInteger(R.integer.onboarding_light_min_valid_favorites_count) == 0){
+                            //Adding onboarding Favorite
+                            StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+
+                            for(StationItem station : mStationsNetwork) {
+                                if (!station.getId().equalsIgnoreCase(stationA.getId())) {
+
+                                    //station.setFavorite(true, NearbyActivity.this); //We want to manipulate everything, hence go directly to DBHelper
+                                    DBHelper.updateFavorite(true, station.getId(), "TEST FAVORITE", false, NearbyActivity.this);
+                                    ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteAll(NearbyActivity.this);
+                                    setupFavoriteListFeedback(favoriteList.isEmpty());
+                                    mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
+                                    break;
+                                }
+                            }
+                        }
+
                         mClosestBikeAutoSelected = true;
                         //launch twitter task if not already running, pass it the raw String
                         if ( Utils.Connectivity.isConnected(getApplicationContext()) && //data network available
