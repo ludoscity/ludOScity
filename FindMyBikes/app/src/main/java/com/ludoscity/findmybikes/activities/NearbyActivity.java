@@ -744,16 +744,6 @@ public class NearbyActivity extends AppCompatActivity
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivityForResult(settingsIntent, SETTINGS_REQUEST_CODE);
                 return true;
-            case R.id.tutorial_menu_item:
-
-                //switch to B tab
-                mStationListViewPager.setCurrentItem(StationListPagerAdapter.DOCK_STATIONS, true);
-
-                if (!mFavoriteSheetVisible)
-                    mFavoritesSheetFab.showSheet();
-
-                mClosestBikeAutoSelected = false;
-                return true;
 
             case R.id.legal_notices_menu_item:
                 new LicensesDialog.Builder(this)
