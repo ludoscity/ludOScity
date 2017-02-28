@@ -114,6 +114,7 @@
 
             <FrameLayout
                 android:layout_width="wrap_content"
+                android:id="@+id/search_framelayout"
                 android:layout_height="wrap_content">
 
                 <android.support.design.widget.FloatingActionButton
