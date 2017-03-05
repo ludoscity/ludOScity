@@ -47,6 +47,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     private Context mCtx;
 
     private boolean mIsLookingForBike;
+    private boolean mShowProximity;
 
     private int mSelectedPos = NO_POSITION;
 
@@ -265,7 +266,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     @Override
     public void onBindViewHolder(StationListItemViewHolder holder, int position) {
 
-        holder.bindStation(mStationList.get(position), position == mSelectedPos);
+        holder.bindStation(mStationList.get(position), position == mSelectedPos, mShowProximity);
     }
 
     @Override
@@ -312,11 +313,11 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             mFavoriteFab.setOnClickListener(this);
         }
 
-        void bindStation(StationItem _station, boolean _selected){
+        void bindStation(StationItem _station, boolean _selected, boolean _showProximity){
 
             mStationId = _station.getId();
 
-            if (mStationSortComparator != null) {
+            if (_showProximity && mStationSortComparator != null) {
 
                 String proximityString;
 
@@ -359,12 +360,21 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             if (_selected){
 
+                float nameWidthPercent;
+
+                if (mShowProximity) {
+                    nameWidthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_selected_percent, true);
+                }
+                else{
+                    nameWidthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_selected_percent, true) + Utils.getPercentResource(mCtx, R.dimen.proximity_column_width_percent, true);
+                }
+
                 //The width percentage is updated so that the name TextView gives room to the fabs
                 //RecyclerView gives us free opacity/bounds resizing animations
                 PercentRelativeLayout.LayoutParams params =(PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
                 PercentLayoutHelper.PercentLayoutInfo info = params.getPercentLayoutInfo();
 
-                info.widthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_selected_percent, true);
+                info.widthPercent = nameWidthPercent;
                 mName.requestLayout();
 
                 //Show two fabs, anchored through app:layout_anchor="@id/fabs_anchor" stationlist_item.xml
@@ -409,10 +419,20 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             }
             else{
+
+                float nameWidthPercent;
+
+                if (mShowProximity) {
+                    nameWidthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_default_percent, true);
+                }
+                else{
+                    nameWidthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_default_percent, true) + Utils.getPercentResource(mCtx, R.dimen.proximity_column_width_percent, true);
+                }
+
                 //name width percentage restoration
-                PercentRelativeLayout.LayoutParams params =(PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
+                PercentRelativeLayout.LayoutParams params = (PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
                 PercentLayoutHelper.PercentLayoutInfo info = params.getPercentLayoutInfo();
-                info.widthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_default_percent, true);
+                info.widthPercent = nameWidthPercent;
                 mName.requestLayout();
 
                 //Hidding two fabs and their anchor
@@ -520,10 +540,15 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                         mListener.onStationListItemClick(StationListFragment.STATION_LIST_INACTIVE_ITEM_CLICK_PATH);
                     } else {
 
-                        int newlySelectedPos = StationRecyclerViewAdapter.this.setSelection(mStationId, false);
+                        int oldSelectedPos = mSelectedPos;
 
-                        mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
-                        mFabAnimationRequested = newlySelectedPos != mSelectedPos;
+                        StationRecyclerViewAdapter.this.setSelection(mStationId, false);
+
+                        if (oldSelectedPos != mSelectedPos) {
+
+                            mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
+                            requestFabAnimation();
+                        }
                     }
                     break;
 
@@ -573,6 +598,10 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         if (selectedIdBefore != null)
             setSelection(selectedIdBefore, false);
+    }
+
+    public void setShowProximity(boolean _showProximity){
+        mShowProximity = _showProximity;
     }
 
     public void setStationSortComparatorAndSort(Comparator<StationItem> _comparator){

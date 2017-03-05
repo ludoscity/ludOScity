@@ -3,7 +3,6 @@ package com.ludoscity.findmybikes.fragments;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -27,7 +26,6 @@ import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
 import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.DividerItemDecoration;
 import com.ludoscity.findmybikes.utils.ScrollingLinearLayoutManager;
-import com.ludoscity.findmybikes.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -159,6 +157,9 @@ public class StationListFragment extends Fragment
         outState.putString("station_recap_availability_string", mStationRecapAvailability.getText().toString());
         outState.putInt("station_recap_availability_color", mStationRecapAvailability.getCurrentTextColor());
         outState.putBoolean("station_recap_visible", mStationRecap.getVisibility() == View.VISIBLE);
+        outState.putBoolean("proximity_header_visible", mProximityHeader.getVisibility() == View.VISIBLE);
+        outState.putInt("proximity_header_from_icon_resid", mProximityHeaderFromImageView.getTag() == null ? -1 : (Integer)mProximityHeaderFromImageView.getTag());
+        outState.putInt("proximity_header_to_icon_resid", mProximityHeaderToImageView.getTag() == null ? -1 : (Integer)mProximityHeaderToImageView.getTag());
 
         getStationRecyclerViewAdapter().saveLookingForBike(outState);
         getStationRecyclerViewAdapter().saveIsAvailabilityOutdated(outState);
@@ -181,6 +182,9 @@ public class StationListFragment extends Fragment
             getStationRecyclerViewAdapter().setAvailabilityOutdated(savedInstanceState.getBoolean("availability_outdated"));
 
             setupUI(stationList, savedInstanceState.getBoolean("looking_for_bike"),
+                    savedInstanceState.getBoolean("proximity_header_visible"),
+                    savedInstanceState.getInt("proximity_header_from_icon_resid") == -1 ? null : savedInstanceState.getInt("proximity_header_from_icon_resid"),
+                    savedInstanceState.getInt("proximity_header_to_icon_resid") == -1 ? null : savedInstanceState.getInt("proximity_header_to_icon_resid"),
                     savedInstanceState.getString("string_if_empty"),
                     comparator);
 
@@ -203,26 +207,29 @@ public class StationListFragment extends Fragment
         }
     }
 
-    public void setupUI(ArrayList<StationItem> stationsNetwork, boolean lookingForBike, String stringIfEmpty,
+    public void setupUI(ArrayList<StationItem> _stationsNetwork, boolean _lookingForBike, boolean _showProximity,
+                        Integer _headerFromIconResId, Integer _headerToIconResId,
+                        String _stringIfEmpty,
                         Comparator<StationItem> _sortComparator) {
 
-        if (stationsNetwork != null) {
+        if (_stationsNetwork != null) {
 
-            //TODO: fix glitch when coming back from place widget
-            if (!stationsNetwork.isEmpty()) {
+            //TODO: fix glitch when coming back from place widget (Note to past self : describe glitch)
+            if (!_stationsNetwork.isEmpty()) {
                 mStationRecyclerView.setVisibility(View.VISIBLE);
                 mEmptyListTextView.setVisibility(View.GONE);
                 mStationRecap.setVisibility(View.GONE);
             }
             else{
                 mStationRecyclerView.setVisibility(View.GONE);
-                mEmptyListTextView.setText(stringIfEmpty);
+                mEmptyListTextView.setText(_stringIfEmpty);
                 mEmptyListTextView.setVisibility(View.VISIBLE);
                 mStationRecap.setVisibility(View.VISIBLE);
             }
 
-            getStationRecyclerViewAdapter().setupStationList(stationsNetwork, _sortComparator);
-            lookingForBikes(lookingForBike);
+            getStationRecyclerViewAdapter().setupStationList(_stationsNetwork, _sortComparator);
+            getStationRecyclerViewAdapter().setShowProximity(_showProximity);
+            setupHeaders(_lookingForBike, _showProximity, _headerFromIconResId, _headerToIconResId);
         }
     }
 
@@ -324,7 +331,7 @@ public class StationListFragment extends Fragment
         getStationRecyclerViewAdapter().clearSelection();
     }
 
-    public void lookingForBikes(boolean lookingForBike) {
+    public void setupHeaders(boolean lookingForBike, boolean _showProximityHeader, Integer _headerFromIconResId, Integer _headerToIconResId) {
 
         getStationRecyclerViewAdapter().lookingForBikesNotify(lookingForBike);
 
@@ -337,14 +344,10 @@ public class StationListFragment extends Fragment
             }
             else {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    mProximityHeaderFromImageView.setPaddingRelative(0,0, Utils.dpToPx(1.f,getContext()),0);
-                } else {
-                    mProximityHeaderFromImageView.setPadding(0,0, Utils.dpToPx(1.f,getContext()),0);
-                }
-
                 mProximityHeaderFromImageView.setVisibility(View.GONE);
-                mProximityHeaderToImageView.setImageResource(R.drawable.ic_walking_24dp_white);
+                mProximityHeaderFromImageView.setTag(-1);
+                mProximityHeaderToImageView.setTag(_headerToIconResId);
+                mProximityHeaderToImageView.setImageResource(_headerToIconResId);
 
                 mProximityHeader.setVisibility(View.VISIBLE);
             }
@@ -353,20 +356,16 @@ public class StationListFragment extends Fragment
 
             mAvailabilityTextView.setText(getString(R.string.docks));
 
-            if (getArguments()!= null){
-                mProximityHeader.setVisibility(View.GONE);
+            if (getArguments()!= null || !_showProximityHeader){
+                mProximityHeader.setVisibility(View.INVISIBLE);
             }
             else {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    mProximityHeaderToImageView.setPaddingRelative(Utils.dpToPx(3.f,getContext()),0,0,0);
-                } else {
-                    mProximityHeaderToImageView.setPadding(Utils.dpToPx(3.f,getContext()),0,0,0);
-                }
-
                 mProximityHeaderFromImageView.setVisibility(View.VISIBLE);
-                mProximityHeaderFromImageView.setImageResource(R.drawable.ic_pin_a_24dp_white);
-                mProximityHeaderToImageView.setImageResource(R.drawable.ic_biking_24dp_white);
+                mProximityHeaderFromImageView.setImageResource(_headerFromIconResId);
+                mProximityHeaderToImageView.setImageResource(_headerToIconResId);
+                mProximityHeaderFromImageView.setTag(_headerFromIconResId);
+                mProximityHeaderToImageView.setTag(_headerToIconResId);
 
                 mProximityHeader.setVisibility(View.VISIBLE);
             }

@@ -1023,14 +1023,18 @@ public class NearbyActivity extends AppCompatActivity
     private void setupTabPages() {
 
         //TAB A
-        getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "",
+        getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork,
+                true, null, R.drawable.ic_walking_24dp_white,
+                "",
                 mCurrentUserLatLng != null ? new StationRecyclerViewAdapter.DistanceComparator(mCurrentUserLatLng) : null);
 
         LatLng stationBLatLng = mStationMapFragment.getMarkerBVisibleLatLng();
 
         if (stationBLatLng == null) {
             //TAB B
-            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.b_tab_question), null);
+            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(),
+                    false, null, null,
+                    getString(R.string.b_tab_question), null);
 
             //TAB A
             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, false);
@@ -1191,6 +1195,8 @@ public class NearbyActivity extends AppCompatActivity
                         getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, isAppBarExpanded());
                         final StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
                         mStationMapFragment.setPinOnStation(true, closestBikeStation.getId());
+                        getListPagerAdapter().notifyStationAUpdate(closestBikeStation.getPosition(), mCurrentUserLatLng);
+                        hideSetupShowTripDetailsWidget();
                         getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
 
                         if (isLookingForBike()) {
@@ -1668,7 +1674,10 @@ public class NearbyActivity extends AppCompatActivity
         //!!! DANGER !!!
         if (!mStationMapFragment.isPickedPlaceMarkerVisible() && !mStationMapFragment.isPickedFavoriteMarkerVisible())
         {
-            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
+            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork,
+                    _dest.isSationFavorite() || _dest.isPlace(), R.drawable.ic_destination_arrow_white_24dp,
+                    _dest.isPlace() ? R.drawable.ic_pin_search_24dp_white : R.drawable.ic_pin_favorite_24dp_white,
+                    "",
                     new StationRecyclerViewAdapter.TotalTripTimeComparator(
                             getResources().getInteger(R.integer.average_walking_speed_kmh),
                             getResources().getInteger(R.integer.average_biking_speed_kmh),
@@ -1741,7 +1750,10 @@ public class NearbyActivity extends AppCompatActivity
                         //hackfix. On some devices timing issues led to infinite loop with isRecyclerViewReadyForItemSelection always returning false
                         //so, retry stting up the UI before going to sleep
                         //Replace recyclerview content
-                        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
+                        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork,
+                                _dest.isSationFavorite() || _dest.isPlace(), R.drawable.ic_destination_arrow_white_24dp,
+                                _dest.isPlace() ? R.drawable.ic_pin_search_24dp_white : R.drawable.ic_pin_favorite_24dp_white,
+                                "",
                                 new StationRecyclerViewAdapter.TotalTripTimeComparator(
                                         getResources().getInteger(R.integer.average_walking_speed_kmh),
                                         getResources().getInteger(R.integer.average_biking_speed_kmh),
@@ -2009,6 +2021,7 @@ public class NearbyActivity extends AppCompatActivity
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
 
         getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(),
+                false, null, null,
                 getString(R.string.b_tab_question), null);
 
         mStationMapFragment.clearMarkerB();

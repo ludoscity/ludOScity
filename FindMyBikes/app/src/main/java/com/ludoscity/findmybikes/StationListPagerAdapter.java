@@ -47,9 +47,13 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         return NUM_ITEMS;
     }
 
-    public void setupUI(int _pageID, ArrayList<StationItem> _stationsList, String _stringIfEmpty,
+    public void setupUI(int _pageID, ArrayList<StationItem> _stationsList, boolean _showProximity,
+                        Integer _headerFromIconResId, Integer _headerToIconResId,
+                        String _stringIfEmpty,
                         Comparator<StationItem> _sortComparator){
-        retrieveListFragment(_pageID).setupUI(_stationsList, _pageID == BIKE_STATIONS, _stringIfEmpty, _sortComparator);
+        retrieveListFragment(_pageID).setupUI(_stationsList, _pageID == BIKE_STATIONS,
+                _showProximity, _headerFromIconResId, _headerToIconResId,
+                _stringIfEmpty, _sortComparator);
     }
 
     public void hideStationRecap(int _pageId){
