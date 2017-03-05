@@ -955,7 +955,8 @@ public class NearbyActivity extends AppCompatActivity
                 mOnboardingSnackBar.dismiss();
                 mOnboardingSnackBar = null;
             }
-        } else if(mOnboardingShowcaseView != null){
+        } else //noinspection StatementWithEmptyBody
+            if(mOnboardingShowcaseView != null){
             //do nothing if onboarding is in progress
         } else if(isLookingForBike()){
             //A tab exploring
@@ -1022,13 +1023,14 @@ public class NearbyActivity extends AppCompatActivity
     private void setupTabPages() {
 
         //TAB A
-        getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "", mCurrentUserLatLng, mCurrentUserLatLng);
+        getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork, "",
+                mCurrentUserLatLng != null ? new StationRecyclerViewAdapter.DistanceComparator(mCurrentUserLatLng) : null);
 
         LatLng stationBLatLng = mStationMapFragment.getMarkerBVisibleLatLng();
 
         if (stationBLatLng == null) {
             //TAB B
-            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.b_tab_question), null, null);
+            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.b_tab_question), null);
 
             //TAB A
             getListPagerAdapter().setClickResponsivenessForPage(StationListPagerAdapter.BIKE_STATIONS, false);
@@ -1466,8 +1468,7 @@ public class NearbyActivity extends AppCompatActivity
         //Marker click - ignored if onboarding is in progress
         else if ( uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH) && mOnboardingShowcaseView == null){
 
-            if(isLookingForBike() && mStationMapFragment.getMarkerBVisibleLatLng() != null ||
-                    !isLookingForBike()) {
+            if(!isLookingForBike() || mStationMapFragment.getMarkerBVisibleLatLng() != null) {
 
                 if (isLookingForBike()) {
 
@@ -1482,7 +1483,7 @@ public class NearbyActivity extends AppCompatActivity
 
                         if (mStationMapFragment.getMarkerBVisibleLatLng() != null) {
                             LatLng newALatLng = mStationMapFragment.getMarkerALatLng();
-                            getListPagerAdapter().notifyStationAUpdate(newALatLng);
+                            getListPagerAdapter().notifyStationAUpdate(newALatLng, mCurrentUserLatLng);
                             hideSetupShowTripDetailsWidget();
 
                             if ( (getListPagerAdapter().getClosestBikeLatLng().latitude != newALatLng.latitude) &&
@@ -1667,10 +1668,11 @@ public class NearbyActivity extends AppCompatActivity
         //!!! DANGER !!!
         if (!mStationMapFragment.isPickedPlaceMarkerVisible() && !mStationMapFragment.isPickedFavoriteMarkerVisible())
         {
-            LatLng sortRef = _dest.getLocation();
-            //Replace recyclerview content. SORTS by distance to sortref
             getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
-                    sortRef, mStationMapFragment.getMarkerALatLng());
+                    new StationRecyclerViewAdapter.TotalTripTimeComparator(
+                            getResources().getInteger(R.integer.average_walking_speed_kmh),
+                            getResources().getInteger(R.integer.average_biking_speed_kmh),
+                            mCurrentUserLatLng, mStationMapFragment.getMarkerALatLng(), _dest.getLocation()));
 
             if (!_silent) {
                 mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
@@ -1738,10 +1740,12 @@ public class NearbyActivity extends AppCompatActivity
 
                         //hackfix. On some devices timing issues led to infinite loop with isRecyclerViewReadyForItemSelection always returning false
                         //so, retry stting up the UI before going to sleep
-                        LatLng sortRef = _dest.getLocation();
                         //Replace recyclerview content
                         getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork, "",
-                                sortRef, mStationMapFragment.getMarkerALatLng());
+                                new StationRecyclerViewAdapter.TotalTripTimeComparator(
+                                        getResources().getInteger(R.integer.average_walking_speed_kmh),
+                                        getResources().getInteger(R.integer.average_biking_speed_kmh),
+                                        mCurrentUserLatLng, mStationMapFragment.getMarkerALatLng(), _dest.getLocation()));
                         //end hackfix
 
                         handler.postDelayed(this, 10);
@@ -1816,8 +1820,8 @@ public class NearbyActivity extends AppCompatActivity
 
 
                     selectedStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS);
-                    rawProximityString = selectedStation.getProximityStringFromLatLng(getListPagerAdapter().getDistanceDisplayReferenceForPage(StationListPagerAdapter.DOCK_STATIONS),
-                            false, getResources().getInteger(R.integer.average_biking_speed_kmh), NearbyActivity.this);//getListPagerAdapter().getSelectedStationProximityStringForPage(StationListPagerAdapter.DOCK_STATIONS);
+                    rawProximityString = selectedStation.getProximityStringFromLatLng(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS).getPosition(),
+                            false, getResources().getInteger(R.integer.average_biking_speed_kmh), NearbyActivity.this);
 
                     formattedProximityString = getTripDetailsWdigetFormattedString(rawProximityString);
                     if (formattedProximityString.startsWith(">"))
@@ -2004,7 +2008,8 @@ public class NearbyActivity extends AppCompatActivity
     private void clearBTab(){
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
 
-        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(), getString(R.string.b_tab_question), null, null);
+        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, new ArrayList<StationItem>(),
+                getString(R.string.b_tab_question), null);
 
         mStationMapFragment.clearMarkerB();
         mStationMapFragment.clearMarkerPickedPlace();
@@ -2070,8 +2075,7 @@ public class NearbyActivity extends AppCompatActivity
 
         if (uri.getPath().equalsIgnoreCase("/" + StationListFragment.STATION_LIST_ITEM_CLICK_PATH))
         {
-            if(isLookingForBike() && mStationMapFragment.getMarkerBVisibleLatLng() != null ||
-                    !isLookingForBike()) {
+            if(!isLookingForBike() || mStationMapFragment.getMarkerBVisibleLatLng() != null) {
                 //if null, means the station was clicked twice, hence unchecked
                 final StationItem clickedStation = getListPagerAdapter().getHighlightedStationForPage(mTabLayout.getSelectedTabPosition());
 
@@ -2079,8 +2083,8 @@ public class NearbyActivity extends AppCompatActivity
 
                     if (mStationMapFragment.getMarkerBVisibleLatLng() != null) {
 
-                        LatLng newALatLng = mStationMapFragment.getMarkerALatLng();
-                        getListPagerAdapter().notifyStationAUpdate(newALatLng);
+                        LatLng newALatLng = clickedStation.getPosition();
+                        getListPagerAdapter().notifyStationAUpdate(newALatLng, mCurrentUserLatLng);
 
                         if ( (getListPagerAdapter().getClosestBikeLatLng().latitude != newALatLng.latitude) &&
                                 (getListPagerAdapter().getClosestBikeLatLng().longitude != newALatLng.longitude) ){
@@ -2088,14 +2092,13 @@ public class NearbyActivity extends AppCompatActivity
                             mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_fab_padding));
                             mAutoSelectBikeFab.show();
                             animateCameraToShowUserAndStation(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS));
-
                         }
 
-
                         hideSetupShowTripDetailsWidget();
-                    }
+                    } else{
 
-                    animateCameraToShowUserAndStation(clickedStation);
+                        animateCameraToShowUserAndStation(clickedStation);
+                    }
 
                     mStationMapFragment.setPinOnStation(true, clickedStation.getId());
                     getListPagerAdapter().setupBTabStationARecap(clickedStation);
@@ -2419,6 +2422,11 @@ public class NearbyActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
+
+        if (mCurrentUserLatLng != null &&
+                mCurrentUserLatLng.latitude == location.getLatitude() &&
+                mCurrentUserLatLng.longitude == location.getLongitude())
+            return;
 
         mCurrentUserLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 

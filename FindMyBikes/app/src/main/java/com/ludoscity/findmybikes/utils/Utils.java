@@ -23,6 +23,8 @@ import android.view.View;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.SphericalUtil;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
 
 import java.math.BigDecimal;
@@ -112,7 +114,7 @@ public class Utils {
     private static List<String> splitEqually(String text, int size) {
         // Give the list the right capacity to start with. You could use an array
         // instead if you wanted.
-        List<String> ret = new ArrayList<String>((text.length() + size - 1) / size);
+        List<String> ret = new ArrayList<>((text.length() + size - 1) / size);
 
         for (int start = 0; start < text.length(); start += size) {
             ret.add(text.substring(start, Math.min(text.length(), start + size)));
@@ -142,6 +144,20 @@ public class Utils {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, toConvert, r.getDisplayMetrics());
     }
 
+    public static int computeTimeBetweenInMinutes(LatLng _from, LatLng _to, float _speedKmH){
+
+        int distance = (int) SphericalUtil.computeDistanceBetween(_from, _to);
+
+        float speedMetersPerH = _speedKmH * 1000f;
+        float speedMetersPerS = speedMetersPerH / 3600f;
+
+        float timeInS = distance / speedMetersPerS;
+
+        long timeInMs = (long) (timeInS * 1000);
+
+        return (int)(timeInMs / 1000 / 60);
+    }
+
     /**
      * Round to certain number of decimals
      *
@@ -149,7 +165,7 @@ public class Utils {
      * @param decimalPlace
      * @return
      */
-    public static float round(float d, int decimalPlace) {
+    private static float round(float d, int decimalPlace) {
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
