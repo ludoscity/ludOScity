@@ -91,6 +91,11 @@ public class StationMapGfx {
     public LatLng getMarkerLatLng() { return marker.getPosition(); }
 
     public void updateMarker(boolean isLookingForBikes, Context _ctx) {
+
+        //happens on screen orientation change with slow devices
+        if (groundOverlay == null)
+            return;
+
         if (isLookingForBikes){
             if (!mItem.isLocked()) {
                 if (mItem.getFree_bikes() <= DBHelper.getCriticalAvailabilityMax(_ctx))
