@@ -9,6 +9,7 @@ import com.ludoscity.findmybikes.fragments.StationListFragment;
 import com.ludoscity.findmybikes.utils.SmartFragmentPagerAdapter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Created by F8Full on 2015-10-19.
@@ -46,9 +47,13 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         return NUM_ITEMS;
     }
 
-    public void setupUI(int _pageID, ArrayList<StationItem> _stationsList, String _stringIfEmpty,
-                        LatLng _sortReferenceLatLng, LatLng _distanceReferenceLatLng){
-        retrieveListFragment(_pageID).setupUI(_stationsList, _pageID == BIKE_STATIONS, _stringIfEmpty, _sortReferenceLatLng, _distanceReferenceLatLng);
+    public void setupUI(int _pageID, ArrayList<StationItem> _stationsList, boolean _showProximity,
+                        Integer _headerFromIconResId, Integer _headerToIconResId,
+                        String _stringIfEmpty,
+                        Comparator<StationItem> _sortComparator){
+        retrieveListFragment(_pageID).setupUI(_stationsList, _pageID == BIKE_STATIONS,
+                _showProximity, _headerFromIconResId, _headerToIconResId,
+                _stringIfEmpty, _sortComparator);
     }
 
     public void hideStationRecap(int _pageId){
@@ -83,9 +88,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
 
     public void setCurrentUserLatLng(LatLng currentUserLatLng) {
         if (isViewPagerReady()) {
-            //We don't notify as the call to setDistanceSortReferenceLatLngAndSort will do it
-            retrieveListFragment(BIKE_STATIONS).setDistanceDisplayReferenceLatLng(currentUserLatLng, false);
-            retrieveListFragment(BIKE_STATIONS).setDistanceSortReferenceLatLngAndSort(currentUserLatLng);
+            retrieveListFragment(BIKE_STATIONS).setSortComparatorAndSort(new StationRecyclerViewAdapter.DistanceComparator(currentUserLatLng));
+            retrieveListFragment(DOCK_STATIONS).updateTotalTripSortComparator(currentUserLatLng, null);
         }
     }
 
@@ -134,16 +138,12 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         retrieveListFragment(DOCK_STATIONS).setRefreshing(toSet);
     }
 
-    public void notifyStationAUpdate(LatLng _newALatLng) {
-        retrieveListFragment(DOCK_STATIONS).setDistanceDisplayReferenceLatLng(_newALatLng, true);
+    public void notifyStationAUpdate(LatLng _newALatLng, LatLng _userLatLng) {
+        retrieveListFragment(DOCK_STATIONS).updateTotalTripSortComparator(_userLatLng, _newALatLng);
     }
 
     public void smoothScrollHighlightedInViewForPage(int _pageID, boolean _appBarExpanded) {
         retrieveListFragment(_pageID).smoothScrollSelectionInView(_appBarExpanded);
-    }
-
-    public LatLng getDistanceDisplayReferenceForPage(int _pageID){
-        return retrieveListFragment(_pageID).getDistanceDisplayReference();
     }
 
     public boolean isHighlightedVisibleInRecyclerView() {

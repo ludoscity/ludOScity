@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.percent.PercentLayoutHelper;
 import android.support.percent.PercentRelativeLayout;
@@ -37,15 +39,15 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     public static final String AOK_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "AOK";
     public static final String BAD_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "BAD";
     public static final String CRITICAL_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "CRI";
-    public static final String LOCKED_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "LCK";
+    private static final String LOCKED_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "LCK";
 
     private ArrayList<StationItem> mStationList = new ArrayList<>();
-    private LatLng mDistanceSortReferenceLatLng;
-    private LatLng mDistanceDisplayReferenceLatLng;
+    private Comparator<StationItem> mStationSortComparator;
 
     private Context mCtx;
 
     private boolean mIsLookingForBike;
+    private boolean mShowProximity;
 
     private int mSelectedPos = NO_POSITION;
 
@@ -54,6 +56,157 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     private OnStationListItemClickListener mListener;
     private boolean mRespondToClick = true;
     private boolean mOutdatedAvailability = false;
+
+    //TODO: come up with a design that doesn't require dynamic casting
+    public static class DistanceComparator implements Comparator<StationItem>, Parcelable {
+
+        LatLng mRefLatLng;
+        public DistanceComparator(LatLng _fromLatLng){mRefLatLng = _fromLatLng;}
+
+        LatLng getDistanceRef() { return mRefLatLng; }
+
+        @Override
+        public int compare(StationItem lhs, StationItem rhs) {
+            return (int) (lhs.getMeterFromLatLng(mRefLatLng) - rhs.getMeterFromLatLng(mRefLatLng));
+        }
+
+        private DistanceComparator(Parcel in){
+            double latitude = in.readDouble();
+            double longitude = in.readDouble();
+
+            mRefLatLng = new LatLng(latitude, longitude);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeDouble(mRefLatLng.latitude);
+            dest.writeDouble(mRefLatLng.longitude);
+        }
+
+        public static final Parcelable.Creator CREATOR = new Parcelable.Creator(){
+
+            @Override
+            public DistanceComparator createFromParcel(Parcel source) {
+                return new DistanceComparator(source);
+            }
+
+            @Override
+            public DistanceComparator[] newArray(int size) {
+                return new DistanceComparator[size];
+            }
+        };
+    }
+
+    public static class TotalTripTimeComparator implements Comparator<StationItem>, Parcelable{
+
+        private final LatLng mStationALatLng;
+        private final LatLng mDestinationLatLng;
+        private final int mWalkingSpeedKmh;
+        private final int mBikingSpeedKmh;
+
+        private final int mTimeUserToAMinutes;
+
+        public TotalTripTimeComparator(int _walkingSpeedKmh, int _bikingSpeedKmh, LatLng _userLatLng,
+                                       LatLng _stationALatLng, LatLng _destinationLatLng){
+
+            mWalkingSpeedKmh = _walkingSpeedKmh;
+            mBikingSpeedKmh = _bikingSpeedKmh;
+
+            mTimeUserToAMinutes = Utils.computeTimeBetweenInMinutes(_userLatLng, _stationALatLng, mWalkingSpeedKmh);
+
+            mStationALatLng = _stationALatLng;
+            mDestinationLatLng = _destinationLatLng;
+        }
+
+        private TotalTripTimeComparator(Parcel in){
+
+            double latitude = in.readDouble();
+            double longitude = in.readDouble();
+            mStationALatLng = new LatLng(latitude, longitude);
+
+            latitude = in.readDouble();
+            longitude = in.readDouble();
+            mDestinationLatLng = new LatLng(latitude, longitude);
+
+            mWalkingSpeedKmh = in.readInt();
+            mBikingSpeedKmh = in.readInt();
+            mTimeUserToAMinutes = in.readInt();
+        }
+
+        TotalTripTimeComparator getUpdatedComparatorFor(LatLng _userLatLng, LatLng _stationALatLng){
+            return new TotalTripTimeComparator(mWalkingSpeedKmh, mBikingSpeedKmh, _userLatLng,
+                    _stationALatLng != null ? _stationALatLng : mStationALatLng, mDestinationLatLng );
+        }
+
+        @Override
+        public int compare(StationItem lhs, StationItem rhs) {
+
+            int lhsWalkTime = calculateWalkTimeMinutes(lhs);
+            int rhsWalkTime = calculateWalkTimeMinutes(rhs);
+
+            int lhsBikeTime = calculateBikeTimeMinutes(lhs);
+            int rhsBikeTime = calculateBikeTimeMinutes(rhs);
+
+            int totalTimeDiff = (lhsWalkTime + lhsBikeTime) - (rhsWalkTime + rhsBikeTime);
+
+            if (totalTimeDiff != 0)
+                return totalTimeDiff;
+            else
+                return lhsWalkTime - rhsWalkTime;
+        }
+
+        int calculateWalkTimeMinutes(StationItem _stationB){
+
+            int timeBtoDestMinutes = 0;
+
+            if (mDestinationLatLng != null)
+                timeBtoDestMinutes = Utils.computeTimeBetweenInMinutes(_stationB.getPosition(),
+                        mDestinationLatLng, mWalkingSpeedKmh);
+
+            return mTimeUserToAMinutes + timeBtoDestMinutes;
+
+        }
+
+        int calculateBikeTimeMinutes(StationItem _stationB){
+
+            return Utils.computeTimeBetweenInMinutes(mStationALatLng, _stationB.getPosition(),
+                    mBikingSpeedKmh);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeDouble(mStationALatLng.latitude);
+            dest.writeDouble(mStationALatLng.longitude);
+            dest.writeDouble(mDestinationLatLng.latitude);
+            dest.writeDouble(mDestinationLatLng.longitude);
+            dest.writeInt(mWalkingSpeedKmh);
+            dest.writeInt(mBikingSpeedKmh);
+            dest.writeInt(mTimeUserToAMinutes);
+        }
+
+        public static final Parcelable.Creator CREATOR = new Parcelable.Creator(){
+
+            @Override
+            public TotalTripTimeComparator createFromParcel(Parcel source) {
+                return new TotalTripTimeComparator(source);
+            }
+
+            @Override
+            public TotalTripTimeComparator[] newArray(int size) {
+                return new TotalTripTimeComparator[size];
+            }
+        };
+    }
 
     public void saveLookingForBike(Bundle outState) {
         outState.putBoolean("looking_for_bike", mIsLookingForBike);
@@ -113,7 +266,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     @Override
     public void onBindViewHolder(StationListItemViewHolder holder, int position) {
 
-        holder.bindStation(mStationList.get(position), position == mSelectedPos);
+        holder.bindStation(mStationList.get(position), position == mSelectedPos, mShowProximity);
     }
 
     @Override
@@ -128,7 +281,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         return mStationList.size();
     }
 
-    public class StationListItemViewHolder extends RecyclerView.ViewHolder
+    class StationListItemViewHolder extends RecyclerView.ViewHolder
                 implements View.OnClickListener{
 
         TextView mProximity;
@@ -146,7 +299,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         private Handler mFabAnimHandler = null;
         private String mStationId;
 
-        public StationListItemViewHolder(View itemView) {
+        StationListItemViewHolder(View itemView) {
             super(itemView);
 
             mProximity = (TextView) itemView.findViewById(R.id.station_proximity);
@@ -160,23 +313,36 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             mFavoriteFab.setOnClickListener(this);
         }
 
-        public void bindStation(StationItem _station, boolean _selected){
+        void bindStation(StationItem _station, boolean _selected, boolean _showProximity){
 
             mStationId = _station.getId();
 
-            if (mDistanceDisplayReferenceLatLng != null) {
+            if (_showProximity && mStationSortComparator != null) {
 
                 String proximityString;
-                if (mIsLookingForBike){
-                    proximityString = _station.getProximityStringFromLatLng(mDistanceDisplayReferenceLatLng,
-                            false,
-                            mCtx.getResources().getInteger(R.integer.average_walking_speed_kmh),
-                            mCtx);
+
+                int speed = mIsLookingForBike ? mCtx.getResources().getInteger(R.integer.average_walking_speed_kmh) :
+                        mCtx.getResources().getInteger(R.integer.average_biking_speed_kmh);
+
+                if (mStationSortComparator instanceof TotalTripTimeComparator){
+                    TotalTripTimeComparator comparator = (TotalTripTimeComparator) mStationSortComparator;
+
+                    int totalTime = comparator.calculateWalkTimeMinutes(_station) + comparator.calculateBikeTimeMinutes(_station);
+
+                    if (totalTime < 1)
+                        proximityString = "< 1" + mCtx.getString(R.string.min);
+                    else if (totalTime < 60 )
+                        proximityString = "~" + totalTime + mCtx.getString(R.string.min);
+                    else
+                        proximityString = "> 1" + mCtx.getString(R.string.hour_symbol);
                 }
-                else{
-                    proximityString = _station.getProximityStringFromLatLng(mDistanceDisplayReferenceLatLng,
+                else {
+
+                    DistanceComparator comparator = (DistanceComparator) mStationSortComparator;
+
+                    proximityString = _station.getProximityStringFromLatLng(comparator.getDistanceRef(),
                             false,
-                            mCtx.getResources().getInteger(R.integer.average_biking_speed_kmh),
+                            speed,
                             mCtx);
                 }
 
@@ -194,12 +360,21 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             if (_selected){
 
+                float nameWidthPercent;
+
+                if (mShowProximity) {
+                    nameWidthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_selected_percent, true);
+                }
+                else{
+                    nameWidthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_selected_percent, true) + Utils.getPercentResource(mCtx, R.dimen.proximity_column_width_percent, true);
+                }
+
                 //The width percentage is updated so that the name TextView gives room to the fabs
                 //RecyclerView gives us free opacity/bounds resizing animations
                 PercentRelativeLayout.LayoutParams params =(PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
                 PercentLayoutHelper.PercentLayoutInfo info = params.getPercentLayoutInfo();
 
-                info.widthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_selected_percent, true);
+                info.widthPercent = nameWidthPercent;
                 mName.requestLayout();
 
                 //Show two fabs, anchored through app:layout_anchor="@id/fabs_anchor" stationlist_item.xml
@@ -244,10 +419,20 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             }
             else{
+
+                float nameWidthPercent;
+
+                if (mShowProximity) {
+                    nameWidthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_default_percent, true);
+                }
+                else{
+                    nameWidthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_default_percent, true) + Utils.getPercentResource(mCtx, R.dimen.proximity_column_width_percent, true);
+                }
+
                 //name width percentage restoration
-                PercentRelativeLayout.LayoutParams params =(PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
+                PercentRelativeLayout.LayoutParams params = (PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
                 PercentLayoutHelper.PercentLayoutInfo info = params.getPercentLayoutInfo();
-                info.widthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_default_percent, true);
+                info.widthPercent = nameWidthPercent;
                 mName.requestLayout();
 
                 //Hidding two fabs and their anchor
@@ -355,10 +540,15 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                         mListener.onStationListItemClick(StationListFragment.STATION_LIST_INACTIVE_ITEM_CLICK_PATH);
                     } else {
 
-                        int newlySelectedPos = StationRecyclerViewAdapter.this.setSelection(mStationId, false);
+                        int oldSelectedPos = mSelectedPos;
 
-                        mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
-                        mFabAnimationRequested = newlySelectedPos != mSelectedPos;
+                        StationRecyclerViewAdapter.this.setSelection(mStationId, false);
+
+                        if (oldSelectedPos != mSelectedPos) {
+
+                            mListener.onStationListItemClick(StationListFragment.STATION_LIST_ITEM_CLICK_PATH);
+                            requestFabAnimation();
+                        }
                     }
                     break;
 
@@ -375,7 +565,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             }
         }
 
-        public ViewTarget getFavoriteFabTarget(){
+        ViewTarget getFavoriteFabTarget(){
             return new ViewTarget(mFavoriteFab);
         }
     }
@@ -394,8 +584,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
     public void requestFabAnimation(){ mFabAnimationRequested = true; }
 
-    public void setupStationList(ArrayList<StationItem> _toSet, LatLng _sortReferenceLatLng,
-                                 LatLng _distanceReferenceLatLng){
+    public void setupStationList(ArrayList<StationItem> _toSet, Comparator<StationItem> _sortComparator){
         String selectedIdBefore = null;
 
         if (null != getSelected())
@@ -405,41 +594,35 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         mStationList.clear();
         mStationList.addAll(_toSet);
 
-        //Forcing sorting so that a currently displayed selection doesn't glitch when set again
-        setDistanceSortReferenceLatLngAndSortIfRequired(_sortReferenceLatLng, true);
-
-        mDistanceDisplayReferenceLatLng = _distanceReferenceLatLng;
+        setStationSortComparatorAndSort(_sortComparator);
 
         if (selectedIdBefore != null)
             setSelection(selectedIdBefore, false);
     }
 
-    public LatLng getDistanceDisplayReference(){
-        return mDistanceDisplayReferenceLatLng;
+    public void setShowProximity(boolean _showProximity){
+        mShowProximity = _showProximity;
     }
 
-    public void setDistanceSortReferenceLatLngAndSortIfRequired(LatLng _sortReferenceLatLng, boolean _forceSort) {
-        if (_forceSort || mDistanceSortReferenceLatLng != _sortReferenceLatLng) {
-            mDistanceSortReferenceLatLng = _sortReferenceLatLng;
-            sortStationListByClosestToReference();
-            notifyDataSetChanged();
+    public void setStationSortComparatorAndSort(Comparator<StationItem> _comparator){
+        mStationSortComparator = _comparator;
+        sortStationList();
+        notifyDataSetChanged();
+    }
+
+    //_stationALatLng can be null
+    public void updateTotalTripSortComparator(LatLng _userLatLng, LatLng _stationALatLng){
+        if (mStationSortComparator instanceof TotalTripTimeComparator){
+            TotalTripTimeComparator comparator = (TotalTripTimeComparator)mStationSortComparator;
+
+            setStationSortComparatorAndSort(comparator.getUpdatedComparatorFor(_userLatLng, _stationALatLng));
         }
     }
 
-    public void setDistanceDisplayReferenceLatLng(LatLng _toSet, boolean _notify) {
-        mDistanceDisplayReferenceLatLng = _toSet;
-        if (_notify)
-            notifyDataSetChanged();
+    //TODO: remove this accessor (don't share your private parts)
+    public Comparator<StationItem> getSortComparator(){
+        return mStationSortComparator;
     }
-
-    public LatLng getSortReferenceLatLng(){
-        return mDistanceSortReferenceLatLng;
-    }
-
-    public LatLng getDistanceReferenceLatLng(){
-        return mDistanceDisplayReferenceLatLng;
-    }
-
 
     public int setSelection(String _stationId, boolean unselectOnTwice){
 
@@ -593,21 +776,14 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         }
     }
 
-    public void sortStationListByClosestToReference(){
-
+    private void sortStationList(){
         String selectedIdBefore = null;
 
         if (null != getSelected())
             selectedIdBefore = getSelected().getId();
 
-        if (mDistanceSortReferenceLatLng != null) {
-            Collections.sort(mStationList, new Comparator<StationItem>() {
-                @Override
-                public int compare(StationItem lhs, StationItem rhs) {
-                    return (int) (lhs.getMeterFromLatLng(mDistanceSortReferenceLatLng) - rhs.getMeterFromLatLng(mDistanceSortReferenceLatLng));
-                }
-            });
-        }
+        if (mStationSortComparator != null)
+            Collections.sort(mStationList, mStationSortComparator);
 
         if (selectedIdBefore != null)
             setSelection(selectedIdBefore, false);

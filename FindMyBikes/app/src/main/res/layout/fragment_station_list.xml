@@ -33,16 +33,12 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingEnd="1dp"
-                    android:paddingRight="1dp"
                     android:visibility="gone"
                     android:id="@+id/proximity_header_from" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="3dp"
-                    android:paddingLeft="3dp"
                     app:srcCompat="@drawable/ic_walking_24dp_white"
                     android:id="@+id/proximity_header_to" />
             </LinearLayout>
