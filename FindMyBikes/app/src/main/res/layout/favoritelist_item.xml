@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/reorder_affordance_handle"
         app:layout_widthPercent="@dimen/favorite_handle_width"
-        android:layout_height="?listPreferredItemHeight"
+        style="@style/favorite_sheet"
         android:layout_gravity="center_vertical|start"
         android:scaleType="center"
         android:visibility="gone"
@@ -21,7 +21,7 @@
         app:layout_widthPercent="@dimen/favorite_name_width_no_sheet_editing"
         android:layout_toRightOf="@+id/reorder_affordance_handle"
         android:layout_toEndOf="@+id/reorder_affordance_handle"
-        android:layout_height="?listPreferredItemHeight"
+        style="@style/favorite_sheet"
         android:minHeight="@dimen/favorite_item_min_height"
         android:textSize="16sp"
         android:fontFamily="sans-serif-condensed"

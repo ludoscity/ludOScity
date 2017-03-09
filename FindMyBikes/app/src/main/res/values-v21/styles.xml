@@ -24,6 +24,10 @@
         <item name="pressedTranslationZ">12dp</item>
     </style>
 
+    <style name="favorite_sheet">
+        <item name="android:layout_height">?attr/listPreferredItemHeight</item>
+    </style>
+
     <style name="map_floating_action_button_end_aligned">
         <item name="android:layout_marginStart">0dp</item>
         <item name="android:layout_marginTop">0dp</item>

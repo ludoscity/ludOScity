@@ -13,11 +13,12 @@ import com.gordonwong.materialsheetfab.MaterialSheetFab;
 public class EditableMaterialSheetFab extends MaterialSheetFab
                         implements View.OnClickListener{
 
-    public interface OnFavoriteSheetClickListener {
-        void onFavoriteSheetEditDoneClick();
+    public interface OnFavoriteSheetEventListener {
+        void onFavoriteSheetEditDone();
+        void onFavoriteSheetEditCancel();
     }
 
-    private OnFavoriteSheetClickListener mListener;
+    private OnFavoriteSheetEventListener mListener;
 
     private FloatingActionButton mEditFAB;
     private FloatingActionButton mEditDoneFAB;
@@ -31,7 +32,7 @@ public class EditableMaterialSheetFab extends MaterialSheetFab
      * @param sheetColor The background color of the material sheet.
      * @param fabColor   The background color of the FAB.
      */
-    public EditableMaterialSheetFab( View view, View sheet, View overlay, int sheetColor, int fabColor, OnFavoriteSheetClickListener _listener) {
+    public EditableMaterialSheetFab( View view, View sheet, View overlay, int sheetColor, int fabColor, OnFavoriteSheetEventListener _listener) {
         super(view, sheet, overlay, sheetColor, fabColor);
         mEditFAB = (FloatingActionButton)sheet.findViewById(R.id.favorite_sheet_edit_fab);
         mEditFAB.setOnClickListener(this);
@@ -47,6 +48,28 @@ public class EditableMaterialSheetFab extends MaterialSheetFab
 
     public void hideEditFab(){ mEditFAB.hide(); }
     public void showEditFab(){ mEditFAB.show(); }
+    public void smoothScrollToTop(){
+
+        if (mFavRecyclerview.getAdapter().getItemCount() > 1)
+            mFavRecyclerview.smoothScrollToPosition(0);}
+
+    @Override
+    public void hideSheet() {
+
+        if (mEditDoneFAB.getVisibility() == View.VISIBLE){
+            ((FavoriteRecyclerViewAdapter)mFavRecyclerview.getAdapter()).setSheetEditing(false);
+
+            mFavRecyclerview.getAdapter().notifyDataSetChanged();
+
+            mEditDoneFAB.hide();
+            mEditFAB.show();
+
+            mListener.onFavoriteSheetEditCancel();
+
+        }
+
+        super.hideSheet();
+    }
 
     @Override
     public void onClick(View v) {
@@ -67,7 +90,7 @@ public class EditableMaterialSheetFab extends MaterialSheetFab
                 mEditDoneFAB.hide();
                 mEditFAB.show();
 
-                mListener.onFavoriteSheetEditDoneClick();
+                mListener.onFavoriteSheetEditDone();
                 break;
         }
     }

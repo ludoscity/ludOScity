@@ -1,13 +1,18 @@
 package com.ludoscity.findmybikes;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.percent.PercentLayoutHelper;
 import android.support.percent.PercentRelativeLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -29,7 +34,8 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
                                         implements ItemTouchHelperAdapter {
 
 
-    private final OnFavoriteListItemClickListener mListener;
+    private final OnFavoriteListItemClickListener mItemClickListener;
+    private final OnFavoriteListItemStartDragListener mItemStartDragListener;
     private final Context mCtx;
 
     private boolean mSheetEditing = false;
@@ -67,6 +73,8 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         return mSheetEditing;
     }
 
+    //TODO: investigate making the sheet (and not NearbyActivity) listening and forwarding relevant
+    //event to NearbyActivity
     public interface OnFavoriteListItemClickListener {
         void onFavoriteListItemClick(String _stationId);
         void onFavoristeListItemEditDone(String _stationId, String _newName );
@@ -78,9 +86,35 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         void onFavoriteListItemDelete(String mStationId);
     }
 
-    public FavoriteRecyclerViewAdapter(OnFavoriteListItemClickListener _listener, Context _ctx){
+    public interface OnFavoriteListItemStartDragListener{
+
+         void onFavoriteListItemStartDrag(RecyclerView.ViewHolder viewHolder);
+    }
+
+    public interface FavoriteItemTouchHelperViewHolder {
+
+        /**
+         * Called when the ItemTouchHelper first registers an
+         * item as being moved or swiped.
+         * Implementations should update the item view to indicate
+         * it's active state.
+         */
+        void onItemSelected();
+
+
+        /**
+         * Called when the ItemTouchHelper has completed the
+         * move or swipe, and the active item state should be cleared.
+         */
+        void onItemClear();
+    }
+
+    public FavoriteRecyclerViewAdapter(OnFavoriteListItemClickListener _onItemClicklistener,
+                                       OnFavoriteListItemStartDragListener _onItemDragListener, Context _ctx){
         super();
-        mListener = _listener;
+        mItemClickListener = _onItemClicklistener;
+        mItemStartDragListener = _onItemDragListener;
+
         mCtx = _ctx;
     }
 
@@ -110,7 +144,8 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         return mFavoriteList.size();
     }
 
-    public class FavoriteListItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
+    public class FavoriteListItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+            View.OnFocusChangeListener, View.OnTouchListener, FavoriteItemTouchHelperViewHolder {
 
         TextView mName;
         String mStationId;
@@ -124,7 +159,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
 
         public String getStationId(){ return mStationId; }
 
-        public FavoriteListItemViewHolder(View itemView) {
+        FavoriteListItemViewHolder(View itemView) {
             super(itemView);
 
             mName = (TextView) itemView.findViewById(R.id.favorite_name);
@@ -133,19 +168,16 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
             mDeleteFab = (FloatingActionButton) itemView.findViewById(R.id.favorite_delete_fab);
 
             mOrderingAffordanceHandle = (ImageView)itemView.findViewById(R.id.reorder_affordance_handle);
+            mOrderingAffordanceHandle.setOnTouchListener(this);
+
 
             mName.setOnClickListener(this);
             mEditFab.setOnClickListener(this);
             mDoneFab.setOnClickListener(this);
             mDeleteFab.setOnClickListener(this);
-
-            mName.setOnLongClickListener(this);
-            mOrderingAffordanceHandle.setOnLongClickListener(this);
-            mDeleteFab.setOnLongClickListener(this);
-
         }
 
-        public void bindFavorite(FavoriteItem _favorite){
+        void bindFavorite(FavoriteItem _favorite){
 
             if (_favorite.isDisplayNameDefault())
                 mName.setTypeface(null, Typeface.ITALIC);
@@ -155,7 +187,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
             mName.setText(_favorite.getDisplayName());
             mStationId = _favorite.getStationId();
 
-            setTransparentBackground();
+            itemView.setBackgroundResource(R.color.theme_accent_transparent);
 
             //Beware FloatingActionButton bugs !!
             //so, to get nicely animated buttons I need
@@ -215,41 +247,15 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         }
 
         @Override
-        public boolean onLongClick(View view) {
-
-            if (mSheetEditing) {
-                switchItemViewBackgroundColor();
-                return false;
-            }
-
-            return true;
-        }
-
-        private void setTransparentBackground(){
-            itemView.setSelected(false);
-            itemView.setBackgroundResource(android.R.color.transparent);
-        }
-
-        private void switchItemViewBackgroundColor(){
-            if (itemView.isSelected()) {
-                itemView.setBackgroundResource(android.R.color.transparent);
-                itemView.setSelected(false);
-            }
-
-            else{
-
-                itemView.setSelected(true);
-                itemView.setBackgroundResource(R.color.theme_accent);
-            }
-        }
-
-        @Override
         public void onClick(View v) {
+
+            if (mSheetEditing && v.getId() != R.id.favorite_delete_fab)
+                return;
 
             switch (v.getId()){
                 case R.id.favorite_name:
                     if (!mEditing)
-                        mListener.onFavoriteListItemClick(mStationId);
+                        mItemClickListener.onFavoriteListItemClick(mStationId);
                     else //User pressed back to hide keyboard
                         showSoftInput();
                     break;
@@ -257,17 +263,17 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
                 case R.id.favorite_name_edit_fab:
                     mEditing = true;
                     setupItemEditMode(true);
-                    mListener.onFavoristeListItemEditBegin();
+                    mItemClickListener.onFavoristeListItemEditBegin();
                     break;
 
                 case R.id.favorite_name_done_fab:
                     mEditing = false;
                     setupItemEditMode(false);
-                    mListener.onFavoristeListItemEditDone(mStationId, mName.getText().toString());
+                    mItemClickListener.onFavoristeListItemEditDone(mStationId, mName.getText().toString());
                     break;
 
                 case R.id.favorite_delete_fab:
-                    mListener.onFavoriteListItemDelete(mStationId);
+                    mItemClickListener.onFavoriteListItemDelete(mStationId);
                     break;
             }
         }
@@ -331,9 +337,45 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
 
                     mEditing = false;
                     setupItemEditMode(false);
-                    mListener.onFavoristeListItemEditAbort();
+                    mItemClickListener.onFavoristeListItemEditAbort();
                 }
             }
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN){
+
+                mItemStartDragListener.onFavoriteListItemStartDrag(this);
+            }
+            return false;
+        }
+
+        @Override
+        public void onItemSelected() {
+
+            if (mSheetEditing)
+                animateBackgroundColor(R.color.theme_accent_transparent, R.color.theme_accent, 250);
+        }
+
+        @Override
+        public void onItemClear() {
+            if (mSheetEditing)
+                animateBackgroundColor(R.color.theme_accent, R.color.theme_accent_transparent, 250);
+        }
+
+        //http://stackoverflow.com/questions/2614545/animate-change-of-view-background-color-on-android/14467625#14467625
+        private void animateBackgroundColor(int _colorFromResId, int _colorToResId, int _durationMillisecond){
+            ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), ContextCompat.getColor(mCtx, _colorFromResId),
+                    ContextCompat.getColor(mCtx, _colorToResId));
+            colorAnimation.setDuration(_durationMillisecond);
+            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    itemView.setBackgroundColor((int) valueAnimator.getAnimatedValue());
+                }
+            });
+            colorAnimation.start();
         }
     }
 }

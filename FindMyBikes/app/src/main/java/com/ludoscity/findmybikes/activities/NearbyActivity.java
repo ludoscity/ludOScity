@@ -98,6 +98,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import de.psdev.licensesdialog.LicensesDialog;
@@ -115,8 +116,9 @@ import twitter4j.TwitterException;
 public class NearbyActivity extends AppCompatActivity
         implements StationMapFragment.OnStationMapFragmentInteractionListener,
         StationListFragment.OnStationListFragmentInteractionListener,
-        FavoriteRecyclerViewAdapter.OnFavoriteListItemClickListener,
-        EditableMaterialSheetFab.OnFavoriteSheetClickListener,
+        FavoriteRecyclerViewAdapter.OnFavoriteListItemClickListener,//TODO: investigate making the sheet listening and forwarding
+        FavoriteRecyclerViewAdapter.OnFavoriteListItemStartDragListener,//TODO: investigate making the sheet listening and forwarding
+        EditableMaterialSheetFab.OnFavoriteSheetEventListener,
         SwipeRefreshLayout.OnRefreshListener,
         ViewPager.OnPageChangeListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -156,6 +158,8 @@ public class NearbyActivity extends AppCompatActivity
     private View mTripDetailsPinSearch;
     private View mTripDetailsPinFavorite;
 
+    private ItemTouchHelper mFavoriteItemTouchHelper;
+
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private static final int SETTINGS_REQUEST_CODE = 2;
     private static final int REQUEST_CHECK_SETTINGS_GPS = 3;
@@ -184,6 +188,8 @@ public class NearbyActivity extends AppCompatActivity
     private boolean mRequestingLocationUpdates = false;
 
     private boolean mClosestBikeAutoSelected = false;
+
+    private boolean mFavoriteItemEditInProgress = false;
 
     private Snackbar mFindBikesSnackbar;
 
@@ -542,9 +548,7 @@ public class NearbyActivity extends AppCompatActivity
 
                     checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_HINT);
 
-                } catch (GooglePlayServicesRepairableException e) {
-                    Log.d("mPlacePickerFAB onClick", "oops", e);
-                } catch (GooglePlayServicesNotAvailableException e) {
+                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                     Log.d("mPlacePickerFAB onClick", "oops", e);
                 }
             }
@@ -648,25 +652,47 @@ public class NearbyActivity extends AppCompatActivity
             @Override
             public boolean isItemViewSwipeEnabled() {
 
-                return !mFavoriteRecyclerViewAdapter.getSheetEditing();
+                return !mFavoriteRecyclerViewAdapter.getSheetEditing() && !mFavoriteItemEditInProgress;
+            }
+
+            @Override
+            public void onSelectedChanged(RecyclerView.ViewHolder _viewHolder, int _actionState){
+                if (_actionState != ItemTouchHelper.ACTION_STATE_IDLE){
+                    if (_viewHolder instanceof FavoriteRecyclerViewAdapter.FavoriteItemTouchHelperViewHolder){
+                        FavoriteRecyclerViewAdapter.FavoriteItemTouchHelperViewHolder favoriteItemViewHolder =
+                                (FavoriteRecyclerViewAdapter.FavoriteItemTouchHelperViewHolder) _viewHolder;
+                        favoriteItemViewHolder.onItemSelected();
+                    }
+                }
+                super.onSelectedChanged(_viewHolder, _actionState);
+            }
+
+            @Override
+            public void clearView(RecyclerView _recyclerView, RecyclerView.ViewHolder _viewHolder){
+                super.clearView(_recyclerView, _viewHolder);
+                if (_viewHolder instanceof FavoriteRecyclerViewAdapter.FavoriteItemTouchHelperViewHolder){
+                    FavoriteRecyclerViewAdapter.FavoriteItemTouchHelperViewHolder favoriteItemViewHolder =
+                            (FavoriteRecyclerViewAdapter.FavoriteItemTouchHelperViewHolder) _viewHolder;
+                    favoriteItemViewHolder.onItemClear();
+                }
             }
         };
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        mFavoriteItemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
 
         RecyclerView favoriteRecyclerView = (RecyclerView) findViewById(R.id.favorites_sheet_recyclerview);
 
         favoriteRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
         favoriteRecyclerView.setLayoutManager(new ScrollingLinearLayoutManager(this, LinearLayoutManager.VERTICAL, false, 300));
 
-        mFavoriteRecyclerViewAdapter = new FavoriteRecyclerViewAdapter(this, this);
+        mFavoriteRecyclerViewAdapter = new FavoriteRecyclerViewAdapter(this, this, this);
 
         ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteAll(this);
         setupFavoriteListFeedback(favoriteList.isEmpty());
         mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
         favoriteRecyclerView.setAdapter(mFavoriteRecyclerViewAdapter);
 
-        itemTouchHelper.attachToRecyclerView(favoriteRecyclerView);
+        mFavoriteItemTouchHelper.attachToRecyclerView(favoriteRecyclerView);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -772,13 +798,14 @@ public class NearbyActivity extends AppCompatActivity
 
     //TODO: refactor add and remove favorite
     private void removeFavorite(final StationItem _station, boolean _showUndo) {
+        final String favName = DBHelper.getFavoriteItemForStationId(this, _station.getId()).getDisplayName();
         _station.setFavorite(false, "", this);
         ArrayList<FavoriteItem> favoriteList = DBHelper.getFavoriteAll(this);
         setupFavoriteListFeedback(favoriteList.isEmpty());
         mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
 
         //To setup correct name
-        StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
+        final StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
         getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
 
         if (!_showUndo) {
@@ -794,8 +821,9 @@ public class NearbyActivity extends AppCompatActivity
                     @Override
                     public void onClick(View v) {
 
-                        addFavorite(_station, _station.getName(), false, false);
-                        getListPagerAdapter().setupBTabStationARecap(_station);
+                        addFavorite(_station, favName, false, false);
+                        mFavoritesSheetFab.smoothScrollToTop();
+                        getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
                     }
                 }).show();
         }
@@ -2169,6 +2197,8 @@ public class NearbyActivity extends AppCompatActivity
                     else {   //there's a third destination
                         addFavorite(clickedStation, mStationMapFragment.getMarkerPickedPlaceVisibleName(), false, showUndo);
                     }
+                    mFavoritesSheetFab.smoothScrollToTop();
+
                 } else {
                     removeFavorite(clickedStation, showUndo);
                 }
@@ -2485,12 +2515,13 @@ public class NearbyActivity extends AppCompatActivity
     @Override
     public void onFavoristeListItemEditBegin() {
         mFavoritesSheetFab.hideEditFab();
-
+        mFavoriteItemEditInProgress = true;
     }
 
     @Override
     public void onFavoristeListItemEditAbort() {
         mFavoritesSheetFab.showEditFab();
+        mFavoriteItemEditInProgress = false;
     }
 
     @Override
@@ -2506,28 +2537,36 @@ public class NearbyActivity extends AppCompatActivity
         StationItem closestBikeStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
         getListPagerAdapter().setupBTabStationARecap(closestBikeStation);
         getListPagerAdapter().notifyRecyclerViewDatasetChangedForAllPages();
+
+        mFavoriteItemEditInProgress = false;
     }
 
     @Override
-    public void onFavoriteSheetEditDoneClick() {
+    public void onFavoriteListItemStartDrag(RecyclerView.ViewHolder _viewHolder){
+        mFavoriteItemTouchHelper.startDrag(_viewHolder);
+    }
+
+    @Override
+    public void onFavoriteSheetEditDone() {
 
         DBHelper.dropFavoriteAll(this);
 
         ArrayList<FavoriteItem> newlyOrderedFavList = new ArrayList<>();
         newlyOrderedFavList.addAll(mFavoriteRecyclerViewAdapter.getCurrentFavoriteList());
 
-        Collections.reverse(newlyOrderedFavList);   //pfff, it's ok those list will be small
+        ListIterator<FavoriteItem> li = newlyOrderedFavList.listIterator(newlyOrderedFavList.size());
 
-        for (FavoriteItem fav : newlyOrderedFavList){
-
-            StationItem station = getStation(fav.getStationId());
-
-            //String favDisplayName = fav.getDisplayName();
-            //String StationName = station.getName();
-
-            addFavorite(station, fav.getDisplayName(), true, false);
+        while (li.hasPrevious())
+        {
+            FavoriteItem fav = li.previous();
+            addFavorite(getStation(fav.getStationId()), fav.getDisplayName(), true, false);
         }
+    }
 
+    @Override
+    public void onFavoriteSheetEditCancel(){
+
+        mFavoriteRecyclerViewAdapter.setupFavoriteList(DBHelper.getFavoriteAll(this));
     }
 
     private class RedrawMarkersTask extends AsyncTask<Boolean, Void, Void> {

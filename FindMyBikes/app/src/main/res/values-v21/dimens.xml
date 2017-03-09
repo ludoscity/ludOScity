@@ -1,6 +1,8 @@
 <resources>
 
     <dimen name="sheet_spacing">0dp</dimen>
+    <!--mini : https://www.google.com/design/spec/components/buttons-floating-action-button.html#buttons-floating-action-button-floating-action-button -->
+    <dimen name="sheet_header_height">40dp</dimen>
     <dimen name="fab_sheet_elevation">4dp</dimen>
 
     <dimen name="dummy_fab_height">56dp</dimen>

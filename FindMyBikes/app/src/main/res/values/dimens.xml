@@ -12,12 +12,12 @@
     <dimen name="start_aligned_fab_margin_start">5dp</dimen>
 
     <dimen name="sheet_width">210dp</dimen>
-    <!--mini : https://www.google.com/design/spec/components/buttons-floating-action-button.html#buttons-floating-action-button-floating-action-button -->
-    <dimen name="sheet_header_height">40dp</dimen>
+    <dimen name="sheet_header_height">50dp</dimen>
     <dimen name="sheet_spacing">10dp</dimen>
+    <dimen name="sheet_preferred_item_height">@dimen/favorite_item_min_height</dimen>
     <dimen name="fab_sheet_elevation">0dp</dimen>
 
-    <dimen name="favorite_item_min_height">56dp</dimen>
+    <dimen name="favorite_item_min_height">60dp</dimen>
 
     <dimen name="dummy_fab_height">62dp</dimen>
     <dimen name="dummy_fab_height_mini">46dp</dimen>
