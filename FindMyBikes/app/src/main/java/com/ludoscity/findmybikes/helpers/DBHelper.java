@@ -26,6 +26,7 @@ import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import java.util.Map;
 @SuppressWarnings("unchecked") //(List<QueryRow>) allDocs.get("rows");
 public class DBHelper {
 
+    private  static final String TAG = "DBHelper";
     private static Manager mManager = null;
     private static final String mTRACKS_DB_NAME = "tracksdb";
 
@@ -51,8 +53,8 @@ public class DBHelper {
     private static final String PREF_LAST_SAVE_CORRUPTED = "last_save_corrupted";
     private static boolean mSaving = false;
 
-    public static final String SHARED_PREF_FILENAME = "FindMyBikes_prefs";
-    public static final String SHARED_PREF_VERSION_CODE = "FindMyBikes_prefs_version_code";
+    static final String SHARED_PREF_FILENAME = "FindMyBikes_prefs";
+    private static final String SHARED_PREF_VERSION_CODE = "FindMyBikes_prefs_version_code";
 
     private static final String PREF_CURRENT_BIKE_NETWORK_ID = "current_bike_network_id";
 
@@ -68,6 +70,10 @@ public class DBHelper {
 
     private static final int PREF_CRITICAL_AVAILABILITY_MAX_DEFAULT = 1;
     private static final int PREF_BAD_AVAILABILITY_MAX_DEFAULT = 4;
+
+    private static final String STATION_FAVORITE_JSON_NAME_STATION_ID = "station_id";
+    private static final String STATION_FAVORITE_JSON_NAME_DISPLAY_NAME = "display_name";
+    private static final String STATION_FAVORITE_JSON_NAME_IS_DISPLAY_NAME_DEFAULT = "is_display_name_default";
 
     private static boolean mAutoUpdatePaused = false;
 
@@ -403,8 +409,8 @@ public class DBHelper {
 
         QueryEnumerator result = query.run();
 
-        for (Iterator<QueryRow> it = result; it.hasNext(); ) {
-            QueryRow row = it.next();
+        for (; result.hasNext(); ) {
+            QueryRow row = result.next();
 
             toReturn.add(row);
 
@@ -538,11 +544,24 @@ public class DBHelper {
             JSONArray favoritesJSONArray = new JSONArray(sp.getString(
                     buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, _ctx), "[]" ));
 
-            for (int i=0; i<favoritesJSONArray.length(); i+=3){
-                toReturn.add(new FavoriteItem(favoritesJSONArray.getString(i), favoritesJSONArray.getString(i+1),favoritesJSONArray.getBoolean(i+2) ));
-            }
+                //reverse iteration so that newly added favorites appear on top of the list
+                for (int i=favoritesJSONArray.length()-1; i>=0; --i){
+
+                    JSONObject curFav = favoritesJSONArray.optJSONObject(i);
+
+                    if ( curFav != null){
+                        toReturn.add(new FavoriteItem(curFav.getString(STATION_FAVORITE_JSON_NAME_STATION_ID),
+                                curFav.getString(STATION_FAVORITE_JSON_NAME_DISPLAY_NAME),
+                                curFav.getBoolean(STATION_FAVORITE_JSON_NAME_IS_DISPLAY_NAME_DEFAULT)) );
+                    }
+                }
+
+            //check if there was no valid data in the retrieved array
+            if (favoritesJSONArray.length() != 0 && toReturn.isEmpty())
+                dropFavoriteAll(_ctx);
+
         } catch (JSONException e) {
-            Log.d("DBHelper", "Error while loading favorites from prefs", e);
+            Log.d(TAG, "Error while loading favorites from prefs", e);
         }
 
         return toReturn;
@@ -551,43 +570,33 @@ public class DBHelper {
     public static FavoriteItem getFavoriteItemForStationId(Context _ctx, String _stationID){
         FavoriteItem toReturn = null;
 
-        SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+        ArrayList<FavoriteItem> favoriteList = getFavoriteAll(_ctx);
 
-        try {
-            JSONArray favoritesJSONArray = new JSONArray(sp.getString(
-                    buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, _ctx), "[]" ));
-
-            for (int i=0; i<favoritesJSONArray.length(); i+=3){
-                if (favoritesJSONArray.getString(i).equalsIgnoreCase(_stationID)) {
-                    toReturn = new FavoriteItem(favoritesJSONArray.getString(i), favoritesJSONArray.getString(i + 1), favoritesJSONArray.getBoolean(i + 2));
-                    break;
-                }
+        for (int i=0; i<favoriteList.size(); ++i){
+            if (favoriteList.get(i).getStationId().equalsIgnoreCase(_stationID)) {
+                toReturn = favoriteList.get(i);
+                break;
             }
-        } catch (JSONException e) {
-            Log.d("DBHelper", "Error while loading favorites from prefs", e);
         }
 
         return toReturn;
     }
 
+    //TODO: Build a cache of stations that have already been checked
+    //This is called every time the list binds a station
+    //it happens a lot (every time user location is updated).
+    //getFavoriteAll loads a JSON from SharedPref
     public static boolean isFavorite(String id, Context ctx) {
 
         boolean toReturn = false;
 
-        SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+        ArrayList<FavoriteItem> favoriteList = getFavoriteAll(ctx);
 
-        try {
-            JSONArray favoritesJSONArray = new JSONArray(sp.getString(
-                    buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, ctx), "[]" ));
-
-            for (int i=0; i<favoritesJSONArray.length(); i += 3){
-                if (favoritesJSONArray.getString(i).equalsIgnoreCase(id)){
-                    toReturn = true;
-                    break;
-                }
+        for (int i=0; i<favoriteList.size(); ++i){
+            if (favoriteList.get(i).getStationId().equalsIgnoreCase(id)){
+                toReturn = true;
+                break;
             }
-        } catch (JSONException e) {
-            Log.d("DBHelper", "JSON error checking favorite status", e);
         }
 
         return toReturn;
@@ -599,21 +608,12 @@ public class DBHelper {
 
         int validCount = 0;
 
-        SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
+        ArrayList<FavoriteItem> favoriteList = getFavoriteAll(_ctx);
 
-        try {
-            JSONArray favoritesJSONArray = new JSONArray(sp.getString(
-                    buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, _ctx), "[]" ));
-
-            for (int i=0; i<favoritesJSONArray.length(); i += 3){
-                if (favoritesJSONArray.getString(i).equalsIgnoreCase(_closestBikeStation.getId()) == false){
-                    ++validCount;
-                }
-            }
-        } catch (JSONException e) {
-            Log.d("DBHelper", "JSON error counting valid favorites", e);
+        for (int i=0; i<favoriteList.size(); ++i){
+            if (!favoriteList.get(i).getStationId().equalsIgnoreCase(_closestBikeStation.getId()))
+                ++validCount;
         }
-
 
         return validCount >= _n;
     }
@@ -626,63 +626,80 @@ public class DBHelper {
 
     }
 
-    public static void updateFavorite(final Boolean isFavorite, String id, String displayName, boolean isDisplayNameDefault, Context ctx) {
+    public static void updateFavorite(final Boolean isFavorite, String _stationId, String displayName, boolean isDisplayNameDefault, Context ctx) {
 
         SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
         //JSONArray favoriteJSONArray;
-        //contains id followed by favorite display name
-        try {
-            JSONArray oldFavoriteJSONArray = new JSONArray(sp.getString(
+        //contains JSONObject elements
+        //{
+        //    station_id: string,
+        //    display_name: string,
+        //    is_display_name_default: boolean
+        //}
+
+        try{
+            JSONArray favoriteJSONArray = new JSONArray(sp.getString(
                     buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, ctx), "[]" ));
-            JSONArray newFavoriteJSONArray = new JSONArray();
 
-            int existingIndex = -1;
+            int existingIdx = -1;
+            int firstNullIdx = -1;
 
-            for (int i=0; i<oldFavoriteJSONArray.length(); i+=3){
-                if (oldFavoriteJSONArray.getString(i).equalsIgnoreCase(id)){
-                    existingIndex = i;
-                    break;
+            for (int i=0; i<favoriteJSONArray.length(); ++i){
+                JSONObject curFav = favoriteJSONArray.optJSONObject(i);
+                if (curFav != null && curFav.getString(STATION_FAVORITE_JSON_NAME_STATION_ID).equalsIgnoreCase(_stationId)) {
+                    existingIdx = i;
+                }
+                else if(curFav == null && firstNullIdx == -1){
+                    firstNullIdx = i;
                 }
             }
 
             if (isFavorite){
-                if (existingIndex == -1) {
 
-                    newFavoriteJSONArray.put(id);
-                    newFavoriteJSONArray.put(displayName);
-                    newFavoriteJSONArray.put(isDisplayNameDefault);
+                if (existingIdx == -1){
 
-                    for (int i=0; i<oldFavoriteJSONArray.length(); ++i){
-                        newFavoriteJSONArray.put(i+3, oldFavoriteJSONArray.get(i));
+                    JSONObject newFavorite = new JSONObject();
+                    newFavorite.put(STATION_FAVORITE_JSON_NAME_STATION_ID, _stationId);
+                    newFavorite.put(STATION_FAVORITE_JSON_NAME_DISPLAY_NAME, displayName);
+                    newFavorite.put(STATION_FAVORITE_JSON_NAME_IS_DISPLAY_NAME_DEFAULT, isDisplayNameDefault);
+
+                    if (firstNullIdx == -1){
+                        favoriteJSONArray.put(newFavorite);
+                    }
+                    else{
+                        favoriteJSONArray.put(firstNullIdx, newFavorite);
                     }
                 }
                 else{
-
-                    oldFavoriteJSONArray.put(existingIndex + 1, displayName);
-                    oldFavoriteJSONArray.put(existingIndex + 2, isDisplayNameDefault);
-
-                    //TEMP. I need to handle the update case
-                    newFavoriteJSONArray = oldFavoriteJSONArray;
+                    JSONObject fav = favoriteJSONArray.getJSONObject(existingIdx);
+                    fav.put(STATION_FAVORITE_JSON_NAME_DISPLAY_NAME, displayName);
+                    fav.put(STATION_FAVORITE_JSON_NAME_IS_DISPLAY_NAME_DEFAULT, isDisplayNameDefault);
                 }
             }
-            else{ //Removing favorite
-                //Requires API 19
-                //oldFavoriteJSONArray.remove(existingIndex);
-                newFavoriteJSONArray = new JSONArray();
-                for (int i=0; i<oldFavoriteJSONArray.length(); ++i){
-                    if (i != existingIndex && i != existingIndex+1 && i != existingIndex+2)
-                        newFavoriteJSONArray.put(oldFavoriteJSONArray.getString(i));    //get and put methods coerce boolean to String and vice versa
+            else{
+
+                int i = existingIdx+1;
+
+                //packing all null at the end of the array
+                for (; i < favoriteJSONArray.length(); ++i){
+                    JSONObject curFav = favoriteJSONArray.optJSONObject(i);
+
+                    if (curFav == null)
+                        break;
+
+                    favoriteJSONArray.put(i-1, curFav);
+
                 }
+
+                favoriteJSONArray.put(i-1, JSONObject.NULL);
             }
 
-            sp.edit().putString(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, ctx), newFavoriteJSONArray.toString()).apply();
+            sp.edit().putString(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_JSONARRAY, ctx), favoriteJSONArray.toString()).apply();
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.d(TAG, "Error while retrieving favorites from Preferences", e);
         }
-
-
 
         //Set<String> oldFavorites = sp.getStringSet(buildNetworkSpecificKey(PREF_SUFFIX_FAVORITES_SET, ctx), new HashSet<String>());
 
