@@ -19,7 +19,9 @@ import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.android.AndroidContext;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.ludoscity.findmybikes.FavoriteItem;
+import com.ludoscity.findmybikes.FavoriteItemBase;
+import com.ludoscity.findmybikes.FavoriteItemPlace;
+import com.ludoscity.findmybikes.FavoriteItemStation;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
@@ -31,7 +33,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -70,10 +71,6 @@ public class DBHelper {
 
     private static final int PREF_CRITICAL_AVAILABILITY_MAX_DEFAULT = 1;
     private static final int PREF_BAD_AVAILABILITY_MAX_DEFAULT = 4;
-
-    private static final String STATION_FAVORITE_JSON_NAME_STATION_ID = "station_id";
-    private static final String STATION_FAVORITE_JSON_NAME_DISPLAY_NAME = "display_name";
-    private static final String STATION_FAVORITE_JSON_NAME_IS_DISPLAY_NAME_DEFAULT = "is_display_name_default";
 
     private static boolean mAutoUpdatePaused = false;
 
@@ -388,7 +385,7 @@ public class DBHelper {
         try {
             toReturn = mManager.getDatabase(mSTATIONS_DB_NAME).getDocument(_stationId);
         } catch (CouchbaseLiteException | SQLiteException e) {
-            Log.d("DBHelper", "Couldn't retrieve a station document from id", e);
+            Log.d(TAG, "Couldn't retrieve a station document from id", e);
         }
 
         return toReturn;
@@ -425,7 +422,7 @@ public class DBHelper {
             mManager.getDatabase(mSTATIONS_DB_NAME).delete();
         }
         catch (SQLiteException e){
-            Log.d("DDB", "exception raised, doing nothing", e);
+            Log.d(TAG, "exception raised, doing nothing", e);
         }
 
     }
@@ -535,8 +532,8 @@ public class DBHelper {
 
     //TODO: Add validation of IDs to handle the case were a favorite station been removed
     //Replace edit fab with red delete one
-    public static ArrayList<FavoriteItem> getFavoriteAll(Context _ctx){
-        ArrayList<FavoriteItem> toReturn = new ArrayList<>();
+    public static ArrayList<FavoriteItemBase> getFavoriteAll(Context _ctx){
+        ArrayList<FavoriteItemBase> toReturn = new ArrayList<>();
 
         SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
@@ -550,9 +547,13 @@ public class DBHelper {
                     JSONObject curFav = favoritesJSONArray.optJSONObject(i);
 
                     if ( curFav != null){
-                        toReturn.add(new FavoriteItem(curFav.getString(STATION_FAVORITE_JSON_NAME_STATION_ID),
-                                curFav.getString(STATION_FAVORITE_JSON_NAME_DISPLAY_NAME),
-                                curFav.getBoolean(STATION_FAVORITE_JSON_NAME_IS_DISPLAY_NAME_DEFAULT)) );
+
+                        if (curFav.getString(FavoriteItemBase.FAVORITE_JSON_KEY_ID).startsWith(FavoriteItemPlace.PLACE_ID_PREFIX)){
+                            toReturn.add(FavoriteItemPlace.fromJSON(curFav));
+                        }
+                        else{
+                            toReturn.add(FavoriteItemStation.fromJSON(curFav));
+                        }
                     }
                 }
 
@@ -567,13 +568,13 @@ public class DBHelper {
         return toReturn;
     }
 
-    public static FavoriteItem getFavoriteItemForStationId(Context _ctx, String _stationID){
-        FavoriteItem toReturn = null;
+    public static FavoriteItemBase getFavoriteItemForId(Context _ctx, String _favoriteID){
+        FavoriteItemBase toReturn = null;
 
-        ArrayList<FavoriteItem> favoriteList = getFavoriteAll(_ctx);
+        ArrayList<FavoriteItemBase> favoriteList = getFavoriteAll(_ctx);
 
         for (int i=0; i<favoriteList.size(); ++i){
-            if (favoriteList.get(i).getStationId().equalsIgnoreCase(_stationID)) {
+            if (favoriteList.get(i).getId().equalsIgnoreCase(_favoriteID)) {
                 toReturn = favoriteList.get(i);
                 break;
             }
@@ -590,10 +591,10 @@ public class DBHelper {
 
         boolean toReturn = false;
 
-        ArrayList<FavoriteItem> favoriteList = getFavoriteAll(ctx);
+        ArrayList<FavoriteItemBase> favoriteList = getFavoriteAll(ctx);
 
         for (int i=0; i<favoriteList.size(); ++i){
-            if (favoriteList.get(i).getStationId().equalsIgnoreCase(id)){
+            if (favoriteList.get(i).getId().equalsIgnoreCase(id)){
                 toReturn = true;
                 break;
             }
@@ -608,10 +609,10 @@ public class DBHelper {
 
         int validCount = 0;
 
-        ArrayList<FavoriteItem> favoriteList = getFavoriteAll(_ctx);
+        ArrayList<FavoriteItemBase> favoriteList = getFavoriteAll(_ctx);
 
         for (int i=0; i<favoriteList.size(); ++i){
-            if (!favoriteList.get(i).getStationId().equalsIgnoreCase(_closestBikeStation.getId()))
+            if (!favoriteList.get(i).getId().equalsIgnoreCase(_closestBikeStation.getId()))
                 ++validCount;
         }
 
@@ -626,16 +627,25 @@ public class DBHelper {
 
     }
 
-    public static void updateFavorite(final Boolean isFavorite, String _stationId, String displayName, boolean isDisplayNameDefault, Context ctx) {
+    public static void updateFavorite(final Boolean isFavorite, FavoriteItemBase _favorite, Context ctx) {
 
         SharedPreferences sp = ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
         //JSONArray favoriteJSONArray;
         //contains JSONObject elements
+        //Station favorite
         //{
-        //    station_id: string,
+        //    favorite_id: string, (a station ID)
         //    display_name: string,
         //    is_display_name_default: boolean
+        //}
+        //Place favorite
+        //{
+        //    favorite_id: string, (a place ID, prefixed with FavoriteItemPlace.PLACE_ID_PREFIX)
+        //    display_name: string,
+        //    latitude: double,
+        //    longitude: double,
+        //    attributions: string
         //}
 
         try{
@@ -647,7 +657,7 @@ public class DBHelper {
 
             for (int i=0; i<favoriteJSONArray.length(); ++i){
                 JSONObject curFav = favoriteJSONArray.optJSONObject(i);
-                if (curFav != null && curFav.getString(STATION_FAVORITE_JSON_NAME_STATION_ID).equalsIgnoreCase(_stationId)) {
+                if (curFav != null && curFav.getString(FavoriteItemBase.FAVORITE_JSON_KEY_ID).equalsIgnoreCase(_favorite.getId())) {
                     existingIdx = i;
                 }
                 else if(curFav == null && firstNullIdx == -1){
@@ -659,22 +669,15 @@ public class DBHelper {
 
                 if (existingIdx == -1){
 
-                    JSONObject newFavorite = new JSONObject();
-                    newFavorite.put(STATION_FAVORITE_JSON_NAME_STATION_ID, _stationId);
-                    newFavorite.put(STATION_FAVORITE_JSON_NAME_DISPLAY_NAME, displayName);
-                    newFavorite.put(STATION_FAVORITE_JSON_NAME_IS_DISPLAY_NAME_DEFAULT, isDisplayNameDefault);
-
                     if (firstNullIdx == -1){
-                        favoriteJSONArray.put(newFavorite);
+                        favoriteJSONArray.put(_favorite.toJSON());
                     }
                     else{
-                        favoriteJSONArray.put(firstNullIdx, newFavorite);
+                        favoriteJSONArray.put(firstNullIdx, _favorite.toJSON());
                     }
                 }
                 else{
-                    JSONObject fav = favoriteJSONArray.getJSONObject(existingIdx);
-                    fav.put(STATION_FAVORITE_JSON_NAME_DISPLAY_NAME, displayName);
-                    fav.put(STATION_FAVORITE_JSON_NAME_IS_DISPLAY_NAME_DEFAULT, isDisplayNameDefault);
+                    favoriteJSONArray.put(existingIdx, _favorite.toJSON());
                 }
             }
             else{

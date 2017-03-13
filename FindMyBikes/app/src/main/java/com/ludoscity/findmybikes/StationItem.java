@@ -3,7 +3,6 @@ package com.ludoscity.findmybikes;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
@@ -150,9 +149,9 @@ public class StationItem implements Parcelable, ClusterItem {
 
     public void setFavorite(Boolean isFavorite, String displayName, Context ctx){
         if (displayName.equalsIgnoreCase(name))
-            DBHelper.updateFavorite(isFavorite, id, name, true, ctx);
+            DBHelper.updateFavorite(isFavorite, new FavoriteItemStation(id, name, true), ctx);
         else
-            DBHelper.updateFavorite(isFavorite, id, displayName, false, ctx);
+            DBHelper.updateFavorite(isFavorite, new FavoriteItemStation(id, displayName, false), ctx);
     }
 
     public boolean isLocked() {
@@ -160,18 +159,19 @@ public class StationItem implements Parcelable, ClusterItem {
     }
 
     // you MUST call this on a favorite station. No validation to not got to SharedPref too much
+    //Called multiple times (station binding happens on user location update)
     public Spanned getFavoriteName(Context _ctx, boolean _favoriteDisplayNameOnly){
 
         Spanned toReturn = Utils.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_only_italic),
                 name));
 
-        if (!DBHelper.getFavoriteItemForStationId(_ctx, id).isDisplayNameDefault()){
+        if (!DBHelper.getFavoriteItemForId(_ctx, id).isDisplayNameDefault()){
             if(_favoriteDisplayNameOnly){
                 toReturn = Utils.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_only_bold),
-                        DBHelper.getFavoriteItemForStationId(_ctx, id).getDisplayName()));
+                        DBHelper.getFavoriteItemForId(_ctx, id).getDisplayName()));
             } else {
                 toReturn = Utils.fromHtml(String.format(_ctx.getString(R.string.favorite_display_name_complete),
-                        DBHelper.getFavoriteItemForStationId(_ctx, id).getDisplayName(), name ));
+                        DBHelper.getFavoriteItemForId(_ctx, id).getDisplayName(), name ));
             }
         }
 

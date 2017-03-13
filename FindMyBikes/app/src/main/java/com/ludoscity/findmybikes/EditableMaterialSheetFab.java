@@ -1,6 +1,7 @@
 package com.ludoscity.findmybikes;
 
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -48,9 +49,12 @@ public class EditableMaterialSheetFab extends MaterialSheetFab
 
     public void hideEditFab(){ mEditFAB.hide(); }
     public void showEditFab(){ mEditFAB.show(); }
-    public void smoothScrollToTop(){
+    public void scrollToTop(){
 
-        if (mFavRecyclerview.getAdapter().getItemCount() > 1)
+        //from http://stackoverflow.com/questions/27757892/recyclerview-no-animation-on-notifyiteminsert
+        if (((LinearLayoutManager)mFavRecyclerview.getLayoutManager()).findFirstCompletelyVisibleItemPosition() == 0)
+            mFavRecyclerview.getLayoutManager().scrollToPosition(0);
+        else if (mFavRecyclerview.getAdapter().getItemCount() > 1)
             mFavRecyclerview.smoothScrollToPosition(0);}
 
     @Override

@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.Utils;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
 
     private boolean mSheetEditing = false;
 
-    private ArrayList<FavoriteItem> mFavoriteList = new ArrayList<>();
+    private ArrayList<FavoriteItemBase> mFavoriteList = new ArrayList<>();
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
@@ -63,7 +64,8 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
 
     }
 
-    public ArrayList<FavoriteItem> getCurrentFavoriteList(){ return mFavoriteList; }
+    public ArrayList<FavoriteItemBase> getCurrentFavoriteList(){ return mFavoriteList; }
+    public void clearFavoriteList(){ mFavoriteList.clear(); notifyDataSetChanged(); }
 
     public void setSheetEditing(boolean sheetEditing) {
         mSheetEditing = sheetEditing;
@@ -118,13 +120,29 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         mCtx = _ctx;
     }
 
-    public void setupFavoriteList(ArrayList<FavoriteItem> _toSet){
+    public void setupFavoriteList(ArrayList<FavoriteItemBase> _toSet){
         mFavoriteList.clear();
         mFavoriteList.addAll(_toSet);
 
         notifyDataSetChanged();
     }
 
+    public void addFavorite(String _toAddFavoriteId){
+
+        mFavoriteList.add(0, DBHelper.getFavoriteItemForId(mCtx, _toAddFavoriteId));
+        notifyItemInserted(0);
+    }
+
+    public void removeFavorite(String _toRemoveFavoriteId){
+
+        for (int i=0; i<mFavoriteList.size(); ++i){
+            if (mFavoriteList.get(i).getId().equalsIgnoreCase(_toRemoveFavoriteId)){
+                mFavoriteList.remove(i);
+                notifyItemRemoved(i);
+                break;
+            }
+        }
+    }
 
     @Override
     public FavoriteListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -148,7 +166,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
             View.OnFocusChangeListener, View.OnTouchListener, FavoriteItemTouchHelperViewHolder {
 
         TextView mName;
-        String mStationId;
+        String mFavoriteId;
         FloatingActionButton mEditFab;
         FloatingActionButton mDoneFab;
         FloatingActionButton mDeleteFab;
@@ -157,7 +175,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         boolean mEditing = false;
         String mNameBuffer;
 
-        public String getStationId(){ return mStationId; }
+        public String getFavoriteId(){ return mFavoriteId; }
 
         FavoriteListItemViewHolder(View itemView) {
             super(itemView);
@@ -177,7 +195,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
             mDeleteFab.setOnClickListener(this);
         }
 
-        void bindFavorite(FavoriteItem _favorite){
+        void bindFavorite(FavoriteItemBase _favorite){
 
             if (_favorite.isDisplayNameDefault())
                 mName.setTypeface(null, Typeface.ITALIC);
@@ -185,7 +203,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
                 mName.setTypeface(null, Typeface.BOLD);
 
             mName.setText(_favorite.getDisplayName());
-            mStationId = _favorite.getStationId();
+            mFavoriteId = _favorite.getId();
 
             itemView.setBackgroundResource(R.color.theme_accent_transparent);
 
@@ -255,7 +273,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
             switch (v.getId()){
                 case R.id.favorite_name:
                     if (!mEditing)
-                        mItemClickListener.onFavoriteListItemClick(mStationId);
+                        mItemClickListener.onFavoriteListItemClick(mFavoriteId);
                     else //User pressed back to hide keyboard
                         showSoftInput();
                     break;
@@ -269,11 +287,11 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
                 case R.id.favorite_name_done_fab:
                     mEditing = false;
                     setupItemEditMode(false);
-                    mItemClickListener.onFavoristeListItemEditDone(mStationId, mName.getText().toString());
+                    mItemClickListener.onFavoristeListItemEditDone(mFavoriteId, mName.getText().toString());
                     break;
 
                 case R.id.favorite_delete_fab:
-                    mItemClickListener.onFavoriteListItemDelete(mStationId);
+                    mItemClickListener.onFavoriteListItemDelete(mFavoriteId);
                     break;
             }
         }
