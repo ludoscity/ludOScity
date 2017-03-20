@@ -341,8 +341,8 @@ public class DBHelper {
                     properties.put("locked", toSave.isLocked());
                     properties.put("empty_slots", toSave.getEmpty_slots());
                     properties.put("free_bikes", toSave.getFree_bikes());
-                    properties.put("latitude", toSave.getPosition().latitude);
-                    properties.put("longitude", toSave.getPosition().longitude);
+                    properties.put("latitude", toSave.getLocation().latitude);
+                    properties.put("longitude", toSave.getLocation().longitude);
                     properties.put("timestamp", toSave.getTimestamp());
                     newRevision.setUserProperties(properties);
                     return true;

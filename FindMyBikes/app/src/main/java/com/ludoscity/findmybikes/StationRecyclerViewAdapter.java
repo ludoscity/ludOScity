@@ -40,6 +40,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     public static final String BAD_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "BAD";
     public static final String CRITICAL_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "CRI";
     private static final String LOCKED_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "LCK";
+    private static final String OUTDATED_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "OUT";
+    private static final String ERROR_AVAILABILITY_POSTFIX = AVAILABILITY_POSTFIX_START_SEQUENCE + "ERR";
 
     private ArrayList<StationItem> mStationList = new ArrayList<>();
     private Comparator<StationItem> mStationSortComparator;
@@ -165,7 +167,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             int timeBtoDestMinutes = 0;
 
             if (mDestinationLatLng != null)
-                timeBtoDestMinutes = Utils.computeTimeBetweenInMinutes(_stationB.getPosition(),
+                timeBtoDestMinutes = Utils.computeTimeBetweenInMinutes(_stationB.getLocation(),
                         mDestinationLatLng, mWalkingSpeedKmh);
 
             return mTimeUserToAMinutes + timeBtoDestMinutes;
@@ -174,7 +176,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         int calculateBikeTimeMinutes(StationItem _stationB){
 
-            return Utils.computeTimeBetweenInMinutes(mStationALatLng, _stationB.getPosition(),
+            return Utils.computeTimeBetweenInMinutes(mStationALatLng, _stationB.getLocation(),
                     mBikingSpeedKmh);
         }
 
@@ -216,6 +218,10 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         outState.putBoolean("availability_outdated", mOutdatedAvailability);
     }
 
+    public void notifyStationChanged(String _stationId) {
+        notifyItemChanged(getStationItemPositionInList(_stationId));
+    }
+
     public boolean removeItem(StationItem toRemove) {
         int positionToRemove = getStationItemPositionInList(toRemove.getId());
 
@@ -224,7 +230,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         mStationList.remove(positionToRemove);
 
-        notifyDataSetChanged();
+        notifyItemRemoved(positionToRemove);
 
         return mStationList.isEmpty();
     }
@@ -232,7 +238,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     public void addItem(StationItem toAdd) {
         mStationList.add(toAdd);
 
-        notifyDataSetChanged();
+        notifyItemInserted(mStationList.size()-1);
     }
 
     public boolean setAvailabilityOutdated(boolean _toSet) {
@@ -554,7 +560,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
                 case R.id.favorite_fab:
                     //must redo binding for favorite name display
-                    notifyDataSetChanged();
+                    notifyItemChanged(getStationItemPositionInList(getSelected().getId()));
                     mListener.onStationListItemClick(StationListFragment.STATION_LIST_FAVORITE_FAB_CLICK_PATH);
                     //ordering matters
                     if (getSelected().isFavorite(mCtx))
@@ -654,28 +660,40 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         StringBuilder availabilityDataPostfixBuilder = new StringBuilder("");
 
+        if (mOutdatedAvailability){
+            availabilityDataPostfixBuilder.append(mStationList.get(0).getId()).append(OUTDATED_AVAILABILITY_POSTFIX);
+            return availabilityDataPostfixBuilder.toString();
+        }
+
+        int badOrAOKStationCount = 0;
+        final long minimumServiceCount = Math.round(mStationList.size()*0.1);   //10%
+
         for (StationItem stationItem: mStationList){ //mStationList is SORTED BY DISTANCE
             if (_lookingForBike) {
                 if (!stationItem.isLocked()) {
 
                     if (stationItem.getFree_bikes() > DBHelper.getCriticalAvailabilityMax(mCtx)) {
 
-                        if (stationItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(mCtx)){
+                        if (badOrAOKStationCount == 0) {
+                            if (stationItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(mCtx)) {
 
-                            availabilityDataPostfixBuilder.insert(0, stationItem.getId() + BAD_AVAILABILITY_POSTFIX);
-                        }
-                        else{
-                            availabilityDataPostfixBuilder.insert(0, stationItem.getId() + AOK_AVAILABILITY_POSTFIX);
+                                availabilityDataPostfixBuilder.insert(0, stationItem.getId() + BAD_AVAILABILITY_POSTFIX);
+                            } else {
+                                availabilityDataPostfixBuilder.insert(0, stationItem.getId() + AOK_AVAILABILITY_POSTFIX);
+                            }
                         }
 
-                        break;
+                        ++badOrAOKStationCount;
+
+                        if (badOrAOKStationCount >= minimumServiceCount)
+                            break;
                     }
-                    else{
+                    else if (badOrAOKStationCount == 0){
                         availabilityDataPostfixBuilder.append(stationItem.getId())
                                 .append(CRITICAL_AVAILABILITY_POSTFIX);
                     }
                 }
-                else {
+                else if(badOrAOKStationCount == 0) {
                     availabilityDataPostfixBuilder.append(stationItem.getId())
                             .append(LOCKED_AVAILABILITY_POSTFIX);
                 }
@@ -684,27 +702,40 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
                 if (stationItem.getEmpty_slots() > DBHelper.getCriticalAvailabilityMax(mCtx)){
 
-                    if (stationItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(mCtx)){
+                    if (badOrAOKStationCount == 0) {
 
-                        availabilityDataPostfixBuilder.insert(0, stationItem.getId() + BAD_AVAILABILITY_POSTFIX);
+                        if (stationItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(mCtx)) {
+
+                            availabilityDataPostfixBuilder.insert(0, stationItem.getId() + BAD_AVAILABILITY_POSTFIX);
+                        } else {
+
+                            availabilityDataPostfixBuilder.insert(0, stationItem.getId() + AOK_AVAILABILITY_POSTFIX);
+                        }
                     }
-                    else{
 
-                        availabilityDataPostfixBuilder.insert(0, stationItem.getId() + AOK_AVAILABILITY_POSTFIX);
-                    }
+                    ++badOrAOKStationCount;
 
-                    break;
+                    if (badOrAOKStationCount >= minimumServiceCount)
+                        break;
                 }
-                else{
+                else if (badOrAOKStationCount == 0){
                     availabilityDataPostfixBuilder.append(stationItem.getId())
                             .append(CRITICAL_AVAILABILITY_POSTFIX);
                 }
             }
         }
 
-        //failsafe
-        if (availabilityDataPostfixBuilder.toString().isEmpty() && !mStationList.isEmpty())
+        //failsafe if no bike could be found
+        if (badOrAOKStationCount == 0 && !mStationList.isEmpty())
             availabilityDataPostfixBuilder.append(mStationList.get(0).getId()).append(LOCKED_AVAILABILITY_POSTFIX);
+        else if(badOrAOKStationCount != 0 && badOrAOKStationCount < minimumServiceCount){
+            //if less than 10% of the network could provide service but a bike could still be found, let's prevent tweeting from happening
+            int firstBadOrOkIdx = availabilityDataPostfixBuilder.indexOf(BAD_AVAILABILITY_POSTFIX) != -1 ?
+                    availabilityDataPostfixBuilder.indexOf(BAD_AVAILABILITY_POSTFIX) :
+                    availabilityDataPostfixBuilder.indexOf(AOK_AVAILABILITY_POSTFIX);
+
+            availabilityDataPostfixBuilder.replace(firstBadOrOkIdx, firstBadOrOkIdx + ERROR_AVAILABILITY_POSTFIX.length(), ERROR_AVAILABILITY_POSTFIX);
+        }
 
         return availabilityDataPostfixBuilder.toString();
     }
@@ -730,7 +761,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         }
 
         if (closest != null)
-            return closest.getPosition();
+            return closest.getLocation();
 
         return null;
     }

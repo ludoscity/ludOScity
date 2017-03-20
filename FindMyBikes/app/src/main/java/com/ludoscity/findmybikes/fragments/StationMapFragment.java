@@ -533,8 +533,14 @@ public class StationMapFragment extends Fragment
 
     public void hideAllStations() {
 
-        for (StationMapGfx markerData : mMapMarkersGfxData){
-            markerData.hide();
+        try {
+            for (StationMapGfx markerData : mMapMarkersGfxData) {
+                markerData.hide();
+            }
+        }
+        catch (ConcurrentModificationException e){
+            //Can happen on screen orientation change. Simply retry
+            hideAllStations();
         }
     }
 
@@ -545,10 +551,8 @@ public class StationMapFragment extends Fragment
                 markerData.show(mGoogleMap.getCameraPosition().zoom);
             }
         } catch (ConcurrentModificationException e){
-            Log.d("StationMapFragment", "problem while showing station - aborting." +
-                    "setting up new download", e);
-
-            DBHelper.notifyBeginSavingStations(getContext());   //hackfix. So data will be redownloaded
+            //Can happen on screen orientation change. Simply retry
+            showAllStations();
         }
     }
 
@@ -563,30 +567,38 @@ public class StationMapFragment extends Fragment
 
     private void updateMarkerAll(boolean lookingForBike){
 
-        //TODO: seen java.util.ConcurrentModificationException
-        for (StationMapGfx markerData : mMapMarkersGfxData){
-            markerData.updateMarker(lookingForBike, getContext());
+        try {
+            for (StationMapGfx markerData : mMapMarkersGfxData) {
+                markerData.updateMarker(lookingForBike, getContext());
+            }
+        }
+        catch (ConcurrentModificationException e){
+            updateMarkerAll(lookingForBike);
         }
     }
 
     //TODO: if clients have a stationname, maybe they have the station LatLng on hand
     public void setPinOnStation(boolean _lookingForBike, String _stationId){
 
-        //TODO: Seen concurrentmodification exception on app resuming after long hibernation
-        //investigate access to mMapMarkersGfxData
-        for (StationMapGfx markerData : mMapMarkersGfxData){
-            if (markerData.getMarkerTitle().equalsIgnoreCase(_stationId)) {
-                if (_lookingForBike){
-                    mMarkerStationA.setPosition(markerData.getMarkerLatLng());
-                    mMarkerStationA.setVisible(true);
-                    mMarkerStationA.setTitle(markerData.getMarkerTitle());
-                } else {
-                    mMarkerStationB.setPosition(markerData.getMarkerLatLng());
-                    mMarkerStationB.setVisible(true);
-                }
+        try {
+            for (StationMapGfx markerData : mMapMarkersGfxData) {
+                if (markerData.getMarkerTitle().equalsIgnoreCase(_stationId)) {
+                    if (_lookingForBike) {
+                        mMarkerStationA.setPosition(markerData.getMarkerLatLng());
+                        mMarkerStationA.setVisible(true);
+                        mMarkerStationA.setTitle(markerData.getMarkerTitle());
+                    } else {
+                        mMarkerStationB.setPosition(markerData.getMarkerLatLng());
+                        mMarkerStationB.setVisible(true);
+                    }
 
-                break;
+                    break;
+                }
             }
+        }
+        catch (ConcurrentModificationException e){
+            //Can happen on screen orientation change. Simply retry
+            setPinOnStation(_lookingForBike, _stationId);
         }
     }
 
@@ -603,15 +615,19 @@ public class StationMapFragment extends Fragment
         }
     }
 
-    public void setPinForPickedFavorite(String _favoriteName, LatLng _favoritePosition, boolean _showInfoWindow){
+    public void setPinForPickedFavorite(String _favoriteName, LatLng _favoritePosition, CharSequence _attributions,  boolean _showInfoWindow){
 
         mMarkerPickedFavorite.setTitle(_favoriteName);
         mMarkerPickedFavorite.setPosition(_favoritePosition);
         mMarkerPickedFavorite.setVisible(true);
 
-
         if (_showInfoWindow)
             mMarkerPickedFavorite.showInfoWindow();
+
+        if (_attributions != null) {
+            mAttributionsText.setText(Utils.fromHtml(_attributions.toString()));
+            mAttributionsText.setVisibility(View.VISIBLE);
+        }
     }
 
     public  void clearMarkerPickedPlace(){

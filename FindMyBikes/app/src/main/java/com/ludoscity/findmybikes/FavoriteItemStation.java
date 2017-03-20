@@ -1,6 +1,10 @@
 package com.ludoscity.findmybikes;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +33,13 @@ public class FavoriteItemStation extends FavoriteItemBase {
     }
 
     @Override
+    public LatLng getLocation() {
+        return null;
+        //return DBHelper.getStation(getId()).getLocation();
+        //TODO: Rework saving algorithm. See DBHelper.getStation
+    }
+
+    @Override
     public JSONObject toJSON() {
         JSONObject toReturn = new JSONObject();
 
@@ -53,4 +64,36 @@ public class FavoriteItemStation extends FavoriteItemBase {
             return null;
         }
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int i) {
+        dest.writeString(getId());
+        dest.writeString(getDisplayName());
+
+        dest.writeByte((byte) (mDisplayNameIsDefault ? 1 : 0));
+    }
+
+    private FavoriteItemStation(Parcel in){
+        super(in.readString(), in.readString());
+
+        mDisplayNameIsDefault = in.readByte() != 0;
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator(){
+
+        @Override
+        public FavoriteItemStation createFromParcel(Parcel source) {
+            return new FavoriteItemStation(source);
+        }
+
+        @Override
+        public FavoriteItemStation[] newArray(int size) {
+            return new FavoriteItemStation[size];
+        }
+    };
 }

@@ -414,8 +414,8 @@ public class StationListFragment extends Fragment
         getStationRecyclerViewAdapter().setClickResponsiveness(_toSet);
     }
 
-    public void notifyDatasetChangedToRecyclerView() {
-        getStationRecyclerViewAdapter().notifyDataSetChanged();
+    public void notifyStationChanged(String _stationId) {
+        getStationRecyclerViewAdapter().notifyStationChanged(_stationId);
     }
 
     public void setOutdatedData(boolean _availabilityOutdated, StationItem _toRecap) {
@@ -423,6 +423,15 @@ public class StationListFragment extends Fragment
 
             setupStationRecap(_toRecap);
         }
+    }
+
+    public boolean isDataOutdated() {
+        return getStationRecyclerViewAdapter().isAvailabilityOutdated();
+    }
+
+    public void showFavoriteHeader() {
+
+        mProximityHeaderToImageView.setImageResource(R.drawable.ic_pin_favorite_24dp_white);
     }
 
     public interface OnStationListFragmentInteractionListener {

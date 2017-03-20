@@ -20,7 +20,7 @@ import java.io.UnsupportedEncodingException;
  *
  * Simple item holding the data necessary for each stations to be shown in listViewAdapter
  */
-public class StationItem implements Parcelable, ClusterItem {
+public class StationItem implements Parcelable {
     private String id;
     private String name;
     private boolean locked;
@@ -141,17 +141,17 @@ public class StationItem implements Parcelable, ClusterItem {
     //public double getBearingFromLatLng(LatLng userLocation){
     //    return SphericalUtil.computeHeading(userLocation, new LatLng(latitude,longitude) );}
 
-    public LatLng getPosition() {return new LatLng(latitude,longitude);}
+    public LatLng getLocation() {return new LatLng(latitude,longitude);}
 
     public boolean isFavorite(Context ctx) {
         return DBHelper.isFavorite(id, ctx);
     }
 
-    public void setFavorite(Boolean isFavorite, String displayName, Context ctx){
-        if (displayName.equalsIgnoreCase(name))
-            DBHelper.updateFavorite(isFavorite, new FavoriteItemStation(id, name, true), ctx);
+    public FavoriteItemStation getFavoriteItemForDisplayName(String _displayName){
+        if (_displayName.equalsIgnoreCase(name))
+            return new FavoriteItemStation(id, name, true);
         else
-            DBHelper.updateFavorite(isFavorite, new FavoriteItemStation(id, displayName, false), ctx);
+            return new FavoriteItemStation(id, _displayName, false);
     }
 
     public boolean isLocked() {

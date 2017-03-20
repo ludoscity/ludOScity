@@ -19,7 +19,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.Utils;
 
 import java.util.ArrayList;
@@ -79,11 +78,11 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
     //event to NearbyActivity
     public interface OnFavoriteListItemClickListener {
         void onFavoriteListItemClick(String _stationId);
-        void onFavoristeListItemEditDone(String _stationId, String _newName );
+        void onFavoristeListItemNameEditDone(String _stationId, String _newName );
 
-        void onFavoristeListItemEditBegin();
+        void onFavoristeListItemNameEditBegin();
 
-        void onFavoristeListItemEditAbort();
+        void onFavoristeListItemNameEditAbort();
 
         void onFavoriteListItemDelete(String mStationId);
     }
@@ -127,16 +126,16 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         notifyDataSetChanged();
     }
 
-    public void addFavorite(String _toAddFavoriteId){
+    public void addFavorite(FavoriteItemBase _toAdd){
 
-        mFavoriteList.add(0, DBHelper.getFavoriteItemForId(mCtx, _toAddFavoriteId));
+        mFavoriteList.add(0, _toAdd);
         notifyItemInserted(0);
     }
 
-    public void removeFavorite(String _toRemoveFavoriteId){
+    public void removeFavorite(FavoriteItemBase _toRemove){
 
         for (int i=0; i<mFavoriteList.size(); ++i){
-            if (mFavoriteList.get(i).getId().equalsIgnoreCase(_toRemoveFavoriteId)){
+            if (mFavoriteList.get(i).getId().equalsIgnoreCase(_toRemove.getId())){
                 mFavoriteList.remove(i);
                 notifyItemRemoved(i);
                 break;
@@ -173,7 +172,7 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
         ImageView mOrderingAffordanceHandle;
 
         boolean mEditing = false;
-        String mNameBuffer;
+        String mNameBeforeEdit;
 
         public String getFavoriteId(){ return mFavoriteId; }
 
@@ -281,13 +280,13 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
                 case R.id.favorite_name_edit_fab:
                     mEditing = true;
                     setupItemEditMode(true);
-                    mItemClickListener.onFavoristeListItemEditBegin();
+                    mItemClickListener.onFavoristeListItemNameEditBegin();
                     break;
 
                 case R.id.favorite_name_done_fab:
                     mEditing = false;
                     setupItemEditMode(false);
-                    mItemClickListener.onFavoristeListItemEditDone(mFavoriteId, mName.getText().toString());
+                    mItemClickListener.onFavoristeListItemNameEditDone(mFavoriteId, mName.getText().toString());
                     break;
 
                 case R.id.favorite_delete_fab:
@@ -321,7 +320,13 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
                 mName.setTextIsSelectable(false);
                 mName.setFocusableInTouchMode(false);
 
-                mName.setText(mName.getText().toString().trim());
+                String newName = mName.getText().toString().trim();
+
+                if (!newName.isEmpty())
+                    mName.setText(newName);
+                else
+                    //restoring original name
+                    mName.setText(mNameBeforeEdit);
 
                 mDoneFab.hide();
                 mEditFab.show();
@@ -345,17 +350,17 @@ public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter<FavoriteRe
 
             if (hasFocus){
 
-                mNameBuffer = vTV.getText().toString();
+                mNameBeforeEdit = vTV.getText().toString();
 
             } else {
 
                 if (mEditing) {
                     //Editing mode wasn't left from clicking done fab, restoring original name
-                    vTV.setText(mNameBuffer);
+                    vTV.setText(mNameBeforeEdit);
 
                     mEditing = false;
                     setupItemEditMode(false);
-                    mItemClickListener.onFavoristeListItemEditAbort();
+                    mItemClickListener.onFavoristeListItemNameEditAbort();
                 }
             }
         }

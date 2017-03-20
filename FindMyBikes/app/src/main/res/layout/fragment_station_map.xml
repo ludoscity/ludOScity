@@ -16,6 +16,6 @@
         android:visibility="gone"
         android:id="@+id/attributions_text"
         android:background="@color/theme_window_background"
-        android:layout_gravity="bottom|center"/>
+        android:layout_gravity="bottom|end"/>
 
 </FrameLayout>

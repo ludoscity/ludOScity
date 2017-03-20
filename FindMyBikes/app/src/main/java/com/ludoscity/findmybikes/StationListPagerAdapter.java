@@ -56,12 +56,12 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
                 _stringIfEmpty, _sortComparator);
     }
 
-    public void hideStationRecap(int _pageId){
-        retrieveListFragment(_pageId).hideStationRecap();
+    public void hideStationRecap(){
+        retrieveListFragment(DOCK_STATIONS).hideStationRecap();
     }
 
-    public void showStationRecap(int _pageId){
-        retrieveListFragment(_pageId).showStationRecap();
+    public void showStationRecap(){
+        retrieveListFragment(DOCK_STATIONS).showStationRecap();
     }
 
     public void setRefreshEnableAll(boolean toSet) {
@@ -93,9 +93,9 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         }
     }
 
-    public void notifyRecyclerViewDatasetChangedForAllPages(){
-        retrieveListFragment(BIKE_STATIONS).notifyDatasetChangedToRecyclerView();
-        retrieveListFragment(DOCK_STATIONS).notifyDatasetChangedToRecyclerView();
+    public void notifyStationChangedAll(String _stationId) {
+        retrieveListFragment(BIKE_STATIONS).notifyStationChanged(_stationId);
+        retrieveListFragment(DOCK_STATIONS).notifyStationChanged(_stationId);
     }
 
     public String retrieveClosestRawIdAndAvailability(boolean _lookingForBike){
@@ -162,7 +162,11 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         retrieveListFragment(_pageID).setOutdatedData(_isDataOutdated, _toRecap);
     }
 
-    public ViewTarget getDockingStationFavoriteFabViewTarget(){
-        return retrieveListFragment(DOCK_STATIONS).getHighlightedFavoriteFabViewTarget();
+    public void showFavoriteHeaderInBTab() {
+        retrieveListFragment(DOCK_STATIONS).showFavoriteHeader();
+    }
+
+    public boolean isDataOutdatedForPage(int _pageID) {
+        return retrieveListFragment(_pageID).isDataOutdated();
     }
 }

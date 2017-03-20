@@ -47,7 +47,7 @@ public class StationMapGfx {
 
         //Marker setup
         markerOptions = new MarkerOptions()
-                .position(item.getPosition())
+                .position(item.getLocation())
                 .title(item.getId())
                 .alpha(0)
                 .zIndex(.5f)//so that invisible clicking marker is in front of Favorite pin
@@ -56,7 +56,7 @@ public class StationMapGfx {
 
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
         groundOverlayOptions = new GroundOverlayOptions()
-                .position(item.getPosition(), maxOverlaySize)
+                .position(item.getLocation(), maxOverlaySize)
                 .transparency(0.1f)
                 .visible(false);
         if (item.isLocked())
@@ -130,7 +130,9 @@ public class StationMapGfx {
 
     public void show(float _zoom) {
 
-        groundOverlay.setDimensions(Utils.map(_zoom, maxZoomOut, maxZoomIn, maxOverlaySize, minOverlaySize));
-        groundOverlay.setVisible(true);
+        if (groundOverlay != null) {
+            groundOverlay.setDimensions(Utils.map(_zoom, maxZoomOut, maxZoomIn, maxOverlaySize, minOverlaySize));
+            groundOverlay.setVisible(true);
+        }
     }
 }

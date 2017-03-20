@@ -28,7 +28,7 @@
     <string name="no_connectivity">connected #not.</string>
     <string name="placeholder_lorem_ipsum" translatable="false">lorem ipsum</string>
     <string name="refreshing">#refreshing map…</string>
-    <string name="auto_download_failed">#download failed :/ Auto update paused</string>
+    <string name="auto_download_failed">#download failed :/ Auto update paused.</string>
     <string name="google_maps_not_installed">Google Maps not installed !</string>
     <string name="searching_bike_network">#searching closest bike system on citybik.es…</string>
     <string name="bike_network_found_message"><![CDATA[#bike system been set to <b>%1$s</b>.<br />I\'ll update it if you travel.]]></string>
@@ -69,7 +69,8 @@
     <string name="resume">RESUME</string>
     <string name="auto_bike_select_finding">#finding your bikes. Hang tight…</string>
     <string name="auto_bike_select_found">#found your bike ! :)</string>
-    <string name="auto_bike_select_error">#couldn\'t find any bike :s ! #selected closest station.</string>
+    <string name="auto_bike_select_none">#couldn\'t find any bike ! :s #selected closest station.</string>
+    <string name="auto_bike_select_outdated">#outdated data ! :| #selected closest station.</string>
     <string name="title_legal">#legal</string>
     <string name="twitter_not_closest_bike_data_format" translatable="false">%1$s bike is not closest! Bikes:%2$d %3$s at %4$s %5$s walk %6$s %7$s</string>
     <string name="twitter_closer_discarded_reply_data_format" translatable="false">%1$s discarded closer! Bikes:%2$d %3$s at %4$s %5$s</string>
@@ -90,6 +91,6 @@
     <string name="onboarding_showcase_add_favorite_text">\nAlmost done ! Add a favorite by tapping this heart shaped button.</string>
     <string name="onboarding_hint_main_choice">#open favorites, use search, or tap station</string>
     <string name="onboarding_hint_main_choice_no_connectivity">#open favorites or tap station</string>
-    <string name="onboarding_hint_tap_favorite_name">#tap a favorite name to set as destination</string>
+    <string name="onboarding_hint_tap_favorite_name">#tap name to set as destination, #swipe to delete</string>
     <string name="onboarding_hint_search">#type any place name or address</string>
 </resources>

@@ -21,7 +21,7 @@
     <string name="downloading">#téléchargement des données…</string>
     <string name="no_connectivity">#non connecté</string>
     <string name="refreshing">#rafraîchissement de la carte…</string>
-    <string name="auto_download_failed">#échec du téléchargement :/ Màj auto suspendue</string>
+    <string name="auto_download_failed">#échec du téléchargement :/ Màj auto suspendue.</string>
     <string name="google_maps_not_installed">Google Maps non installé !</string>
     <string name="searching_bike_network">#recherche sur citybik.es du système le plus proche…</string>
     <string name="bike_network_found_message"><![CDATA[#système de vélos réglé sur <b>%1$s</b>.<br />Je le mettrai à jour si vous voyagez.]]></string>
@@ -50,7 +50,7 @@
     <string name="auto_bike_select_found">#vélocalisé ! :)</string>
     <string name="hello_city"><![CDATA[%1$s#bonjour <b>%2$s</b> !]]></string>
     <string name="hello_travel">#il semble que vous avez voyagé.\u0020</string>
-    <string name="auto_bike_select_error">#je n\'ai pu localiser aucun vélo :s ! #sélectionné station la plus proche.</string>
+    <string name="auto_bike_select_none">#je n\'ai pu localiser aucun vélo ! :s #sélectionné station la plus proche.</string>
     <string name="title_legal">#légal</string>
     <string name="appbar_title_postfix" />
     <string name="appbar_title_prefix">#vélocalise</string>
@@ -65,12 +65,13 @@
     <string name="cities">#villes</string>
     <string name="onboarding_showcase_add_favorite_text">\nPresque terminé ! Pour ajouter un favori, cliquez sur ce bouton coeur.</string>
     <string name="onboarding_showcase_add_favorite_title">#truc 2/2</string>
-    <string name="onboarding_showcase_search_text">Pédalons de A vers B.\n\nVous n\'avez aucun favori ! Pour commencer, cliquez sur le bouton de recherche et entrez un nom de lieu ou une adresse…</string>
+    <string name="onboarding_showcase_search_text">Pédalons de A à B.\n\nVous n\'avez aucun favori ! Pour commencer, cliquez sur le bouton de recherche et entrez un nom de lieu ou une adresse…</string>
     <string name="onboarding_showcase_search_title">#vers où ?</string>
     <string name="onboarding_showcase_total_time_text">\nHop ! Voyez l\'estimation de votre temps de trajet basée sur la disponibilité des ancrages %1$s aux alentours de %2$s…</string>
     <string name="onboarding_showcase_total_time_title">#truc 1/2</string>
     <string name="onboarding_hint_main_choice">#ouvrir favoris, utiliser recherche, ou cliquer une station</string>
     <string name="onboarding_hint_main_choice_no_connectivity">#ouvrir favoris ou cliquer une station</string>
-    <string name="onboarding_hint_tap_favorite_name">#cliquer un nom de favori pour définir destination</string>
+    <string name="onboarding_hint_tap_favorite_name">#cliquer nom pour définir destination, #glisser pour supprimer</string>
     <string name="onboarding_hint_search">#Tapez n\'importe quel nom de lieu ou adresse</string>
+    <string name="auto_bike_select_outdated">#données périmées ! :| #sélectionné station la plus proche.</string>
 </resources>
