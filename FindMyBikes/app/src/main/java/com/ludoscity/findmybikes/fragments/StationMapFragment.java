@@ -100,6 +100,7 @@ public class StationMapFragment extends Fragment
     private BitmapDescriptor mPinSearchIconBitmapDescriptor;
     private Marker mMarkerPickedFavorite;
     private BitmapDescriptor mPinFavoriteIconBitmapDescriptor;
+    private BitmapDescriptor mNoPinFavoriteIconBitmapDescriptor;
 
     private TextView mAttributionsText;
 
@@ -123,6 +124,7 @@ public class StationMapFragment extends Fragment
         mPinBIconBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_b_36dp_black);
         mPinSearchIconBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_search_24dp_black);
         mPinFavoriteIconBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_pin_favorite_24dp_black);
+        mNoPinFavoriteIconBitmapDescriptor = Utils.getBitmapDescriptor(getContext(), R.drawable.ic_nopin_favorite_24dp_white);
 
         mAttributionsText = (TextView) inflatedView.findViewById(R.id.attributions_text);
 
@@ -483,12 +485,10 @@ public class StationMapFragment extends Fragment
         mMarkerStationA = mGoogleMap.addMarker(new MarkerOptions().position(pinALatLng)
                 .icon(mPinAIconBitmapDescriptor)
                 .visible(pinAVisible)
-                .title(pinAStationId)
-                .zIndex(1.f));
+                .title(pinAStationId));
         mMarkerStationB = mGoogleMap.addMarker(new MarkerOptions().position(pinBLatLng)
                 .icon(mPinBIconBitmapDescriptor)
-                .visible(pinBVisible)
-                .zIndex(1.f));//so that it hides Favorite one (default Z is 0)
+                .visible(pinBVisible));
         mMarkerPickedPlace = mGoogleMap.addMarker(new MarkerOptions().position(pinPickedPlaceLatLng)
                 .icon(mPinSearchIconBitmapDescriptor)
                 .visible(pinPickedPlaceVisible)
@@ -496,6 +496,7 @@ public class StationMapFragment extends Fragment
         mMarkerPickedFavorite = mGoogleMap.addMarker(new MarkerOptions().position(pinPickedFavoriteLatLng)
                 .icon(mPinFavoriteIconBitmapDescriptor)
                 .visible(pinPickedFavoriteVisible)
+                .zIndex(.5f)//so that it's on top of B pin (default Z is 0)
                 .title(pickedFavoriteName));
 
         if (pinPickedPlaceVisible)
@@ -590,6 +591,18 @@ public class StationMapFragment extends Fragment
                     } else {
                         mMarkerStationB.setPosition(markerData.getMarkerLatLng());
                         mMarkerStationB.setVisible(true);
+
+                        if (isPickedFavoriteMarkerVisible()){
+                            if (getMarkerPickedFavoriteVisibleLatLng().latitude == getMarkerBVisibleLatLng().latitude &&
+                                    getMarkerPickedFavoriteVisibleLatLng().longitude == getMarkerBVisibleLatLng().longitude){
+                                mMarkerPickedFavorite.setIcon(mNoPinFavoriteIconBitmapDescriptor);
+                                mMarkerPickedFavorite.hideInfoWindow();
+                            }
+                            else {
+                                mMarkerPickedFavorite.setIcon(mPinFavoriteIconBitmapDescriptor);
+                                mMarkerPickedFavorite.showInfoWindow();
+                            }
+                        }
                     }
 
                     break;
@@ -615,14 +628,21 @@ public class StationMapFragment extends Fragment
         }
     }
 
-    public void setPinForPickedFavorite(String _favoriteName, LatLng _favoritePosition, CharSequence _attributions,  boolean _showInfoWindow){
+    public void setPinForPickedFavorite(String _favoriteName, LatLng _favoritePosition, CharSequence _attributions){
 
         mMarkerPickedFavorite.setTitle(_favoriteName);
         mMarkerPickedFavorite.setPosition(_favoritePosition);
         mMarkerPickedFavorite.setVisible(true);
 
-        if (_showInfoWindow)
+        if (_favoritePosition.latitude == getMarkerBVisibleLatLng().latitude &&
+                _favoritePosition.longitude == getMarkerBVisibleLatLng().longitude){
+            mMarkerPickedFavorite.setIcon(mNoPinFavoriteIconBitmapDescriptor);
+            mMarkerPickedFavorite.hideInfoWindow();
+        }
+        else {
+            mMarkerPickedFavorite.setIcon(mPinFavoriteIconBitmapDescriptor);
             mMarkerPickedFavorite.showInfoWindow();
+        }
 
         if (_attributions != null) {
             mAttributionsText.setText(Utils.fromHtml(_attributions.toString()));

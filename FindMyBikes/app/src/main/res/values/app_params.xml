@@ -30,8 +30,7 @@
     <item name="station_item_name_bad_availability_alpha" type="fraction">50%</item>
     <item name="station_item_availability_bad_availability_alpha" type="fraction">65%</item>
 
-    <!-- Must be copied to string resources for settings display, I could make it work in SettingsFragment-->
-    <!-- TODO: figure this shit out -->
-    <item name="average_walking_speed_kmh" type="integer">4</item>
-    <item name="average_biking_speed_kmh" type="integer">10</item>
+    <!--http://stackoverflow.com/questions/3282390/add-floating-point-value-to-android-resources-values-->
+    <item name="average_walking_speed_kmh" format="float" type="dimen">3.5</item>
+    <item name="average_biking_speed_kmh" format="float" type="dimen">10.0</item>
 </resources>

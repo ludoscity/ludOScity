@@ -51,14 +51,6 @@
     <string name="pref_refresh_options_key" translatable="false">pref_refresh_options</string>
     <string name="pref_critical_availability_max_key" translatable="false">pref_critical_availability_max</string>
     <string name="pref_bad_availability_max_key" translatable="false">pref_bad_availability_max</string>
-    <!-- TODO: figure this string formatting in shaedprefswitch title shit out -->
-    <!--<string name="pref_walking_proximity_duration">Time. (As the crow flies, at %1$dkm/h)</string>-->
-    <string name="pref_walking_proximity_duration">Duration. (As the crow flies, at 4km/h)</string>
-    <string name="pref_walking_proximity_key" translatable="false">pref_walking_proximity_key</string>
-    <string name="pref_biking_proximity_key" translatable="false">pref_biking_proximity_key</string>
-    <!-- TODO: figure this shit out -->
-    <!--<string name="pref_biking_proximity_duration">Time. (As the crow flies, at %1$dkm/h)</string>-->
-    <string name="pref_biking_proximity_duration">Duration. (As the crow flies, at 10km/h)</string>
     <string name="hour_symbol">h</string>
     <string name="ok" translatable="false">@android:string/ok</string>
     <string name="undo"><b>UNDO</b></string>

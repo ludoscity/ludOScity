@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
+import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
 
 import java.math.BigDecimal;
@@ -142,6 +143,23 @@ public class Utils {
         /// Converts 66 dip into its equivalent px
         Resources r = ctx.getResources();
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, toConvert, r.getDisplayMetrics());
+    }
+
+    //http://stackoverflow.com/questions/3282390/add-floating-point-value-to-android-resources-values
+    public static float getAverageWalkingSpeedKmh(Context ctx){
+        TypedValue outValue = new TypedValue();
+
+        ctx.getResources().getValue(R.dimen.average_walking_speed_kmh, outValue, true);
+
+        return outValue.getFloat();
+    }
+
+    public static float getAverageBikingSpeedKmh(Context ctx){
+        TypedValue outValue = new TypedValue();
+
+        ctx.getResources().getValue(R.dimen.average_biking_speed_kmh, outValue, true);
+
+        return outValue.getFloat();
     }
 
     public static int computeTimeBetweenInMinutes(LatLng _from, LatLng _to, float _speedKmH){

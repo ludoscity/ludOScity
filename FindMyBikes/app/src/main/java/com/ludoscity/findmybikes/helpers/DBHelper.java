@@ -93,21 +93,13 @@ public class DBHelper {
 
             boolean cleared = false;
 
-            if (sharedPrefVersion == 0 && currentVersionCode >= 8){
+            /*if (sharedPrefVersion == 0 && currentVersionCode >= 8){
                 //Because the way favorites are saved changed
 
                 editor.clear();
                 editor.commit(); //I do want commit and not apply
                 cleared = true;
 
-            }
-            if (!cleared && sharedPrefVersion <= 10 && currentVersionCode >= 11 ){
-                //Removed settings
-                editor.remove(context.getString(R.string.pref_walking_proximity_key));
-                editor.remove(context.getString(R.string.pref_biking_proximity_key));
-                //change default value for auto update setting
-                editor.putBoolean(context.getString(R.string.pref_refresh_options_key), false);
-                editor.apply();
             }
 
             if (!cleared && sharedPrefVersion <= 15 && currentVersionCode >= 16){
@@ -125,7 +117,7 @@ public class DBHelper {
                 editor.remove(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_HREF, context));
                 editor.remove(buildNetworkSpecificKey(PREF_SUFFIX_NETWORK_CITY, context));
                 editor.apply();
-            }
+            }*/
 
             editor.putInt(SHARED_PREF_VERSION_CODE, currentVersionCode);
             editor.apply();
@@ -251,7 +243,7 @@ public class DBHelper {
         }
     }
 
-    public static LatLngBounds getBikeNetworkBounds(Context _ctx, double _paddingKms){
+    public static LatLngBounds getBikeNetworkBounds(Context _ctx, double _paddingKm){
 
         SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);
 
@@ -269,10 +261,10 @@ public class DBHelper {
         //http://stackoverflow.com/questions/29478463/offset-latlng-by-some-amount-of-meters-in-android
         //Latitude : easy, 1 degree = 111111m (historically because of the French :D)
         //Longitude : 1 degree = 111111 * cos (latitude)m
-        LatLng southwestPadded = new LatLng(southwestRaw.latitude - (_paddingKms*1000.d) / 111111.d,
-                southwestRaw.longitude - (_paddingKms*1000.d) / 111111.d * Math.cos(southwestRaw.latitude)  );
-        LatLng northeastPadded = new LatLng(northeastRaw.latitude + (_paddingKms*1000.d) / 111111.d,
-                northeastRaw.longitude + (_paddingKms*1000.d) / 111111.d * Math.cos(northeastRaw.latitude)  );
+        LatLng southwestPadded = new LatLng(southwestRaw.latitude - (_paddingKm*1000.d) / 111111.d,
+                southwestRaw.longitude - (_paddingKm*1000.d) / 111111.d * Math.cos(southwestRaw.latitude)  );
+        LatLng northeastPadded = new LatLng(northeastRaw.latitude + (_paddingKm*1000.d) / 111111.d,
+                northeastRaw.longitude + (_paddingKm*1000.d) / 111111.d * Math.cos(northeastRaw.latitude)  );
 
         return new LatLngBounds(southwestPadded, northeastPadded);
     }

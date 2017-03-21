@@ -108,12 +108,12 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         private final LatLng mStationALatLng;
         private final LatLng mDestinationLatLng;
-        private final int mWalkingSpeedKmh;
-        private final int mBikingSpeedKmh;
+        private final float mWalkingSpeedKmh;
+        private final float mBikingSpeedKmh;
 
         private final int mTimeUserToAMinutes;
 
-        public TotalTripTimeComparator(int _walkingSpeedKmh, int _bikingSpeedKmh, LatLng _userLatLng,
+        public TotalTripTimeComparator(float _walkingSpeedKmh, float _bikingSpeedKmh, LatLng _userLatLng,
                                        LatLng _stationALatLng, LatLng _destinationLatLng){
 
             mWalkingSpeedKmh = _walkingSpeedKmh;
@@ -135,8 +135,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             longitude = in.readDouble();
             mDestinationLatLng = new LatLng(latitude, longitude);
 
-            mWalkingSpeedKmh = in.readInt();
-            mBikingSpeedKmh = in.readInt();
+            mWalkingSpeedKmh = in.readFloat();
+            mBikingSpeedKmh = in.readFloat();
             mTimeUserToAMinutes = in.readInt();
         }
 
@@ -191,8 +191,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             dest.writeDouble(mStationALatLng.longitude);
             dest.writeDouble(mDestinationLatLng.latitude);
             dest.writeDouble(mDestinationLatLng.longitude);
-            dest.writeInt(mWalkingSpeedKmh);
-            dest.writeInt(mBikingSpeedKmh);
+            dest.writeFloat(mWalkingSpeedKmh);
+            dest.writeFloat(mBikingSpeedKmh);
             dest.writeInt(mTimeUserToAMinutes);
         }
 
@@ -241,6 +241,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         notifyItemInserted(mStationList.size()-1);
     }
 
+    //returns true if availability was not already outdated
     public boolean setAvailabilityOutdated(boolean _toSet) {
 
         if (mOutdatedAvailability == _toSet)
@@ -327,8 +328,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
                 String proximityString;
 
-                int speed = mIsLookingForBike ? mCtx.getResources().getInteger(R.integer.average_walking_speed_kmh) :
-                        mCtx.getResources().getInteger(R.integer.average_biking_speed_kmh);
+                float speed = mIsLookingForBike ? Utils.getAverageWalkingSpeedKmh(mCtx) :
+                        Utils.getAverageBikingSpeedKmh(mCtx);
 
                 if (mStationSortComparator instanceof TotalTripTimeComparator){
                     TotalTripTimeComparator comparator = (TotalTripTimeComparator) mStationSortComparator;
@@ -364,6 +365,26 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 mName.setText(_station.getName());
 
 
+            /////////////////////////////////////////////////////////////////////
+            //Remove this code to display a fab on selected station
+            float nameWidthPercent;
+
+            if (mShowProximity) {
+                nameWidthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_default_percent, true);
+            }
+            else{
+                nameWidthPercent = Utils.getPercentResource(mCtx, R.dimen.name_column_width_default_percent, true) + Utils.getPercentResource(mCtx, R.dimen.proximity_column_width_percent, true);
+            }
+
+            //name width percentage restoration
+            PercentRelativeLayout.LayoutParams params = (PercentRelativeLayout.LayoutParams) mName.getLayoutParams();
+            PercentLayoutHelper.PercentLayoutInfo info = params.getPercentLayoutInfo();
+            info.widthPercent = nameWidthPercent;
+            mName.requestLayout();
+            /////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////
+            ////Use this code for displaying a fab on selected station
+            /*
             if (_selected){
 
                 float nameWidthPercent;
@@ -384,7 +405,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 mName.requestLayout();
 
                 //Show two fabs, anchored through app:layout_anchor="@id/fabs_anchor" stationlist_item.xml
-                mFabsAnchor.setVisibility(View.VISIBLE);
+                /*mFabsAnchor.setVisibility(View.VISIBLE);
 
                 if (_station.isFavorite(mCtx))
                     mFavoriteFab.setImageResource(R.drawable.ic_action_favorite_24dp);
@@ -407,8 +428,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 else if (mFabAnimHandler == null)
                 {
                     mFavoriteFab.setVisibility(View.VISIBLE);
-                }
-
+                }*/
                 //TODO: use this to rework landscape layout
                 //manipulating last item column, displaying bikes or docks numbers
                 //padding is direct but didn't give desired results
@@ -421,7 +441,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 //40/2 - 4 = 20 - 4 = 16.
                 /*PercentRelativeLayout.LayoutParams availParams =(PercentRelativeLayout.LayoutParams) mAvailability.getLayoutParams();
                 availParams.setMargins((int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_left_selected), 0, 0, 0);
-                mAvailability.requestLayout();*/
+                mAvailability.requestLayout();
 
             }
             else{
@@ -449,14 +469,15 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 //margins, not padding. Set to 0 when item is not selected (hidden fabs)
                 //mAvailability.setPadding(0, 0, 0, 0);
                 //see if(_selected)
-                /*PercentRelativeLayout.LayoutParams availParams =(PercentRelativeLayout.LayoutParams) mAvailability.getLayoutParams();
+                PercentRelativeLayout.LayoutParams availParams =(PercentRelativeLayout.LayoutParams) mAvailability.getLayoutParams();
                 //availParams.setMargins(0,0,0,0);
                 availParams.setMargins((int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default),
                         (int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default),
                         (int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default),
                         (int)mCtx.getResources().getDimension(R.dimen.station_availability_margin_default));
-                mAvailability.requestLayout();*/
-            }
+                mAvailability.requestLayout();
+            }*/
+            ////////////////////////////////////////////////////////////////////////////////
 
             if (mIsLookingForBike) {
                 mAvailability.setText(String.valueOf(_station.getFree_bikes()));

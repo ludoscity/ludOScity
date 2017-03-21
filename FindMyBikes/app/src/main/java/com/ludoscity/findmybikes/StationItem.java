@@ -202,6 +202,9 @@ public class StationItem implements Parcelable {
 
     public String getProximityStringFromLatLng(LatLng _targetLatLng, boolean _asDistance, float _speedKmh, Context _ctx) {
 
+        if (_targetLatLng == null)
+            return "";
+
         String toReturn;
 
         int distance = (int) getMeterFromLatLng(_targetLatLng);
