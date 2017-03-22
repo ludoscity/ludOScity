@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
-import com.google.maps.android.clustering.ClusterItem;
 import com.ludoscity.findmybikes.citybik_es.model.Station;
 import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.Utils;
@@ -198,43 +197,6 @@ public class StationItem implements Parcelable {
         dest.writeDouble(longitude);
         //dest.writeParcelable(position, flags);
         dest.writeString(timestamp);
-    }
-
-    public String getProximityStringFromLatLng(LatLng _targetLatLng, boolean _asDistance, float _speedKmh, Context _ctx) {
-
-        if (_targetLatLng == null)
-            return "";
-
-        String toReturn;
-
-        int distance = (int) getMeterFromLatLng(_targetLatLng);
-
-        if (_asDistance) {
-            if (distance < 1000)
-                toReturn = "" + distance + " m";
-            else {
-                distance = distance / 1000;
-                toReturn = String.format("%d.3", distance) + " km";
-            }
-        }
-        else {
-            //I want a result in milliseconds
-            float speedMetersPerH = _speedKmh * 1000f;
-            float speedMetersPerS = speedMetersPerH / 3600f;
-
-            float timeInS = distance / speedMetersPerS;
-
-            long timeInMs = (long) (timeInS * 1000);
-
-            if (timeInMs < 60000)
-                toReturn = "< 1" + _ctx.getString(R.string.min);
-            else if (timeInMs < 3600000 )
-                toReturn = "~" + timeInMs / 1000 / 60 + _ctx.getString(R.string.min);
-            else
-                toReturn = "> 1" + _ctx.getString(R.string.hour_symbol);
-        }
-
-        return toReturn;
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator(){

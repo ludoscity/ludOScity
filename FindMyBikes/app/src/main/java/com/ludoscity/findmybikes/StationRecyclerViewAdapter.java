@@ -22,6 +22,7 @@ import com.ludoscity.findmybikes.fragments.StationListFragment;
 import com.ludoscity.findmybikes.helpers.DBHelper;
 import com.ludoscity.findmybikes.utils.Utils;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -148,11 +149,11 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         @Override
         public int compare(StationItem lhs, StationItem rhs) {
 
-            int lhsWalkTime = calculateWalkTimeMinutes(lhs);
-            int rhsWalkTime = calculateWalkTimeMinutes(rhs);
+            int lhsWalkTime = calculateWalkTimeMinute(lhs);
+            int rhsWalkTime = calculateWalkTimeMinute(rhs);
 
-            int lhsBikeTime = calculateBikeTimeMinutes(lhs);
-            int rhsBikeTime = calculateBikeTimeMinutes(rhs);
+            int lhsBikeTime = calculateBikeTimeMinute(lhs);
+            int rhsBikeTime = calculateBikeTimeMinute(rhs);
 
             int totalTimeDiff = (lhsWalkTime + lhsBikeTime) - (rhsWalkTime + rhsBikeTime);
 
@@ -162,7 +163,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                 return lhsWalkTime - rhsWalkTime;
         }
 
-        int calculateWalkTimeMinutes(StationItem _stationB){
+        int calculateWalkTimeMinute(StationItem _stationB){
 
             int timeBtoDestMinutes = 0;
 
@@ -174,7 +175,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         }
 
-        int calculateBikeTimeMinutes(StationItem _stationB){
+        int calculateBikeTimeMinute(StationItem _stationB){
 
             return Utils.computeTimeBetweenInMinutes(mStationALatLng, _stationB.getLocation(),
                     mBikingSpeedKmh);
@@ -306,6 +307,8 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         private Handler mFabAnimHandler = null;
         private String mStationId;
 
+        private NumberFormat mNumberFormat = NumberFormat.getInstance();
+
         StationListItemViewHolder(View itemView) {
             super(itemView);
 
@@ -328,29 +331,22 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
                 String proximityString;
 
-                float speed = mIsLookingForBike ? Utils.getAverageWalkingSpeedKmh(mCtx) :
-                        Utils.getAverageBikingSpeedKmh(mCtx);
-
                 if (mStationSortComparator instanceof TotalTripTimeComparator){
                     TotalTripTimeComparator comparator = (TotalTripTimeComparator) mStationSortComparator;
 
-                    int totalTime = comparator.calculateWalkTimeMinutes(_station) + comparator.calculateBikeTimeMinutes(_station);
+                    int totalTime = comparator.calculateWalkTimeMinute(_station) + comparator.calculateBikeTimeMinute(_station);
 
-                    if (totalTime < 1)
-                        proximityString = "< 1" + mCtx.getString(R.string.min);
-                    else if (totalTime < 60 )
-                        proximityString = "~" + totalTime + mCtx.getString(R.string.min);
-                    else
-                        proximityString = "> 1" + mCtx.getString(R.string.hour_symbol);
+                    proximityString = Utils.durationToProximityString(totalTime, false, mNumberFormat, mCtx);
                 }
                 else {
 
                     DistanceComparator comparator = (DistanceComparator) mStationSortComparator;
 
-                    proximityString = _station.getProximityStringFromLatLng(comparator.getDistanceRef(),
-                            false,
-                            speed,
-                            mCtx);
+                    proximityString = mIsLookingForBike ?
+                            Utils.getWalkingProximityString(
+                                    _station.getLocation(), comparator.getDistanceRef(), false, mNumberFormat, mCtx) :
+                            Utils.getBikingProximityString(
+                                    _station.getLocation(), comparator.getDistanceRef(), false, mNumberFormat, mCtx);
                 }
 
                 mProximity.setVisibility(View.VISIBLE);
@@ -480,12 +476,12 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             ////////////////////////////////////////////////////////////////////////////////
 
             if (mIsLookingForBike) {
-                mAvailability.setText(String.valueOf(_station.getFree_bikes()));
+                mAvailability.setText(mNumberFormat.format(_station.getFree_bikes()));
                 setColorAndTransparencyFeedback(_selected, _station.getFree_bikes());
 
             }
             else {
-                mAvailability.setText(String.valueOf(_station.getEmpty_slots()));
+                mAvailability.setText(mNumberFormat.format(_station.getEmpty_slots()));
                 setColorAndTransparencyFeedback(_selected, _station.getEmpty_slots());
             }
 

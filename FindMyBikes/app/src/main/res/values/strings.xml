@@ -12,7 +12,7 @@
     <string name="menu_settings">#settings</string>
     <string name="fromCitibik_es">from citybik.es</string>
     <string name="moments">Moments</string>
-    <string name="min">min</string>
+    <string name="min_abbreviated">min</string>
     <string name="favorite_removed">#favorite removed</string>
     <string name="favorite_added">#favorite added</string>
     <string name="such_short_trip">#you don\'t need me for such a short trip ! ;)</string>
@@ -51,7 +51,7 @@
     <string name="pref_refresh_options_key" translatable="false">pref_refresh_options</string>
     <string name="pref_critical_availability_max_key" translatable="false">pref_critical_availability_max</string>
     <string name="pref_bad_availability_max_key" translatable="false">pref_bad_availability_max</string>
-    <string name="hour_symbol">h</string>
+    <string name="hour_abbreviated">h</string>
     <string name="ok" translatable="false">@android:string/ok</string>
     <string name="undo"><b>UNDO</b></string>
     <string name="no_favorite">No favorite for &lt;b>%1$s&lt;/b></string>

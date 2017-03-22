@@ -29,6 +29,7 @@ import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -160,6 +161,46 @@ public class Utils {
         ctx.getResources().getValue(R.dimen.average_biking_speed_kmh, outValue, true);
 
         return outValue.getFloat();
+    }
+
+    public static String getWalkingProximityString(LatLng _from, LatLng _to, boolean _2digitsFormat, NumberFormat _nf, Context _ctx ){
+        return getProximityString(_from, _to, getAverageWalkingSpeedKmh(_ctx), _2digitsFormat, _nf, _ctx);
+    }
+
+    public static String getBikingProximityString(LatLng _from, LatLng _to, boolean _2digitsFormat, NumberFormat _nf, Context _ctx ){
+        return getProximityString(_from, _to, getAverageBikingSpeedKmh(_ctx), _2digitsFormat, _nf, _ctx);
+    }
+
+    private static String getProximityString(LatLng _from, LatLng _to, float _speedKmh, boolean _2digitsFormat, NumberFormat _nf, Context _ctx){
+
+        if (_from == null || _to == null)
+            return "";
+
+        return durationToProximityString(computeTimeBetweenInMinutes(_from, _to, _speedKmh), _2digitsFormat, _nf, _ctx);
+    }
+
+    public static String durationToProximityString(int _durationMinute, boolean _2digitsFormat, NumberFormat _nf, Context _ctx){
+
+        String toReturn;
+
+        NumberFormat nf = _nf;
+
+        if (nf == null)
+            nf = NumberFormat.getInstance();
+
+        if (_2digitsFormat)
+            nf.setMinimumIntegerDigits(2);
+        else
+            nf.setMinimumIntegerDigits(1);
+
+        if (_durationMinute < 1)
+            toReturn = "<" + nf.format(1) + _ctx.getString(R.string.min_abbreviated);
+        else if (_durationMinute < 60 )
+            toReturn = "~" + nf.format(_durationMinute) + _ctx.getString(R.string.min_abbreviated);
+        else
+            toReturn = ">"+ nf.format(1) + _ctx.getString(R.string.hour_abbreviated);
+
+        return toReturn;
     }
 
     public static int computeTimeBetweenInMinutes(LatLng _from, LatLng _to, float _speedKmH){

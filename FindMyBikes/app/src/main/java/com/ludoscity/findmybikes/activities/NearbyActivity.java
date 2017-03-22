@@ -95,6 +95,7 @@ import com.ludoscity.findmybikes.utils.ScrollingLinearLayoutManager;
 import com.ludoscity.findmybikes.utils.Utils;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1214,6 +1215,7 @@ public class NearbyActivity extends AppCompatActivity
         return new Runnable() {
 
             private boolean mPagerReady = false;
+            private NumberFormat mNumberFormat = NumberFormat.getInstance();
 
             /*private final long startTime = System.currentTimeMillis();
             private long lastRunTime;
@@ -1256,7 +1258,7 @@ public class NearbyActivity extends AppCompatActivity
                         if (difference < DateUtils.MINUTE_IN_MILLIS)
                             pastStringBuilder.append(getString(R.string.moments));
                         else
-                            pastStringBuilder.append(getString(R.string.il_y_a)).append(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(R.string.min));
+                            pastStringBuilder.append(getString(R.string.il_y_a)).append(mNumberFormat.format(difference / DateUtils.MINUTE_IN_MILLIS)).append(" ").append(getString(R.string.min_abbreviated));
                     }
                     //mStatusTextView.setText(Long.toString(difference / DateUtils.MINUTE_IN_MILLIS) +" "+ getString(R.string.minsAgo) + " " + getString(R.string.fromCitibik_es) );
 
@@ -2027,19 +2029,16 @@ public class NearbyActivity extends AppCompatActivity
             @Override
             public void run() {
                 if (getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS) != null) {
-                    boolean totalOver1h = false;
 
                     int locToAMinutes = 0;
                     int AToBMinutes = 0;
                     int BToSearchMinutes = 0;
 
                     StationItem selectedStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
-                    String rawProximityString = selectedStation.getProximityStringFromLatLng(mCurrentUserLatLng,
-                            false, Utils.getAverageWalkingSpeedKmh(NearbyActivity.this), NearbyActivity.this);//getListPagerAdapter().getSelectedStationProximityStringForPage(StationListPagerAdapter.BIKE_STATIONS);
-
-                    String formattedProximityString = getTripDetailsWdigetFormattedString(rawProximityString);
+                    String formattedProximityString = Utils.getWalkingProximityString(selectedStation.getLocation(),
+                            mCurrentUserLatLng, true, null, NearbyActivity.this);
                     if (formattedProximityString.startsWith(">"))
-                        totalOver1h = true;
+                        locToAMinutes = 61;
                     else if (!formattedProximityString.startsWith("<"))
                         locToAMinutes = Integer.valueOf(formattedProximityString.substring(1, 3));
 
@@ -2047,12 +2046,11 @@ public class NearbyActivity extends AppCompatActivity
 
 
                     selectedStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS);
-                    rawProximityString = selectedStation.getProximityStringFromLatLng(getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS).getLocation(),
-                            false, Utils.getAverageBikingSpeedKmh(NearbyActivity.this), NearbyActivity.this);
-
-                    formattedProximityString = getTripDetailsWdigetFormattedString(rawProximityString);
+                    formattedProximityString = Utils.getBikingProximityString(selectedStation.getLocation(),
+                            getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS).getLocation(),
+                            true, null, NearbyActivity.this);
                     if (formattedProximityString.startsWith(">"))
-                        totalOver1h = true;
+                        AToBMinutes = 61;
                     else if (!formattedProximityString.startsWith("<"))
                         AToBMinutes = Integer.valueOf(formattedProximityString.substring(1, 3));
 
@@ -2072,12 +2070,12 @@ public class NearbyActivity extends AppCompatActivity
                     else if(mStationMapFragment.getMarkerPickedPlaceVisibleLatLng() != null){
                         //Place marker is showed
 
-                        rawProximityString = selectedStation.getProximityStringFromLatLng(mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(),
-                                false, Utils.getAverageWalkingSpeedKmh(NearbyActivity.this), NearbyActivity.this);
-                        formattedProximityString = getTripDetailsWdigetFormattedString(rawProximityString);
+                        formattedProximityString = Utils.getWalkingProximityString(selectedStation.getLocation(),
+                                mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(),
+                                true, null, NearbyActivity.this);
 
                         if (formattedProximityString.startsWith(">"))
-                            totalOver1h = true;
+                            BToSearchMinutes = 61;
                         else if (!formattedProximityString.startsWith("<"))
                             BToSearchMinutes = Integer.valueOf(formattedProximityString.substring(1, 3));
 
@@ -2093,12 +2091,12 @@ public class NearbyActivity extends AppCompatActivity
                                 mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng().longitude != mStationMapFragment.getMarkerBVisibleLatLng().longitude) {
                         //Favorite marker is showed and not on B station
 
-                        rawProximityString = selectedStation.getProximityStringFromLatLng(mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng(),
-                                false, Utils.getAverageWalkingSpeedKmh(NearbyActivity.this), NearbyActivity.this);
-                        formattedProximityString = getTripDetailsWdigetFormattedString(rawProximityString);
+                        formattedProximityString = Utils.getWalkingProximityString(selectedStation.getLocation(),
+                                mStationMapFragment.getMarkerPickedFavoriteVisibleLatLng(),
+                                true, null, NearbyActivity.this);
 
                         if (formattedProximityString.startsWith(">"))
-                            totalOver1h = true;
+                            BToSearchMinutes = 61;
                         else if (!formattedProximityString.startsWith("<"))
                             BToSearchMinutes = Integer.valueOf(formattedProximityString.substring(1, 3));
 
@@ -2118,35 +2116,14 @@ public class NearbyActivity extends AppCompatActivity
                         ((RelativeLayout.LayoutParams) param).addRule(RelativeLayout.BELOW, R.id.trip_details_a_to_b);
                     }
 
-                    int total = 0;
+                    int total = locToAMinutes + AToBMinutes + BToSearchMinutes;
 
-                    if (!totalOver1h) {
-                        total = locToAMinutes + AToBMinutes + BToSearchMinutes;
-                        if (total >= 60)
-                            totalOver1h = true;
-                    }
-
-                    if (totalOver1h)
-                        mTripDetailsProximityTotal.setText("> 1h");
-                    else
-                        mTripDetailsProximityTotal.setText("~" + total + getResources().getString(R.string.min));
+                    mTripDetailsProximityTotal.setText(Utils.durationToProximityString(total, false, null, NearbyActivity.this));
 
                 } else
                     handler.postDelayed(this, 10);
             }
         }, 10);
-    }
-
-    private String getTripDetailsWdigetFormattedString(String _poximityString){
-
-        String toReturn;
-
-        if (_poximityString.length() == 5)   //'~1min' .. '~9min'
-            toReturn = "~0" + _poximityString.substring(1); //'~01min' .. '~09min'
-        else
-            toReturn = _poximityString;
-
-        return toReturn;
     }
 
     //For reusable Animators (which most Animators are, apart from the one-shot animator produced by createCircularReveal()
@@ -3150,8 +3127,8 @@ public class NearbyActivity extends AppCompatActivity
 
                     selectedNbBikes = selectedStation.getFree_bikes();
 
-                    selectedProximityString = selectedStation.getProximityStringFromLatLng(mCurrentUserLatLng,
-                            false, Utils.getAverageWalkingSpeedKmh(NearbyActivity.this), NearbyActivity.this);
+                    selectedProximityString = Utils.getWalkingProximityString(selectedStation.getLocation(),
+                            mCurrentUserLatLng, false, null, NearbyActivity.this);
 
                     //station name will be truncated to fit everything in a single tweet
                     //see R.string.twitter_not_closest_bike_data_format
