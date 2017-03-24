@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="about_dialog_items">
+        <item>@string/cities</item>
+        <item>@string/rate</item>
+        <item>@string/like</item>
+        <item>@string/feedback</item>
+        <item>@string/title_legal</item>
+        <item>@string/menu_privacy</item>
+        <item>@string/title_source_code</item>
+    </string-array>
+</resources>

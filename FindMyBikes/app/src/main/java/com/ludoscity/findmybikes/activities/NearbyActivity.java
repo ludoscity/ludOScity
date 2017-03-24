@@ -47,6 +47,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
@@ -888,25 +889,79 @@ public class NearbyActivity extends AppCompatActivity
                 startActivityForResult(settingsIntent, SETTINGS_REQUEST_CODE);
                 return true;
 
-            case R.id.legal_notices_menu_item:
-                new LicensesDialog.Builder(this)
-                        .setNotices(R.raw.notices)
-                        .build()
+            case R.id.about_menu_item:
+                new MaterialDialog.Builder(this)
+                        .title(getString(R.string.app_name) + " – " + getString(R.string.app_version_name) + " ©2015–2017     F8Full") //http://stackoverflow.com/questions/4471025/how-can-you-get-the-manifest-version-number-from-the-apps-layout-xml-variable-->
+                        .items(R.array.about_dialog_items)
+                        .icon(ContextCompat.getDrawable(NearbyActivity.this,R.drawable.ic_launcher_48dp))
+                        .autoDismiss(false)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+
+                                Intent intent;
+
+                                switch (which){
+                                    case 0:
+                                        //android system webview
+                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                                            intent = new Intent(NearbyActivity.this, WebViewActivity.class);
+                                            intent.putExtra(WebViewActivity.EXTRA_URL, "http://www.citybik.es");
+                                            intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, text);
+                                            intent.putExtra(WebViewActivity.EXTRA_JAVASCRIPT_ENABLED, true);
+                                            startActivity(intent);
+                                        }
+                                        //browser
+                                        else{
+                                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.citybik.es"));
+                                            startActivity(intent);
+                                        }
+                                        break;
+                                    case 1:
+                                        intent = new Intent(Intent.ACTION_VIEW);
+                                        intent.setData(Uri.parse("market://details?id="+getPackageName()));
+                                        if (intent.resolveActivity(getPackageManager()) != null) {
+                                            startActivity(intent);
+                                        }
+                                        break;
+                                    case 2:
+                                        intent = Utils.newFacebookIntent(getPackageManager(), "https://www.facebook.com/findmybikes/");
+                                        startActivity(intent);
+                                        break;
+                                    case 3:
+                                        intent = new Intent(Intent.ACTION_SENDTO);
+                                        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+                                        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"ludos+findmybikesfeedback" + getString(R.string.app_version_name) + "@ludoscity.com"});
+                                        intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_subject));
+                                        if (intent.resolveActivity(getPackageManager()) != null) {
+                                            startActivity(intent);
+                                        }
+                                        break;
+                                    case 4:
+                                        new LicensesDialog.Builder(NearbyActivity.this)
+                                                .setNotices(R.raw.notices)
+                                                .build()
+                                                .show();
+                                        break;
+                                    case 5:
+                                        intent = new Intent(NearbyActivity.this, WebViewActivity.class);
+                                        intent.putExtra(WebViewActivity.EXTRA_URL, "file:///android_res/raw/privacy_policy.html");
+                                        intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, getString(R.string.menu_privacy));
+                                        startActivity(intent);
+                                        break;
+                                    case 6:
+                                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/f8full/ludOScity/tree/master/FindMyBikes"));
+                                        startActivity(intent);
+                                        break;
+
+                                }
+
+                            }
+                        })
                         .show();
-                return true;
 
-            case R.id.privacy_policy_menu_item:
-                Intent intent = new Intent(this, WebViewActivity.class);
-                intent.putExtra(WebViewActivity.EXTRA_URL, "file:///android_res/raw/privacy_policy.html");
-                intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, getString(R.string.menu_privacy));
-                startActivity(intent);
                 return true;
-
-            case R.id.source_code_menu_item:
-                Intent implicit2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/f8full/ludOScity/tree/master/FindMyBikes"));
-                startActivity(implicit2);
-                return true;
-
         }
         return super.onOptionsItemSelected(item);
     }

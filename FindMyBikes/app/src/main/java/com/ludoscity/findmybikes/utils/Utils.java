@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -138,6 +139,32 @@ public class Utils {
     public static float map(float x, float in_min, float in_max, float out_min, float out_max)
     {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
+
+    /**
+     * http://stackoverflow.com/questions/24526882/open-facebook-page-from-android-app-in-facebook-version-v11
+     * Intent to open the official Facebook app. If the Facebook app is not installed then the
+     * default web browser will be used.</p>
+     *
+     * Example usage:</p>
+     * <code>newFacebookIntent(context.getPackageManager(), "https://www.facebook.com/JRummyApps");</code></p>
+     *
+     * @param pm
+     *            Instance of the {@link PackageManager}.
+     * @param url
+     *            The full URL to the Facebook page or profile.
+     * @return An intent that will open the Facebook page/profile.
+     */
+    public static Intent newFacebookIntent(PackageManager pm, String url) {
+        Uri uri;
+        try {
+            pm.getPackageInfo("com.facebook.katana", 0);
+            // http://stackoverflow.com/a/24547437/1048340
+            uri = Uri.parse("fb://facewebmodal/f?href=" + url);
+        } catch (PackageManager.NameNotFoundException e) {
+            uri = Uri.parse(url);
+        }
+        return new Intent(Intent.ACTION_VIEW, uri);
     }
 
     public static int dpToPx(float toConvert, Context ctx){

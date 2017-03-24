@@ -3,6 +3,7 @@
     <string name="app_name">#vélocalise</string>
     <string name="favorites_sheet_header">Favoris - &lt;b>%1$s&lt;/b></string>
     <string name="menu_settings">#paramètres</string>
+    <string name="menu_about">À propos</string>
     <string name="title_section_nearby">À proximité</string>
     <string name="navigation_drawer_open">Ouvrir navigation drawer</string>
     <string name="navigation_drawer_close">Fermer navigation drawer</string>
@@ -72,4 +73,8 @@
     <string name="onboarding_hint_tap_favorite_name">#cliquer nom pour définir destination, #glisser pour supprimer</string>
     <string name="onboarding_hint_search">#Tapez n\'importe quel nom de lieu ou adresse</string>
     <string name="auto_bike_select_outdated">#données périmées ! :| #sélectionné station la plus proche.</string>
+    <string name="feedback">#rétroaction</string>
+    <string name="like">#aimer</string>
+    <string name="rate">#noter</string>
+    <string name="feedback_subject">J\'ai quelque chose à dire !</string>
 </resources>

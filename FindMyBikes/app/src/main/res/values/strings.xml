@@ -10,6 +10,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="no_data">#connection needed for data download!</string>
     <string name="menu_settings">#settings</string>
+    <string name="menu_about">About</string>
     <string name="fromCitibik_es">from citybik.es</string>
     <string name="moments">Moments</string>
     <string name="min_abbreviated">min</string>
@@ -85,4 +86,8 @@
     <string name="onboarding_hint_main_choice_no_connectivity">#open favorites or tap station</string>
     <string name="onboarding_hint_tap_favorite_name">#tap name to set as destination, #swipe to delete</string>
     <string name="onboarding_hint_search">#type any place name or address</string>
+    <string name="rate">#rate</string>
+    <string name="like">#like</string>
+    <string name="feedback">#feedback</string>
+    <string name="feedback_subject">I have something to say !</string>
 </resources>

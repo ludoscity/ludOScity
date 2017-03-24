@@ -23,6 +23,10 @@ android {
         multiDexEnabled true
     }
 
+    applicationVariants.all { variant ->
+        variant.resValue "string", "app_version_name", variant.versionName
+    }
+
     signingConfigs {
         debug {
             storeFile file("build_cloud/travis/debug.keystore")
@@ -96,4 +100,6 @@ dependencies {
     compile 'com.github.amlcurran.showcaseview:library:5.4.3'
 
     compile 'de.psdev.licensesdialog:licensesdialog:1.8.0'
+
+    compile 'com.afollestad.material-dialogs:core:0.9.4.2'
 }

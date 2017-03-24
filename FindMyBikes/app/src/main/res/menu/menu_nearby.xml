@@ -11,18 +11,9 @@
         android:icon="@drawable/ic_action_settings_24dp"/>
 
     <item
-        android:id="@+id/legal_notices_menu_item"
-        app:showAsAction="never"
-        android:title="@string/title_legal"/>
-
-    <item
-        android:id="@+id/privacy_policy_menu_item"
-        app:showAsAction="never"
-        android:title="@string/menu_privacy"/>
-
-    <item
-        android:id="@+id/source_code_menu_item"
-        app:showAsAction="never"
-        android:title="@string/title_source_code"/>
+        android:id="@+id/about_menu_item"
+        app:showAsAction="ifRoom"
+        android:title="@string/menu_settings"
+        android:icon="@drawable/ic_action_about_24dp"/>
 
 </menu>
