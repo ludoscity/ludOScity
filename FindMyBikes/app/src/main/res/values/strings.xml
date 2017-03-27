@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">#findmybikes</string>
     <string name="appbar_title_formatting" translatable="false">%1$s&lt;u>%2$s&lt;/u>%3$s</string>
     <string name="appbar_title_prefix">#findmy</string>
@@ -78,7 +78,7 @@
     <string name="cities">#cities</string>
     <string name="onboarding_showcase_search_title">#where to ?</string>
     <string name="onboarding_showcase_search_text">Let\'s bike from A to B.\n\nYou have no favorites ! To get started, tap the search button and enter a place name or address…</string>
-    <string name="onboarding_showcase_total_time_title">#tip 1/2</string>
+    <string name="onboarding_showcase_total_time_title" tools:ignore="TypographyFractions">#tip 1/2</string>
     <string name="onboarding_showcase_total_time_text">"\nBam ! View your trip time estimate based on %1$s dock availability around %2$s…</string>
     <string name="onboarding_showcase_add_favorite_title">#tip 2/2</string>
     <string name="onboarding_showcase_add_favorite_text">\nAlmost done ! Add a favorite by tapping this heart shaped button.</string>
@@ -90,4 +90,9 @@
     <string name="like">#like</string>
     <string name="feedback">#feedback</string>
     <string name="feedback_subject">I have something to say !</string>
+    <string name="location_please">#pretty please :)</string>
+    <string name="location_rationale">#\'location\' permission required to find your bikes !</string>
+    <string name="settings">SETTINGS</string>
+    <string name="location_turn_on">#location service required to find your bikes !</string>
+    <string name="sad_emoji" translatable="false">:\'(</string>
 </resources>

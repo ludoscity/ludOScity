@@ -155,7 +155,8 @@
                         android:id="@+id/place_autocomplete_loading"
                         style="@style/map_floating_action_button_top"
                         android:elevation="7dp"
-                        android:visibility="gone"/>
+                        android:visibility="gone"
+                        tools:ignore="UnusedAttribute" />
 
                 </FrameLayout>
 
@@ -227,4 +228,10 @@
             </io.codetail.widget.RevealLinearLayout>
         </android.support.design.widget.CoordinatorLayout>
     </LinearLayout>
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+
+        layout="@layout/splashscreen" />
 </android.support.percent.PercentRelativeLayout>

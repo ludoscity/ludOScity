@@ -24,7 +24,8 @@
             android:name=".activities.NearbyActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -36,6 +37,7 @@
         <activity
             android:name=".activities.WebViewActivity"
             android:parentActivityName=".activities.NearbyActivity" />
+        <!--TODO : https://developer.android.com/topic/performance/background-optimization.html-->
         <receiver
             android:name=".utils.Utils$Connectivity"
             android:enabled="false">

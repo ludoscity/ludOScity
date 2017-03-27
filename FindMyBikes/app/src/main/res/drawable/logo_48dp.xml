@@ -41,16 +41,16 @@ A13.67,13.67,0,0,0,37.71,18.19 L37.71,14.38 A9.69,9.69,0,0,1,30.71,11.52 Z" />
         android:fillColor="@color/theme_accent"
         android:pathData="M30.77,0.86 A3,3,0,1,0,33.77,3.86 A3,3,0,0,0,30.77,0.86 Z" />
     <path
-        android:fillColor="@color/station_recap_red"
+        android:fillColor="@color/launcher_icon_red"
         android:pathData="M2.15,12.73 L7.79,12.73 Q9.94,12.73,9.94,14.88 L9.94,15.21
 Q9.94,17.36,7.79,17.36 L2.15,17.36 Q0,17.36,0,15.21 L0,14.88 Q0,12.73,2.15,12.73
 Z" />
     <path
-        android:fillColor="@color/station_recap_yellow"
+        android:fillColor="@color/launcher_icon_yellow"
         android:pathData="M3.63,6.37 L12.92,6.37 Q15.17,6.37,15.17,8.62 L15.17,8.75 Q15.17,11,12.92,11
 L3.63,11 Q1.38,11,1.38,8.75 L1.38,8.62 Q1.38,6.37,3.63,6.37 Z" />
     <path
-        android:fillColor="@color/station_recap_green"
+        android:fillColor="@color/launcher_icon_green"
         android:pathData="M5.26,0 L20.71,0 Q22.99,0,22.99,2.28 L22.99,2.35 Q22.99,4.63,20.71,4.63
 L5.26,4.63 Q2.98,4.63,2.98,2.35 L2.98,2.28 Q2.98,0,5.26,0 Z" />
 </vector>

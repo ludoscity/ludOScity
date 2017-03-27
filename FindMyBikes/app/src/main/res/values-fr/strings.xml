@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">#vélocalise</string>
     <string name="favorites_sheet_header">Favoris - &lt;b>%1$s&lt;/b></string>
     <string name="menu_settings">#paramètres</string>
@@ -49,7 +49,7 @@
     <string name="auto_bike_select_found">#vélocalisé ! :)</string>
     <string name="hello_city"><![CDATA[%1$s#bonjour <b>%2$s</b> !]]></string>
     <string name="hello_travel">#il semble que vous avez voyagé.\u0020</string>
-    <string name="auto_bike_select_none">#je n\'ai pu localiser aucun vélo ! :s #sélectionné station la plus proche.</string>
+    <string name="auto_bike_select_none">#aucun vélo localisé ! :s #station la plus proche sélectionnée.</string>
     <string name="title_legal">#légal</string>
     <string name="appbar_title_postfix" />
     <string name="appbar_title_prefix">#vélocalise</string>
@@ -67,14 +67,18 @@
     <string name="onboarding_showcase_search_text">Pédalons de A à B.\n\nVous n\'avez aucun favori ! Pour commencer, cliquez sur le bouton de recherche et entrez un nom de lieu ou une adresse…</string>
     <string name="onboarding_showcase_search_title">#où aller ?</string>
     <string name="onboarding_showcase_total_time_text">\nHop ! Voyez l\'estimation de votre temps de trajet basée sur la disponibilité des ancrages %1$s aux alentours de %2$s…</string>
-    <string name="onboarding_showcase_total_time_title">#truc 1/2</string>
+    <string name="onboarding_showcase_total_time_title" tools:ignore="TypographyFractions">#truc 1/2</string>
     <string name="onboarding_hint_main_choice">#ouvrir favoris, utiliser recherche, ou cliquer une station</string>
     <string name="onboarding_hint_main_choice_no_connectivity">#ouvrir favoris ou cliquer une station</string>
     <string name="onboarding_hint_tap_favorite_name">#cliquer nom pour définir destination, #glisser pour supprimer</string>
     <string name="onboarding_hint_search">#Tapez n\'importe quel nom de lieu ou adresse</string>
-    <string name="auto_bike_select_outdated">#données périmées ! :| #sélectionné station la plus proche.</string>
+    <string name="auto_bike_select_outdated">#données périmées ! :| #station la plus proche sélectionnée.</string>
     <string name="feedback">#rétroaction</string>
     <string name="like">#aimer</string>
     <string name="rate">#noter</string>
     <string name="feedback_subject">J\'ai quelque chose à dire !</string>
+    <string name="location_please">#s\'il vous plaît :)</string>
+    <string name="location_rationale">#permission \'localisation\' requise pour trouver vos vélos !</string>
+    <string name="settings">PARAMÈTRES</string>
+    <string name="location_turn_on">#localisation requise pour trouver vos vélos !</string>
 </resources>

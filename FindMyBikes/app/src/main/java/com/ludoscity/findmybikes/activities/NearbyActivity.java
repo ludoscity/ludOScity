@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -161,12 +162,15 @@ public class NearbyActivity extends AppCompatActivity
     private View mTripDetailsBToDestinationRow;
     private View mTripDetailsPinSearch;
     private View mTripDetailsPinFavorite;
+    private View mSplashScreen;
+    private TextView mSplashScreenText;
 
     private ItemTouchHelper mFavoriteItemTouchHelper;
 
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
-    private static final int SETTINGS_REQUEST_CODE = 2;
-    private static final int REQUEST_CHECK_SETTINGS_GPS = 3;
+    private static final int SETTINGS_ACTIVITY_REQUEST_CODE = 2;
+    private static final int CHECK_GPS_REQUEST_CODE = 3;
+    private static final int CHECK_PERMISSION_REQUEST_CODE = 4;
     private FloatingActionButton mDirectionsLocToAFab;
     private FloatingActionButton mSearchFAB;
     private FloatingActionButton mAddFavoriteFAB;
@@ -211,6 +215,8 @@ public class NearbyActivity extends AppCompatActivity
     public void onStart() {
 
         mGoogleApiClient.connect();
+
+        checkAndAskLocationPermission();
 
         if (Utils.Connectivity.isConnected(getApplicationContext()) && !DBHelper.isBikeNetworkIdAvailable(this)) {
 
@@ -263,16 +269,24 @@ public class NearbyActivity extends AppCompatActivity
         mUpdateRefreshHandler.post(mUpdateRefreshRunnableCode);
     }
 
+    private void checkAndAskLocationPermission(){
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            mSplashScreenText.setText(R.string.location_please);
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    0);
+        }
+    }
+
     private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-        } else {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             mRequestingLocationUpdates = true;
         }
@@ -300,6 +314,7 @@ public class NearbyActivity extends AppCompatActivity
         //when doing Drawable vectorDrawable = ResourcesCompat.getDrawable(ctx.getResources(), id, null);
         //see https://medium.com/@chrisbanes/appcompat-v23-2-age-of-the-vectors-91cbafa87c88#.i8luinewc
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+        setTheme(R.style.FindMyBikesTheme); //https://developer.android.com/topic/performance/launch-time.html
         super.onCreate(savedInstanceState);
 
         boolean autoCompleteLoadingProgressBarVisible = false;
@@ -360,6 +375,8 @@ public class NearbyActivity extends AppCompatActivity
         mAppBarLayout = (AppBarLayout) findViewById(R.id.action_toolbar_layout);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.snackbar_coordinator);
+        mSplashScreen = findViewById(R.id.splashscreen);
+        mSplashScreenText = (TextView)findViewById(R.id.splashscreen_text);
 
         mTripDetailsWidget = findViewById(R.id.trip_details);
         mTripDetailsProximityA = (TextView) findViewById(R.id.trip_details_proximity_a);
@@ -385,6 +402,9 @@ public class NearbyActivity extends AppCompatActivity
             mOnboardingShowcaseView.setTag(showcaseTripTotalPlaceName);
         }
 
+        if(savedInstanceState == null)
+            mSplashScreen.setVisibility(View.VISIBLE);
+
         setupDirectionsLocToAFab();
         setupSearchFab();
         setupFavoritePickerFab();
@@ -400,12 +420,6 @@ public class NearbyActivity extends AppCompatActivity
         getListPagerAdapter().setCurrentUserLatLng(mCurrentUserLatLng);
 
         setupFavoriteSheet();
-
-        if (!mClosestBikeAutoSelected){
-            mFindBikesSnackbar = Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_bike_select_finding,
-                    Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(this, R.color.theme_primary_dark));
-            mFindBikesSnackbar.show();
-        }
 
         //noinspection ConstantConditions
         findViewById(R.id.trip_details_directions_loc_to_a).setOnClickListener(new View.OnClickListener() {
@@ -458,6 +472,13 @@ public class NearbyActivity extends AppCompatActivity
                     .build();
         }
 
+        setupLocationRequest();
+
+        mCircularRevealInterpolator = AnimationUtils.loadInterpolator(this, R.interpolator.msf_interpolator);
+    }
+
+    private void setupLocationRequest(){
+
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
@@ -483,7 +504,7 @@ public class NearbyActivity extends AppCompatActivity
                         // and check the result in onActivityResult().
                         status.startResolutionForResult(
                                 NearbyActivity.this,
-                                REQUEST_CHECK_SETTINGS_GPS);
+                                CHECK_GPS_REQUEST_CODE);
                     } catch (IntentSender.SendIntentException e) {
                         // Ignore the error.
                     }
@@ -492,8 +513,6 @@ public class NearbyActivity extends AppCompatActivity
             }
         });
 
-
-        mCircularRevealInterpolator = AnimationUtils.loadInterpolator(this, R.interpolator.msf_interpolator);
     }
 
     private void setupAutoselectBikeFab() {
@@ -716,7 +735,7 @@ public class NearbyActivity extends AppCompatActivity
                     setupHintMainChoice();
                 }
             }
-        } else if (requestCode == SETTINGS_REQUEST_CODE){
+        } else if (requestCode == SETTINGS_ACTIVITY_REQUEST_CODE){
 
             getListPagerAdapter().highlightStationforId(true, Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(true)));
             getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, isAppBarExpanded());
@@ -724,12 +743,38 @@ public class NearbyActivity extends AppCompatActivity
             mRefreshMarkers = true;
             refreshMap();
             mRefreshTabs = true;
-        } /*else if(requestCode == REQUEST_CHECK_SETTINGS_GPS){
-            //getting here when GPS been activated through system settings dialog
-            if (resultCode == RESULT_OK){
+        } else if (requestCode == CHECK_PERMISSION_REQUEST_CODE){
 
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED){
+                // permission was granted, yay! Do the thing
+                mSplashScreenText.setText(R.string.auto_bike_select_finding);
+                mStationMapFragment.enableMyLocationCheckingPermission();
             }
-        }*/
+            else
+                checkAndAskLocationPermission();
+        }
+        else if(requestCode == CHECK_GPS_REQUEST_CODE){
+            //getting here when GPS been activated through system settings dialog
+            if (resultCode != RESULT_OK){
+
+                if (mSplashScreen.isShown()){
+                    mSplashScreenText.setText(R.string.sad_emoji);
+
+                    Utils.Snackbar.makeStyled(mSplashScreen, R.string.location_turn_on, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                            .setAction(R.string.retry, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    setupLocationRequest();
+                                }
+                            }).show();
+                }
+            }
+            else{
+                mSplashScreenText.setText(R.string.auto_bike_select_finding);
+            }
+        }
     }
 
     private void setupFavoriteSheet() {
@@ -869,14 +914,37 @@ public class NearbyActivity extends AppCompatActivity
         if (grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-            // permission was granted, yay! Do the
+            // permission was granted, yay! Do the thing
+            mSplashScreenText.setText(R.string.auto_bike_select_finding);
             mStationMapFragment.enableMyLocationCheckingPermission();
 
         }else {
 
-            //TODO: Actually do something so that it doesn't look and feel horribly horribly broken
-            // permission denied, boo! Disable the
-            // functionality that depends on this permission.
+            mSplashScreenText.setText(R.string.sad_emoji);
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(NearbyActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                Utils.Snackbar.makeStyled(mSplashScreen, R.string.location_rationale, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                        .setAction(R.string.retry, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                checkAndAskLocationPermission();
+                            }
+                        }).show();
+            }
+            else{
+                Utils.Snackbar.makeStyled(mSplashScreen, R.string.location_rationale, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                        .setAction(R.string.settings, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                intent.setData(uri);
+                                startActivityForResult(intent, CHECK_PERMISSION_REQUEST_CODE);
+                            }
+                        }).show();
+            }
         }
     }
 
@@ -886,14 +954,14 @@ public class NearbyActivity extends AppCompatActivity
 
             case R.id.settings_menu_item:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivityForResult(settingsIntent, SETTINGS_REQUEST_CODE);
+                startActivityForResult(settingsIntent, SETTINGS_ACTIVITY_REQUEST_CODE);
                 return true;
 
             case R.id.about_menu_item:
                 new MaterialDialog.Builder(this)
                         .title(getString(R.string.app_name) + " – " + getString(R.string.app_version_name) + " ©2015–2017     F8Full") //http://stackoverflow.com/questions/4471025/how-can-you-get-the-manifest-version-number-from-the-apps-layout-xml-variable-->
                         .items(R.array.about_dialog_items)
-                        .icon(ContextCompat.getDrawable(NearbyActivity.this,R.drawable.ic_launcher_48dp))
+                        .icon(ContextCompat.getDrawable(NearbyActivity.this,R.drawable.logo_48dp))
                         .autoDismiss(false)
                         .itemsCallback(new MaterialDialog.ListCallback() {
 
@@ -1499,25 +1567,6 @@ public class NearbyActivity extends AppCompatActivity
                                     mFindBikesSnackbar.show();
                             }
                         }, 500);
-
-                        //special case for test versions in firebase lab
-                        //full onboarding prevents meaningfull coverage (robo test don't input anything in search autocomplete widget)
-                        if (getApplicationContext().getResources().getInteger(R.integer.onboarding_light_min_valid_favorites_count) == 0){
-                            //Adding onboarding Favorite
-                            StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
-
-                            for(StationItem station : mStationsNetwork) {
-                                if (!station.getId().equalsIgnoreCase(stationA.getId())) {
-
-                                    //station.setFavorite(true, NearbyActivity.this); //We want to manipulate everything, hence go directly to DBHelper
-                                    DBHelper.updateFavorite(true, new FavoriteItemStation(station.getId(), "TEST FAVORITE", false), NearbyActivity.this);
-                                    ArrayList<FavoriteItemBase> favoriteList = DBHelper.getFavoriteAll(NearbyActivity.this);
-                                    setupFavoriteListFeedback(favoriteList.isEmpty());
-                                    mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
-                                    break;
-                                }
-                            }
-                        }
 
                         mClosestBikeAutoSelected = true;
                         //launch twitter task if not already running, pass it the raw String
@@ -2663,6 +2712,10 @@ public class NearbyActivity extends AppCompatActivity
     @Override
     public void onPageScrollStateChanged(int state) {
 
+        //pager will always transition from tab A to tab B on app launch
+        if (state == ViewPager.SCROLL_STATE_IDLE && mSplashScreen.isShown()) {
+            mSplashScreen.setVisibility(View.GONE);
+        }
     }
 
     //Google API client
@@ -2862,35 +2915,6 @@ public class NearbyActivity extends AppCompatActivity
 
         FindNetworkTask(String _currentNetworkName){ mOldBikeNetworkName = _currentNetworkName; }
 
-        private void checkAndAskLocationPermission(){
-            // Here, thisActivity is the current activity
-            if (ContextCompat.checkSelfPermission(NearbyActivity.this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                // Should we show an explanation?
-                //if (ActivityCompat.shouldShowRequestPermissionRationale(NearbyActivity.this,
-                //        Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                    // Show an expanation to the user *asynchronously* -- don't block
-                    // this thread waiting for the user's response! After the user
-                    // sees the explanation, try again to request the permission.
-
-                //} else {
-
-                    // No explanation needed, we can request the permission.
-
-                    ActivityCompat.requestPermissions(NearbyActivity.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            0);
-
-                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
-                //}
-            }
-        }
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -2898,8 +2922,6 @@ public class NearbyActivity extends AppCompatActivity
             if(mStationMapFragment != null && mStationMapFragment.getMarkerBVisibleLatLng() != null) {
                 clearBTab();
             }
-
-            checkAndAskLocationPermission();
 
             mStatusTextView.setText(getString(R.string.searching_wait_location));
 
@@ -3016,6 +3038,10 @@ public class NearbyActivity extends AppCompatActivity
             //noinspection ConstantConditions
             getSupportActionBar().setSubtitle(DBHelper.getBikeNetworkName(NearbyActivity.this));
             setupFavoriteSheet();
+
+            if (mSplashScreen.isShown()){
+                mSplashScreen.setVisibility(View.GONE);
+            }
 
             AlertDialog alertDialog = new AlertDialog.Builder(NearbyActivity.this).create();
             //alertDialog.setTitle(getString(R.string.network_found_title));
@@ -3302,35 +3328,6 @@ public class NearbyActivity extends AppCompatActivity
 
     public class DownloadWebTask extends AsyncTask<Void, Void, Void> {
 
-        private void checkAndAskLocationPermission(){
-            // Here, thisActivity is the current activity
-            if (ContextCompat.checkSelfPermission(NearbyActivity.this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                // Should we show an explanation?
-                //if (ActivityCompat.shouldShowRequestPermissionRationale(NearbyActivity.this,
-                //        Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-                //} else {
-
-                // No explanation needed, we can request the permission.
-
-                ActivityCompat.requestPermissions(NearbyActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        0);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-                //}
-            }
-        }
-
         @Override
         protected Void doInBackground(Void... aVoid) {
 
@@ -3381,10 +3378,6 @@ public class NearbyActivity extends AppCompatActivity
 
             DBHelper.resumeAutoUpdate();
 
-            //Cannot do that, for some obscure reason, task gets automatically
-            //cancelled when the permission dialog is visible
-            //checkAndAskLocationPermission();
-
             if (getListPagerAdapter().isViewPagerReady())
                 getListPagerAdapter().setRefreshingAll(true);
         }
@@ -3432,11 +3425,6 @@ public class NearbyActivity extends AppCompatActivity
             getListPagerAdapter().setRefreshingAll(false);
             mClosestBikeAutoSelected = false;
 
-            //Removed this Toast as progressBar AND updated textView with time in minutes already convey the idea
-            //Maybe have a toast if it was NOT a success
-            //Toast.makeText(mContext, R.string.download_success, Toast.LENGTH_SHORT).show();
-
-
             DBHelper.saveLastUpdateTimestampAsNow(getApplicationContext());
             mRefreshMarkers = true;
             mRefreshTabs = true;
@@ -3445,10 +3433,41 @@ public class NearbyActivity extends AppCompatActivity
 
             new SaveNetworkToDatabaseTask().execute();
 
-            checkAndAskLocationPermission();
-
             //must be done last
             mDownloadWebTask = null;
+
+            //special case for test versions in firebase lab
+            //full onboarding prevents meaningful coverage (robo test don't input anything in search autocomplete widget)
+            if (getString(R.string.app_version_name).contains("test") || getString(R.string.app_version_name).contains("alpha")){
+
+                int addedCount = 0;
+
+                for(StationItem station : mStationsNetwork) {
+                    if (!DBHelper.isFavorite(station.getId(), NearbyActivity.this)) {
+
+                        if (addedCount > 3)
+                            break;
+
+                        else if (addedCount % 2 == 0) { //non default favorite name
+                            //station.setFavorite(true, NearbyActivity.this); //We want to manipulate everything, hence go directly to DBHelper
+                            DBHelper.updateFavorite(true, new FavoriteItemStation(station.getId(), station.getName() + "-test", false), NearbyActivity.this);
+                            ArrayList<FavoriteItemBase> favoriteList = DBHelper.getFavoriteAll(NearbyActivity.this);
+                            setupFavoriteListFeedback(favoriteList.isEmpty());
+                            mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
+                        }
+                        else{   //default favorite name
+                            DBHelper.updateFavorite(true, new FavoriteItemStation(station.getId(), station.getName(), true), NearbyActivity.this);
+                            ArrayList<FavoriteItemBase> favoriteList = DBHelper.getFavoriteAll(NearbyActivity.this);
+                            setupFavoriteListFeedback(favoriteList.isEmpty());
+                            mFavoriteRecyclerViewAdapter.setupFavoriteList(favoriteList);
+                        }
+
+                        ++addedCount;
+                    }
+                }
+
+                mOnboardingShowcaseView.hide();
+            }
         }
     }
 }
