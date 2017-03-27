@@ -972,19 +972,7 @@ public class NearbyActivity extends AppCompatActivity
 
                                 switch (which){
                                     case 0:
-                                        //android system webview
-                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                                            intent = new Intent(NearbyActivity.this, WebViewActivity.class);
-                                            intent.putExtra(WebViewActivity.EXTRA_URL, "http://www.citybik.es");
-                                            intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, text);
-                                            intent.putExtra(WebViewActivity.EXTRA_JAVASCRIPT_ENABLED, true);
-                                            startActivity(intent);
-                                        }
-                                        //browser
-                                        else{
-                                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.citybik.es"));
-                                            startActivity(intent);
-                                        }
+                                        startActivity(Utils.getWebIntent(NearbyActivity.this, "http://www.citybik.es", true, text.toString()));
                                         break;
                                     case 1:
                                         intent = new Intent(Intent.ACTION_VIEW);
@@ -994,7 +982,17 @@ public class NearbyActivity extends AppCompatActivity
                                         }
                                         break;
                                     case 2:
-                                        intent = Utils.newFacebookIntent(getPackageManager(), "https://www.facebook.com/findmybikes/");
+                                        String url = "https://www.facebook.com/findmybikes/";
+                                        Uri uri;
+                                        try {
+                                            getPackageManager().getPackageInfo("com.facebook.katana", 0);
+                                            // http://stackoverflow.com/questions/24526882/open-facebook-page-from-android-app-in-facebook-version-v11
+                                            uri = Uri.parse("fb://facewebmodal/f?href=" + url);
+                                            intent = new Intent(Intent.ACTION_VIEW, uri);
+                                        } catch (PackageManager.NameNotFoundException e) {
+                                            intent = Utils.getWebIntent(NearbyActivity.this, url, true, text.toString());
+                                        }
+
                                         startActivity(intent);
                                         break;
                                     case 3:

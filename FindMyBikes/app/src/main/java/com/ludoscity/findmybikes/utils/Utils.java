@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 import com.ludoscity.findmybikes.R;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
+import com.ludoscity.findmybikes.activities.WebViewActivity;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -141,30 +142,21 @@ public class Utils {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
-    /**
-     * http://stackoverflow.com/questions/24526882/open-facebook-page-from-android-app-in-facebook-version-v11
-     * Intent to open the official Facebook app. If the Facebook app is not installed then the
-     * default web browser will be used.</p>
-     *
-     * Example usage:</p>
-     * <code>newFacebookIntent(context.getPackageManager(), "https://www.facebook.com/JRummyApps");</code></p>
-     *
-     * @param pm
-     *            Instance of the {@link PackageManager}.
-     * @param url
-     *            The full URL to the Facebook page or profile.
-     * @return An intent that will open the Facebook page/profile.
-     */
-    public static Intent newFacebookIntent(PackageManager pm, String url) {
-        Uri uri;
-        try {
-            pm.getPackageInfo("com.facebook.katana", 0);
-            // http://stackoverflow.com/a/24547437/1048340
-            uri = Uri.parse("fb://facewebmodal/f?href=" + url);
-        } catch (PackageManager.NameNotFoundException e) {
-            uri = Uri.parse(url);
+    public static Intent getWebIntent(Context _ctx, String _url, boolean _javascriptEnabled, String _webViewTitle){
+        Intent toReturn;
+        //android system webview
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            toReturn = new Intent(_ctx, WebViewActivity.class);
+            toReturn.putExtra(WebViewActivity.EXTRA_URL, _url);
+            toReturn.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, _webViewTitle);
+            toReturn.putExtra(WebViewActivity.EXTRA_JAVASCRIPT_ENABLED, _javascriptEnabled);
         }
-        return new Intent(Intent.ACTION_VIEW, uri);
+        //browser
+        else{
+            toReturn = new Intent(Intent.ACTION_VIEW, Uri.parse(_url));
+        }
+
+        return toReturn;
     }
 
     public static int dpToPx(float toConvert, Context ctx){
