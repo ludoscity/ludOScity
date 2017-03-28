@@ -1,5 +1,6 @@
 package com.ludoscity.findmybikes;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
@@ -16,10 +17,11 @@ import com.ludoscity.findmybikes.helpers.DBHelper;
  */
 public class AvailabilitySettingsDialogPreference extends DialogPreference {
 
-    NumberPicker mCriticalMaxPicker;
-    NumberPicker mBadMaxPicker;
-    TextView mBadMinText;
-    TextView mGreatMinText;
+    private NumberPicker mCriticalMaxPicker;
+    private NumberPicker mBadMaxPicker;
+    private TextView mBadMinText;
+    private TextView mGreatMinText;
+    private TextView mCriticalHint;
 
     public AvailabilitySettingsDialogPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -28,6 +30,7 @@ public class AvailabilitySettingsDialogPreference extends DialogPreference {
         setDialogLayoutResource(R.layout.map_settings_dialog_content);
     }
 
+    @SuppressLint("StringFormatInvalid")
     @Override
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
@@ -36,6 +39,7 @@ public class AvailabilitySettingsDialogPreference extends DialogPreference {
         mBadMaxPicker = (NumberPicker) view.findViewById(R.id.pref_availability_bad_max_picker);
         mBadMinText = (TextView) view.findViewById(R.id.pref_availability_bad_min_text);
         mGreatMinText = (TextView) view.findViewById(R.id.pref_availability_great_min_text);
+        mCriticalHint = (TextView) view.findViewById(R.id.pref_availability_critical_hint);
 
         int redUpperValue = DBHelper.getCriticalAvailabilityMax(getContext());
         int yellowUpperValue = DBHelper.getBadAvailabilityMax(getContext());
@@ -45,6 +49,7 @@ public class AvailabilitySettingsDialogPreference extends DialogPreference {
         mCriticalMaxPicker.setMaxValue(3);
 
         mBadMinText.setText(String.format(getContext().getString(R.string.pref_availability_bad_min_label), redUpperValue + 1));
+        ((TextView) view.findViewById(R.id.pref_availability_cri_min_text)).setText(String.format(getContext().getString(R.string.pref_availability_cri_min_label), 0));
 
         mBadMaxPicker.setMinValue(redUpperValue + 1);
         mBadMaxPicker.setMaxValue(redUpperValue + 4);
@@ -52,16 +57,20 @@ public class AvailabilitySettingsDialogPreference extends DialogPreference {
         mCriticalMaxPicker.setValue(redUpperValue);
         mBadMaxPicker.setValue(yellowUpperValue);
 
+        setupCriticalHint();
+
         mGreatMinText.setText(String.format(getContext().getString(R.string.pref_availability_great_min_label), yellowUpperValue + 1));
 
         mCriticalMaxPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @SuppressLint("StringFormatInvalid")
             @Override
-            public void onValueChange(NumberPicker numberPicker, int i, int i1) { //i1 is new value
+            public void onValueChange(NumberPicker numberPicker, int i, int _newValue) {
+                setupCriticalHint();
 
-                mBadMinText.setText(String.format(getContext().getString(R.string.pref_availability_bad_min_label), i1 + 1));
+                mBadMinText.setText(String.format(getContext().getString(R.string.pref_availability_bad_min_label), _newValue + 1));
 
-                mBadMaxPicker.setMinValue(i1 + 1);
-                mBadMaxPicker.setMaxValue(i1 + 4);
+                mBadMaxPicker.setMinValue(_newValue + 1);
+                mBadMaxPicker.setMaxValue(_newValue + 4);
 
                 mGreatMinText.setText(String.format(getContext().getString(R.string.pref_availability_great_min_label), mBadMaxPicker.getValue() + 1));
             }
@@ -75,6 +84,24 @@ public class AvailabilitySettingsDialogPreference extends DialogPreference {
 
             }
         });
+    }
+
+    private void setupCriticalHint(){
+
+        switch (mCriticalMaxPicker.getValue()){
+            case 0:
+                mCriticalHint.setText(R.string.availability_hint_never);
+                break;
+            case 1:
+                mCriticalHint.setText(R.string.availability_hint_sometime);
+                break;
+            case 2:
+                mCriticalHint.setText(R.string.availability_hint_often);
+                break;
+            case 3:
+                mCriticalHint.setText(R.string.availability_hint_veryoften);
+                break;
+        }
     }
 
     @Override

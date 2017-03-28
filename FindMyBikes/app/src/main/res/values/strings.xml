@@ -43,7 +43,8 @@
     <string name="status_string">%1$s ago from citybik.es - %2$s</string>
     <string name="il_y_a">""</string>
     <string name="pref_availability_settings_dialog_title">Availability settings</string>
-    <string name="pref_availability_bad_min_label" translatable="false">%1$d -- </string>
+    <string name="pref_availability_cri_min_label" translatable="false">%1$d -- </string>
+    <string name="pref_availability_bad_min_label" translatable="false">@string/pref_availability_cri_min_label</string>
     <string name="pref_availability_great_min_label" translatable="false">%1$d+</string>
     <string name="pref_availability_critical_hint">Treated as empty in tab A or full in tab B</string>
     <string name="pref_manual_refresh_mode">Automatic refresh</string>
@@ -95,4 +96,8 @@
     <string name="settings">SETTINGS</string>
     <string name="location_turn_on">#location service required to find your bikes !</string>
     <string name="sad_emoji" translatable="false">:\'(</string>
+    <string name="availability_hint_never">Bikes or docks are never broken</string>
+    <string name="availability_hint_sometime">Bikes or docks are sometime broken</string>
+    <string name="availability_hint_often">Bikes or docks are often broken</string>
+    <string name="availability_hint_veryoften">Bikes or docks are very often broken</string>
 </resources>

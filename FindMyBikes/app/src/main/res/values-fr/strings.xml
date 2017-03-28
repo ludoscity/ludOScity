@@ -81,4 +81,8 @@
     <string name="location_rationale">#permission \'localisation\' requise pour trouver vos vélos !</string>
     <string name="settings">PARAMÈTRES</string>
     <string name="location_turn_on">#localisation requise pour trouver vos vélos !</string>
+    <string name="availability_hint_never">Vélos ou ancrages jamais hors service</string>
+    <string name="availability_hint_sometime">Vélos ou ancrages parfois hors service</string>
+    <string name="availability_hint_often">Vélos ou ancrages souvent hors service</string>
+    <string name="availability_hint_veryoften">Vélos ou ancrages très souvent hors service</string>
 </resources>
