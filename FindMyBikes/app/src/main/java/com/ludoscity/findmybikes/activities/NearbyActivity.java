@@ -3463,7 +3463,8 @@ public class NearbyActivity extends AppCompatActivity
                     }
                 }
 
-                mOnboardingShowcaseView.hide();
+                if (mOnboardingShowcaseView != null)
+                    mOnboardingShowcaseView.hide();
             }
         }
     }
