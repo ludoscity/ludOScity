@@ -644,7 +644,8 @@ public class NearbyActivity extends AppCompatActivity
                         mOnboardingShowcaseView = null;
                     }
 
-                    checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_HINT);
+                    if(!checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_HINT))
+                        dismissOnboardingHint();
 
                 } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                     Log.d("mPlacePickerFAB onClick", "oops", e);
@@ -731,8 +732,8 @@ public class NearbyActivity extends AppCompatActivity
                 //... check if full onboarding should happen
                 if( !checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE) ) {
 
-                    //... if it doesn't, display hint
-                    setupHintMainChoice();
+                    //... if it doesn't, display hint if required
+                    checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT);
                 }
             }
         } else if (requestCode == SETTINGS_ACTIVITY_REQUEST_CODE){
@@ -1123,6 +1124,9 @@ public class NearbyActivity extends AppCompatActivity
 
                 mSearchFAB.hide();
                 mFavoriteSheetVisible = true;
+
+                if (!checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_ULTRA_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_TAP_FAV_NAME_HINT))
+                    dismissOnboardingHint();
             }
 
             @Override
@@ -1135,16 +1139,11 @@ public class NearbyActivity extends AppCompatActivity
                     if (!checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_SEARCH_SHOWCASE) &&
                             !checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_MAIN_CHOICE_HINT))
                     {
-                        dismissOnboarding();
+                        dismissOnboardingHint();
                     }
                 }
 
                 mFavoriteSheetVisible = false;
-            }
-
-            @Override
-            public void onSheetShown() {
-                checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_ULTRA_LIGHT, eONBOARDING_STEP.ONBOARDING_STEP_TAP_FAV_NAME_HINT);
             }
         });
     }
@@ -1221,7 +1220,7 @@ public class NearbyActivity extends AppCompatActivity
     public void onBackPressed() {
         if (mFavoritesSheetFab.isSheetVisible()) {
             mFavoritesSheetFab.hideSheet();
-            dismissOnboarding();
+            dismissOnboardingHint();
         } else //noinspection StatementWithEmptyBody
             if(mOnboardingShowcaseView != null){
             //do nothing if onboarding is in progress
@@ -1822,7 +1821,7 @@ public class NearbyActivity extends AppCompatActivity
     //that means no markers are currently on map (due to app flow)
     private void setupBTabSelectionClosestDock(final Place _from){
 
-        dismissOnboarding();
+        dismissOnboardingHint();
 
         //Remove any previous selection
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
@@ -1904,7 +1903,7 @@ public class NearbyActivity extends AppCompatActivity
     //that means no markers are currently on map (due to app flow)
     private void setupBTabSelectionClosestDock(final String _favoriteId){
 
-        dismissOnboarding();
+        dismissOnboardingHint();
 
         //Remove any previous selection
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
@@ -2003,7 +2002,7 @@ public class NearbyActivity extends AppCompatActivity
 
     private void setupBTabSelection(final String _selectedStationId, final boolean _silent){
 
-        dismissOnboarding();
+        dismissOnboardingHint();
 
         //Remove any previous selection
         getListPagerAdapter().removeStationHighlightForPage(StationListPagerAdapter.DOCK_STATIONS);
@@ -2113,7 +2112,7 @@ public class NearbyActivity extends AppCompatActivity
         }
     }
 
-    private void dismissOnboarding()
+    private void dismissOnboardingHint()
     {
         if (mOnboardingSnackBar != null)
         {
@@ -2598,7 +2597,7 @@ public class NearbyActivity extends AppCompatActivity
             //A TAB
             if (position == StationListPagerAdapter.BIKE_STATIONS) {
 
-                dismissOnboarding();
+                dismissOnboardingHint();
 
                 mStationMapFragment.setScrollGesturesEnabled(false);
 
