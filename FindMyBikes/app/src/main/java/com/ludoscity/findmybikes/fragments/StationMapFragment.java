@@ -43,11 +43,12 @@ public class StationMapFragment extends Fragment
     private class CustomCancellableCallback implements GoogleMap.CancelableCallback {
 
         Boolean mLookingForBikeWhenFinished = null;
+        Boolean mOutdatedWhenFinished = null;
         @Override
         public void onFinish() {
 
             if (mLookingForBikeWhenFinished != null)
-                updateMarkerAll(mLookingForBikeWhenFinished);
+                updateMarkerAll(mOutdatedWhenFinished, mLookingForBikeWhenFinished);
 
             showAllStations();
 
@@ -59,7 +60,7 @@ public class StationMapFragment extends Fragment
         public void onCancel() {
 
             if (mLookingForBikeWhenFinished != null)
-                updateMarkerAll(mLookingForBikeWhenFinished);
+                updateMarkerAll(mOutdatedWhenFinished, mLookingForBikeWhenFinished);
 
 
             showAllStations();
@@ -413,8 +414,14 @@ public class StationMapFragment extends Fragment
 
     public boolean isMapReady(){ return mGoogleMap != null; }
 
-    public void addMarkerForStationItem(StationItem item, boolean lookingForBike) {
-        mMapMarkersGfxData.add(new StationMapGfx(item, lookingForBike, getContext()));
+    public void addMarkerForStationItem(boolean _outdated, StationItem item, boolean lookingForBike) {
+        while (true)
+        {
+            //getContext returns null during screen configuration change when called from background thread
+            if (!(getContext() == null)) break;
+        }
+
+        mMapMarkersGfxData.add(new StationMapGfx(_outdated, item, lookingForBike, getContext()));
     }
 
     public void redrawMarkers() {
@@ -545,24 +552,31 @@ public class StationMapFragment extends Fragment
         }
     }
 
-    public void lookingForBikes(boolean lookingForBike) {
+    public void lookingForBikes(boolean _outdated, boolean _lookingForBike) {
 
         if (mAnimCallback != null){
-            mAnimCallback.mLookingForBikeWhenFinished = lookingForBike;
+            mAnimCallback.mLookingForBikeWhenFinished = _lookingForBike;
+            mAnimCallback.mOutdatedWhenFinished = _outdated;
         }
         else
-            updateMarkerAll(lookingForBike);
+            updateMarkerAll(_outdated, _lookingForBike);
     }
 
-    private void updateMarkerAll(boolean lookingForBike){
+    private void updateMarkerAll(boolean _outdated, boolean _lookingForBike){
+
+        while (true)
+        {
+            //getContext returns null during screen configuration change when called from background thread
+            if (!(getContext() == null)) break;
+        }
 
         try {
             for (StationMapGfx markerData : mMapMarkersGfxData) {
-                markerData.updateMarker(lookingForBike, getContext());
+                markerData.updateMarker(_outdated, _lookingForBike, getContext());
             }
         }
         catch (ConcurrentModificationException e){
-            updateMarkerAll(lookingForBike);
+            updateMarkerAll(_outdated, _lookingForBike);
         }
     }
 

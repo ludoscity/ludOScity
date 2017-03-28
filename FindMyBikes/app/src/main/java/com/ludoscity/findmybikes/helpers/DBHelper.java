@@ -1,5 +1,6 @@
 package com.ludoscity.findmybikes.helpers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -603,6 +604,9 @@ public class DBHelper {
 
         ArrayList<FavoriteItemBase> favoriteList = getFavoriteAll(_ctx);
 
+        if (_closestBikeStation == null)
+            return favoriteList.size() >= _n;
+
         for (int i=0; i<favoriteList.size(); ++i){
             if (!favoriteList.get(i).getId().equalsIgnoreCase(_closestBikeStation.getId()))
                 ++validCount;
@@ -611,6 +615,7 @@ public class DBHelper {
         return validCount >= _n;
     }
 
+    @SuppressLint("CommitPrefEdits")
     public static void dropFavoriteAll(Context _ctx){
 
         SharedPreferences sp = _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE);

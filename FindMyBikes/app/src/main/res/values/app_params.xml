@@ -17,7 +17,7 @@
     <item name="main_layout_map_section" type="dimen">55%</item>
     <item name="land_main_layout_progressbar" type="dimen">80%</item>
 
-    <item name="outdated_data_warning_time_min" type="integer">15</item>
+    <item name="outdated_data_time_minute" type="integer">15</item>
     <!-- 0 favorite corresponds to onboarding_full-->
     <item name="onboarding_light_min_valid_favorites_count" type="integer">1</item>
     <item name="onboarding_ultra_light_min_valid_favorites_count" type="integer">2</item>

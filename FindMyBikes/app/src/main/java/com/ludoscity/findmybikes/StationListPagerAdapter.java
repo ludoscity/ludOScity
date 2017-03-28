@@ -150,23 +150,20 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         return retrieveListFragment(BIKE_STATIONS).isHighlightedVisibleInRecyclerView();
     }
 
-    public void setupBTabStationARecap(StationItem _stationA) {
-        retrieveListFragment(DOCK_STATIONS).setupStationRecap(_stationA);
+    public void setupBTabStationARecap(StationItem _stationA, boolean _outdated) {
+        retrieveListFragment(DOCK_STATIONS).setupStationRecap(_stationA, _outdated);
     }
 
     public void setClickResponsivenessForPage(int _pageID, boolean _toSet) {
         retrieveListFragment(_pageID).setResponsivenessToClick(_toSet);
     }
 
-    public boolean setOutdatedDataForPage(int _pageID, boolean _isDataOutdated){
-        return retrieveListFragment(_pageID).setOutdatedData(_isDataOutdated);
+    public void setOutdatedDataAll(boolean _isDataOutdated){
+        retrieveListFragment(BIKE_STATIONS).setOutdatedData(_isDataOutdated);
+        retrieveListFragment(DOCK_STATIONS).setOutdatedData(_isDataOutdated);
     }
 
     public void showFavoriteHeaderInBTab() {
         retrieveListFragment(DOCK_STATIONS).showFavoriteHeader();
-    }
-
-    public boolean isDataOutdatedForPage(int _pageID) {
-        return retrieveListFragment(_pageID).isDataOutdated();
     }
 }

@@ -31,6 +31,7 @@ public class StationMapGfx {
     private static final BitmapDescriptor greyIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_station_64px_grey);
     private static final BitmapDescriptor greenIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_station_64px_green);
     private static final BitmapDescriptor yellowIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_station_64px_yellow);
+    private static final BitmapDescriptor pinkIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_station_64px_outdated);
 
     //For linear mappig of zoom level to oberlay size. Empirically determined.
     @SuppressWarnings("FieldCanBeLocal")
@@ -41,14 +42,14 @@ public class StationMapGfx {
     private static float minOverlaySize = 1;
     private static float maxOverlaySize = 50;
 
-    public StationMapGfx(StationItem item, boolean lookingForBike, Context _ctx){
+    public StationMapGfx(boolean _outdated, StationItem _item, boolean _lookingForBike, Context _ctx){
 
-        mItem = item;
+        mItem = _item;
 
         //Marker setup
         markerOptions = new MarkerOptions()
-                .position(item.getLocation())
-                .title(item.getId())
+                .position(_item.getLocation())
+                .title(_item.getId())
                 .alpha(0)
                 .zIndex(1.f)//so that invisible clicking marker is in front of Favorite pin
                 .anchor(0.5f,0.5f)
@@ -56,28 +57,33 @@ public class StationMapGfx {
 
         // Since googleMap doesn't allow marker resizing we have to use ground overlay to not clog the map when we zoom out...
         groundOverlayOptions = new GroundOverlayOptions()
-                .position(item.getLocation(), maxOverlaySize)
+                .position(_item.getLocation(), maxOverlaySize)
                 .transparency(0.1f)
                 .visible(false);
-        if (item.isLocked())
-            groundOverlayOptions.image(greyIcon);
-        else{
-            if (lookingForBike){
-                if (item.getFree_bikes() <= DBHelper.getCriticalAvailabilityMax(_ctx))
-                    groundOverlayOptions.image(redIcon);
-                else if (item.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
-                    groundOverlayOptions.image(yellowIcon);
-                else
-                    groundOverlayOptions.image(greenIcon);
+
+        if (!_outdated) {
+            if (_item.isLocked())
+                groundOverlayOptions.image(greyIcon);
+            else {
+                if (_lookingForBike) {
+                    if (_item.getFree_bikes() <= DBHelper.getCriticalAvailabilityMax(_ctx))
+                        groundOverlayOptions.image(redIcon);
+                    else if (_item.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
+                        groundOverlayOptions.image(yellowIcon);
+                    else
+                        groundOverlayOptions.image(greenIcon);
+                } else {
+                    if (_item.getEmpty_slots() <= DBHelper.getCriticalAvailabilityMax(_ctx))
+                        groundOverlayOptions.image(redIcon);
+                    else if (_item.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
+                        groundOverlayOptions.image(yellowIcon);
+                    else
+                        groundOverlayOptions.image(greenIcon);
+                }
             }
-            else{
-                if (item.getEmpty_slots() <= DBHelper.getCriticalAvailabilityMax(_ctx))
-                    groundOverlayOptions.image(redIcon);
-                else if (item.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
-                    groundOverlayOptions.image(yellowIcon);
-                else
-                    groundOverlayOptions.image(greenIcon);
-            }
+        }
+        else {
+            groundOverlayOptions.image(pinkIcon);
         }
     }
 
@@ -90,36 +96,41 @@ public class StationMapGfx {
 
     public LatLng getMarkerLatLng() { return marker.getPosition(); }
 
-    public void updateMarker(boolean isLookingForBikes, Context _ctx) {
+    public void updateMarker(boolean _outdated, boolean _isLookingForBikes, Context _ctx) {
 
         //happens on screen orientation change with slow devices
         if (groundOverlay == null)
             return;
 
-        if (isLookingForBikes){
-            if (!mItem.isLocked()) {
-                if (mItem.getFree_bikes() <= DBHelper.getCriticalAvailabilityMax(_ctx))
-                    groundOverlay.setImage(redIcon);
-                else if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
-                    groundOverlay.setImage(yellowIcon);
-                    // check if the overlay is not already green
-                else //if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
-                    // overlay isn't green yet
-                    groundOverlay.setImage(greenIcon);
-            } else
-                groundOverlay.setImage(greyIcon);
-        } else {
-            if (!mItem.isLocked()) {
-                if (mItem.getEmpty_slots() <= DBHelper.getCriticalAvailabilityMax(_ctx))
-                    groundOverlay.setImage(redIcon);
-                else if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
-                    groundOverlay.setImage(yellowIcon);
-                    // check if the overlay is not already green
-                else //if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
-                    // overlay isn't green yet
-                    groundOverlay.setImage(greenIcon);
-            } else
-                groundOverlay.setImage(greyIcon);
+        if (!_outdated) {
+            if (_isLookingForBikes) {
+                if (!mItem.isLocked()) {
+                    if (mItem.getFree_bikes() <= DBHelper.getCriticalAvailabilityMax(_ctx))
+                        groundOverlay.setImage(redIcon);
+                    else if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
+                        groundOverlay.setImage(yellowIcon);
+                        // check if the overlay is not already green
+                    else //if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
+                        // overlay isn't green yet
+                        groundOverlay.setImage(greenIcon);
+                } else
+                    groundOverlay.setImage(greyIcon);
+            } else {
+                if (!mItem.isLocked()) {
+                    if (mItem.getEmpty_slots() <= DBHelper.getCriticalAvailabilityMax(_ctx))
+                        groundOverlay.setImage(redIcon);
+                    else if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
+                        groundOverlay.setImage(yellowIcon);
+                        // check if the overlay is not already green
+                    else //if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
+                        // overlay isn't green yet
+                        groundOverlay.setImage(greenIcon);
+                } else
+                    groundOverlay.setImage(greyIcon);
+            }
+        }
+        else{
+            groundOverlay.setImage(pinkIcon);
         }
     }
 

@@ -242,19 +242,14 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
         notifyItemInserted(mStationList.size()-1);
     }
 
-    //returns true if availability was not already outdated
-    public boolean setAvailabilityOutdated(boolean _toSet) {
+    public void setAvailabilityOutdated(boolean _toSet) {
 
-        if (mOutdatedAvailability == _toSet)
-            return false;
+        if (mOutdatedAvailability != _toSet) {
 
-        mOutdatedAvailability = !mOutdatedAvailability;
-        notifyDataSetChanged();
-
-        return true;
+            mOutdatedAvailability = _toSet;
+            notifyDataSetChanged();
+        }
     }
-
-    public boolean isAvailabilityOutdated(){ return mOutdatedAvailability; }
 
     public void setClickResponsiveness(boolean _toSet) {
         mRespondToClick = _toSet;
@@ -500,7 +495,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
         private void setColorAndTransparencyFeedback(boolean selected, int availabilityValue){
 
-            if (!isAvailabilityOutdated()) {
+            if (!mOutdatedAvailability) {
 
                 if (availabilityValue <= DBHelper.getCriticalAvailabilityMax(mCtx)) {
                     if (selected) {

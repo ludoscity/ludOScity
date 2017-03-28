@@ -219,7 +219,7 @@ public class StationListFragment extends Fragment
         mStationRecap.setVisibility(View.VISIBLE);
     }
 
-    public void setupStationRecap(StationItem _station){
+    public void setupStationRecap(StationItem _station, boolean _outdated){
 
         if (_station.isFavorite(getContext())) {
             mStationRecapName.setText(_station.getFavoriteName(getContext(), true));
@@ -230,7 +230,7 @@ public class StationListFragment extends Fragment
 
         mStationRecapAvailability.setText(String.format(getResources().getString(R.string.station_recap_bikes), _station.getFree_bikes()));
 
-        if (getStationRecyclerViewAdapter().isAvailabilityOutdated()){
+        if (_outdated){
             mStationRecapAvailability.getPaint().setStrikeThruText(true);
             mStationRecapAvailability.getPaint().setTypeface(Typeface.DEFAULT);
             mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.theme_accent));
@@ -389,12 +389,8 @@ public class StationListFragment extends Fragment
         getStationRecyclerViewAdapter().notifyStationChanged(_stationId);
     }
 
-    public boolean setOutdatedData(boolean _availabilityOutdated) {
-        return getStationRecyclerViewAdapter().setAvailabilityOutdated(_availabilityOutdated);
-    }
-
-    public boolean isDataOutdated() {
-        return getStationRecyclerViewAdapter().isAvailabilityOutdated();
+    public void setOutdatedData(boolean _availabilityOutdated) {
+        getStationRecyclerViewAdapter().setAvailabilityOutdated(_availabilityOutdated);
     }
 
     public void showFavoriteHeader() {
