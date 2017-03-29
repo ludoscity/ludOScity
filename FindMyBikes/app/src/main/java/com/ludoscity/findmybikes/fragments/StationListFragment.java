@@ -153,7 +153,7 @@ public class StationListFragment extends Fragment
             ArrayList<StationItem> stationList = null;
             try {
                 stationList = DBHelper.getStationsNetwork();
-            } catch (CouchbaseLiteException e) {
+            } catch (CouchbaseLiteException | IllegalStateException e) {
                 Log.d("StationListFragment", "Couldn't retrieve Station Network from db when restoring view state.",e );
             }
 
@@ -219,7 +219,10 @@ public class StationListFragment extends Fragment
         mStationRecap.setVisibility(View.VISIBLE);
     }
 
-    public void setupStationRecap(StationItem _station, boolean _outdated){
+    public boolean setupStationRecap(StationItem _station, boolean _outdated){
+
+        if (getContext() == null)
+            return false;
 
         if (_station.isFavorite(getContext())) {
             mStationRecapName.setText(_station.getFavoriteName(getContext(), true));
@@ -248,6 +251,8 @@ public class StationListFragment extends Fragment
                 mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.station_recap_green));
 
         }
+
+        return true;
     }
 
     public void setSortComparatorAndSort(Comparator<StationItem> _toSet){

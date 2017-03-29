@@ -415,11 +415,9 @@ public class StationMapFragment extends Fragment
     public boolean isMapReady(){ return mGoogleMap != null; }
 
     public void addMarkerForStationItem(boolean _outdated, StationItem item, boolean lookingForBike) {
-        while (true)
-        {
-            //getContext returns null during screen configuration change when called from background thread
-            if (!(getContext() == null)) break;
-        }
+
+        if (getContext() == null)
+            return;
 
         mMapMarkersGfxData.add(new StationMapGfx(_outdated, item, lookingForBike, getContext()));
     }
@@ -520,11 +518,18 @@ public class StationMapFragment extends Fragment
     }
 
     public void animateCamera(CameraUpdate cameraUpdate) {
-        mAnimCallback = new CustomCancellableCallback();
 
-        hideAllStations();
+        if (getContext() != null) {
 
-        mGoogleMap.animateCamera(cameraUpdate, getResources().getInteger(R.integer.camera_animation_duration), mAnimCallback);
+            mAnimCallback = new CustomCancellableCallback();
+
+            hideAllStations();
+
+            mGoogleMap.animateCamera(cameraUpdate, getResources().getInteger(R.integer.camera_animation_duration), mAnimCallback);
+        }
+        else{
+            mGoogleMap.animateCamera(cameraUpdate);
+        }
     }
 
     public void hideAllStations() {
@@ -564,11 +569,8 @@ public class StationMapFragment extends Fragment
 
     private void updateMarkerAll(boolean _outdated, boolean _lookingForBike){
 
-        while (true)
-        {
-            //getContext returns null during screen configuration change when called from background thread
-            if (!(getContext() == null)) break;
-        }
+        if (getContext() == null)
+            return;
 
         try {
             for (StationMapGfx markerData : mMapMarkersGfxData) {

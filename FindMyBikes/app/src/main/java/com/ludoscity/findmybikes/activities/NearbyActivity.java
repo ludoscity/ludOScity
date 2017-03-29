@@ -231,7 +231,7 @@ public class NearbyActivity extends AppCompatActivity
 
             try {
                 mStationsNetwork = DBHelper.getStationsNetwork();
-            } catch (CouchbaseLiteException e) {
+            } catch (CouchbaseLiteException | IllegalStateException e) {
                 Log.d("nearbyActivity", "Couldn't retrieve Station Network from db, trying to get a fresh copy from network",e );
 
                 needDownload = true;
@@ -338,21 +338,8 @@ public class NearbyActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_nearby);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
+        setupActionBarStrings();
 
-
-        //noinspection ConstantConditions
-        getSupportActionBar().setTitle(Utils.fromHtml(String.format(getResources().getString(R.string.appbar_title_formatting),
-                getResources().getString(R.string.appbar_title_prefix),
-                DBHelper.getHashtaggableNetworkName(this),
-                getResources().getString(R.string.appbar_title_postfix))));
-        //doesn't scale well, but just a little touch for my fellow Montréalers
-        String city_hashtag = "";
-        String bikeNetworkCity = DBHelper.getBikeNetworkCity(this);
-        if (bikeNetworkCity.contains(", QC")){
-            city_hashtag = " @mtlvi";
-        }
-        String hastagedEnhanced_bikeNetworkCity = bikeNetworkCity + city_hashtag;
-        getSupportActionBar().setSubtitle(Utils.fromHtml(String.format(getResources().getString(R.string.appbar_subtitle_formatted), hastagedEnhanced_bikeNetworkCity)));
 
         // Update Bar
         mStatusTextView = (TextView) findViewById(R.id.status_textView);
@@ -481,6 +468,22 @@ public class NearbyActivity extends AppCompatActivity
         setupLocationRequest();
 
         mCircularRevealInterpolator = AnimationUtils.loadInterpolator(this, R.interpolator.msf_interpolator);
+    }
+
+    private void setupActionBarStrings() {
+        //noinspection ConstantConditions
+        getSupportActionBar().setTitle(Utils.fromHtml(String.format(getResources().getString(R.string.appbar_title_formatting),
+                getResources().getString(R.string.appbar_title_prefix),
+                DBHelper.getHashtaggableNetworkName(this),
+                getResources().getString(R.string.appbar_title_postfix))));
+        //doesn't scale well, but just a little touch for my fellow Montréalers
+        String city_hashtag = "";
+        String bikeNetworkCity = DBHelper.getBikeNetworkCity(this);
+        if (bikeNetworkCity.contains("Montreal")){
+            city_hashtag = " @mtlvi";
+        }
+        String hastagedEnhanced_bikeNetworkCity = bikeNetworkCity + city_hashtag;
+        getSupportActionBar().setSubtitle(Utils.fromHtml(String.format(getResources().getString(R.string.appbar_subtitle_formatted), hastagedEnhanced_bikeNetworkCity)));
     }
 
     private void setupLocationRequest(){
@@ -744,12 +747,9 @@ public class NearbyActivity extends AppCompatActivity
             }
         } else if (requestCode == SETTINGS_ACTIVITY_REQUEST_CODE){
 
-            getListPagerAdapter().highlightStationforId(true, Utils.extractClosestAvailableStationIdFromProcessedString(getListPagerAdapter().retrieveClosestRawIdAndAvailability(true)));
-            getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.BIKE_STATIONS, isAppBarExpanded());
-
+            mClosestBikeAutoSelected = false;
             mRefreshMarkers = true;
             refreshMap();
-            mRefreshTabs = true;
         } else if (requestCode == CHECK_PERMISSION_REQUEST_CODE){
 
             if (ContextCompat.checkSelfPermission(this,
@@ -1314,24 +1314,29 @@ public class NearbyActivity extends AppCompatActivity
         }
         else {
             StationItem highlighthedDockStation = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS);
-            setupBTabSelection(highlighthedDockStation.getId(), isLookingForBike());
 
-            FavoriteItemBase newFavForStation = new FavoriteItemStation(highlighthedDockStation.getId(),
-                    highlighthedDockStation.getName(), true);
+            if (highlighthedDockStation != null) {
+                setupBTabSelection(highlighthedDockStation.getId(), isLookingForBike());
 
-            boolean showFavoriteAddFab = false;
+                FavoriteItemBase newFavForStation = new FavoriteItemStation(highlighthedDockStation.getId(),
+                        highlighthedDockStation.getName(), true);
 
-            if(!mStationMapFragment.isPickedFavoriteMarkerVisible()){
-                if (mStationMapFragment.isPickedPlaceMarkerVisible())
-                    showFavoriteAddFab = true;  //Don't setup the fab as it's been done in OnActivityResult
-                else if (setupAddFavoriteFab(newFavForStation))
-                    showFavoriteAddFab = true;
+                boolean showFavoriteAddFab = false;
+
+                if (!mStationMapFragment.isPickedFavoriteMarkerVisible()) {
+                    if (mStationMapFragment.isPickedPlaceMarkerVisible())
+                        showFavoriteAddFab = true;  //Don't setup the fab as it's been done in OnActivityResult
+                    else if (setupAddFavoriteFab(newFavForStation))
+                        showFavoriteAddFab = true;
+                }
+
+                if (showFavoriteAddFab)
+                    mAddFavoriteFAB.show();
+                else
+                    mAddFavoriteFAB.hide();
             }
-
-            if (showFavoriteAddFab)
-                mAddFavoriteFAB.show();
-            else
-                mAddFavoriteFAB.hide();
+            else    //B pin on map with no list selection can happen on rapid multiple screen orientation change
+                clearBTab();
         }
 
         mRefreshTabs = false;
@@ -2270,7 +2275,12 @@ public class NearbyActivity extends AppCompatActivity
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-            buildTripDetailsWidgetAnimators(true, getResources().getInteger(R.integer.camera_animation_duration), 0).start();
+            try {
+                buildTripDetailsWidgetAnimators(true, getResources().getInteger(R.integer.camera_animation_duration), 0).start();
+            }
+            catch (IllegalStateException e){
+                Log.i("NearbyActivity", "Trip widget show animation end encountered some trouble, skipping", e);
+            }
         }
     }
 
@@ -2584,8 +2594,10 @@ public class NearbyActivity extends AppCompatActivity
 
         StationItem stationA = getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS);
 
-        if (stationA != null)
-            getListPagerAdapter().setupBTabStationARecap(stationA, mDataOutdated);
+        if (stationA != null) {
+            if(!getListPagerAdapter().setupBTabStationARecap(stationA, mDataOutdated))
+                mClosestBikeAutoSelected = false;   //to handle rapid multiple screen orientation change
+        }
 
         //Happens on screen orientation change
         if (mStationMapFragment == null ||
@@ -2659,10 +2671,7 @@ public class NearbyActivity extends AppCompatActivity
 
                     mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerALatLng(), 13.75f));
 
-                    if (mFavoriteSheetVisible && !mFavoritesSheetFab.isSheetVisible())
-                        mFavoritesSheetFab.showSheet();
-                    else if (mPlaceAutocompleteLoadingProgressBar.getVisibility() != View.GONE){
-                        mFavoritesSheetFab.hideSheetThenFab();
+                    if (mPlaceAutocompleteLoadingProgressBar.getVisibility() != View.GONE){
                         mSearchFAB.show();
                         mSearchFAB.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.light_gray));
                     }
@@ -3043,7 +3052,7 @@ public class NearbyActivity extends AppCompatActivity
             mClosestBikeAutoSelected = false;
 
             //noinspection ConstantConditions
-            getSupportActionBar().setSubtitle(DBHelper.getBikeNetworkName(NearbyActivity.this));
+            setupActionBarStrings();
             setupFavoriteSheet();
 
             if (mSplashScreen.isShown()){

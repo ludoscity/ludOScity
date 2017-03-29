@@ -142,8 +142,8 @@ public class StationItem implements Parcelable {
 
     public LatLng getLocation() {return new LatLng(latitude,longitude);}
 
-    public boolean isFavorite(Context ctx) {
-        return DBHelper.isFavorite(id, ctx);
+    public boolean isFavorite(Context _ctx) {
+        return _ctx != null && DBHelper.isFavorite(id, _ctx);
     }
 
     public FavoriteItemStation getFavoriteItemForDisplayName(String _displayName){

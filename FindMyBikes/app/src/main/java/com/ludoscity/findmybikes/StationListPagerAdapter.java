@@ -150,8 +150,8 @@ public class StationListPagerAdapter extends SmartFragmentPagerAdapter {
         return retrieveListFragment(BIKE_STATIONS).isHighlightedVisibleInRecyclerView();
     }
 
-    public void setupBTabStationARecap(StationItem _stationA, boolean _outdated) {
-        retrieveListFragment(DOCK_STATIONS).setupStationRecap(_stationA, _outdated);
+    public boolean setupBTabStationARecap(StationItem _stationA, boolean _outdated) {
+        return retrieveListFragment(DOCK_STATIONS).setupStationRecap(_stationA, _outdated);
     }
 
     public void setClickResponsivenessForPage(int _pageID, boolean _toSet) {
