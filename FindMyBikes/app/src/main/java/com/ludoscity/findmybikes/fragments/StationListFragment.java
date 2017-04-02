@@ -9,17 +9,16 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.couchbase.lite.CouchbaseLiteException;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.maps.model.LatLng;
 import com.ludoscity.findmybikes.R;
+import com.ludoscity.findmybikes.RootApplication;
 import com.ludoscity.findmybikes.StationItem;
 import com.ludoscity.findmybikes.StationRecyclerViewAdapter;
 import com.ludoscity.findmybikes.helpers.DBHelper;
@@ -150,16 +149,10 @@ public class StationListFragment extends Fragment
         if (savedInstanceState != null) {
 
             Comparator<StationItem> comparator = savedInstanceState.getParcelable("sort_comparator");
-            ArrayList<StationItem> stationList = null;
-            try {
-                stationList = DBHelper.getStationsNetwork();
-            } catch (CouchbaseLiteException | IllegalStateException e) {
-                Log.d("StationListFragment", "Couldn't retrieve Station Network from db when restoring view state.",e );
-            }
 
             getStationRecyclerViewAdapter().setAvailabilityOutdated(savedInstanceState.getBoolean("availability_outdated"));
 
-            setupUI(stationList, savedInstanceState.getBoolean("looking_for_bike"),
+            setupUI(RootApplication.getBikeNetworkStationList(), savedInstanceState.getBoolean("looking_for_bike"),
                     savedInstanceState.getBoolean("proximity_header_visible"),
                     savedInstanceState.getInt("proximity_header_from_icon_resid") == -1 ? null : savedInstanceState.getInt("proximity_header_from_icon_resid"),
                     savedInstanceState.getInt("proximity_header_to_icon_resid") == -1 ? null : savedInstanceState.getInt("proximity_header_to_icon_resid"),
@@ -190,25 +183,22 @@ public class StationListFragment extends Fragment
                         String _stringIfEmpty,
                         Comparator<StationItem> _sortComparator) {
 
-        if (_stationsNetwork != null) {
-
-            //TODO: fix glitch when coming back from place widget (Note to past self : describe glitch)
-            if (!_stationsNetwork.isEmpty()) {
-                mStationRecyclerView.setVisibility(View.VISIBLE);
-                mEmptyListTextView.setVisibility(View.GONE);
-                mStationRecap.setVisibility(View.GONE);
-            }
-            else{
-                mStationRecyclerView.setVisibility(View.GONE);
-                mEmptyListTextView.setText(_stringIfEmpty);
-                mEmptyListTextView.setVisibility(View.VISIBLE);
-                mStationRecap.setVisibility(View.VISIBLE);
-            }
-
-            getStationRecyclerViewAdapter().setupStationList(_stationsNetwork, _sortComparator);
-            getStationRecyclerViewAdapter().setShowProximity(_showProximity);
-            setupHeaders(_lookingForBike, _showProximity, _headerFromIconResId, _headerToIconResId);
+        //TODO: fix glitch when coming back from place widget (Note to past self : describe glitch)
+        if (!_stationsNetwork.isEmpty()) {
+            mStationRecyclerView.setVisibility(View.VISIBLE);
+            mEmptyListTextView.setVisibility(View.GONE);
+            mStationRecap.setVisibility(View.GONE);
         }
+        else{
+            mStationRecyclerView.setVisibility(View.GONE);
+            mEmptyListTextView.setText(_stringIfEmpty);
+            mEmptyListTextView.setVisibility(View.VISIBLE);
+            mStationRecap.setVisibility(View.VISIBLE);
+        }
+
+        getStationRecyclerViewAdapter().setupStationList(_stationsNetwork, _sortComparator);
+        getStationRecyclerViewAdapter().setShowProximity(_showProximity);
+        setupHeaders(_lookingForBike, _showProximity, _headerFromIconResId, _headerToIconResId);
     }
 
     public void hideStationRecap(){

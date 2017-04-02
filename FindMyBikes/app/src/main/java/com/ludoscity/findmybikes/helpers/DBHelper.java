@@ -296,6 +296,8 @@ public class DBHelper {
 
         _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE).edit()
                 .putBoolean(PREF_LAST_SAVE_CORRUPTED, true).apply();
+
+        Log.d(TAG, "Begin saving stations");
     }
 
     public static void notifyEndSavingStations(Context _ctx){
@@ -304,12 +306,13 @@ public class DBHelper {
                 .putBoolean(PREF_LAST_SAVE_CORRUPTED, false).apply();
 
         mSaving = false;
+        Log.d(TAG, "End saving stations");
     }
 
-    public static boolean isDataCorrupted(Context _ctx) {
+    public static boolean wasLastSavePartial(Context _ctx) {
 
         return !mSaving && _ctx.getSharedPreferences(SHARED_PREF_FILENAME, Context.MODE_PRIVATE)
-                .getBoolean(PREF_LAST_SAVE_CORRUPTED, false);
+                .getBoolean(PREF_LAST_SAVE_CORRUPTED, true);
 
     }
 
@@ -356,7 +359,7 @@ public class DBHelper {
     //TODO: Rework saving algorithm.
     //current method of dropping / recreating everything leads to some big troubles
     //NO CLIENT FOR NOW
-    public static StationItem getStation(final String _stationId){
+    /*public static StationItem getStation(final String _stationId){
 
         StationItem toReturn = null;
 
@@ -382,7 +385,7 @@ public class DBHelper {
         }
 
         return toReturn;
-    }
+    }*/
 
     public static List<QueryRow> getAllTracks() throws CouchbaseLiteException {
         Map<String, Object> allDocs;

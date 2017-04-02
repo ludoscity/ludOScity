@@ -42,7 +42,7 @@ public class StationItem implements Parcelable {
         this.timestamp = timestamp;
     }
 
-    public StationItem(Station _station, Context _ctx) {
+    public StationItem(Station _station) {
 
         this.id = _station.id;
 
@@ -83,22 +83,7 @@ public class StationItem implements Parcelable {
             this.free_bikes = 31;
         } else {*/
 
-        //Some systems have empty_slots to null (like nextbike SZ-bike in Dresden, Germany)
-        //in that case, dock availability is derived from bike availability
-        //bike availability CRI ==> dock availability is AOK
-        //bike availability BAD ==> dock availability is BAD
-        //bike availability AOK ==> dock availibility is CRI
-        if(_station.empty_slots != null)
-            this.empty_slots = _station.empty_slots;
-        else{
-            if (_station.free_bikes <= DBHelper.getCriticalAvailabilityMax(_ctx))
-                this.empty_slots = DBHelper.getBadAvailabilityMax(_ctx) + 1;    //This is AOK
-            else if (_station.free_bikes <= DBHelper.getBadAvailabilityMax(_ctx))
-                this.empty_slots = DBHelper.getBadAvailabilityMax(_ctx);
-            else
-                this.empty_slots = DBHelper.getCriticalAvailabilityMax(_ctx);
-        }
-
+        this.empty_slots = _station.empty_slots;
         this.free_bikes = _station.free_bikes;
         //}
         this.latitude = _station.latitude;

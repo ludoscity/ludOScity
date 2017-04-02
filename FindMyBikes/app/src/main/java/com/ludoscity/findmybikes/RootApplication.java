@@ -8,9 +8,12 @@ import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.ludoscity.findmybikes.citybik_es.Citybik_esAPI;
+import com.ludoscity.findmybikes.citybik_es.model.Station;
 import com.ludoscity.findmybikes.helpers.DBHelper;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -31,6 +34,10 @@ public class RootApplication extends Application {
 
     Citybik_esAPI mCitybik_esAPI;
     Twitter mTwitterAPI;
+    //Station list data is kept here to survive screen orientation change
+    //It's built from the database on launch (if there's a complete record available) and updated in memory after data download
+    private static ArrayList<StationItem> mBikeshareStationList;
+    //TODO: refactor with MVC in mind. This is model
 
     @Override
     public void onCreate() {
@@ -38,11 +45,24 @@ public class RootApplication extends Application {
 
         try {
             DBHelper.init(this);
-        } catch (IOException | CouchbaseLiteException e) {
-            Log.d(TAG, "Error initializing database", e);
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (IOException | CouchbaseLiteException | PackageManager.NameNotFoundException e) {
             Log.d(TAG, "Error initializing database", e);
         }
+
+        if(!DBHelper.wasLastSavePartial(this)){
+
+            try {
+                mBikeshareStationList = DBHelper.getStationsNetwork();
+            } catch (CouchbaseLiteException | IllegalStateException e) {
+                Log.d("RootApplication", "Couldn't retrieve Station Network from db",e );
+                mBikeshareStationList = new ArrayList<>();
+            }
+
+            Log.i("RootApplication", mBikeshareStationList.size() + " stations loaded from DB");
+        }
+        else
+            mBikeshareStationList = new ArrayList<>();
+
 
         mCitybik_esAPI = buildCitybik_esAPI();
         mTwitterAPI = buildTwitterAPI();
@@ -76,6 +96,47 @@ public class RootApplication extends Application {
 
     public Twitter getTwitterApi(){
         return mTwitterAPI;
+    }
+
+    public static ArrayList<StationItem> getBikeNetworkStationList(){
+        return mBikeshareStationList;
+    }
+
+    public static ArrayList<StationItem> addAllToBikeNetworkStationList(List<Station> _stationList, Context _ctx){
+
+        ArrayList<StationItem> newList = new ArrayList<>(mBikeshareStationList.size());
+
+        for (Station station : _stationList) {
+
+            if (station.empty_slots == null)
+                station = computeDockAvailability(station, _ctx);
+
+            StationItem stationItem = new StationItem(station);
+            newList.add(stationItem);
+        }
+
+        mBikeshareStationList = newList;
+
+        return mBikeshareStationList;
+    }
+
+    //Some systems have empty_slots to null (like nextbike SZ-bike in Dresden, Germany)
+    //in that case, dock availability is derived from bike availability
+    //bike availability CRI ==> dock availability is AOK
+    //bike availability BAD ==> dock availability is BAD
+    //bike availability AOK ==> dock availability is CRI
+    private static Station computeDockAvailability(Station _inData, Context _ctx){
+
+        @SuppressWarnings("UnnecessaryLocalVariable") Station toReturn = _inData;
+
+        if (toReturn.free_bikes <= DBHelper.getCriticalAvailabilityMax(_ctx))
+            toReturn.empty_slots = DBHelper.getBadAvailabilityMax(_ctx) + 1;    //This is AOK
+        else if (toReturn.free_bikes <= DBHelper.getBadAvailabilityMax(_ctx))
+            toReturn.empty_slots = DBHelper.getBadAvailabilityMax(_ctx);
+        else
+            toReturn.empty_slots = DBHelper.getCriticalAvailabilityMax(_ctx);
+
+        return toReturn;
     }
 
     @Override

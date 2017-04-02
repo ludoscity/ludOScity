@@ -49,7 +49,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.couchbase.lite.CouchbaseLiteException;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.common.ConnectionResult;
@@ -88,7 +87,6 @@ import com.ludoscity.findmybikes.citybik_es.Citybik_esAPI;
 import com.ludoscity.findmybikes.citybik_es.model.ListNetworksAnswerRoot;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkDesc;
 import com.ludoscity.findmybikes.citybik_es.model.NetworkStatusAnswerRoot;
-import com.ludoscity.findmybikes.citybik_es.model.Station;
 import com.ludoscity.findmybikes.fragments.StationListFragment;
 import com.ludoscity.findmybikes.fragments.StationMapFragment;
 import com.ludoscity.findmybikes.helpers.DBHelper;
@@ -141,8 +139,6 @@ public class NearbyActivity extends AppCompatActivity
     private RedrawMarkersTask mRedrawMarkersTask = null;
     private FindNetworkTask mFindNetworkTask = null;
     private UpdateTwitterStatusTask mUpdateTwitterTask = null;
-
-    private ArrayList<StationItem> mStationsNetwork = new ArrayList<>();
 
     private LatLng mCurrentUserLatLng = null;
 
@@ -219,31 +215,6 @@ public class NearbyActivity extends AppCompatActivity
         mGoogleApiClient.connect();
 
         checkAndAskLocationPermission();
-
-        if (Utils.Connectivity.isConnected(getApplicationContext()) && !DBHelper.isBikeNetworkIdAvailable(this)) {
-
-            mFindNetworkTask = new FindNetworkTask(DBHelper.getBikeNetworkName(this));
-            mFindNetworkTask.execute();
-        }
-        else if(mStationsNetwork.isEmpty()){
-
-            boolean needDownload = false;
-
-            try {
-                mStationsNetwork = DBHelper.getStationsNetwork();
-            } catch (CouchbaseLiteException | IllegalStateException e) {
-                Log.d("nearbyActivity", "Couldn't retrieve Station Network from db, trying to get a fresh copy from network",e );
-
-                needDownload = true;
-            }
-
-            if (needDownload || mStationsNetwork.isEmpty()){
-                mDownloadWebTask = new DownloadWebTask();
-                mDownloadWebTask.execute();
-            }
-
-            Log.d("nearbyActivity", mStationsNetwork.size() + " stations loaded from DB");
-        }
 
         super.onStart();
     }
@@ -468,6 +439,41 @@ public class NearbyActivity extends AppCompatActivity
         setupLocationRequest();
 
         mCircularRevealInterpolator = AnimationUtils.loadInterpolator(this, R.interpolator.msf_interpolator);
+
+        //Not empty if RootApplication::onCreate got database data
+        if(RootApplication.getBikeNetworkStationList().isEmpty()){
+
+            tryInitialSetup();
+        }
+    }
+
+    private void tryInitialSetup(){
+
+        if (Utils.Connectivity.isConnected(this)) {
+            mSplashScreenText.setText(getString(R.string.auto_bike_select_finding));
+
+            if (DBHelper.isBikeNetworkIdAvailable(this)) {
+
+                mDownloadWebTask = new DownloadWebTask();
+                mDownloadWebTask.execute();
+
+                Log.i("nearbyActivity", "No stationList data in RootApplication but bike network id available in DBHelper- launching first download");
+            }
+            else{
+
+                mFindNetworkTask = new FindNetworkTask(DBHelper.getBikeNetworkName(this));
+                mFindNetworkTask.execute();
+            }
+        }
+        else{
+            Utils.Snackbar.makeStyled(mSplashScreen, R.string.connectivity_rationale, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                    .setAction(R.string.retry, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            tryInitialSetup();
+                        }
+                    }).show();
+        }
     }
 
     private void setupActionBarStrings() {
@@ -1277,7 +1283,7 @@ public class NearbyActivity extends AppCompatActivity
         if (DBHelper.isBikeNetworkIdAvailable(this)){
 
             if(mStationMapFragment.isMapReady()) {
-                if (mStationsNetwork != null && mRefreshMarkers && mRedrawMarkersTask == null) {
+                if (mRefreshMarkers && mRedrawMarkersTask == null) {
 
                     mRedrawMarkersTask = new RedrawMarkersTask();
                     mRedrawMarkersTask.execute(mDataOutdated, isLookingForBike());
@@ -1296,7 +1302,7 @@ public class NearbyActivity extends AppCompatActivity
     private void setupTabPages() {
 
         //TAB A
-        getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, mStationsNetwork,
+        getListPagerAdapter().setupUI(StationListPagerAdapter.BIKE_STATIONS, RootApplication.getBikeNetworkStationList(),
                 true, null, R.drawable.ic_walking_24dp_white,
                 "",
                 mCurrentUserLatLng != null ? new StationRecyclerViewAdapter.DistanceComparator(mCurrentUserLatLng) : null);
@@ -1368,11 +1374,6 @@ public class NearbyActivity extends AppCompatActivity
                     }
 
                     mPagerReady = true;
-                }
-
-                if ( DBHelper.isDataCorrupted(NearbyActivity.this) && mPagerReady && mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null){
-                    mDownloadWebTask = new DownloadWebTask();
-                    mDownloadWebTask.execute();
                 }
 
                 //Update not already in progress
@@ -1459,10 +1460,6 @@ public class NearbyActivity extends AppCompatActivity
                                     futureStringBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
                                 }
                             }
-                        }
-                        else{
-                            mFindNetworkTask = new FindNetworkTask(DBHelper.getBikeNetworkName(NearbyActivity.this));
-                            mFindNetworkTask.execute();
                         }
                     } else {
                         futureStringBuilder.append(getString(R.string.no_connectivity));
@@ -1582,7 +1579,7 @@ public class NearbyActivity extends AppCompatActivity
                                 (rawClosest.contains(StationRecyclerViewAdapter.AOK_AVAILABILITY_POSTFIX) || rawClosest.contains(StationRecyclerViewAdapter.BAD_AVAILABILITY_POSTFIX) ) && //validate content
                                 !mDataOutdated){
 
-                            mUpdateTwitterTask = new UpdateTwitterStatusTask(mStationsNetwork);
+                            mUpdateTwitterTask = new UpdateTwitterStatusTask();
                             mUpdateTwitterTask.execute(rawClosest);
 
                         }
@@ -1844,7 +1841,7 @@ public class NearbyActivity extends AppCompatActivity
             hideSetupShowTripDetailsWidget();
         }
 
-        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork,
+        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, RootApplication.getBikeNetworkStationList(),
                 true ,
                 R.drawable.ic_destination_arrow_white_24dp,
                 R.drawable.ic_pin_search_24dp_white,
@@ -1891,7 +1888,7 @@ public class NearbyActivity extends AppCompatActivity
                     //hackfix. On some devices timing issues led to infinite loop with isRecyclerViewReadyForItemSelection always returning false
                     //so, retry setting up the UI before repost
                     //Replace recyclerview content
-                    getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork,
+                    getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, RootApplication.getBikeNetworkStationList(),
                             true ,
                             R.drawable.ic_destination_arrow_white_24dp,
                             R.drawable.ic_pin_search_24dp_white,
@@ -1931,7 +1928,7 @@ public class NearbyActivity extends AppCompatActivity
 
         final FavoriteItemBase favorite = DBHelper.getFavoriteItemForId(this, _favoriteId);
 
-        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork,
+        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, RootApplication.getBikeNetworkStationList(),
                 true,
                 R.drawable.ic_destination_arrow_white_24dp,
                 R.drawable.ic_pin_favorite_24dp_white,
@@ -1990,7 +1987,7 @@ public class NearbyActivity extends AppCompatActivity
                     //hackfix. On some devices timing issues led to infinite loop with isRecyclerViewReadyForItemSelection always returning false
                     //so, retry stting up the UI before repost
                     //Replace recyclerview content
-                    getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork,
+                    getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, RootApplication.getBikeNetworkStationList(),
                             true,
                             R.drawable.ic_destination_arrow_white_24dp,
                             R.drawable.ic_pin_favorite_24dp_white,
@@ -2061,7 +2058,7 @@ public class NearbyActivity extends AppCompatActivity
             getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
         }
         else{   //it's just an A-B trip
-            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork,
+            getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, RootApplication.getBikeNetworkStationList(),
                     false,
                     null,
                     null,
@@ -2103,7 +2100,7 @@ public class NearbyActivity extends AppCompatActivity
                         //hackfix. On some devices timing issues led to infinite loop with isRecyclerViewReadyForItemSelection always returning false
                         //so, retry stting up the UI before repost
                         //Replace recyclerview content
-                        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, mStationsNetwork,
+                        getListPagerAdapter().setupUI(StationListPagerAdapter.DOCK_STATIONS, RootApplication.getBikeNetworkStationList(),
                                 false,
                                 null,
                                 null,
@@ -2138,7 +2135,8 @@ public class NearbyActivity extends AppCompatActivity
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS) != null) {
+                if (getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.DOCK_STATIONS) != null &&
+                        getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS) != null) {
 
                     int locToAMinutes = 0;
                     int AToBMinutes = 0;
@@ -2376,7 +2374,8 @@ public class NearbyActivity extends AppCompatActivity
     private StationItem getStation(String _stationId){
         StationItem toReturn = null;
 
-        for(StationItem station : mStationsNetwork){
+        ArrayList<StationItem> networkStationList = RootApplication.getBikeNetworkStationList();
+        for(StationItem station : networkStationList){
             if (station.getId().equalsIgnoreCase(_stationId)){
                 toReturn = station;
                 break;
@@ -2730,6 +2729,18 @@ public class NearbyActivity extends AppCompatActivity
 
         //pager will always transition from tab A to tab B on app launch
         if (state == ViewPager.SCROLL_STATE_IDLE && mSplashScreen.isShown()) {
+
+            //If update mode is set to manual and user are out of the bound of the bike network
+            //let's check if there's a better bike network avaialble.
+            if (!DBHelper.getAutoUpdate(this) && Utils.Connectivity.isConnected(NearbyActivity.this))
+            {
+                if (mCurrentUserLatLng != null && !DBHelper.getBikeNetworkBounds(NearbyActivity.this, 5).contains(mCurrentUserLatLng)) {
+                    //This task will possibly auto cancel if it can't find a better bike network
+                    mFindNetworkTask = new FindNetworkTask(DBHelper.getBikeNetworkName(NearbyActivity.this));
+                    mFindNetworkTask.execute();
+                }
+            }
+
             mSplashScreen.setVisibility(View.GONE);
         }
     }
@@ -2889,7 +2900,8 @@ public class NearbyActivity extends AppCompatActivity
 
             mStationMapFragment.clearMarkerGfxData();
             //SETUP MARKERS DATA
-            for (StationItem item : mStationsNetwork){
+            ArrayList<StationItem> networkStationList = RootApplication.getBikeNetworkStationList();
+            for (StationItem item : networkStationList){
                 mStationMapFragment.addMarkerForStationItem(bools[0], item, bools[1]);
             }
 
@@ -2898,7 +2910,9 @@ public class NearbyActivity extends AppCompatActivity
 
         @Override
         protected void onCancelled (Void aVoid) {
-            super.onCancelled(aVoid);
+            //super.onCancelled(aVoid);
+            //https://developer.android.com/reference/android/os/AsyncTask.html#onCancelled(Result)
+            //" If you write your own implementation, do not call super.onCancelled(result)."
 
             mRefreshMarkers = true;
 
@@ -2931,13 +2945,12 @@ public class NearbyActivity extends AppCompatActivity
 
         FindNetworkTask(String _currentNetworkName){ mOldBikeNetworkName = _currentNetworkName; }
 
+        private static final String ERROR_KEY_NO_BETTER = "NO_BETTER_NETWORK" ;
+        private static final String ERROR_KEY_IOEXCEPTION = "IOEXCEPTION" ;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            if(mStationMapFragment != null && mStationMapFragment.getMarkerBVisibleLatLng() != null) {
-                clearBTab();
-            }
 
             mStatusTextView.setText(getString(R.string.searching_wait_location));
 
@@ -2946,10 +2959,39 @@ public class NearbyActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onCancelled() {
-            super.onCancelled();
+        protected void onCancelled(Map<String,String> _result) {
+            //super.onCancelled(aVoid);
+            //https://developer.android.com/reference/android/os/AsyncTask.html#onCancelled(Result)
+            //" If you write your own implementation, do not call super.onCancelled(result)."
 
             getListPagerAdapter().setRefreshingAll(false);
+
+            //This was initial setup
+            if (!DBHelper.isBikeNetworkIdAvailable(NearbyActivity.this)){
+                mSplashScreenText.setText(getString(R.string.sad_emoji));
+                Utils.Snackbar.makeStyled(mSplashScreen, R.string.connectivity_rationale, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                        .setAction(R.string.retry, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                tryInitialSetup();
+                            }
+                        }).show();
+            }
+            else if (_result.containsKey(ERROR_KEY_IOEXCEPTION)){   //HTTP session ran into troubles
+                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_download_failed,
+                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                        .setAction(R.string.resume, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                DBHelper.resumeAutoUpdate();
+                            }
+                        }).show();
+            }
+            else{//_result.containsValue(ERROR_VALUE_NO_BETTER)
+                //new SaveNetworkToDatabaseTask().execute();
+                //Saving to database executes in parallel. Maybe a service should be used in place
+                new SaveNetworkToDatabaseTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
 
             mFindNetworkTask = null;
         }
@@ -3001,6 +3043,7 @@ public class NearbyActivity extends AppCompatActivity
 
                 //It seems we don't have a better candidate than the one we're presently using
                 if (closestNetwork.id.equalsIgnoreCase(DBHelper.getBikeNetworkId(NearbyActivity.this))){
+                    toReturn.put(ERROR_KEY_NO_BETTER, "dummy");
                     cancel(false);
                 }
                 else{
@@ -3017,15 +3060,7 @@ public class NearbyActivity extends AppCompatActivity
             } catch (IOException e) {
 
                 DBHelper.pauseAutoUpdate();
-
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_download_failed,
-                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
-                        .setAction(R.string.resume, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                DBHelper.resumeAutoUpdate();
-                            }
-                        }).show();
+                toReturn.put(ERROR_KEY_IOEXCEPTION, "dummy");
 
                 cancel(false); //No need to try to interrupt the thread
             }
@@ -3048,6 +3083,11 @@ public class NearbyActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Map<String,String> backgroundResults) {
             super.onPostExecute(backgroundResults);
+
+            //We get here only if the network was actually changed
+            if(mStationMapFragment != null && mStationMapFragment.getMarkerBVisibleLatLng() != null) {
+                clearBTab();
+            }
 
             mClosestBikeAutoSelected = false;
 
@@ -3106,25 +3146,14 @@ public class NearbyActivity extends AppCompatActivity
         @Override
         protected Void doInBackground(Void... params) {
 
-            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-
-            for (StationItem station : mStationsNetwork){
-                boundsBuilder.include(station.getLocation());
-            }
-
-            DBHelper.saveBikeNetworkBounds(boundsBuilder.build(), NearbyActivity.this);
-
-            //User is not in coverage area, postExecute will launch appropriate task
-            if (mCurrentUserLatLng != null && !boundsBuilder.build().contains(mCurrentUserLatLng)){
-                return null;
-            }
+            ArrayList<StationItem> networkStationList = RootApplication.getBikeNetworkStationList();
 
             try {
                 //TODO: This is ugly.
                 //This process shouldn't use an asynctask anyway as it's long running :/
                 DBHelper.deleteAllStations();
 
-                for (StationItem station : mStationsNetwork) {
+                for (StationItem station : networkStationList) {
                     DBHelper.saveStation(station);
                 }
             } catch (Exception e) {
@@ -3138,14 +3167,6 @@ public class NearbyActivity extends AppCompatActivity
             super.onPostExecute(aVoid);
 
             DBHelper.notifyEndSavingStations(NearbyActivity.this);
-
-            if (mCurrentUserLatLng != null && !DBHelper.getBikeNetworkBounds(NearbyActivity.this, 0).contains(mCurrentUserLatLng)){
-
-                getListPagerAdapter().removeStationHighlightForPage(mTabLayout.getSelectedTabPosition());
-
-                mFindNetworkTask = new FindNetworkTask(DBHelper.getBikeNetworkName(NearbyActivity.this));
-                mFindNetworkTask.execute();
-            }
         }
     }
 
@@ -3154,22 +3175,16 @@ public class NearbyActivity extends AppCompatActivity
         private static final int REPLY_STATION_NAME_MAX_LENGTH = 54;
         private static final int STATION_ID_LENGTH = 32;
 
-        private final Map<String, StationItem> mTrustedEfficientMap;
-
-        UpdateTwitterStatusTask(List<StationItem> _stationsNetwork){
-
-            mTrustedEfficientMap = new HashMap<>();
-
-            //first, build an efficient map of stations from stationnetwork
-            //because I don't trust the DBHelper.getStationForId just yet
-            //TODO: reowrk database code to use versioning
-            for (StationItem station : _stationsNetwork){
-                mTrustedEfficientMap.put(station.getId(), station);
-            }
-        }
-
         @Override
         protected Void doInBackground(String... params) {
+
+            List<StationItem> networkStationList = RootApplication.getBikeNetworkStationList();
+
+            Map<String, StationItem> networkStationMap = new HashMap<>(networkStationList.size());
+
+            for (StationItem station : networkStationList){
+                networkStationMap.put(station.getId(), station);
+            }
 
             Twitter api = ((RootApplication) getApplication()).getTwitterApi();
 
@@ -3220,7 +3235,7 @@ public class NearbyActivity extends AppCompatActivity
                     selectedBadorAok = e.substring(STATION_ID_LENGTH + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() ,
                             STATION_ID_LENGTH + StationRecyclerViewAdapter.AVAILABILITY_POSTFIX_START_SEQUENCE.length() + 3); //'BAD' or 'AOK'
 
-                    selectedStation = mTrustedEfficientMap.get(selectedStationId);
+                    selectedStation = networkStationMap.get(selectedStationId);
 
                     selectedNbBikes = selectedStation.getFree_bikes();
 
@@ -3281,7 +3296,7 @@ public class NearbyActivity extends AppCompatActivity
                     long replyToId = answerStatus.getId();
 
                     for (Pair<String, String> discarded : discardedStations ){
-                        StationItem discardedStationItem = mTrustedEfficientMap.get(discarded.first);
+                        StationItem discardedStationItem = networkStationMap.get(discarded.first);
 
                         String replyStatusString = String.format(getResources().getString(R.string.twitter_closer_discarded_reply_data_format),
                                 systemHashtag, discardedStationItem.getFree_bikes(), discarded.second, discarded.first,
@@ -3344,6 +3359,8 @@ public class NearbyActivity extends AppCompatActivity
 
     public class DownloadWebTask extends AsyncTask<Void, Void, Void> {
 
+        private LatLngBounds mDownloadedBikeNetworkBounds;
+
         @Override
         protected Void doInBackground(Void... aVoid) {
 
@@ -3366,12 +3383,17 @@ public class NearbyActivity extends AppCompatActivity
             try {
                 statusAnswer = call.execute();
 
-                mStationsNetwork.clear();
+                ArrayList<StationItem> newBikeNetworkStationList = RootApplication.addAllToBikeNetworkStationList(statusAnswer.body().network.stations, NearbyActivity.this);
 
-                for (Station station : statusAnswer.body().network.stations) {
-                    StationItem stationItem = new StationItem(station, NearbyActivity.this);
-                    mStationsNetwork.add(stationItem);
+                //Calculate bounds
+                LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+                for (StationItem station : newBikeNetworkStationList){
+                    boundsBuilder.include(station.getLocation());
                 }
+
+                mDownloadedBikeNetworkBounds = boundsBuilder.build();
+
             } catch (IOException e) {
 
                 cancel(false); //No need to try to interrupt the thread
@@ -3400,30 +3422,46 @@ public class NearbyActivity extends AppCompatActivity
 
         @Override
         protected void onCancelled (Void aVoid){
-            super.onCancelled(aVoid);
+            //super.onCancelled(aVoid);
+            //https://developer.android.com/reference/android/os/AsyncTask.html#onCancelled(Result)
+            //" If you write your own implementation, do not call super.onCancelled(result)."
             //Set interface back
             getListPagerAdapter().setRefreshingAll(false);
 
-            DBHelper.pauseAutoUpdate();
+            //wasn't initial download
+            if(!RootApplication.getBikeNetworkStationList().isEmpty()) {
 
-            if (DBHelper.getAutoUpdate(NearbyActivity.this)) {
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_download_failed,
-                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
-                        .setAction(R.string.resume, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                DBHelper.resumeAutoUpdate();
-                            }
-                        }).show();
+                DBHelper.pauseAutoUpdate();
+
+                if (DBHelper.getAutoUpdate(NearbyActivity.this)) {
+                    Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_download_failed,
+                            Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                            .setAction(R.string.resume, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    DBHelper.resumeAutoUpdate();
+                                }
+                            }).show();
+                } else {
+                    Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.manual_download_failed,
+                            Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+                            .setAction(R.string.retry, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mDownloadWebTask = new DownloadWebTask();
+                                    mDownloadWebTask.execute();
+                                }
+                            }).show();
+                }
             }
             else {
-                Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.manual_download_failed,
-                        Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
+
+                mSplashScreenText.setText(getString(R.string.sad_emoji));
+                Utils.Snackbar.makeStyled(mSplashScreen, R.string.connectivity_rationale, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
                         .setAction(R.string.retry, new View.OnClickListener() {
                             @Override
-                            public void onClick(View v) {
-                                mDownloadWebTask = new DownloadWebTask();
-                                mDownloadWebTask.execute();
+                            public void onClick(View view) {
+                                tryInitialSetup();
                             }
                         }).show();
             }
@@ -3442,6 +3480,7 @@ public class NearbyActivity extends AppCompatActivity
             mClosestBikeAutoSelected = false;
 
             DBHelper.saveLastUpdateTimestampAsNow(getApplicationContext());
+            DBHelper.saveBikeNetworkBounds(mDownloadedBikeNetworkBounds, NearbyActivity.this);
 
             mDataOutdated = false;
             mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
@@ -3455,9 +3494,22 @@ public class NearbyActivity extends AppCompatActivity
             mRefreshMarkers = true;
             mRefreshTabs = true;
             refreshMap();
-            Log.d("nearbyFragment", mStationsNetwork.size() + " stations downloaded from citibik.es");
+            Log.d("nearbyActivity", RootApplication.getBikeNetworkStationList().size() + " stations downloaded from citibik.es");
 
-            new SaveNetworkToDatabaseTask().execute();
+            //users are inside bounds
+            if (mCurrentUserLatLng == null || DBHelper.getBikeNetworkBounds(NearbyActivity.this, 5).contains(mCurrentUserLatLng) ){
+
+                //new SaveNetworkToDatabaseTask().execute();
+                //Saving to database executes in parallel. Maybe a service should be used in place
+                new SaveNetworkToDatabaseTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+            }
+            else if(mCurrentUserLatLng != null){    //users are outside bounds
+
+                //This task will possibly auto cancel if it can't find a better bike network
+                mFindNetworkTask = new FindNetworkTask(DBHelper.getBikeNetworkName(NearbyActivity.this));
+                mFindNetworkTask.execute();
+            }
 
             //must be done last
             mDownloadWebTask = null;
@@ -3468,7 +3520,8 @@ public class NearbyActivity extends AppCompatActivity
 
                 int addedCount = 0;
 
-                for(StationItem station : mStationsNetwork) {
+                ArrayList<StationItem> networkStationList = RootApplication.getBikeNetworkStationList();
+                for(StationItem station : networkStationList) {
                     if (!DBHelper.isFavorite(station.getId(), NearbyActivity.this)) {
 
                         if (addedCount > 3)
@@ -3494,6 +3547,7 @@ public class NearbyActivity extends AppCompatActivity
 
                 if (mOnboardingShowcaseView != null)
                     mOnboardingShowcaseView.hide();
+                    mOnboardingShowcaseView = null;
             }
         }
     }
