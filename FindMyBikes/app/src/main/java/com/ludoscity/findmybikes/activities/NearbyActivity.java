@@ -389,6 +389,10 @@ public class NearbyActivity extends AppCompatActivity
         findViewById(R.id.trip_details_directions_loc_to_a).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mOnboardingShowcaseView != null){
+                    mOnboardingShowcaseView.hide();
+                    mOnboardingShowcaseView = null;
+                }
                 launchGoogleMapsForDirections(mCurrentUserLatLng, mStationMapFragment.getMarkerALatLng(), true);
             }
         });
@@ -396,6 +400,10 @@ public class NearbyActivity extends AppCompatActivity
         findViewById(R.id.trip_details_directions_a_to_b).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mOnboardingShowcaseView != null){
+                    mOnboardingShowcaseView.hide();
+                    mOnboardingShowcaseView = null;
+                }
                 launchGoogleMapsForDirections(mStationMapFragment.getMarkerALatLng(), mStationMapFragment.getMarkerBVisibleLatLng(), false);
             }
         });
@@ -403,6 +411,10 @@ public class NearbyActivity extends AppCompatActivity
         findViewById(R.id.trip_details_directions_b_to_destination).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(mOnboardingShowcaseView != null){
+                    mOnboardingShowcaseView.hide();
+                    mOnboardingShowcaseView = null;
+                }
                 if (mStationMapFragment.isPickedPlaceMarkerVisible())
                     launchGoogleMapsForDirections(mStationMapFragment.getMarkerBVisibleLatLng(), mStationMapFragment.getMarkerPickedPlaceVisibleLatLng(), true);
                 else //Either Place marker or Favorite marker is visible, but not both at once
@@ -585,9 +597,8 @@ public class NearbyActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
-                if(mOnboardingShowcaseView != null){
-                    mOnboardingShowcaseView.hide();
-                    mOnboardingShowcaseView = null;
+                if (mOnboardingShowcaseView != null){
+                    animateShowcaseToItinerary();
                 }
 
                 if (_toAdd instanceof FavoriteItemPlace) {
@@ -1651,8 +1662,10 @@ public class NearbyActivity extends AppCompatActivity
                         .setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                //onboarding step 3
-                                animateShowcaseStationBFavorite();
+                                if (!mStationMapFragment.isPickedFavoriteMarkerVisible())
+                                    animateShowcaseToAddFavorite();
+                                else
+                                    animateShowcaseToItinerary();
                             }
                         })
                         .build();
@@ -1717,12 +1730,20 @@ public class NearbyActivity extends AppCompatActivity
         mOnboardingSnackBar.show();
     }
 
-    private void animateShowcaseStationBFavorite() {
+    private void animateShowcaseToAddFavorite() {
         mOnboardingShowcaseView.hideButton();
 
         mOnboardingShowcaseView.setShowcase(new ViewTarget(mAddFavoriteFAB) , true);
         mOnboardingShowcaseView.setContentTitle(getString(R.string.onboarding_showcase_add_favorite_title));
         mOnboardingShowcaseView.setContentText(getString(R.string.onboarding_showcase_add_favorite_text));
+    }
+
+    private void animateShowcaseToItinerary(){
+        mOnboardingShowcaseView.hideButton();
+
+        mOnboardingShowcaseView.setShowcase(new ViewTarget(R.id.trip_details_directions_a_to_b, this), true);
+        mOnboardingShowcaseView.setContentTitle(getString(R.string.onboarding_showcase_itinerary_title));
+        mOnboardingShowcaseView.setContentText(getString(R.string.onboarding_showcase_itinerary_favorite_text));
     }
 
     private void setStatusBarClickListener() {
