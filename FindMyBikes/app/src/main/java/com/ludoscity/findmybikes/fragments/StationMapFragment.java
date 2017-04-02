@@ -231,7 +231,8 @@ public class StationMapFragment extends Fragment
         if (isPickedPlaceMarkerVisible())
             mMarkerPickedPlace.showInfoWindow();
 
-        if ( (mMarkerStationA.isVisible() &&
+        if (marker.getTitle().equalsIgnoreCase(mMarkerPickedFavorite.getTitle()) ||
+            (mMarkerStationA.isVisible() &&
                 mMarkerStationA.getPosition().latitude == marker.getPosition().latitude &&
                 mMarkerStationA.getPosition().longitude == marker.getPosition().longitude) ||
             (mMarkerStationB.isVisible() &&
