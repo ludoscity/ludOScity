@@ -598,7 +598,12 @@ public class NearbyActivity extends AppCompatActivity
             public void onClick(View view) {
 
                 if (mOnboardingShowcaseView != null){
-                    animateShowcaseToItinerary();
+                    if (checkOnboarding(eONBOARDING_LEVEL.ONBOARDING_LEVEL_FULL, eONBOARDING_STEP.ONBOARDING_STEP_CHECKONLY))
+                        animateShowcaseToItinerary(); //TODO: have those elevated to steps and have animate* methods called from checkOnboarding
+                    else{
+                        mOnboardingShowcaseView.hide();
+                        mOnboardingShowcaseView = null;
+                    }
                 }
 
                 if (_toAdd instanceof FavoriteItemPlace) {
@@ -1196,7 +1201,7 @@ public class NearbyActivity extends AppCompatActivity
         }
     }
 
-    private enum eONBOARDING_STEP { ONBOARDING_STEP_SEARCH_SHOWCASE, ONBOARDING_STEP_TRIP_TOTAL_SHOWCASE,
+    private enum eONBOARDING_STEP { ONBOARDING_STEP_CHECKONLY, ONBOARDING_STEP_SEARCH_SHOWCASE, ONBOARDING_STEP_TRIP_TOTAL_SHOWCASE,
         ONBOARDING_STEP_MAIN_CHOICE_HINT, ONBOARDING_STEP_TAP_FAV_NAME_HINT, ONBOARDING_STEP_SEARCH_HINT }
 
     private enum eONBOARDING_LEVEL{ONBOARDING_LEVEL_FULL, ONBOARDING_LEVEL_LIGHT, ONBOARDING_LEVEL_ULTRA_LIGHT}
@@ -1216,8 +1221,6 @@ public class NearbyActivity extends AppCompatActivity
             minValidFavorites = getApplicationContext().getResources().getInteger(R.integer.onboarding_none_min_valid_favorites_count);
 
         //count valid favorites
-        //+ network
-        //== onboarding
         if ( !DBHelper.hasAtLeastNValidFavorites(
                 getListPagerAdapter().getHighlightedStationForPage(StationListPagerAdapter.BIKE_STATIONS),
                 minValidFavorites,

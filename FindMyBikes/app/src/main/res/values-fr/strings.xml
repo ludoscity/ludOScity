@@ -63,11 +63,11 @@
     <string name="trip_details_share_title">Partager durée du trajet avec…</string>
     <string name="cities">#villes</string>
     <string name="onboarding_showcase_add_favorite_text">\nPresque terminé ! Pour ajouter un favori, cliquez sur ce bouton coeur.</string>
-    <string name="onboarding_showcase_add_favorite_title">#truc 1/2</string>
+    <string name="onboarding_showcase_add_favorite_title">#truc 2/2</string>
     <string name="onboarding_showcase_search_text">Pédalons de A à B.\n\nVous n\'avez aucun favori ! Pour commencer, cliquez sur le bouton de recherche et entrez un nom de lieu ou une adresse…</string>
     <string name="onboarding_showcase_search_title">#où aller ?</string>
     <string name="onboarding_showcase_total_time_text">\nHop ! Voyez l\'estimation de votre temps de trajet basée sur la disponibilité des ancrages %1$s aux alentours de %2$s…</string>
-    <string name="onboarding_showcase_total_time_title" tools:ignore="TypographyFractions">#truc 0/2</string>
+    <string name="onboarding_showcase_total_time_title" tools:ignore="TypographyFractions">#truc 1/2</string>
     <string name="onboarding_hint_main_choice">#ouvrir favoris, utiliser recherche, ou cliquer une station</string>
     <string name="onboarding_hint_main_choice_no_connectivity">#ouvrir favoris ou cliquer une station</string>
     <string name="onboarding_hint_tap_favorite_name">#cliquer nom pour définir destination, #glisser pour supprimer</string>
@@ -87,5 +87,5 @@
     <string name="availability_hint_veryoften">Vélos ou ancrages très souvent hors service</string>
     <string name="connectivity_rationale">#connexion internet requise pour la configuration initiale !</string>
     <string name="onboarding_showcase_itinerary_favorite_text">Une dernière chose. Pour voir l\'itinéraire et une durée estimée plus précise dans Google Map, utilisez les boutons \'itinéraire\'. Puis pressez retour.</string>
-    <string name="onboarding_showcase_itinerary_title">#truc 2/2</string>
+    <string name="onboarding_showcase_itinerary_title">#dernier truc</string>
 </resources>

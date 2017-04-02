@@ -79,9 +79,9 @@
     <string name="cities">#cities</string>
     <string name="onboarding_showcase_search_title">#where to ?</string>
     <string name="onboarding_showcase_search_text">Let\'s bike from A to B.\n\nYou have no favorites ! To get started, tap the search button and enter a place name or address…</string>
-    <string name="onboarding_showcase_total_time_title">#tip 0/2</string>
+    <string name="onboarding_showcase_total_time_title">#tip 1/2</string>
     <string name="onboarding_showcase_total_time_text">"\nBam ! View your trip time estimate based on %1$s dock availability around %2$s…</string>
-    <string name="onboarding_showcase_add_favorite_title" tools:ignore="TypographyFractions">#tip 1/2</string>
+    <string name="onboarding_showcase_add_favorite_title" tools:ignore="TypographyFractions">#tip 2/2</string>
     <string name="onboarding_showcase_add_favorite_text">\nAlmost done ! Add a favorite by tapping this heart shaped button.</string>
     <string name="onboarding_hint_main_choice">#open favorites, use search, or tap station</string>
     <string name="onboarding_hint_main_choice_no_connectivity">#open favorites or tap station</string>
@@ -101,6 +101,6 @@
     <string name="availability_hint_often">Bikes or docks are often broken</string>
     <string name="availability_hint_veryoften">Bikes or docks are very often broken</string>
     <string name="connectivity_rationale">#internet connection required for initial setup !</string>
-    <string name="onboarding_showcase_itinerary_title">#tip 2/2</string>
+    <string name="onboarding_showcase_itinerary_title">#last tip</string>
     <string name="onboarding_showcase_itinerary_favorite_text">One last thing. To view your itinerary and a more precise time estimate in Google Map, use the \'directions\' buttons. Press back when done.</string>
 </resources>
