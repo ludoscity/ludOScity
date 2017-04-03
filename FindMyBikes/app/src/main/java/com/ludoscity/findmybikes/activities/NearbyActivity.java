@@ -1901,7 +1901,7 @@ public class NearbyActivity extends AppCompatActivity
                             _from.getLatLng(),
                             _from.getAttributions());
 
-                    mStationMapFragment.setMapPaddingRight(0);
+                    mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_infowindow_padding));
                     animateCameraToShow((int) getResources().getDimension(R.dimen.camera_search_infowindow_padding),
                             _from.getLatLng(),
                             mStationMapFragment.getMarkerBVisibleLatLng(),
@@ -1994,7 +1994,7 @@ public class NearbyActivity extends AppCompatActivity
                                 location,
                                 favorite.getAttributions());
 
-                        mStationMapFragment.setMapPaddingRight(0);
+                        mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_infowindow_padding));
                         animateCameraToShow((int) getResources().getDimension(R.dimen.camera_search_infowindow_padding),
                                 location,
                                 mStationMapFragment.getMarkerBVisibleLatLng(),
@@ -2070,7 +2070,7 @@ public class NearbyActivity extends AppCompatActivity
                 if (locationToShow.latitude != selectedStation.getLocation().latitude ||
                         locationToShow.longitude != selectedStation.getLocation().longitude)
                 {
-                    mStationMapFragment.setMapPaddingRight(0);
+                    mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_infowindow_padding));
                     animateCameraToShow((int) getResources().getDimension(R.dimen.camera_search_infowindow_padding),
                             selectedStation.getLocation(),//getLatLngForStation(_selectedStationId),
                             locationToShow,
@@ -2737,7 +2737,7 @@ public class NearbyActivity extends AppCompatActivity
                         mAddFavoriteFAB.show();
 
                     if (locationToShow != null) {
-                        mStationMapFragment.setMapPaddingRight(0);
+                        mStationMapFragment.setMapPaddingRight((int) getResources().getDimension(R.dimen.map_infowindow_padding));
                         animateCameraToShow((int) getResources().getDimension(R.dimen.camera_search_infowindow_padding),
                                 mStationMapFragment.getMarkerBVisibleLatLng(),
                                 locationToShow,

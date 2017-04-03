@@ -27,6 +27,7 @@
     <dimen name="map_fab_padding">72dp</dimen> <!-- fab_width + end_aligned_fab_margin_end -->
     <dimen name="camera_fab_padding">@dimen/map_fab_padding</dimen>
     <dimen name="camera_ab_pin_padding">39dp</dimen> <!-- pin size + 3dp of padding -->
+    <dimen name="map_infowindow_padding">20dp</dimen>
     <dimen name="camera_search_infowindow_padding">60dp</dimen>
 
     <dimen name="trip_details_widget_width">134dp</dimen>
