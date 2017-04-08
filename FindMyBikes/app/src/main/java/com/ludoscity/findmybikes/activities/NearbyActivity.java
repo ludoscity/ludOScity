@@ -139,6 +139,7 @@ public class NearbyActivity extends AppCompatActivity
     private RedrawMarkersTask mRedrawMarkersTask = null;
     private FindNetworkTask mFindNetworkTask = null;
     private UpdateTwitterStatusTask mUpdateTwitterTask = null;
+    private SaveNetworkToDatabaseTask mSaveNetworkToDatabaseTask = null;
 
     private LatLng mCurrentUserLatLng = null;
 
@@ -2762,7 +2763,7 @@ public class NearbyActivity extends AppCompatActivity
                         mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                 }
 
-                Log.d("NearbyActivity", "onPageSelected - about to update markers with mDataOutdated : " + mDataOutdated, new Exception());
+                //Log.d("NearbyActivity", "onPageSelected - about to update markers with mDataOutdated : " + mDataOutdated, new Exception());
                 //if mDataOutdated is true, a Download task will be launched if auto update is also true and a connection is available
                 //That's because autoupdate max interval is SMALLER than outdating one
                 if (!(mDataOutdated && DBHelper.getAutoUpdate(this) && Utils.Connectivity.isConnected(this)))
@@ -3058,9 +3059,13 @@ public class NearbyActivity extends AppCompatActivity
                 mRefreshTabs = true;
 
                 refreshMap();
-                //new SaveNetworkToDatabaseTask().execute();
-                //Saving to database executes in parallel. Maybe a service should be used in place
-                new SaveNetworkToDatabaseTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+                if (mSaveNetworkToDatabaseTask == null) {
+                    //new SaveNetworkToDatabaseTask().execute();
+                    //Saving to database executes in parallel. Maybe a service should be used in place
+                    mSaveNetworkToDatabaseTask = new SaveNetworkToDatabaseTask();
+                    mSaveNetworkToDatabaseTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
             }
 
             mFindNetworkTask = null;
@@ -3248,6 +3253,9 @@ public class NearbyActivity extends AppCompatActivity
             super.onPostExecute(aVoid);
 
             DBHelper.notifyEndSavingStations(NearbyActivity.this);
+
+            //must be done last
+            mSaveNetworkToDatabaseTask = null;
         }
     }
 
@@ -3484,6 +3492,11 @@ public class NearbyActivity extends AppCompatActivity
                 cancel(false); //No need to try to interrupt the thread
             }
 
+            while (true){   //Must hang in the background if data saving is in progress already
+                if (mSaveNetworkToDatabaseTask == null)
+                    break;
+            }
+
             return null;
         }
 
@@ -3592,7 +3605,8 @@ public class NearbyActivity extends AppCompatActivity
 
                 //new SaveNetworkToDatabaseTask().execute();
                 //Saving to database executes in parallel. Maybe a service should be used in place
-                new SaveNetworkToDatabaseTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                mSaveNetworkToDatabaseTask =  new SaveNetworkToDatabaseTask();
+                mSaveNetworkToDatabaseTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
             }
             else if(mCurrentUserLatLng != null){    //users are outside bounds
