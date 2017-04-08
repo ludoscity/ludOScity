@@ -334,7 +334,9 @@ public class StationMapFragment extends Fragment
 
     public void setMapPaddingRight(int _paddingPx){
         CURRENT_MAP_PADDING_RIGHT = _paddingPx;
-        mGoogleMap.setPadding(CURRENT_MAP_PADDING_LEFT, 0, CURRENT_MAP_PADDING_RIGHT, 0);
+        mGoogleMap.setPadding(CURRENT_MAP_PADDING_LEFT, 0, CURRENT_MAP_PADDING_RIGHT, 0);   //seen java.lang.NullPointerException on Galaxy Nexus
+                                                                                            //on rapid multiple screen orientation change
+                                                                                            //timing issue with Handler runnable (NearbyActivity.java:2653)
     }
 
     public void setScrollGesturesEnabled(boolean _toSet){
@@ -572,6 +574,8 @@ public class StationMapFragment extends Fragment
 
         if (getContext() == null)
             return;
+
+        //Log.d("StaitonMapFragment", "updateMarkerAll - about to update markers with _outdated : " + _outdated, new Exception());
 
         try {
             for (StationMapGfx markerData : mMapMarkersGfxData) {

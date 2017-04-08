@@ -150,7 +150,16 @@ public class StationListFragment extends Fragment
 
             Comparator<StationItem> comparator = savedInstanceState.getParcelable("sort_comparator");
 
-            getStationRecyclerViewAdapter().setAvailabilityOutdated(savedInstanceState.getBoolean("availability_outdated"));
+            if (savedInstanceState.getBoolean("availability_outdated")) {
+                getStationRecyclerViewAdapter().setAvailabilityOutdated(true);
+                mStationRecapAvailability.getPaint().setStrikeThruText(true);
+                mStationRecapAvailability.getPaint().setTypeface(Typeface.DEFAULT);
+            }
+            else{
+                getStationRecyclerViewAdapter().setAvailabilityOutdated(false);
+                mStationRecapAvailability.getPaint().setStrikeThruText(false);
+                mStationRecapAvailability.getPaint().setTypeface(Typeface.DEFAULT_BOLD);
+            }
 
             setupUI(RootApplication.getBikeNetworkStationList(), savedInstanceState.getBoolean("looking_for_bike"),
                     savedInstanceState.getBoolean("proximity_header_visible"),
@@ -164,17 +173,21 @@ public class StationListFragment extends Fragment
             if (selectedPos != NO_POSITION)
                 getStationRecyclerViewAdapter().setSelectedPos(selectedPos, false);
 
-            if (!savedInstanceState.getBoolean("station_recap_visible")) {
-                mStationRecap.setVisibility(View.GONE);
-            }
-
             mStationRecapName.setText(savedInstanceState.getString("station_recap_name"));
             mStationRecapAvailability.setText(savedInstanceState.getString("station_recap_availability_string"));
 
-            if (savedInstanceState.getInt("station_recap_availability_color") == ContextCompat.getColor(getContext(), R.color.station_recap_green))
-                mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.station_recap_green));
-            else
-                mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.station_recap_yellow));
+            mStationRecapAvailability.setTextColor(savedInstanceState.getInt("station_recap_availability_color"));
+
+            if (savedInstanceState.getBoolean("station_recap_visible")) {
+                mStationRecyclerView.setVisibility(View.GONE);
+                mEmptyListTextView.setVisibility(View.VISIBLE);
+                mStationRecap.setVisibility(View.VISIBLE);
+            }
+            else{
+                mStationRecyclerView.setVisibility(View.VISIBLE);
+                mEmptyListTextView.setVisibility(View.GONE);
+                mStationRecap.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -184,6 +197,7 @@ public class StationListFragment extends Fragment
                         Comparator<StationItem> _sortComparator) {
 
         //TODO: fix glitch when coming back from place widget (Note to past self : describe glitch)
+        mEmptyListTextView.setText(_stringIfEmpty);
         if (!_stationsNetwork.isEmpty()) {
             mStationRecyclerView.setVisibility(View.VISIBLE);
             mEmptyListTextView.setVisibility(View.GONE);
@@ -191,7 +205,6 @@ public class StationListFragment extends Fragment
         }
         else{
             mStationRecyclerView.setVisibility(View.GONE);
-            mEmptyListTextView.setText(_stringIfEmpty);
             mEmptyListTextView.setVisibility(View.VISIBLE);
             mStationRecap.setVisibility(View.VISIBLE);
         }
@@ -385,6 +398,12 @@ public class StationListFragment extends Fragment
     }
 
     public void setOutdatedData(boolean _availabilityOutdated) {
+        //TODO: refactor with MVC in mind. Outdated status is model
+        if (_availabilityOutdated){
+            mStationRecapAvailability.getPaint().setStrikeThruText(true);
+            mStationRecapAvailability.getPaint().setTypeface(Typeface.DEFAULT);
+            mStationRecapAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.theme_accent));
+        }
         getStationRecyclerViewAdapter().setAvailabilityOutdated(_availabilityOutdated);
     }
 

@@ -244,6 +244,9 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
     public void setAvailabilityOutdated(boolean _toSet) {
 
+        //TODO: refactor with MVC in mind. Outdated status is model
+        //There's a copy in NearbyActivity (loosely being the controller)
+        //This local one is used for bindings
         if (mOutdatedAvailability != _toSet) {
 
             mOutdatedAvailability = _toSet;

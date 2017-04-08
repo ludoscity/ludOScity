@@ -769,6 +769,7 @@ public class NearbyActivity extends AppCompatActivity
             }
         } else if (requestCode == SETTINGS_ACTIVITY_REQUEST_CODE){
 
+            DBHelper.resumeAutoUpdate();    //Does NOT start it if user didn't activated it in Setting activity
             mClosestBikeAutoSelected = false;
             mRefreshMarkers = true;
             refreshMap();
@@ -1294,6 +1295,9 @@ public class NearbyActivity extends AppCompatActivity
 
     private void refreshMap(){
 
+        /*Log.d("nearbyActivity", "refreshMap", new Exception());
+        Log.d("nearbyActivity", "refreshMap outdateddata status :" + mDataOutdated );*/
+
         if (DBHelper.isBikeNetworkIdAvailable(this)){
 
             if(mStationMapFragment.isMapReady()) {
@@ -1433,30 +1437,13 @@ public class NearbyActivity extends AppCompatActivity
 
                         if (DBHelper.isBikeNetworkIdAvailable(getApplicationContext())) {
 
-                            String rawClosest = getListPagerAdapter().retrieveClosestRawIdAndAvailability(true);
-                            StationItem closestStation = getStation(Utils.extractClosestAvailableStationIdFromProcessedString(rawClosest));
-
-                            if (difference >= NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.outdated_data_time_minute) * 60 * 1000 &&
-                                    !mDataOutdated) {
-
-                                mDataOutdated = true;
-
-                                mRefreshMarkers = true;
-                                refreshMap();
-
-                                mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
-
-                                getListPagerAdapter().setupBTabStationARecap(closestStation, mDataOutdated);
-                                getListPagerAdapter().setOutdatedDataAll(true);
-                            }
-
                             if (!DBHelper.getAutoUpdate(getApplicationContext())) {
                                 futureStringBuilder.append(getString(R.string.pull_to_refresh));
 
                             } else {
 
                                 //Should come from something keeping tabs on time, maybe this runnable itself
-                                long wishedUpdateTime = runnableLastRefreshTimestamp + 5 * 1000 * 60;  //comes from Prefs
+                                long wishedUpdateTime = runnableLastRefreshTimestamp + NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.update_auto_interval_minute) * 1000 * 60;  //comes from Prefs
                                 //Debug
                                 //long wishedUpdateTime = runnableLastRefreshTimestamp + 15 * 1000;  //comes from Prefs
 
@@ -1473,6 +1460,21 @@ public class NearbyActivity extends AppCompatActivity
                                     // formatted will be HH:MM:SS or MM:SS
                                     futureStringBuilder.append(DateUtils.formatElapsedTime(differenceSecond));
                                 }
+                            }
+
+                            if (difference >= NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.outdated_data_time_minute) * 60 * 1000 &&
+                                    !mDataOutdated) {
+
+                                mDataOutdated = true;
+
+                                if (mDownloadWebTask == null) {  //Auto update didn't kick in. If task cancels it will execute same code then
+
+                                    mRefreshMarkers = true;
+                                    refreshMap();
+                                    mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
+                                    getListPagerAdapter().setOutdatedDataAll(true);
+                                }
+
                             }
                         }
                     } else {
@@ -1630,6 +1632,9 @@ public class NearbyActivity extends AppCompatActivity
 
         if (Utils.Connectivity.isConnected(getApplicationContext())) {
 
+            if(mFavoritesSheetFab.isSheetVisible())
+                mFavoritesSheetFab.hideSheet();
+
             if (mOnboardingShowcaseView == null) {
                 mOnboardingShowcaseView =
                         new ShowcaseView.Builder(NearbyActivity.this)
@@ -1776,7 +1781,12 @@ public class NearbyActivity extends AppCompatActivity
         //Map ready
         if (uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MAP_READY_PATH))
         {
-            refreshMap();
+            long wishedUpdateTime = DBHelper.getLastUpdateTimestamp(getApplicationContext()) + NearbyActivity.this.getApplicationContext().getResources().getInteger(R.integer.update_auto_interval_minute) * 1000 * 60;  //comes from Prefs
+
+            if ( mDownloadWebTask == null && !( //if no download task been launched but conditions are met that one will be launched imminently, don't refresh map
+                    DBHelper.getAutoUpdate(this) && System.currentTimeMillis() >= wishedUpdateTime && Utils.Connectivity.isConnected(this)
+                    ) )
+                refreshMap();
         }
         //Marker click - ignored if onboarding is in progress
         else if ( uri.getPath().equalsIgnoreCase("/" + StationMapFragment.MARKER_CLICK_PATH) && mOnboardingShowcaseView == null){
@@ -1886,7 +1896,8 @@ public class NearbyActivity extends AppCompatActivity
             @Override
             public void run() {
 
-                if (getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.DOCK_STATIONS)) {
+                if (getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.DOCK_STATIONS) &&
+                        mRedrawMarkersTask == null) {
                     //highlight B station in list
 
                     //the following is why the handler is required (to let time for things to settle after calling getListPagerAdapter().setupUI)
@@ -2117,7 +2128,7 @@ public class NearbyActivity extends AppCompatActivity
                         //highlight B station in list
 
                         getListPagerAdapter().highlightStationForPage(_selectedStationId, StationListPagerAdapter.DOCK_STATIONS);
-                        if (!_silent)
+                        if (!_silent && mStationMapFragment.getMarkerBVisibleLatLng() != null)
                             mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
 
                         getListPagerAdapter().smoothScrollHighlightedInViewForPage(StationListPagerAdapter.DOCK_STATIONS, isAppBarExpanded());
@@ -2627,7 +2638,8 @@ public class NearbyActivity extends AppCompatActivity
 
         //Happens on screen orientation change
         if (mStationMapFragment == null ||
-                (mStationMapFragment.getMarkerBVisibleLatLng() != null && getListPagerAdapter().getHighlightedStationForPage(position) == null)){
+                (mStationMapFragment.getMarkerBVisibleLatLng() != null && getListPagerAdapter().getHighlightedStationForPage(position) == null) ||
+                !mStationMapFragment.isMapReady()){
             Handler handler = new Handler();
 
             handler.postDelayed(new Runnable() {
@@ -2677,7 +2689,10 @@ public class NearbyActivity extends AppCompatActivity
 
                     animateCameraToShowUserAndStation(highlightedStation);
 
-                    mStationMapFragment.lookingForBikes(mDataOutdated, true);
+                    //if mDataOutdated is true, a Download task will be launched if auto update is also true and a connection is available
+                    //That's because autoupdate max interval is SMALLER than outdating one
+                    if (!(mDataOutdated && DBHelper.getAutoUpdate(this) && Utils.Connectivity.isConnected(this)))
+                        mStationMapFragment.lookingForBikes(mDataOutdated, true);
                 }
             } else { //B TAB
 
@@ -2747,7 +2762,11 @@ public class NearbyActivity extends AppCompatActivity
                         mStationMapFragment.animateCamera(CameraUpdateFactory.newLatLngZoom(mStationMapFragment.getMarkerBVisibleLatLng(), 15));
                 }
 
-                mStationMapFragment.lookingForBikes(mDataOutdated, false);
+                Log.d("NearbyActivity", "onPageSelected - about to update markers with mDataOutdated : " + mDataOutdated, new Exception());
+                //if mDataOutdated is true, a Download task will be launched if auto update is also true and a connection is available
+                //That's because autoupdate max interval is SMALLER than outdating one
+                if (!(mDataOutdated && DBHelper.getAutoUpdate(this) && Utils.Connectivity.isConnected(this)))
+                    mStationMapFragment.lookingForBikes(mDataOutdated, false);
             }
         }
     }
@@ -2769,7 +2788,8 @@ public class NearbyActivity extends AppCompatActivity
                 }
             }
 
-            mSplashScreen.setVisibility(View.GONE);
+            if (mFindNetworkTask == null)
+                mSplashScreen.setVisibility(View.GONE);
         }
     }
 
@@ -2907,6 +2927,10 @@ public class NearbyActivity extends AppCompatActivity
 
     private class RedrawMarkersTask extends AsyncTask<Boolean, Void, Void> {
 
+        /*public RedrawMarkersTask(){
+            Log.d("NearbyActivity", "redraw markers construction, mDataOutdated : " + mDataOutdated, new Exception());
+        }*/
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -2924,6 +2948,8 @@ public class NearbyActivity extends AppCompatActivity
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            //Log.d("NearbyActivity", "redraw markers doInBackground, outdated : " + bools[0], new Exception());
 
 
             mStationMapFragment.clearMarkerGfxData();
@@ -3016,6 +3042,22 @@ public class NearbyActivity extends AppCompatActivity
                         }).show();
             }
             else{//_result.containsValue(ERROR_VALUE_NO_BETTER)
+
+                if (mSplashScreen.isShown()){
+                    mSplashScreen.setVisibility(View.GONE);
+                }
+
+                mClosestBikeAutoSelected = false;
+
+                mDataOutdated = false;
+                mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
+
+                getListPagerAdapter().setOutdatedDataAll(false);
+
+                mRefreshMarkers = true;
+                mRefreshTabs = true;
+
+                refreshMap();
                 //new SaveNetworkToDatabaseTask().execute();
                 //Saving to database executes in parallel. Maybe a service should be used in place
                 new SaveNetworkToDatabaseTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -3034,11 +3076,21 @@ public class NearbyActivity extends AppCompatActivity
 
             publishProgress();
 
-            //noinspection StatementWithEmptyBody
-            while (mCurrentUserLatLng == null)
+            //This mambo jambo because a NullPointerException on mCurrentUserLatLng been seen on Galaxy Nexus
+            ///////////////////////
+            LatLng userLoc;
+            final LatLng finalUserLoc;
+
+            while (true)
             {
+                userLoc = mCurrentUserLatLng;
                 //Waiting on location
+                if (userLoc != null){
+                    finalUserLoc = userLoc;
+                    break;
+                }
             }
+            ////////////////////////
 
             publishProgress();
 
@@ -3059,7 +3111,8 @@ public class NearbyActivity extends AppCompatActivity
                     @Override
                     public int compare(NetworkDesc networkDesc, NetworkDesc t1) {
 
-                        return (int) (networkDesc.getMeterFromLatLng(mCurrentUserLatLng) - t1.getMeterFromLatLng(mCurrentUserLatLng));
+                        //NullPointerException on mCurrentUserLatLng been seen on Galaxy Nexus
+                        return (int) (networkDesc.getMeterFromLatLng(finalUserLoc) - t1.getMeterFromLatLng(finalUserLoc));
                     }
                 });
 
@@ -3389,6 +3442,10 @@ public class NearbyActivity extends AppCompatActivity
 
         private LatLngBounds mDownloadedBikeNetworkBounds;
 
+        /*DownloadWebTask(){
+            Log.d("nearbyActivity", "spawning new Download task", new Exception());
+        }*/
+
         @Override
         protected Void doInBackground(Void... aVoid) {
 
@@ -3459,7 +3516,14 @@ public class NearbyActivity extends AppCompatActivity
             //wasn't initial download
             if(!RootApplication.getBikeNetworkStationList().isEmpty()) {
 
-                DBHelper.pauseAutoUpdate();
+                if (mDataOutdated){
+                    mRefreshMarkers = true;
+                    refreshMap();
+                    mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_accent));
+                    getListPagerAdapter().setOutdatedDataAll(true);
+                }
+
+                DBHelper.pauseAutoUpdate(); //Must be done in all cases : getAutoUpdate factorizes in the suspend flag
 
                 if (DBHelper.getAutoUpdate(NearbyActivity.this)) {
                     Utils.Snackbar.makeStyled(mCoordinatorLayout, R.string.auto_download_failed,
@@ -3505,27 +3569,26 @@ public class NearbyActivity extends AppCompatActivity
             //switch progressbar view visibility
 
             getListPagerAdapter().setRefreshingAll(false);
-            mClosestBikeAutoSelected = false;
 
             DBHelper.saveLastUpdateTimestampAsNow(getApplicationContext());
             DBHelper.saveBikeNetworkBounds(mDownloadedBikeNetworkBounds, NearbyActivity.this);
 
-            mDataOutdated = false;
-            mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
-
-            getListPagerAdapter().setOutdatedDataAll(false);
-            String rawClosest = getListPagerAdapter().retrieveClosestRawIdAndAvailability(true);
-            StationItem closestStation = getStation(Utils.extractClosestAvailableStationIdFromProcessedString(rawClosest));
-            if (closestStation != null) //null if downloading immediately after app launch
-                getListPagerAdapter().setupBTabStationARecap(closestStation, mDataOutdated);
-
-            mRefreshMarkers = true;
-            mRefreshTabs = true;
-            refreshMap();
             Log.d("nearbyActivity", RootApplication.getBikeNetworkStationList().size() + " stations downloaded from citibik.es");
 
             //users are inside bounds
             if (mCurrentUserLatLng == null || DBHelper.getBikeNetworkBounds(NearbyActivity.this, 5).contains(mCurrentUserLatLng) ){
+
+                mClosestBikeAutoSelected = false;
+
+                mDataOutdated = false;
+                mStatusBar.setBackgroundColor(ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark));
+
+                getListPagerAdapter().setOutdatedDataAll(false);
+
+                mRefreshMarkers = true;
+                mRefreshTabs = true;
+
+                refreshMap();
 
                 //new SaveNetworkToDatabaseTask().execute();
                 //Saving to database executes in parallel. Maybe a service should be used in place
