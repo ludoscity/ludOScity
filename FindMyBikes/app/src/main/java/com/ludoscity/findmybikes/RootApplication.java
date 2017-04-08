@@ -109,7 +109,9 @@ public class RootApplication extends Application {
         for (Station station : _stationList) {
 
             if (station.empty_slots == null)
-                station = computeDockAvailability(station, _ctx);
+                station.empty_slots = -1;
+            //Some systems have empty_slots to null (like nextbike SZ-bike in Dresden, Germany)
+            //-1 is used to encode this case
 
             StationItem stationItem = new StationItem(station);
             newList.add(stationItem);
@@ -118,25 +120,6 @@ public class RootApplication extends Application {
         mBikeshareStationList = newList;
 
         return mBikeshareStationList;
-    }
-
-    //Some systems have empty_slots to null (like nextbike SZ-bike in Dresden, Germany)
-    //in that case, dock availability is derived from bike availability
-    //bike availability CRI ==> dock availability is AOK
-    //bike availability BAD ==> dock availability is BAD
-    //bike availability AOK ==> dock availability is CRI
-    private static Station computeDockAvailability(Station _inData, Context _ctx){
-
-        @SuppressWarnings("UnnecessaryLocalVariable") Station toReturn = _inData;
-
-        if (toReturn.free_bikes <= DBHelper.getCriticalAvailabilityMax(_ctx))
-            toReturn.empty_slots = DBHelper.getBadAvailabilityMax(_ctx) + 1;    //This is AOK
-        else if (toReturn.free_bikes <= DBHelper.getBadAvailabilityMax(_ctx))
-            toReturn.empty_slots = DBHelper.getBadAvailabilityMax(_ctx);
-        else
-            toReturn.empty_slots = DBHelper.getCriticalAvailabilityMax(_ctx);
-
-        return toReturn;
     }
 
     @Override

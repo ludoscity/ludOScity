@@ -73,9 +73,9 @@ public class StationMapGfx {
                     else
                         groundOverlayOptions.image(greenIcon);
                 } else {
-                    if (_item.getEmpty_slots() <= DBHelper.getCriticalAvailabilityMax(_ctx))
+                    if (_item.getEmpty_slots() != -1 && _item.getEmpty_slots() <= DBHelper.getCriticalAvailabilityMax(_ctx))
                         groundOverlayOptions.image(redIcon);
-                    else if (_item.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
+                    else if (_item.getEmpty_slots() != -1 && _item.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
                         groundOverlayOptions.image(yellowIcon);
                     else
                         groundOverlayOptions.image(greenIcon);
@@ -109,21 +109,17 @@ public class StationMapGfx {
                         groundOverlay.setImage(redIcon);
                     else if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
                         groundOverlay.setImage(yellowIcon);
-                        // check if the overlay is not already green
-                    else //if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
-                        // overlay isn't green yet
+                    else
                         groundOverlay.setImage(greenIcon);
                 } else
                     groundOverlay.setImage(greyIcon);
             } else {
                 if (!mItem.isLocked()) {
-                    if (mItem.getEmpty_slots() <= DBHelper.getCriticalAvailabilityMax(_ctx))
+                    if (mItem.getEmpty_slots() != -1 && mItem.getEmpty_slots() <= DBHelper.getCriticalAvailabilityMax(_ctx))
                         groundOverlay.setImage(redIcon);
-                    else if (mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
+                    else if (mItem.getEmpty_slots() != -1 && mItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(_ctx))
                         groundOverlay.setImage(yellowIcon);
-                        // check if the overlay is not already green
-                    else //if (mItem.getFree_bikes() <= DBHelper.getBadAvailabilityMax(_ctx))
-                        // overlay isn't green yet
+                    else
                         groundOverlay.setImage(greenIcon);
                 } else
                     groundOverlay.setImage(greyIcon);

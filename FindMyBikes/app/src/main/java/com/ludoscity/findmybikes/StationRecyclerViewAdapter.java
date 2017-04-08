@@ -479,7 +479,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             }
             else {
-                mAvailability.setText(mNumberFormat.format(_station.getEmpty_slots()));
+                mAvailability.setText(_station.getEmpty_slots() == -1 ? "--" : mNumberFormat.format(_station.getEmpty_slots()));
                 setColorAndTransparencyFeedback(_selected, _station.getEmpty_slots());
             }
 
@@ -500,7 +500,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
 
             if (!mOutdatedAvailability) {
 
-                if (availabilityValue <= DBHelper.getCriticalAvailabilityMax(mCtx)) {
+                if (availabilityValue != -1 && availabilityValue <= DBHelper.getCriticalAvailabilityMax(mCtx)) {
                     if (selected) {
                         itemView.setBackgroundResource(R.color.stationlist_item_selected_background_red);
                         mProximity.setAlpha(1.f);
@@ -514,7 +514,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                         mName.setAlpha(alpha);
                         mAvailability.setAlpha(alpha);
                     }
-                } else if (availabilityValue <= DBHelper.getBadAvailabilityMax(mCtx)) {
+                } else if (availabilityValue != -1 && availabilityValue <= DBHelper.getBadAvailabilityMax(mCtx)) {
                     if (selected) {
                         itemView.setBackgroundResource(R.color.stationlist_item_selected_background_yellow);
                         mProximity.setAlpha(1.f);
@@ -715,11 +715,11 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
             }
             else {  //A locked station accepts bike returns
 
-                if (stationItem.getEmpty_slots() > DBHelper.getCriticalAvailabilityMax(mCtx)){
+                if (stationItem.getEmpty_slots() == -1 || stationItem.getEmpty_slots() > DBHelper.getCriticalAvailabilityMax(mCtx)){
 
                     if (badOrAOKStationCount == 0) {
 
-                        if (stationItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(mCtx)) {
+                        if (stationItem.getEmpty_slots() != -1 && stationItem.getEmpty_slots() <= DBHelper.getBadAvailabilityMax(mCtx)) {
 
                             availabilityDataPostfixBuilder.insert(0, stationItem.getId() + BAD_AVAILABILITY_POSTFIX);
                         } else {
