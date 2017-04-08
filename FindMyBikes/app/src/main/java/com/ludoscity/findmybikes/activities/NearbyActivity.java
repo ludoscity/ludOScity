@@ -160,7 +160,8 @@ public class NearbyActivity extends AppCompatActivity
     private View mTripDetailsPinSearch;
     private View mTripDetailsPinFavorite;
     private View mSplashScreen;
-    private TextView mSplashScreenText;
+    private TextView mSplashScreenTextTop;
+    private TextView mSplashScreenTextBottom;
 
     private ItemTouchHelper mFavoriteItemTouchHelper;
 
@@ -249,7 +250,8 @@ public class NearbyActivity extends AppCompatActivity
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            mSplashScreenText.setText(R.string.location_please);
+            mSplashScreenTextTop.setText(R.string.location_please);
+            mSplashScreenTextBottom.setText("");
 
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -341,7 +343,8 @@ public class NearbyActivity extends AppCompatActivity
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.snackbar_coordinator);
         mSplashScreen = findViewById(R.id.splashscreen);
-        mSplashScreenText = (TextView)findViewById(R.id.splashscreen_text);
+        mSplashScreenTextTop = (TextView)findViewById(R.id.splashscreen_text_top);
+        mSplashScreenTextBottom = (TextView)findViewById(R.id.splashscreen_text_bottom);
 
         mTripDetailsWidget = findViewById(R.id.trip_details);
         mTripDetailsProximityA = (TextView) findViewById(R.id.trip_details_proximity_a);
@@ -463,7 +466,7 @@ public class NearbyActivity extends AppCompatActivity
     private void tryInitialSetup(){
 
         if (Utils.Connectivity.isConnected(this)) {
-            mSplashScreenText.setText(getString(R.string.auto_bike_select_finding));
+            mSplashScreenTextTop.setText(getString(R.string.auto_bike_select_finding));
 
             if (DBHelper.isBikeNetworkIdAvailable(this)) {
 
@@ -780,7 +783,7 @@ public class NearbyActivity extends AppCompatActivity
                     Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED){
                 // permission was granted, yay! Do the thing
-                mSplashScreenText.setText(R.string.auto_bike_select_finding);
+                mSplashScreenTextTop.setText(R.string.auto_bike_select_finding);
                 mStationMapFragment.enableMyLocationCheckingPermission();
             }
             else
@@ -791,7 +794,8 @@ public class NearbyActivity extends AppCompatActivity
             if (resultCode != RESULT_OK){
 
                 if (mSplashScreen.isShown()){
-                    mSplashScreenText.setText(R.string.sad_emoji);
+                    mSplashScreenTextTop.setText(R.string.sad_emoji);
+                    mSplashScreenTextBottom.setText("");
 
                     Utils.Snackbar.makeStyled(mSplashScreen, R.string.location_turn_on, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
                             .setAction(R.string.retry, new View.OnClickListener() {
@@ -803,7 +807,7 @@ public class NearbyActivity extends AppCompatActivity
                 }
             }
             else{
-                mSplashScreenText.setText(R.string.auto_bike_select_finding);
+                mSplashScreenTextTop.setText(R.string.auto_bike_select_finding);
             }
         }
     }
@@ -947,12 +951,13 @@ public class NearbyActivity extends AppCompatActivity
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
             // permission was granted, yay! Do the thing
-            mSplashScreenText.setText(R.string.auto_bike_select_finding);
+            mSplashScreenTextTop.setText(R.string.auto_bike_select_finding);
             mStationMapFragment.enableMyLocationCheckingPermission();
 
         }else {
 
-            mSplashScreenText.setText(R.string.sad_emoji);
+            mSplashScreenTextTop.setText(R.string.sad_emoji);
+            mSplashScreenTextBottom.setText("");
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(NearbyActivity.this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -2937,6 +2942,7 @@ public class NearbyActivity extends AppCompatActivity
             super.onPreExecute();
 
             mStatusTextView.setText(getString(R.string.refreshing));
+            mSplashScreenTextBottom.setText(getString(R.string.refreshing));
             mStationMapFragment.hideAllStations();
         }
 
@@ -3008,6 +3014,7 @@ public class NearbyActivity extends AppCompatActivity
             super.onPreExecute();
 
             mStatusTextView.setText(getString(R.string.searching_wait_location));
+            mSplashScreenTextBottom.setText(getString(R.string.searching_wait_location));
 
             if (getListPagerAdapter().isViewPagerReady())
                 getListPagerAdapter().setRefreshingAll(true);
@@ -3023,7 +3030,8 @@ public class NearbyActivity extends AppCompatActivity
 
             //This was initial setup
             if (!DBHelper.isBikeNetworkIdAvailable(NearbyActivity.this)){
-                mSplashScreenText.setText(getString(R.string.sad_emoji));
+                mSplashScreenTextTop.setText(getString(R.string.sad_emoji));
+                mSplashScreenTextBottom.setText("");
                 Utils.Snackbar.makeStyled(mSplashScreen, R.string.connectivity_rationale, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
                         .setAction(R.string.retry, new View.OnClickListener() {
                             @Override
@@ -3161,8 +3169,10 @@ public class NearbyActivity extends AppCompatActivity
             if (getListPagerAdapter().isViewPagerReady())
                 getListPagerAdapter().setRefreshingAll(true);
 
-            if (mCurrentUserLatLng != null)
+            if (mCurrentUserLatLng != null) {
                 mStatusTextView.setText(getString(R.string.searching_bike_network));
+                mSplashScreenTextBottom.setText(getString(R.string.searching_bike_network));
+            }
 
         }
 
@@ -3511,6 +3521,7 @@ public class NearbyActivity extends AppCompatActivity
         protected void onPreExecute() {
             super.onPreExecute();
             mStatusTextView.setText(getString(R.string.downloading));
+            mSplashScreenTextBottom.setText(getString(R.string.downloading));
 
             DBHelper.resumeAutoUpdate();
 
@@ -3561,7 +3572,8 @@ public class NearbyActivity extends AppCompatActivity
             }
             else {
 
-                mSplashScreenText.setText(getString(R.string.sad_emoji));
+                mSplashScreenTextTop.setText(getString(R.string.sad_emoji));
+                mSplashScreenTextBottom.setText("");
                 Utils.Snackbar.makeStyled(mSplashScreen, R.string.connectivity_rationale, Snackbar.LENGTH_INDEFINITE, ContextCompat.getColor(NearbyActivity.this, R.color.theme_primary_dark))
                         .setAction(R.string.retry, new View.OnClickListener() {
                             @Override
