@@ -67,6 +67,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -292,6 +293,12 @@ public class NearbyActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         setTheme(R.style.FindMyBikesTheme); //https://developer.android.com/topic/performance/launch-time.html
         super.onCreate(savedInstanceState);
+
+        int mapInit = MapsInitializer.initialize(getApplicationContext());
+
+        if ( mapInit != 0){
+            Log.e("NearbyActivity", "GooglePlayServicesNotAvailableException raised with error code :" + mapInit);
+        }
 
         boolean autoCompleteLoadingProgressBarVisible = false;
         String showcaseTripTotalPlaceName = null;
@@ -1030,7 +1037,12 @@ public class NearbyActivity extends AppCompatActivity
                                             intent = Utils.getWebIntent(NearbyActivity.this, url, true, text.toString());
                                         }
 
+                                        //Seen ActivityNotFoundException in firebase cloud lab (FB package found but can't be launched)
+                                        if(intent.resolveActivity(getPackageManager()) == null)
+                                            intent = Utils.getWebIntent(NearbyActivity.this, url, true, text.toString());
+
                                         startActivity(intent);
+
                                         break;
                                     case 3:
                                         intent = new Intent(Intent.ACTION_SENDTO);
@@ -1050,10 +1062,27 @@ public class NearbyActivity extends AppCompatActivity
                                     case 5:
                                         intent = new Intent(NearbyActivity.this, WebViewActivity.class);
                                         intent.putExtra(WebViewActivity.EXTRA_URL, "file:///android_res/raw/privacy_policy.html");
-                                        intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, getString(R.string.menu_privacy));
+                                        intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, getString(R.string.privacy));
                                         startActivity(intent);
                                         break;
                                     case 6:
+                                        try {
+                                            // get the Twitter app if possible
+                                            getPackageManager().getPackageInfo("com.twitter.android", 0);
+                                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("twitter://user?screen_name=findmybikesdata"));
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        } catch (PackageManager.NameNotFoundException e) {
+                                            // no Twitter app, revert to browser
+                                            intent = Utils.getWebIntent(NearbyActivity.this, "https://twitter.com/findmybikesdata", true, text.toString());
+                                        }
+
+                                        if(intent.resolveActivity(getPackageManager()) == null)
+                                            intent = Utils.getWebIntent(NearbyActivity.this, "https://twitter.com/findmybikesdata", true, text.toString());
+
+                                        startActivity(intent);
+
+                                        break;
+                                    case 7:
                                         intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/f8full/ludOScity/tree/master/FindMyBikes"));
                                         startActivity(intent);
                                         break;
@@ -1504,7 +1533,8 @@ public class NearbyActivity extends AppCompatActivity
                     //pulling the trigger on auto select
                     if (mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null &&
                             !mClosestBikeAutoSelected &&
-                            getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.BIKE_STATIONS)){
+                            getListPagerAdapter().isRecyclerViewReadyForItemSelection(StationListPagerAdapter.BIKE_STATIONS) &&
+                            mStationMapFragment.isMapReady()){
 
                         //Requesting raw string with availability
                         String rawClosest = getListPagerAdapter().retrieveClosestRawIdAndAvailability(true);
@@ -1608,7 +1638,7 @@ public class NearbyActivity extends AppCompatActivity
                     }
 
                     //Checking if station is closest bike
-                    if (mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null){
+                    if (mDownloadWebTask == null && mRedrawMarkersTask == null && mFindNetworkTask == null && mStationMapFragment.isMapReady()){
 
                         if (!isStationAClosestBike()){
                             if (mStationMapFragment.getMarkerBVisibleLatLng() == null){
