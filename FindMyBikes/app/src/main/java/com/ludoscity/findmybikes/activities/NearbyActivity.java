@@ -3532,10 +3532,20 @@ public class NearbyActivity extends AppCompatActivity
                 cancel(false); //No need to try to interrupt the thread
             }
 
+            //Log.d("NearbyActivity", "DownloadTaskBackground - start waiting");
             while (true){   //Must hang in the background if data saving is in progress already
                 if (mSaveNetworkToDatabaseTask == null)
                     break;
+                try {
+                    //This has to happen otherwise release code seems to loop infinitely
+                    Thread.sleep(250);  //Empirically determined
+
+                } catch (InterruptedException e) {
+                    Log.d("NearbyActivity", "Exception while trying to sleep", e);
+                }
+                //Log.d("NearbyActivity", "DownloadTaskBackground - waiting");
             }
+            //Log.d("NearbyActivity", "DownloadTaskBackground - stopped waiting");
 
             return null;
         }
