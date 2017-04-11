@@ -32,7 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
 
         //noinspection ConstantConditions
-        getSupportActionBar().setSubtitle(getString(R.string.menu_settings));
+        getSupportActionBar().setSubtitle(getString(R.string.hashtag_settings));
     }
 
     @Override

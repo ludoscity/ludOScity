@@ -5,29 +5,21 @@
     <string name="appbar_title_postfix">bikes</string>
     <string name="appbar_subtitle_formatted">&lt;i>in %1$s&lt;/b></string>
     <string name="favorites_sheet_header">Favorites - &lt;b>%1$s&lt;/b></string>
-    <string name="title_section_nearby">Nearby</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="no_data">#connection needed for data download!</string>
-    <string name="menu_settings">#settings</string>
-    <string name="menu_about">About</string>
+    <string name="hashtag_settings">#settings</string>
+    <string name="hashtag_about">#about</string>
     <string name="fromCitibik_es">from citybik.es</string>
     <string name="moments">Moments</string>
     <string name="min_abbreviated">min</string>
     <string name="favorite_removed">#favorite removed</string>
     <string name="favorite_added">#favorite added</string>
     <string name="such_short_trip">#you don\'t need me for such a short trip ! ;)</string>
-    <string name="distance">Distance</string>
-    <string name="station">Station</string>
     <string name="bikes">#bikes</string>
     <string name="docks">#docks</string>
     <string name="b_tab_question">#where are we going today ?</string>
-    <string name="b_tab_closest_bike">Closest bike available at station A :&lt;br>&lt;b>%1$s&lt;/b></string>
     <string name="station_recap_bikes">#bikes: %1$d</string>
     <string name="downloading">#downloading data…</string>
     <string name="nextUpdate">Next update</string>
     <string name="no_connectivity">connected #not.</string>
-    <string name="placeholder_lorem_ipsum" translatable="false">lorem ipsum</string>
     <string name="refreshing">#refreshing map…</string>
     <string name="auto_download_failed">#download failed :/ Auto update paused.</string>
     <string name="google_maps_not_installed">Google Maps not installed !</string>
@@ -55,6 +47,7 @@
     <string name="pref_bad_availability_max_key" translatable="false">pref_bad_availability_max</string>
     <string name="hour_abbreviated">h</string>
     <string name="ok" translatable="false">@android:string/ok</string>
+    <!--<string name="undo">@android:string/undo</string> NOT PUBLIC -->
     <string name="undo"><b>UNDO</b></string>
     <string name="no_favorite">No favorite for &lt;b>%1$s&lt;/b></string>
     <string name="favorite_display_name_only_bold" translatable="false">&lt;b>%1$s&lt;/b></string>
@@ -66,18 +59,18 @@
     <string name="auto_bike_select_none">#couldn\'t find any bike ! :s #selected closest station.</string>
     <string name="auto_bike_select_outdated">#outdated data ! :| #selected closest station.</string>
     <string name="title_legal">#legal</string>
+    <string name="title_data">#data</string>
     <string name="twitter_not_closest_bike_data_format" translatable="false">%1$s bike is not closest! Bikes:%2$d %3$s at %4$s %5$s walk %6$s %7$s</string>
     <string name="twitter_closer_discarded_reply_data_format" translatable="false">%1$s discarded closer! Bikes:%2$d %3$s at %4$s %5$s</string>
     <string name="trip_details_share_message_content">I will be at the %1$s station %2$s in %3$s ! Shared via #findmybikes</string>
-    <string name="privacy">#privacy</string>
-    <string name="data">#data</string>
-    <string name="source_code">#source</string>
+    <string name="hashtag_privacy">#privacy</string>
+    <string name="hashtag_data">#data</string>
+    <string name="hashtag_source">#source</string>
     <string name="manual_download_failed">#download failed :/</string>
     <string name="retry">RETRY</string>
-    <string name="legal_notices">#notices</string>
-    <string name="gotit">GOT IT!</string>
+    <string name="hashtag_notices">#notices</string>
     <string name="trip_details_share_title">Share trip duration with…</string>
-    <string name="cities">#cities</string>
+    <string name="hashtag_cities">#cities</string>
     <string name="onboarding_showcase_search_title">#where to ?</string>
     <string name="onboarding_showcase_search_text">Let\'s bike from A to B.\n\nYou have no favorites ! To get started, tap the search button and enter a place name or address…</string>
     <string name="onboarding_showcase_total_time_title" tools:ignore="TypographyFractions">#tip 1/2</string>
@@ -88,8 +81,8 @@
     <string name="onboarding_hint_main_choice_no_connectivity">#open favorites or tap station</string>
     <string name="onboarding_hint_tap_favorite_name">#tap name to set as destination, #swipe to delete</string>
     <string name="onboarding_hint_search">#type any place name or address</string>
-    <string name="rate">#rate</string>
-    <string name="like">#like</string>
+    <string name="hashtag_rate">#rate</string>
+    <string name="hashtag_like">#like</string>
     <string name="feedback">#feedback</string>
     <string name="feedback_subject">I have something to say !</string>
     <string name="location_please">#pretty please :)</string>
@@ -103,5 +96,5 @@
     <string name="availability_hint_veryoften">Bikes or docks are very often broken</string>
     <string name="connectivity_rationale">#internet connection required for initial setup !</string>
     <string name="onboarding_showcase_itinerary_title">#last tip</string>
-    <string name="onboarding_showcase_itinerary_favorite_text">One last thing. To view your itinerary and a more precise time estimate in Google Map, use the \'directions\' buttons. Press back when done.</string>
+    <string name="onboarding_showcase_itinerary_favorite_text">To view your itinerary and a more precise time estimate in Google Map, use the \'directions\' buttons. Press back when done.</string>
 </resources>

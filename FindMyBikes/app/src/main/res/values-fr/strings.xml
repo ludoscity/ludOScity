@@ -2,23 +2,18 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">#vélocalise</string>
     <string name="favorites_sheet_header">Favoris - &lt;b>%1$s&lt;/b></string>
-    <string name="menu_settings">#paramètres</string>
-    <string name="menu_about">À propos</string>
-    <string name="title_section_nearby">À proximité</string>
-    <string name="navigation_drawer_open">Ouvrir navigation drawer</string>
-    <string name="navigation_drawer_close">Fermer navigation drawer</string>
-    <string name="no_data">#connexion internet requise pour le téléchargement des données!</string>
+    <string name="hashtag_settings">#paramètres</string>
+    <string name="hashtag_about">À propos</string>
     <string name="favorite_added">#favori ajouté</string>
     <string name="bikes">#vélos</string>
-    <string name="distance">Distance</string>
     <string name="fromCitibik_es">de citybik.es</string>
     <string name="min_abbreviated">min</string>
+    <!-- TODO: Rename to status_ strings used in compositing status_string-->
     <string name="moments">À l\'instant</string>
     <string name="nextUpdate">Prochaine màj</string>
     <string name="b_tab_question">#où allons-nous aujourd\'hui ?</string>
     <string name="docks">#ancrages</string>
     <string name="favorite_removed">#favori supprimé</string>
-    <string name="station">Station</string>
     <string name="downloading">#téléchargement des données…</string>
     <string name="no_connectivity">#non connecté</string>
     <string name="refreshing">#rafraîchissement de la carte…</string>
@@ -38,7 +33,6 @@
     <string name="hour_abbreviated">h</string>
     <string name="undo"><b>ANNULER</b></string>
     <string name="no_favorite">Aucun favori pour &lt;b>%1$s&lt;/b></string>
-    <string name="b_tab_closest_bike">Vélo le plus proche disponible à la station A :&lt;br>&lt;b>%1$s&lt;/b></string>
     <string name="trip_details_share_message_content">Je serai à la station %1$s %2$s dans %3$s ! Partagé via #findmybikes</string>
     <string name="station_recap_bikes">#vélos: %1$d</string>
     <string name="pref_availability_settings_dialog_title">Paramètres disponibilité</string>
@@ -54,15 +48,14 @@
     <string name="appbar_title_postfix" />
     <string name="appbar_title_prefix">#vélocalise</string>
     <string name="appbar_subtitle_formatted"><![CDATA[<i>à %1$s</b>]]></string>
-    <string name="privacy">#confidentialité</string>
-    <string name="data">#données</string>
-    <string name="source_code">#source</string>
+    <string name="hashtag_privacy">#confidentialité</string>
+    <string name="hashtag_data">#données</string>
+    <string name="hashtag_source">#source</string>
     <string name="manual_download_failed">#échec du téléchargement :/</string>
     <string name="retry">RÉESSAYER</string>
-    <string name="legal_notices">#notices</string>
-    <string name="gotit">COMPRIS!</string>
+    <string name="hashtag_notices">#notices</string>
     <string name="trip_details_share_title">Partager durée du trajet avec…</string>
-    <string name="cities">#villes</string>
+    <string name="hashtag_cities">#villes</string>
     <string name="onboarding_showcase_add_favorite_text">\nPresque terminé ! Pour ajouter un favori, cliquez sur ce bouton coeur.</string>
     <string name="onboarding_showcase_add_favorite_title">#truc 2/2</string>
     <string name="onboarding_showcase_search_text">Pédalons de A à B.\n\nVous n\'avez aucun favori ! Pour commencer, cliquez sur le bouton de recherche et entrez un nom de lieu ou une adresse…</string>
@@ -75,8 +68,8 @@
     <string name="onboarding_hint_search">#Tapez n\'importe quel nom de lieu ou adresse</string>
     <string name="auto_bike_select_outdated">#données périmées ! :| #station la plus proche sélectionnée.</string>
     <string name="feedback">#rétroaction</string>
-    <string name="like">#aimer</string>
-    <string name="rate">#noter</string>
+    <string name="hashtag_like">#aimer</string>
+    <string name="hashtag_rate">#noter</string>
     <string name="feedback_subject">J\'ai quelque chose à dire !</string>
     <string name="location_please">#s\'il vous plaît :)</string>
     <string name="location_rationale">#permission \'localisation\' requise pour trouver vos vélos !</string>
@@ -87,6 +80,6 @@
     <string name="availability_hint_often">Vélos ou ancrages souvent hors service</string>
     <string name="availability_hint_veryoften">Vélos ou ancrages très souvent hors service</string>
     <string name="connectivity_rationale">#connexion internet requise pour la configuration initiale !</string>
-    <string name="onboarding_showcase_itinerary_favorite_text">Une dernière chose. Pour voir l\'itinéraire et une durée estimée plus précise dans Google Map, utilisez les boutons \'itinéraire\'. Puis pressez retour.</string>
+    <string name="onboarding_showcase_itinerary_favorite_text">Pour voir l\'itinéraire et une durée estimée plus précise dans Google Map, utilisez les boutons \'itinéraire\'. Puis pressez retour.</string>
     <string name="onboarding_showcase_itinerary_title">#dernier truc</string>
 </resources>
