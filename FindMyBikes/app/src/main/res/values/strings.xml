@@ -20,7 +20,7 @@
     <string name="downloading">#downloading data…</string>
     <string name="nextUpdate">Next update</string>
     <string name="no_connectivity">connected #not.</string>
-    <string name="refreshing">#refreshing map…</string>
+    <string name="refreshing_map">#refreshing map…</string>
     <string name="auto_download_failed">#download failed :/ Auto update paused.</string>
     <string name="google_maps_not_installed">Google Maps not installed !</string>
     <string name="searching_bike_network">#searching closest bike system on citybik.es…</string>
@@ -58,8 +58,6 @@
     <string name="auto_bike_select_found">#found your bike ! :)</string>
     <string name="auto_bike_select_none">#couldn\'t find any bike ! :s #selected closest station.</string>
     <string name="auto_bike_select_outdated">#outdated data ! :| #selected closest station.</string>
-    <string name="title_legal">#legal</string>
-    <string name="title_data">#data</string>
     <string name="twitter_not_closest_bike_data_format" translatable="false">%1$s bike is not closest! Bikes:%2$d %3$s at %4$s %5$s walk %6$s %7$s</string>
     <string name="twitter_closer_discarded_reply_data_format" translatable="false">%1$s discarded closer! Bikes:%2$d %3$s at %4$s %5$s</string>
     <string name="trip_details_share_message_content">I will be at the %1$s station %2$s in %3$s ! Shared via #findmybikes</string>
@@ -83,7 +81,7 @@
     <string name="onboarding_hint_search">#type any place name or address</string>
     <string name="hashtag_rate">#rate</string>
     <string name="hashtag_like">#like</string>
-    <string name="feedback">#feedback</string>
+    <string name="hashtag_feedback">#feedback</string>
     <string name="feedback_subject">I have something to say !</string>
     <string name="location_please">#pretty please :)</string>
     <string name="location_rationale">#\'location\' permission required to find your bikes !</string>

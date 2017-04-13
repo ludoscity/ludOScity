@@ -16,7 +16,7 @@
     <string name="favorite_removed">#favori supprimé</string>
     <string name="downloading">#téléchargement des données…</string>
     <string name="no_connectivity">#non connecté</string>
-    <string name="refreshing">#rafraîchissement de la carte…</string>
+    <string name="refreshing_map">#rafraîchissement de la carte…</string>
     <string name="auto_download_failed">#échec du téléchargement :/ Màj auto suspendue.</string>
     <string name="google_maps_not_installed">Google Maps non installé !</string>
     <string name="searching_bike_network">#recherche sur citybik.es du système le plus proche…</string>
@@ -44,7 +44,6 @@
     <string name="hello_city"><![CDATA[%1$s#bonjour <b>%2$s</b> !]]></string>
     <string name="hello_travel">#il semble que vous avez voyagé.\u0020</string>
     <string name="auto_bike_select_none">#aucun vélo localisé ! :s #station la plus proche sélectionnée.</string>
-    <string name="title_legal">#légal</string>
     <string name="appbar_title_postfix" />
     <string name="appbar_title_prefix">#vélocalise</string>
     <string name="appbar_subtitle_formatted"><![CDATA[<i>à %1$s</b>]]></string>
@@ -67,7 +66,7 @@
     <string name="onboarding_hint_tap_favorite_name">#cliquer nom pour définir destination, #glisser pour supprimer</string>
     <string name="onboarding_hint_search">#Tapez n\'importe quel nom de lieu ou adresse</string>
     <string name="auto_bike_select_outdated">#données périmées ! :| #station la plus proche sélectionnée.</string>
-    <string name="feedback">#rétroaction</string>
+    <string name="hashtag_feedback">#rétroaction</string>
     <string name="hashtag_like">#aimer</string>
     <string name="hashtag_rate">#noter</string>
     <string name="feedback_subject">J\'ai quelque chose à dire !</string>

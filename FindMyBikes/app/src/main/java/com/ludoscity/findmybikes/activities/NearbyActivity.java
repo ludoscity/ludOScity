@@ -2971,8 +2971,8 @@ public class NearbyActivity extends AppCompatActivity
         protected void onPreExecute() {
             super.onPreExecute();
 
-            mStatusTextView.setText(getString(R.string.refreshing));
-            mSplashScreenTextBottom.setText(getString(R.string.refreshing));
+            mStatusTextView.setText(getString(R.string.refreshing_map));
+            mSplashScreenTextBottom.setText(getString(R.string.refreshing_map));
             mStationMapFragment.hideAllStations();
         }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">#findmybikes</string>
     <string name="undo"><b>RÜCKGÄNGIG MACHEN</b></string>
     <string name="appbar_subtitle_formatted">&lt;i>in %1$s&lt;/b></string>
@@ -9,7 +9,7 @@
     <string name="favorite_added">#favorit hinzugefügt</string>
     <string name="favorite_removed">#favorit entfernt</string>
     <string name="favorites_sheet_header">Favoriten - &lt;b>%1$s&lt;/b></string>
-    <string name="feedback">#feedback</string>
+    <string name="hashtag_feedback">#feedback</string>
     <string name="feedback_subject">"Ich habe etwas zu sagen ! "</string>
     <string name="fromCitibik_es">von citybik.es</string>
     <string name="google_maps_not_installed">Google Maps nicht installiert !</string>
@@ -22,7 +22,6 @@
     <string name="locked">Eingesperrt</string>
     <string name="manual_download_failed">#Herunterladen fehlgeschlagen :/</string>
     <string name="hashtag_about">#Über</string>
-    <string name="menu_privacy">#Privatsphäre</string>
     <string name="hashtag_settings">#einstellungen</string>
     <string name="nextUpdate">Nächstes update</string>
     <string name="no_connectivity">nicht verbunden</string>
@@ -37,9 +36,47 @@
     <string name="onboarding_showcase_itinerary_title">#letzter Tipp</string>
     <string name="onboarding_showcase_search_text">Lass uns von A nach B fahren.\n\nDu hast keine Favoriten! Um loszulegen, klicken Sie auf die Suchschaltfläche und geben Sie einen Ortsnamen oder eine Adresse ein…</string>
     <string name="onboarding_showcase_search_title">#wo hin?</string>
-    <string name="onboarding_showcase_total_time_title">#Tipp 1/2</string>
+    <string name="onboarding_showcase_total_time_title" tools:ignore="TypographyFractions">#Tipp 1/2</string>
     <string name="auto_bike_select_found">#fand dein Rad ! :)</string>
     <string name="status_string">%1$s von citybik.es - %2$s</string>
     <string name="il_y_a">"Vor "</string>
     <string name="moments">Sekunden zuvor</string>
+    <string name="onboarding_showcase_total_time_text">"\nBam ! Sehen Sie Ihre Fahrradzeitschätzung Basierend auf %1$s ankerverfügbarkeit um %2$s…</string>
+    <string name="auto_bike_select_finding">#finden Sie Ihre Räder. Warten Sie mal…</string>
+    <string name="auto_bike_select_none">#konnte kein Rad finden ! :s #ausgewähltes nächstes Terminal.</string>
+    <string name="auto_bike_select_outdated">#veraltete Daten ! :| #ausgewähltes nächstes Terminal.</string>
+    <string name="auto_download_failed">#herunterladen fehlgeschlagen :/Automatische Aktualisierung pausiert</string>
+    <string name="b_tab_question">#wohin gehen wir heute ?</string>
+    <string name="connectivity_rationale">Internetverbindung für die Ersteinrichtung erforderlich !</string>
+    <string name="hashtag_privacy">#privatsphäre</string>
+    <string name="hashtag_notices">#anmerkungen</string>
+    <string name="hashtag_data">#daten</string>
+    <string name="hour_abbreviated">Std</string>
+    <string name="min_abbreviated">min</string>
+    <string name="pref_availability_settings_dialog_title">Verfügbarkeitseinstellungen</string>
+    <string name="pref_manual_refresh_mode">Automatische Aktualisierung</string>
+    <string name="pref_manual_refresh_mode_all">AN - Alle 5 minuten + zum Aktualisieren loslassen.</string>
+    <string name="pref_manual_refresh_mode_manual">\"AUS - nur zum Aktualisieren loslassen.\"</string>
+    <string name="pull_to_refresh">zum Aktualisieren loslassen</string>
+    <string name="refreshing_map">#karte aktualisieren…</string>
+    <string name="resume">WIEDER AUFNEHMEN</string>
+    <string name="retry">WIEDERHOLEN</string>
+    <string name="searching_bike_network">#suchen Sie das nächste System auf citibik.es</string>
+    <string name="searching_wait_location">#warten auf standort</string>
+    <string name="settings">EINSTELLUNGEN</string>
+    <string name="station_recap_bikes">#räder: %1$d</string>
+    <string name="availability_hint_never" />
+    <string name="availability_hint_often" />
+    <string name="availability_hint_sometime" />
+    <string name="availability_hint_veryoften" />
+    <string name="docks">#anker</string>
+    <string name="hashtag_rate">#bewerte</string>
+    <string name="hashtag_source">#quellcode</string>
+    <string name="such_short_trip">#du brauchst mich nicht für eine so kurze Reise ! ;)</string>
+    <string name="trip_details_share_message_content">Ich werde am %1$s Terminal %2$s sein in %3$s ! Geteilt über #findmybikes</string>
+    <string name="trip_details_share_title">Fahrzeit mit…</string>
+    <string name="appbar_title_postfix">bikes</string>
+    <string name="appbar_title_prefix">#findmy</string>
+    <string name="bike_network_change_message"><![CDATA[Ich habe Ihr Fahrrad-System nach <b>%1$s</b> gewechselt. Ich habe auch deine Favoriten für <i>%2$s</i> gespeichert.]]></string>
+    <string name="bike_network_found_message"><![CDATA[#fahrrad-System auf <b>%1$s</b> gesetzt. Ich werde es aktualisieren, wenn du reist.]]></string>
 </resources>
