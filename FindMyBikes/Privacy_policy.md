@@ -3,7 +3,7 @@ Version française disponible : https://github.com/f8full/ludOScity/blob/master/
 ### This section applies to all versions of Android
 # #findmybikes does not collect nor use any personal information.
 
-**A note on identifiable information : By itself, a station name (the default name for a new favorite) doesn't say anything about you.
+**A note on identifiable information : By itself, a station name doesn't say anything about you.
 But if you rename one of your favorite, let's say 'Home',
 then the information becomes identifiable as it carries meaning that reveals a personal information.**
 
@@ -15,7 +15,7 @@ This non personal and freeform information is limited to :
 - A **collection of station id** (as provided by citibik.es API) corresponding to your most recent favorites list
 for each bike networks you've used #findmybikes with. NON IDENTIFIABLE
 - A **collection of character strings** (text), corresponding to the personalized name, if any, you gave to each individual favorite in your most recent favorites
-list for each bike networks you've used the #findmybikes with. POTENTIALLY IDENTIFIABLE (not with default favorites names).
+list for each bike networks you've used the #findmybikes with. POTENTIALLY IDENTIFIABLE
 
 The only use of this data is to restore your favorites after a factory reset or upgrade to a new phone (favorites restoration). This policy makes you aware that Google maintains this data outside of reach
 of #findmybikes developer. Google routinely respond to well formed legal requests. You can consult Google's transparency report at
@@ -40,7 +40,7 @@ This non personal and non identifiable information is limited to :
 <br>If relevant, #findmybikes also additionally collects :
 - A **collection of station id** (as provided by citybik.es API) for each station that were closer than the selected one but **COULD NOT** provide you service either
 
-### This public open data is published immediately on the Twitter platform
+### This public open data is published immediately on the Twitter platform on a dedicated account :
 # [@findmybikesdata]
 
 

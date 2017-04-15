@@ -1,7 +1,7 @@
 ### Cette section s'applique à toutes les versions d'Android
 # #vélocalise (#findmybikes) ne collecte ni ne traite aucune donnée personnelle.
 
-**Note sur l'identifiabilité d'une donnée : En soi, le nom d'une station (le nom par défaut d'un nouveau favori) ne révèle rien sur vous.
+**Note sur l'identifiabilité d'une donnée : En soi, le nom d'une station ne révèle rien sur vous.
 Par contre, si vous renommez l'un de vos favoris, disons 'Maison', alors la donnée devient identifiable car elle porte un sens qui révèle une donnée personnelle.**
 
 
@@ -11,7 +11,7 @@ Ces données non personnelles et de forme libre sont limitées à :
 - Le **nom et l'identifiant** (tels que fournis par l'API citybik.es) de chaque système de vélos que vous avez utilisé via #vélocalise (#findmybikes). NON IDENTIFIABLE
 - Une **collection d'identifiants de station** (tels que fournis par l'API citibik.es) correspondant à votre plus récente liste de favoris pour chaque système de vélos que vous avez utilisé via #vélocalise (#findmybikes) NON IDENTIFIABLE
 - Une **collection de chaînes de caractères** (texte), correspondant au nom personnalisé, le cas échéant, que vous avez donné à chacun de vos favoris dans votre plus récente liste de favoris pour chaque système de vélo en libre service que vous avez utilisé via #vélocalise (#findmybikes)
-POTENTIELLEMENT IDENTIFIABLE (pas avec le nom par défaut des favoris).
+POTENTIELLEMENT IDENTIFIABLE
 
 Le seul traitement de ces données est la restauration de vos favoris après une réinitialisation d'usine ou la mise à jour vers un nouveau téléphone (restauration des favoris). Cette politique vous fait savoir que Google maintient ces données hors de portée du développeur de #vélocalise (#findmybikes). Google répond fréquemment aux requêtes judiciaires normalement constituées.
 Vous pouvez consulter le rapport de transparence de Google à
@@ -36,7 +36,7 @@ Ces données non personnelles et non identifiables sont limitées à :
 <br>Si pertinent, #vélocalise (#findmybikes) collecte également :
 - Une **collection d'identifiants de station** (tels que fournis par l'API citybik.es) pour les stations plus proches que celle sélectionnée mais qui **N'ÉTAIENT PAS EN MESURE** de vous fournir le service non plus
 
-### Ces données ouvertes publiques sont immédiatement publiées sur la plateforme Twitter
+### Ces données ouvertes publiques sont immédiatement publiées sur la plateforme Twitter via un compte dédié :
 # [@findmybikesdata]
 
 
