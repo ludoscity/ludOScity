@@ -1020,7 +1020,7 @@ public class NearbyActivity extends AppCompatActivity
                                         break;
                                     case 1:
                                         intent = new Intent(Intent.ACTION_VIEW);
-                                        intent.setData(Uri.parse("market://details?id="+getPackageName()));
+                                        intent.setData(Uri.parse("market://details?id=com.ludoscity.findmybikes"));
                                         if (intent.resolveActivity(getPackageManager()) != null) {
                                             startActivity(intent);
                                         }
