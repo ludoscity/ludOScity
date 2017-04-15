@@ -16,7 +16,7 @@
     <string name="favorite_removed">#favori supprimé</string>
     <string name="downloading">#téléchargement des données…</string>
     <string name="no_connectivity">#non connecté</string>
-    <string name="refreshing_map">#rafraîchissement de la carte…</string>
+    <string name="refreshing_map">#actualisation de la carte…</string>
     <string name="auto_download_failed">#échec du téléchargement :/ Màj auto suspendue.</string>
     <string name="google_maps_not_installed">Google Maps non installé !</string>
     <string name="searching_bike_network">#recherche sur citybik.es du système le plus proche…</string>
@@ -24,12 +24,12 @@
     <string name="searching_wait_location">#attente de localisation…</string>
     <string name="bike_network_change_message"><![CDATA[J\'ai changé votre système de vélo pour <b>%1$s</b>.<br />J\'ai aussi sauvegardé vos favoris pour <i>%2$s</i>.]]></string>
     <string name="locked">Verrouillée</string>
-    <string name="pull_to_refresh">Tirer pour rafraîchir</string>
+    <string name="pull_to_refresh">Tirer pour actualiser</string>
     <string name="status_string">%1$s de citybik.es - %2$s</string>
     <string name="il_y_a">"Il y a "</string>
     <string name="pref_manual_refresh_mode">Rafraîchissement automatique</string>
-    <string name="pref_manual_refresh_mode_all">ON - Toutes les 5 minutes + tirer pour rafraîchir.</string>
-    <string name="pref_manual_refresh_mode_manual">OFF - Tirer pour rafraîchir seulement.</string>
+    <string name="pref_manual_refresh_mode_all">ON - Toutes les 5 minutes + tirer pour actualiser.</string>
+    <string name="pref_manual_refresh_mode_manual">OFF - Tirer pour actualiser seulement.</string>
     <string name="hour_abbreviated">h</string>
     <string name="undo"><b>ANNULER</b></string>
     <string name="no_favorite">Aucun favori pour &lt;b>%1$s&lt;/b></string>
@@ -64,8 +64,8 @@
     <string name="onboarding_hint_main_choice">#ouvrir favoris, utiliser recherche, ou cliquer une station</string>
     <string name="onboarding_hint_main_choice_no_connectivity">#ouvrir favoris ou cliquer une station</string>
     <string name="onboarding_hint_tap_favorite_name">#cliquer nom pour définir destination, #glisser pour supprimer</string>
-    <string name="onboarding_hint_search">#Tapez n\'importe quel nom de lieu ou adresse</string>
-    <string name="auto_bike_select_outdated">#données périmées ! :| #station la plus proche sélectionnée.</string>
+    <string name="onboarding_hint_search">#tapez n\'importe quel nom de lieu ou adresse</string>
+    <string name="auto_bike_select_outdated">#données obsolètes ! :| #station la plus proche sélectionnée.</string>
     <string name="hashtag_feedback">#rétroaction</string>
     <string name="hashtag_like">#aimer</string>
     <string name="hashtag_rate">#noter</string>
