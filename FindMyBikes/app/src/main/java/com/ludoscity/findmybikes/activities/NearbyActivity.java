@@ -1062,7 +1062,7 @@ public class NearbyActivity extends AppCompatActivity
                                     case 5:
                                         intent = new Intent(NearbyActivity.this, WebViewActivity.class);
                                         intent.putExtra(WebViewActivity.EXTRA_URL, "file:///android_res/raw/privacy_policy.html");
-                                        intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, getString(R.string.privacy));
+                                        intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, getString(R.string.hashtag_privacy));
                                         startActivity(intent);
                                         break;
                                     case 6:
@@ -1801,7 +1801,7 @@ public class NearbyActivity extends AppCompatActivity
                         // use the android system webview
                         Intent intent = new Intent(NearbyActivity.this, WebViewActivity.class);
                         intent.putExtra(WebViewActivity.EXTRA_URL, "http://www.citybik.es");
-                        intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, getString(R.string.cities));
+                        intent.putExtra(WebViewActivity.EXTRA_ACTIONBAR_SUBTITLE, getString(R.string.hashtag_cities));
                         intent.putExtra(WebViewActivity.EXTRA_JAVASCRIPT_ENABLED, true);
                         startActivity(intent);
                     }
@@ -2971,8 +2971,8 @@ public class NearbyActivity extends AppCompatActivity
         protected void onPreExecute() {
             super.onPreExecute();
 
-            mStatusTextView.setText(getString(R.string.refreshing));
-            mSplashScreenTextBottom.setText(getString(R.string.refreshing));
+            mStatusTextView.setText(getString(R.string.refreshing_map));
+            mSplashScreenTextBottom.setText(getString(R.string.refreshing_map));
             mStationMapFragment.hideAllStations();
         }
 

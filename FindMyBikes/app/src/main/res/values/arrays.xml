@@ -2,13 +2,13 @@
 <resources>
     <string-array
         name="about_dialog_items">
-        <item>@string/cities</item>
-        <item>@string/rate</item>
-        <item>@string/like</item>
-        <item>@string/feedback</item>
-        <item>@string/title_legal</item>
-        <item>@string/privacy</item>
-        <item>@string/data</item>
-        <item>@string/source_code</item>
+        <item>@string/hashtag_cities</item>
+        <item>@string/hashtag_rate</item>
+        <item>@string/hashtag_like</item>
+        <item>@string/hashtag_feedback</item>
+        <item>@string/hashtag_notices</item>
+        <item>@string/hashtag_privacy</item>
+        <item>@string/hashtag_data</item>
+        <item>@string/hashtag_source</item>
     </string-array>
 </resources>
