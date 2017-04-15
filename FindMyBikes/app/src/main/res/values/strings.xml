@@ -3,7 +3,7 @@
     <string name="appbar_title_formatting" translatable="false">%1$s&lt;u>%2$s&lt;/u>%3$s</string>
     <string name="appbar_title_prefix">#findmy</string>
     <string name="appbar_title_postfix">bikes</string>
-    <string name="appbar_subtitle_formatted">&lt;i>in %1$s&lt;/b></string>
+    <string name="appbar_subtitle_formatted">&lt;i>in %1$s&lt;/i></string>
     <string name="favorites_sheet_header">Favorites - &lt;b>%1$s&lt;/b></string>
     <string name="hashtag_settings">#settings</string>
     <string name="hashtag_about">#about</string>
@@ -19,11 +19,11 @@
     <string name="station_recap_bikes">#bikes: %1$d</string>
     <string name="downloading">#downloading data…</string>
     <string name="nextUpdate">Next update</string>
-    <string name="no_connectivity">connected #not.</string>
+    <string name="no_connectivity">connected #not</string>
     <string name="refreshing_map">#refreshing map…</string>
     <string name="auto_download_failed">#download failed :/ Auto update paused.</string>
     <string name="google_maps_not_installed">Google Maps not installed !</string>
-    <string name="searching_bike_network">#searching closest bike system on citybik.es…</string>
+    <string name="searching_bike_network">#searching nearest bike system on citybik.es…</string>
     <string name="bike_network_found_message"><![CDATA[#bike system been set to <b>%1$s</b>.<br />I\'ll update it if you travel.]]></string>
     <string name="searching_wait_location">#waiting on location…</string>
     <string name="hello_city"><![CDATA[%1$s#hello <b>%2$s</b> !]]></string>
@@ -33,7 +33,7 @@
     <string name="locked">Locked</string>
     <string name="pull_to_refresh">Pull to refresh</string>
     <string name="status_string">%1$s ago from citybik.es - %2$s</string>
-    <string name="il_y_a">""</string>
+    <string name="il_y_a" />
     <string name="pref_availability_settings_dialog_title">Availability settings</string>
     <string name="pref_availability_cri_min_label" translatable="false">%1$d -- </string>
     <string name="pref_availability_bad_min_label" translatable="false">@string/pref_availability_cri_min_label</string>
@@ -56,8 +56,8 @@
     <string name="resume">RESUME</string>
     <string name="auto_bike_select_finding">#finding your bikes. Hang tight…</string>
     <string name="auto_bike_select_found">#found your bike ! :)</string>
-    <string name="auto_bike_select_none">#couldn\'t find any bike ! :s #selected closest station.</string>
-    <string name="auto_bike_select_outdated">#outdated data ! :| #selected closest station.</string>
+    <string name="auto_bike_select_none">#couldn\'t find any bike ! :s #selected nearest station.</string>
+    <string name="auto_bike_select_outdated">#obsolete data ! :| #selected nearest station.</string>
     <string name="twitter_not_closest_bike_data_format" translatable="false">%1$s bike is not closest! Bikes:%2$d %3$s at %4$s %5$s walk %6$s %7$s</string>
     <string name="twitter_closer_discarded_reply_data_format" translatable="false">%1$s discarded closer! Bikes:%2$d %3$s at %4$s %5$s</string>
     <string name="trip_details_share_message_content">I will be at the %1$s station %2$s in %3$s ! Shared via #findmybikes</string>
@@ -72,7 +72,7 @@
     <string name="onboarding_showcase_search_title">#where to ?</string>
     <string name="onboarding_showcase_search_text">Let\'s bike from A to B.\n\nYou have no favorites ! To get started, tap the search button and enter a place name or address…</string>
     <string name="onboarding_showcase_total_time_title" tools:ignore="TypographyFractions">#tip 1/2</string>
-    <string name="onboarding_showcase_total_time_text">"\nBam ! View your trip time estimate based on %1$s dock availability around %2$s…</string>
+    <string name="onboarding_showcase_total_time_text">\nBam ! View your trip time estimate based on %1$s dock availability around %2$s…</string>
     <string name="onboarding_showcase_add_favorite_title" tools:ignore="TypographyFractions">#tip 2/2</string>
     <string name="onboarding_showcase_add_favorite_text">\nAlmost done ! Add a favorite by tapping this heart shaped button.</string>
     <string name="onboarding_hint_main_choice">#open favorites, use search, or tap station</string>
@@ -94,5 +94,5 @@
     <string name="availability_hint_veryoften">Bikes or docks are very often broken</string>
     <string name="connectivity_rationale">#internet connection required for initial setup !</string>
     <string name="onboarding_showcase_itinerary_title">#last tip</string>
-    <string name="onboarding_showcase_itinerary_favorite_text">To view your itinerary and a more precise time estimate in Google Map, use the \'directions\' buttons. Press back when done.</string>
+    <string name="onboarding_showcase_itinerary_favorite_text">To view your itinerary and a more precise time estimate in Google Maps, use the \'directions\' buttons. Press back when done.</string>
 </resources>

@@ -27,7 +27,7 @@
     <string name="pull_to_refresh">Tirer pour actualiser</string>
     <string name="status_string">%1$s de citybik.es - %2$s</string>
     <string name="il_y_a">"Il y a "</string>
-    <string name="pref_manual_refresh_mode">Rafraîchissement automatique</string>
+    <string name="pref_manual_refresh_mode">Actualisation automatique</string>
     <string name="pref_manual_refresh_mode_all">ON - Toutes les 5 minutes + tirer pour actualiser.</string>
     <string name="pref_manual_refresh_mode_manual">OFF - Tirer pour actualiser seulement.</string>
     <string name="hour_abbreviated">h</string>
@@ -46,7 +46,7 @@
     <string name="auto_bike_select_none">#aucun vélo localisé ! :s #station la plus proche sélectionnée.</string>
     <string name="appbar_title_postfix" />
     <string name="appbar_title_prefix">#vélocalise</string>
-    <string name="appbar_subtitle_formatted"><![CDATA[<i>à %1$s</b>]]></string>
+    <string name="appbar_subtitle_formatted"><![CDATA[<i>à %1$s</i>]]></string>
     <string name="hashtag_privacy">#confidentialité</string>
     <string name="hashtag_data">#données</string>
     <string name="hashtag_source">#source</string>
@@ -79,6 +79,6 @@
     <string name="availability_hint_often">Vélos ou ancrages souvent hors service</string>
     <string name="availability_hint_veryoften">Vélos ou ancrages très souvent hors service</string>
     <string name="connectivity_rationale">#connexion internet requise pour la configuration initiale !</string>
-    <string name="onboarding_showcase_itinerary_favorite_text">Pour voir l\'itinéraire et une durée estimée plus précise dans Google Map, utilisez les boutons \'itinéraire\'. Puis pressez retour.</string>
+    <string name="onboarding_showcase_itinerary_favorite_text">Pour voir l\'itinéraire et une durée estimée plus précise dans Google Maps, utilisez les boutons \'itinéraire\'. Puis pressez retour.</string>
     <string name="onboarding_showcase_itinerary_title">#dernier truc</string>
 </resources>

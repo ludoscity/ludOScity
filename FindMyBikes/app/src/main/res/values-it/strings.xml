@@ -23,12 +23,12 @@
     <string name="hashtag_source">#codice sorgente</string>
     <string name="hello_travel">#sembra che tu hai viaggiato</string>
     <string name="hour_abbreviated">h</string>
-    <string name="il_y_a">\"\"</string>
+    <string name="il_y_a" />
     <string name="status_string">%1$s fa di citybik.es - %2$s</string>
     <string name="such_short_trip">Non bisogno di me per un tragitto così corto! ;)</string>
     <string name="trip_details_share_title">Dividere durata del tragitto con…</string>
     <string name="undo"><b>ANNULLARE</b></string>
-    <string name="appbar_subtitle_formatted">&lt;i>a %1$s&lt;/b></string>
+    <string name="appbar_subtitle_formatted">&lt;i>a %1$s&lt;/i></string>
     <string name="appbar_title_postfix">bikes</string>
     <string name="appbar_title_prefix">#findmy</string>
     <string name="auto_bike_select_finding">#localizzazione delle vostre bici. Un momento…</string>
@@ -53,14 +53,14 @@
     <string name="onboarding_showcase_itinerary_title">#ultimo soffiata</string>
     <string name="onboarding_showcase_add_favorite_text">\nQuasi fatto ! Aggiungere un preferito, cliccando su questo pulsante a forma di cuore.</string>
     <string name="onboarding_showcase_search_text">Andiamo da A a B\n\nNon avete favorito ! Per iniziare, clic sul pulsante di ricerca e qualsiasi luogo o indirizzo…</string>
-    <string name="onboarding_showcase_total_time_text">"\nBam ! Vedi il tuo tempo di stima viaggio in base alla disponibilità posti %1$s intorno %2$s…</string>
+    <string name="onboarding_showcase_total_time_text">\nBam ! Vedi il tuo tempo di stima viaggio in base alla disponibilità posti %1$s intorno %2$s…</string>
     <string name="location_please">#per favore :)</string>
     <string name="location_rationale">#autorizzazione \'posizione\' necessaria per trovare le bici !</string>
-    <string name="location_turn_on">#posizione necessaria per trovare le bici !</string>
+    <string name="location_turn_on">#posizione servizio necessaria per trovare le bici !</string>
     <string name="locked">Chiusa</string>
     <string name="manual_download_failed">#scaricamento non riuscito :/</string>
     <string name="min_abbreviated">min</string>
-    <string name="moments">Al momento</string>
+    <string name="moments">Instanti</string>
     <string name="nextUpdate">prossimo aggiornamento</string>
     <string name="no_connectivity">#non collegata</string>
     <string name="no_favorite">Nessun favoriti per &lt;b>%1$s&lt;/b></string>
@@ -73,6 +73,10 @@
     <string name="onboarding_hint_main_choice_no_connectivity">#apri preferiti o cliccare stazione</string>
     <string name="onboarding_hint_search">#qualsiasi luogo o indirizzo</string>
     <string name="onboarding_hint_tap_favorite_name">#clic nome definire destinazione, sfiora per eliminare.</string>
-    <string name="onboarding_showcase_itinerary_favorite_text">per visualizzare il vostro itinerario e una stima del tempo più preciso in Google Map, utilizzare i pulsanti \'indicazioni\'. Premere indietro quando fatto.</string>
+    <string name="onboarding_showcase_itinerary_favorite_text">per visualizzare il vostro itinerario e una stima del tempo più preciso in Google Maps, utilizzare i pulsanti \'indicazioni\'. Premere indietro quando fatto.</string>
     <string name="trip_details_share_message_content">Sarò alla stazione %1$s %2$s in 3 %3$s ! Condiviso da #findmybikes</string>
+    <string name="availability_hint_never" />
+    <string name="availability_hint_often" />
+    <string name="availability_hint_sometime" />
+    <string name="availability_hint_veryoften" />
 </resources>
