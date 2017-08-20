@@ -30,7 +30,12 @@
     <dimen name="map_infowindow_padding">20dp</dimen>
     <dimen name="camera_search_infowindow_padding">60dp</dimen>
 
-    <dimen name="trip_details_widget_width">134dp</dimen>
+    <dimen name="trip_details_widget_width">122dp</dimen>
+    <dimen name="navigation_drawer_width">240dp</dimen>
+    <dimen name="trip_details_widget_marginStart">3dp</dimen>
+    <dimen name="trip_details_widget_marginLeft">3dp</dimen>
+    <dimen name="trip_details_widget_marginEnd">3dp</dimen>
+    <dimen name="trip_details_widget_marginRight">3dp</dimen>
     <dimen name="trip_details_widget_paddingTop">0dp</dimen>
     <dimen name="trip_details_widget_paddingBottom">0dp</dimen>
     <dimen name="trip_details_widget_paddingStart">0dp</dimen>
@@ -48,11 +53,6 @@
     <!--So I want it offset by half its width minus any padding I wannna put in there
     //40/2 - 4 = 20 - 4 = 16.-->
     <dimen name="station_availability_margin_left_selected">16dp</dimen>
-
-    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
-         https://developer.android.com/design/patterns/navigation-drawer.html -->
-    <dimen name="navigation_drawer_width">240dp</dimen>
-
 
 
 </resources>

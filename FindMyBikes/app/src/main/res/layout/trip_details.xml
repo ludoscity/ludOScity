@@ -2,289 +2,287 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/trip_details"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:id="@+id/trip_details"
     android:visibility="invisible"
-
-    android:clickable="true"
-    > <!-- clickable so that map markers underneath don't get clicked-->
+    android:clickable="true"> <!-- clickable so that map markers underneath don't get clicked-->
     <RelativeLayout
 
         android:layout_width="@dimen/trip_details_widget_width"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/trip_details_widget_paddingTop"
         android:paddingBottom="@dimen/trip_details_widget_paddingBottom"
-        android:paddingStart="@dimen/trip_details_widget_paddingStart"
         android:paddingEnd="@dimen/trip_details_widget_paddingEnd"
-        android:paddingRight="@dimen/trip_details_widget_paddingEnd"
         android:paddingLeft="@dimen/trip_details_widget_paddingStart"
+        android:paddingRight="@dimen/trip_details_widget_paddingEnd"
+        android:paddingStart="@dimen/trip_details_widget_paddingStart"
+        android:layout_marginStart="@dimen/trip_details_widget_marginStart"
+        android:layout_marginLeft="@dimen/trip_details_widget_marginLeft"
+        android:layout_marginEnd="@dimen/trip_details_widget_marginEnd"
+        android:layout_marginRight="@dimen/trip_details_widget_marginRight"
+        android:paddingTop="@dimen/trip_details_widget_paddingTop"
         android:background="@color/theme_window_background">
 
         <RelativeLayout
-            android:layout_width="wrap_content"
             android:id="@+id/trip_details_loc_to_a"
-
+            android:layout_width="wrap_content"
             style="@style/trip_details_row">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/trip_details_from_loc"
                 style="@style/trip_details_row_imageview_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                app:srcCompat="@drawable/ic_my_location_24dp_black_blue"/>
+                app:srcCompat="@drawable/ic_my_location_24dp_black_blue" />
 
             <!--TODO: Use rounded ImageButton instead of those convenient but costly fabs -->
             <android.support.design.widget.FloatingActionButton
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/trip_details_directions_loc_to_a"
+                style="@style/listitem_floating_action_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/trip_details_from_loc"
                 android:layout_toRightOf="@id/trip_details_from_loc"
                 android:clickable="true"
-                app:srcCompat="@drawable/ic_action_maps_directions_and_walk_24dp"
 
-                app:fabSize="mini"
                 app:backgroundTint="@color/theme_primary_dark"
+                app:fabSize="mini"
 
-                style="@style/listitem_floating_action_button"
-                />
+                app:srcCompat="@drawable/ic_action_maps_directions_and_walk_24dp" />
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/trip_details_to_pin_a"
                 style="@style/trip_details_row_imageview_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/trip_details_directions_loc_to_a"
                 android:layout_toEndOf="@id/trip_details_directions_loc_to_a"
                 android:layout_toRightOf="@id/trip_details_directions_loc_to_a"
-                android:layout_alignBottom="@id/trip_details_directions_loc_to_a"
-                app:srcCompat="@drawable/ic_pin_a_24dp_black"/>
+                app:srcCompat="@drawable/ic_pin_a_24dp_black" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/trip_details_proximity_a"
-                android:layout_toEndOf="@id/trip_details_to_pin_a"
-                android:layout_toRightOf="@id/trip_details_to_pin_a"
-                android:layout_centerVertical="true"
-                android:fontFamily="droid-sans-mono"
-                android:textSize="12sp"
-                android:text="~XXmin"
-                />
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:fontFamily="droid-sans-mono"
+                android:text="~XXmin"
+                android:textSize="12sp" />
+
+            <!--<TextView
                 android:id="@+id/trip_details_dummy_plus_sign"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:fontFamily="droid-sans-mono"
-                android:textStyle="bold"
-                android:textSize="22sp"
-                android:layout_marginStart="4dp"
                 android:layout_marginLeft="4dp"
-                android:text="+"
+                android:layout_marginStart="4dp"
+                android:fontFamily="droid-sans-mono"
+                android:text=" "
                 android:textColor="@color/theme_textcolor_primary"
-                />
+                android:textSize="22sp"
+                android:textStyle="bold" />-->
 
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_width="wrap_content"
             android:id="@+id/trip_details_a_to_b"
-            android:layout_below="@id/trip_details_loc_to_a"
-            style="@style/trip_details_row">
+            style="@style/trip_details_row"
+            android:layout_width="wrap_content"
+            android:layout_below="@id/trip_details_loc_to_a">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/trip_details_from_pin_a"
                 style="@style/trip_details_row_imageview_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                app:srcCompat="@drawable/ic_pin_a_24dp_black"/>
+                app:srcCompat="@drawable/ic_pin_a_24dp_black" />
 
             <!--TODO: Use rounded ImageButton instead of those convenient but costly fabs -->
             <android.support.design.widget.FloatingActionButton
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/trip_details_directions_a_to_b"
+                style="@style/listitem_floating_action_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/trip_details_from_pin_a"
                 android:layout_toRightOf="@id/trip_details_from_pin_a"
                 android:clickable="true"
-                app:srcCompat="@drawable/ic_action_maps_directions_and_bike_24dp"
+                android:focusable="true"
 
-                app:fabSize="mini"
                 app:backgroundTint="@color/theme_primary_dark"
+                app:fabSize="mini"
 
-                style="@style/listitem_floating_action_button"
-                />
+                app:srcCompat="@drawable/ic_action_maps_directions_and_bike_24dp" />
 
             <ImageView
+                android:id="@+id/trip_details_to_pin_b"
+                style="@style/trip_details_row_imageview_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/trip_details_row_imageview_end"
-                android:id="@+id/trip_details_to_pin_b"
+                android:layout_alignBottom="@id/trip_details_directions_a_to_b"
                 android:layout_toEndOf="@id/trip_details_directions_a_to_b"
                 android:layout_toRightOf="@id/trip_details_directions_a_to_b"
-                android:layout_alignBottom="@id/trip_details_directions_a_to_b"
-                app:srcCompat="@drawable/ic_pin_b_24dp_black"/>
+                app:srcCompat="@drawable/ic_pin_b_24dp_black" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/trip_details_proximity_b"
-                android:layout_toEndOf="@id/trip_details_to_pin_b"
-                android:layout_toRightOf="@id/trip_details_to_pin_b"
-                android:layout_centerVertical="true"
-                android:fontFamily="droid-sans-mono"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:text="~XXmin"
-                />
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:fontFamily="droid-sans-mono"
+                android:text="~XXmin"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!--<TextView
                 android:id="@+id/trip_details_a_to_b_plus_sign"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:fontFamily="droid-sans-mono"
-                android:textStyle="bold"
-                android:textSize="22sp"
-                android:layout_marginStart="3.5dp"
                 android:layout_marginLeft="3.5dp"
-                android:text="+"
-                />
+                android:layout_marginStart="3.5dp"
+                android:fontFamily="droid-sans-mono"
+                android:text=" "
+                android:textSize="22sp"
+                android:textStyle="bold" />-->
 
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_width="wrap_content"
             android:id="@+id/trip_details_b_to_search"
-            android:layout_below="@id/trip_details_a_to_b"
-            style="@style/trip_details_row">
+            style="@style/trip_details_row"
+            android:layout_width="wrap_content"
+            android:layout_below="@id/trip_details_a_to_b">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/trip_details_from_pin_b"
                 style="@style/trip_details_row_imageview_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                app:srcCompat="@drawable/ic_pin_b_24dp_black"/>
+                app:srcCompat="@drawable/ic_pin_b_24dp_black" />
 
             <!--TODO: Use rounded ImageButton instead of those convenient but costly fabs -->
             <android.support.design.widget.FloatingActionButton
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
                 android:id="@+id/trip_details_directions_b_to_destination"
+                style="@style/listitem_floating_action_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/trip_details_from_pin_b"
                 android:layout_toRightOf="@id/trip_details_from_pin_b"
                 android:clickable="true"
-                app:srcCompat="@drawable/ic_action_maps_directions_and_walk_24dp"
+                android:focusable="true"
 
-                app:fabSize="mini"
                 app:backgroundTint="@color/theme_primary_dark"
+                app:fabSize="mini"
 
-                style="@style/listitem_floating_action_button"
-                />
+                app:srcCompat="@drawable/ic_action_maps_directions_and_walk_24dp" />
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/trip_details_row_imageview_end"
                 android:id="@+id/trip_details_to_search"
-                android:layout_toEndOf="@id/trip_details_directions_b_to_destination"
-                android:layout_toRightOf="@id/trip_details_directions_b_to_destination"
-                android:layout_alignBottom="@id/trip_details_directions_b_to_destination"
-                app:srcCompat="@drawable/ic_pin_search_24dp_black"/>
-            <ImageView
+                style="@style/trip_details_row_imageview_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/trip_details_row_imageview_end"
-                android:id="@+id/trip_details_to_favorite"
+                android:layout_alignBottom="@id/trip_details_directions_b_to_destination"
                 android:layout_toEndOf="@id/trip_details_directions_b_to_destination"
                 android:layout_toRightOf="@id/trip_details_directions_b_to_destination"
+                app:srcCompat="@drawable/ic_pin_search_24dp_black" />
+
+            <ImageView
+                android:id="@+id/trip_details_to_favorite"
+                style="@style/trip_details_row_imageview_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignBottom="@id/trip_details_directions_b_to_destination"
-                app:srcCompat="@drawable/ic_pin_favorite_24dp_black"/>
+                android:layout_toEndOf="@id/trip_details_directions_b_to_destination"
+                android:layout_toRightOf="@id/trip_details_directions_b_to_destination"
+                app:srcCompat="@drawable/ic_pin_favorite_24dp_black" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/trip_details_proximity_search"
-                android:layout_toEndOf="@id/trip_details_to_search"
-                android:layout_toRightOf="@id/trip_details_to_search"
-                android:layout_centerVertical="true"
-                android:fontFamily="droid-sans-mono"
-                android:textSize="12sp"
-                android:text="~XXmin"
-                />
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:fontFamily="droid-sans-mono"
+                android:text="~XXmin"
+                android:textSize="12sp" />
+
+            <!--<TextView
                 android:id="@+id/trip_details_b_to_search_plus_sign"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:fontFamily="droid-sans-mono"
-                android:textStyle="bold"
-                android:textSize="22sp"
-                android:layout_marginStart="4dp"
                 android:layout_marginLeft="4dp"
-                android:text="+"
-                />
+                android:layout_marginStart="4dp"
+                android:fontFamily="droid-sans-mono"
+                android:text=" "
+                android:textSize="22sp"
+                android:textStyle="bold" /> -->
 
         </RelativeLayout>
 
         <FrameLayout
+            android:id="@+id/trip_details_sum_separator"
+            style="@style/trip_details_sum_separator"
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:id="@+id/trip_details_sum_separator"
             android:layout_below="@id/trip_details_b_to_search"
-            style="@style/trip_details_sum_separator"
 
-            android:background="@color/background_dark"/>
+            android:background="@color/background_dark" />
 
         <!--TODO: Use rounded ImageButton instead of those convenient but costly fabs -->
         <android.support.design.widget.FloatingActionButton
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/trip_details_share"
+            style="@style/listitem_floating_action_button"
+            android:layout_width="wrap_content"
 
-            android:layout_below="@id/trip_details_sum_separator"
+            android:layout_height="wrap_content"
             android:layout_alignLeft="@id/trip_details_sum_separator"
             android:layout_alignStart="@id/trip_details_sum_separator"
 
 
+            android:layout_below="@id/trip_details_sum_separator"
             android:clickable="true"
-            app:srcCompat="@drawable/ic_action_share_24dp"
+            android:focusable="true"
+            android:visibility="invisible"
 
-            app:fabSize="mini"
             app:backgroundTint="@color/theme_primary_dark"
+            app:fabSize="mini"
 
-            style="@style/listitem_floating_action_button"
-            />
+            app:srcCompat="@drawable/ic_action_share_24dp" />
 
         <RelativeLayout
+            android:id="@+id/trip_details_total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@id/trip_details_sum_separator"
-            android:layout_alignRight="@id/trip_details_sum_separator"
             android:layout_alignBottom="@id/trip_details_share"
+            android:layout_alignEnd="@id/trip_details_sum_separator"
 
-            android:id="@+id/trip_details_total">
+            android:layout_alignRight="@id/trip_details_sum_separator">
 
             <TextView
+                android:id="@+id/trip_details_proximity_total"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/trip_details_proximity_total"
-                android:textStyle="bold"
                 android:fontFamily="droid-sans-mono"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:text="~XXmin"
-                />
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold" />
 
-            <TextView
+            <!--<TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/trip_details_proximity_total"
@@ -292,8 +290,8 @@
                 android:fontFamily="droid-sans-mono"
                 android:textStyle="bold"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:text="="
-                />
+                android:text=" "
+                /> -->
         </RelativeLayout>
     </RelativeLayout>
 </android.support.v7.widget.CardView>
